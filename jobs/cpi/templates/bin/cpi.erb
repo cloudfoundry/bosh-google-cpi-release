@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Set directories
+PACKAGES_DIR=${BOSH_PACKAGES_DIR:-/var/vcap/packages}
+JOBS_DIR=${BOSH_JOBS_DIR:-/var/vcap/jobs}
+LOGS_DIR=/var/vcap/sys/log
+
+# Invoke CPI
+cmd="${PACKAGES_DIR}/bosh-google-cpi/bin/cpi -configPath=${JOBS_DIR}/cpi/config/cpi.json"
+if [ -d ${LOGS_DIR} ]; then
+  exec $cmd 2>>${LOGS_DIR}/cpi/cpi.stderr.log <&0
+else
+  exec $cmd <&0
+fi

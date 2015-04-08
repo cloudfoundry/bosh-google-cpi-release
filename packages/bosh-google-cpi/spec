@@ -1,0 +1,6 @@
+---
+name: bosh-google-cpi
+dependencies:
+  - golang1.4
+files:
+  - bosh-google-cpi/**/*

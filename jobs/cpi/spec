@@ -1,0 +1,48 @@
+---
+name: cpi
+
+packages:
+  - bosh-google-cpi
+
+templates:
+  bin/cpi.erb: bin/cpi
+  config/cpi.json.erb: config/cpi.json
+
+properties:
+  cpi.google.project:
+    description: "Google Compute Engine project"
+  cpi.google.json_key:
+    description: "Google Compute Engine JSON key"
+  cpi.google.default_zone:
+    description: "Google Compute Engine default Zone"
+  cpi.google.access_key_id:
+    description: "Google Cloud Storage access key id"
+  cpi.google.secret_access_key:
+    description: "Google Cloud Storage secret access key"
+
+  cpi.agent.mbus:
+    description: "Mbus URL used by deployed BOSH agents"
+  cpi.agent.ntp:
+    description: "NTP configuration used by deployed BOSH agents"
+    default: []
+  cpi.agent.blobstore.provider:
+    description: "Provider type for the blobstore used by deployed BOSH agents (e.g. dav, s3)"
+    default: "dav"
+  cpi.agent.blobstore.options:
+    description: "Options for the blobstore used by deployed BOSH agents"
+    default: {}
+
+  cpi.registry.schema:
+    description: "Schema of registry"
+    default: "http"
+  cpi.registry.host:
+    description: "Hostname of registry"
+  cpi.registry.port:
+    description: "Port of registry"
+    default: 25889
+  cpi.registry.username:
+    description: "Username for registry"
+    default: "admin"
+  cpi.registry.password:
+    description: "Password for registry"
+    default: "admin"

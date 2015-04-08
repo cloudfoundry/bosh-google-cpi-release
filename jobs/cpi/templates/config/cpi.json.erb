@@ -1,0 +1,28 @@
+<%=
+JSON.dump(
+  "google" => {
+    "project" => p("cpi.google.project"),
+    "json_key" => p("cpi.google.json_key"),
+    "default_zone" => p("cpi.google.default_zone"),
+    "access_key_id" => p("cpi.google.access_key_id"),
+    "secret_access_key" => p("cpi.google.secret_access_key"),
+  },
+  "actions" => {
+    "agent" => {
+      "mbus" => p("cpi.agent.mbus"),
+      "ntp"  => p("cpi.agent.ntp"),
+      "blobstore" => {
+        "type"    => p("cpi.agent.blobstore.provider"),
+        "options" => p("cpi.agent.blobstore.options"),
+      },
+    },
+    "registry" => {
+      "schema" => p("cpi.registry.schema"),
+      "host" => p("cpi.registry.host"),
+      "port" => p("cpi.registry.port"),
+      "username" => p("cpi.registry.username"),
+      "password" => p("cpi.registry.password"),
+    },
+  }
+)
+%>

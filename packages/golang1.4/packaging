@@ -1,0 +1,18 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# We grab the latest versions that are in the directory
+GOLANG_VERSION=`ls -r golang1.4/go* | sed 's/golang1.4\/go\(.*\)\.linux-amd64.tar.gz/\1/' | head -1`
+
+# Extract Go Programming Language package
+echo "Extracting Go Programming Language ${GOLANG_VERSION}..."
+tar xzvf ${BOSH_COMPILE_TARGET}/golang1.4/go${GOLANG_VERSION}.linux-amd64.tar.gz
+if [[ $? != 0 ]] ; then
+  echo "Failed extracting Go Programming Language ${GOLANG_VERSION}"
+  exit 1
+fi
+
+# Copy Go Programming Language package
+echo "Copying Go Programming Language..."
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp -a ${BOSH_COMPILE_TARGET}/go/* ${BOSH_INSTALL_TARGET}
