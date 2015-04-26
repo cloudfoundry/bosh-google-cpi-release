@@ -7,6 +7,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-google-cpi/google/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -75,7 +76,8 @@ func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, insta
 func (i GoogleInstanceService) updateNetwork(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
 	// If the network has changed we need to recreate the VM
 	dynamicNetwork := instanceNetworks.DynamicNetwork()
-	if instance.NetworkInterfaces[0].Network != dynamicNetwork.NetworkName {
+	if gutil.ResourceSplitter(instance.NetworkInterfaces[0].Network) != dynamicNetwork.NetworkName {
+		i.logger.Debug(googleInstanceServiceLogTag, "Changing network for Google Instance '%s' not supported", instance.Name)
 		return api.NotSupportedError{}
 	}
 
