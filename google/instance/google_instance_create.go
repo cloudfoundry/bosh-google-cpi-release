@@ -115,7 +115,7 @@ func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes GoogleI
 	if len(serviceScopes) > 0 {
 		var scopes []string
 		for _, serviceScope := range serviceScopes {
-			scopes = append(scopes, serviceScope)
+			scopes = append(scopes, fmt.Sprintf("https://www.googleapis.com/auth/%s", serviceScope))
 		}
 		serviceAccount := &compute.ServiceAccount{
 			Email:  "default",
