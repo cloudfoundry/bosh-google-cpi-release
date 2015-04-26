@@ -87,6 +87,7 @@ func (i GoogleInstanceService) updateNetwork(instance *compute.Instance, instanc
 func (i GoogleInstanceService) updateIpForwarding(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
 	// If IP Forwarding has changed we need to recreate the VM
 	if instance.CanIpForward != instanceNetworks.CanIpForward() {
+		i.logger.Debug(googleInstanceServiceLogTag, "Changing IP Forwarding for Google Instance '%s' not supported", instance.Name)
 		return api.NotSupportedError{}
 	}
 
