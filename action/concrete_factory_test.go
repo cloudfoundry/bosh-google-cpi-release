@@ -248,6 +248,12 @@ var _ = Describe("concreteFactory", func() {
 			logger,
 		)
 
+		addressService := gaddress.NewGoogleAddressService(
+			project,
+			computeService,
+			logger,
+		)
+
 		diskService := gdisk.NewGoogleDiskService(
 			project,
 			computeService,
@@ -277,6 +283,13 @@ var _ = Describe("concreteFactory", func() {
 			logger,
 		)
 
+		targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+			project,
+			computeService,
+			operationService,
+			logger,
+		)
+
 		registryService := registry.NewRegistryService(
 			options.Registry,
 			logger,
@@ -284,7 +297,7 @@ var _ = Describe("concreteFactory", func() {
 
 		action, err := factory.Create("create_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateVM(vmService, diskService, machineTypeService, networkService, stemcellService, registryService, options.Agent, defaultZone)))
+		Expect(action).To(Equal(NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryService, options.Agent, defaultZone)))
 	})
 
 	It("configure_networks", func() {

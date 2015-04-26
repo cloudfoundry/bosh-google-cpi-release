@@ -122,7 +122,7 @@ func NewConcreteFactory(
 			"delete_stemcell": NewDeleteStemcell(stemcellService),
 
 			// VM management
-			"create_vm":          NewCreateVM(vmService, diskService, machineTypeService, networkService, stemcellService, registryService, options.Agent, googleClient.DefaultZone()),
+			"create_vm":          NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryService, options.Agent, googleClient.DefaultZone()),
 			"configure_networks": NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryService),
 			"delete_vm":          NewDeleteVM(vmService, registryService),
 			"reboot_vm":          NewRebootVM(vmService),

@@ -21,7 +21,7 @@ func (i GoogleInstanceService) ConfigureNetworks(id string, instanceNetworks Goo
 
 	// TODO: Configure VIP network
 
-	if err := i.configureTargetPool(instance, instanceNetworks); err != nil {
+	if err := i.addToTargetPool(instance, instanceNetworks); err != nil {
 		return err
 	}
 
@@ -58,29 +58,13 @@ func (i GoogleInstanceService) UpdateNetworks(id string, instanceNetworks Google
 	return nil
 }
 
-func (i GoogleInstanceService) configureTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
 	targetPoolName := instanceNetworks.TargetPool()
 	if targetPoolName == "" {
 		return nil
 	}
 
-	targetPool, found, err := instanceNetworks.targetPoolService.Find(targetPoolName, "")
-	if err != nil {
-		return err
-	}
-	if !found {
-		return bosherr.WrapErrorf(err, "Google Target Pool '%s' does not exists", targetPoolName)
-	}
-
-	for _, tpInstance := range targetPool.Instances {
-		if tpInstance == instance.SelfLink {
-			// Instance already attached to the target pool
-			return nil
-		}
-	}
-
-	i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Instance '%s' to Google Target Pool '%s'", instance.Name, targetPoolName)
-	err = instanceNetworks.targetPoolService.AddInstance(targetPoolName, instance.Name)
+	err := instanceNetworks.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
 	if err != nil {
 		return err
 	}

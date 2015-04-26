@@ -29,20 +29,24 @@ type CreateVM struct {
 
 func NewCreateVM(
 	vmService ginstance.GoogleInstanceService,
+	addressService gaddress.GoogleAddressService,
 	diskService gdisk.GoogleDiskService,
 	machineTypeService gmachinetype.GoogleMachineTypeService,
 	networkService gnetwork.GoogleNetworkService,
 	stemcellService gimage.GoogleImageService,
+	targetPoolService gtargetpool.GoogleTargetPoolService,
 	registryService registry.RegistryService,
 	agentOptions registry.AgentOptions,
 	defaultZone string,
 ) CreateVM {
 	return CreateVM{
 		vmService:          vmService,
+		addressService:     addressService,
 		diskService:        diskService,
 		machineTypeService: machineTypeService,
 		networkService:     networkService,
 		stemcellService:    stemcellService,
+		targetPoolService:  targetPoolService,
 		registryService:    registryService,
 		agentOptions:       agentOptions,
 		defaultZone:        defaultZone,
