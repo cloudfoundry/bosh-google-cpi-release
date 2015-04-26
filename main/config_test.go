@@ -16,11 +16,9 @@ import (
 )
 
 var validGoogleConfig = GoogleConfig{
-	Project:         "fake-project",
-	JsonKey:         "{}",
-	DefaultZone:     "fake-default-zone",
-	AccessKeyId:     "fake-access-key-id",
-	SecretAccessKey: "fake-secret-access-key",
+	Project:     "fake-project",
+	JsonKey:     "{}",
+	DefaultZone: "fake-default-zone",
 }
 
 var validActionsOptions = bgcaction.ConcreteFactoryOptions{
@@ -155,21 +153,6 @@ var _ = Describe("GoogleConfig", func() {
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty DefaultZone"))
-		})
-		It("returns error if AccessKeyId is empty", func() {
-			config.AccessKeyId = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty AccessKeyId"))
-		})
-
-		It("returns error if SecretAccessKey is empty", func() {
-			config.SecretAccessKey = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty SecretAccessKey"))
 		})
 	})
 })

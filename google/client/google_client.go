@@ -13,21 +13,17 @@ const computeScope = compute.ComputeScope
 const storageScope = storage.DevstorageFull_controlScope
 
 type GoogleClient struct {
-	project         string
-	jsonKey         string
-	defaultZone     string
-	accessKeyId     string
-	secretAccessKey string
-	computeService  *compute.Service
-	storageService  *storage.Service
+	project        string
+	jsonKey        string
+	defaultZone    string
+	computeService *compute.Service
+	storageService *storage.Service
 }
 
 func NewGoogleClient(
 	project string,
 	jsonKey string,
 	defaultZone string,
-	accessKeyId string,
-	secretAccessKey string,
 ) (GoogleClient, error) {
 	computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(jsonKey), computeScope)
 	if err != nil {
@@ -52,13 +48,11 @@ func NewGoogleClient(
 	}
 
 	return GoogleClient{
-		project:         project,
-		jsonKey:         jsonKey,
-		defaultZone:     defaultZone,
-		accessKeyId:     accessKeyId,
-		secretAccessKey: secretAccessKey,
-		computeService:  computeService,
-		storageService:  storageService,
+		project:        project,
+		jsonKey:        jsonKey,
+		defaultZone:    defaultZone,
+		computeService: computeService,
+		storageService: storageService,
 	}, nil
 }
 

@@ -16,11 +16,9 @@ type Config struct {
 }
 
 type GoogleConfig struct {
-	Project         string `json:"project"`
-	JsonKey         string `json:"json_key"`
-	DefaultZone     string `json:"default_zone"`
-	AccessKeyId     string `json:"access_key_id"`
-	SecretAccessKey string `json:"secret_access_key"`
+	Project     string `json:"project"`
+	JsonKey     string `json:"json_key"`
+	DefaultZone string `json:"default_zone"`
 }
 
 func NewConfigFromPath(path string, fs boshsys.FileSystem) (Config, error) {
@@ -69,14 +67,6 @@ func (c GoogleConfig) Validate() error {
 
 	if c.DefaultZone == "" {
 		return bosherr.Error("Must provide a non-empty DefaultZone")
-	}
-
-	if c.AccessKeyId == "" {
-		return bosherr.Error("Must provide a non-empty AccessKeyId")
-	}
-
-	if c.SecretAccessKey == "" {
-		return bosherr.Error("Must provide a non-empty SecretAccessKey")
 	}
 
 	return nil
