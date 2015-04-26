@@ -1,0 +1,126 @@
+package gimage
+
+import (
+	"fmt"
+	"os"
+
+	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+
+	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/storage/v1"
+)
+
+func (i GoogleImageService) Create(name string, description string, sourceURL string) (string, error) {
+	if description == "" {
+		description = googleImageDescription
+	}
+
+	rawdisk := &compute.ImageRawDisk{
+		Source: sourceURL,
+	}
+
+	image := &compute.Image{
+		Name:        name,
+		Description: description,
+		RawDisk:     rawdisk,
+	}
+
+	i.logger.Debug(googleImageServiceLogTag, "Creating Google Image with params: %#v", image)
+	operation, err := i.computeService.Images.Insert(i.project, image).Do()
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
+	}
+
+	if _, err = i.operationService.Waiter(operation, "", ""); err != nil {
+		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
+	}
+
+	return image.Name, nil
+}
+
+func (i GoogleImageService) CreateFromUrl(sourceURL string, description string) (string, error) {
+	uuidStr, err := i.uuidGen.Generate()
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Generating random Google Image name")
+	}
+
+	imageName := fmt.Sprintf("%s-%s", googleImageNamePrefix, uuidStr)
+	image, err := i.Create(imageName, description, sourceURL)
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Creating Google Image from URL")
+	}
+
+	return image, nil
+}
+
+func (i GoogleImageService) CreateFromTarball(imagePath string, description string) (string, error) {
+	uuidStr, err := i.uuidGen.Generate()
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Generating random Google Image name")
+	}
+
+	imageName := fmt.Sprintf("%s-%s", googleImageNamePrefix, uuidStr)
+	bucket := &storage.Bucket{
+		Name: imageName,
+	}
+
+	i.logger.Debug(googleImageServiceLogTag, "Creating Google Storage Bucket with params: %#v", bucket)
+	if _, err = i.storageService.Buckets.Insert(i.project, bucket).Do(); err != nil {
+		return "", bosherr.WrapErrorf(err, "Creating Google Storage Bucket")
+	}
+	defer i.deleteBucket(imageName)
+
+	objectName := fmt.Sprintf("%s.tar.gz", imageName)
+
+	var objectAccessControl []*storage.ObjectAccessControl
+	objectAcl := &storage.ObjectAccessControl{
+		Bucket: imageName,
+		Entity: "allUsers",
+		Object: objectName,
+		Role:   "READER",
+	}
+	objectAccessControl = append(objectAccessControl, objectAcl)
+
+	object := &storage.Object{
+		Name: objectName,
+		Acl:  objectAccessControl,
+	}
+
+	imageFile, err := os.Open(imagePath)
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Reading stemcell image")
+	}
+	defer imageFile.Close()
+
+	i.logger.Debug(googleImageServiceLogTag, "Creating Google Storage Object with params: %#v", object)
+	imageObject, err := i.storageService.Objects.Insert(imageName, object).Media(imageFile).Do()
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Creating Google Storage Object")
+	}
+	defer i.deleteObject(imageName, objectName)
+
+	image, err := i.Create(imageName, description, imageObject.MediaLink)
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Creating Google Image from Tarball")
+	}
+
+	return image, nil
+}
+
+func (i GoogleImageService) deleteObject(bucketName string, objectName string) error {
+	i.logger.Debug(googleImageServiceLogTag, "Deleting Google Storage Object '%s' from Google Storage Bucket '%s'", objectName, bucketName)
+	if err := i.storageService.Objects.Delete(bucketName, objectName).Do(); err != nil {
+		return bosherr.WrapErrorf(err, "Deleting Google Storage Object")
+	}
+
+	return nil
+}
+
+func (i GoogleImageService) deleteBucket(bucketName string) error {
+	i.logger.Debug(googleImageServiceLogTag, "Deleting Google Storage Bucket '%s'", bucketName)
+	if err := i.storageService.Buckets.Delete(bucketName).Do(); err != nil {
+		return bosherr.WrapErrorf(err, "Deleting Google Storage Bucket")
+	}
+
+	return nil
+}

@@ -1,0 +1,10 @@
+language: go
+
+go:
+  - tip
+
+branches:
+  only:
+    - master
+
+script: bin/test

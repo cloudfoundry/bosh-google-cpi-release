@@ -1,0 +1,43 @@
+package gtargetpool
+
+import (
+	"fmt"
+
+	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+
+	"github.com/frodenas/bosh-google-cpi/google/util"
+	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/googleapi"
+)
+
+func (t GoogleTargetPoolService) Find(id string, region string) (*compute.TargetPool, bool, error) {
+	if region == "" {
+		t.logger.Debug(googleTargetPoolServiceLogTag, "Finding Google Target Pool '%s'", id)
+		filter := fmt.Sprintf("name eq .*%s", id)
+		targetPools, err := t.computeService.TargetPools.AggregatedList(t.project).Filter(filter).Do()
+		if err != nil {
+			return &compute.TargetPool{}, false, bosherr.WrapErrorf(err, "Failed to find Google Target Pool '%s'", id)
+		}
+
+		for _, targetPoolItems := range targetPools.Items {
+			for _, targetPool := range targetPoolItems.TargetPools {
+				// Return the first target pool (it can only be 1 target pool with the same name across all regions)
+				return targetPool, true, nil
+			}
+		}
+
+		return &compute.TargetPool{}, false, nil
+	}
+
+	t.logger.Debug(googleTargetPoolServiceLogTag, "Finding Google Target Pool '%s' in region '%s'", id, region)
+	targetPool, err := t.computeService.TargetPools.Get(t.project, gutil.ResourceSplitter(region), id).Do()
+	if err != nil {
+		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
+			return &compute.TargetPool{}, false, nil
+		}
+
+		return &compute.TargetPool{}, false, bosherr.WrapErrorf(err, "Failed to find Google Target Pool '%s' in region '%s'", id, region)
+	}
+
+	return targetPool, true, nil
+}

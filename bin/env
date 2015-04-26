@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+bin=$(cd $(dirname $0) && pwd)
+base=$bin/..
+
+export GOPATH=$base/../../../..:$base/Godeps/_workspace
+export GOBIN=$base/gobin
+export PATH=$PATH:$GOBIN
+
+exec $@

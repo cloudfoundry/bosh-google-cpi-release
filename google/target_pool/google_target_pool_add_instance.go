@@ -1,0 +1,39 @@
+package gtargetpool
+
+import (
+	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+
+	"github.com/frodenas/bosh-google-cpi/google/util"
+	"google.golang.org/api/compute/v1"
+)
+
+func (t GoogleTargetPoolService) AddInstance(id string, vmLink string) error {
+	targetPool, found, err := t.Find(id, "")
+	if err != nil {
+		return err
+	}
+	if !found {
+		return bosherr.WrapErrorf(err, "Google Target Pool '%s' does not exists", id)
+	}
+
+	var instances []*compute.InstanceReference
+	for _, vm := range targetPool.Instances {
+		instance := &compute.InstanceReference{Instance: vm}
+		instances = append(instances, instance)
+	}
+	instance := &compute.InstanceReference{Instance: vmLink}
+	instances = append(instances, instance)
+	targetPoolsRequest := &compute.TargetPoolsAddInstanceRequest{Instances: instances}
+
+	t.logger.Debug(googleTargetPoolServiceLogTag, "Adding Google Instance '%s' to Google Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+	operation, err := t.computeService.TargetPools.AddInstance(t.project, gutil.ResourceSplitter(targetPool.Region), id, targetPoolsRequest).Do()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Failed to add Google Instance '%s' to Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+	}
+
+	if _, err = t.operationService.Waiter(operation, "", targetPool.Region); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to add Google Instance '%s' to Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+	}
+
+	return nil
+}
