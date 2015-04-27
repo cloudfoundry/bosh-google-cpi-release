@@ -20,8 +20,6 @@ func (i GoogleInstanceService) ConfigureNetworks(id string, instanceNetworks Goo
 		return bosherr.Errorf("Google Instance '%s' not found", id)
 	}
 
-	// TODO: Configure VIP network
-
 	if err := i.addToTargetPool(instance, instanceNetworks); err != nil {
 		return err
 	}
@@ -59,7 +57,7 @@ func (i GoogleInstanceService) UpdateNetworks(id string, instanceNetworks Google
 		return err
 	}
 
-	if err = i.updateEphemeralExternalIp(instance, instanceNetworks); err != nil {
+	if err = i.updateExternalIp(instance, instanceNetworks); err != nil {
 		return err
 	}
 
@@ -95,35 +93,120 @@ func (i GoogleInstanceService) updateIpForwarding(instance *compute.Instance, in
 	return nil
 }
 
-func (i GoogleInstanceService) updateEphemeralExternalIp(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
-	var instanceExternalIp string
+func (i GoogleInstanceService) updateExternalIp(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+	var err error
 
+	vipNetwork := instanceNetworks.VipNetwork()
+
+	if vipNetwork.IP != "" {
+		err = i.updateVipAddress(instance, vipNetwork.IP)
+	} else {
+		err = i.updateEphemeralExternalIp(instance, instanceNetworks)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateVipAddress(instance *compute.Instance, ipAddress string) error {
+	var instanceExternalIp, accessConfigName string
 	if len(instance.NetworkInterfaces[0].AccessConfigs) > 0 {
 		instanceExternalIp = instance.NetworkInterfaces[0].AccessConfigs[0].NatIP
+		accessConfigName = instance.NetworkInterfaces[0].AccessConfigs[0].Name
 	}
+
+	networkInterface := instance.NetworkInterfaces[0].Name
+
+	if instanceExternalIp == "" || instanceExternalIp != ipAddress {
+		if instanceExternalIp != "" {
+			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIp, instance.Name)
+			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
+			if err != nil {
+				return err
+			}
+		}
+
+		accessConfig := &compute.AccessConfig{
+			Name:  "External NAT",
+			Type:  "ONE_TO_ONE_NAT",
+			NatIP: ipAddress,
+		}
+
+		i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Static IP Address '%s' to Google Instance '%s'", ipAddress, instance.Name)
+		err := i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateEphemeralExternalIp(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+	var instanceExternalIp, accessConfigName string
+	if len(instance.NetworkInterfaces[0].AccessConfigs) > 0 {
+		instanceExternalIp = instance.NetworkInterfaces[0].AccessConfigs[0].NatIP
+		accessConfigName = instance.NetworkInterfaces[0].AccessConfigs[0].Name
+	}
+
+	networkInterface := instance.NetworkInterfaces[0].Name
 
 	if instanceNetworks.EphemeralExternalIP() {
 		if instanceExternalIp == "" {
-			networkInterface := instance.NetworkInterfaces[0].Name
 			accessConfig := &compute.AccessConfig{
 				Name: "External NAT",
 				Type: "ONE_TO_ONE_NAT",
 			}
+
+			i.logger.Debug(googleInstanceServiceLogTag, "Attaching Ephemeral Google IP Address to Google Instance '%s'", instance.Name)
 			err := i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
 			if err != nil {
 				return err
 			}
+
+			return nil
+		} else {
+			_, found, err := instanceNetworks.addressService.FindByIP(instanceExternalIp)
+			if err != nil {
+				return nil
+			}
+
+			if found {
+				i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIp, instance.Name)
+				err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
+				if err != nil {
+					return err
+				}
+
+				accessConfig := &compute.AccessConfig{
+					Name: "External NAT",
+					Type: "ONE_TO_ONE_NAT",
+				}
+
+				i.logger.Debug(googleInstanceServiceLogTag, "Attaching Ephemeral Google IP Address to Google Instance '%s'", instance.Name)
+				err = i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			}
 		}
 	} else {
 		if instanceExternalIp != "" {
-			// TODO: Only if network has no vip
-			networkInterface := instance.NetworkInterfaces[0].Name
-			accessConfig := instance.NetworkInterfaces[0].AccessConfigs[0].Name
-			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIp, instance.Name)
+			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
 			if err != nil {
 				return err
 			}
 		}
+
+		return nil
 	}
 
 	return nil
