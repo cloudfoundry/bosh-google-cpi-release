@@ -16,17 +16,14 @@ func (t GoogleTargetPoolService) AddInstance(id string, vmLink string) error {
 		return bosherr.WrapErrorf(err, "Google Target Pool '%s' does not exists", id)
 	}
 
-	var instances []*compute.InstanceReference
 	for _, vm := range targetPool.Instances {
 		if vm == vmLink {
-			// Instance already attached to the target pool
 			t.logger.Debug(googleTargetPoolServiceLogTag, "Google Instance '%s' already attached to Google Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
 			return nil
 		}
-
-		instance := &compute.InstanceReference{Instance: vm}
-		instances = append(instances, instance)
 	}
+
+	var instances []*compute.InstanceReference
 	instance := &compute.InstanceReference{Instance: vmLink}
 	instances = append(instances, instance)
 	targetPoolsRequest := &compute.TargetPoolsAddInstanceRequest{Instances: instances}

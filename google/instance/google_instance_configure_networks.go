@@ -29,6 +29,19 @@ func (i GoogleInstanceService) ConfigureNetworks(id string, instanceNetworks Goo
 	return nil
 }
 
+func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+	targetPoolName := instanceNetworks.TargetPool()
+
+	if targetPoolName != "" {
+		err := instanceNetworks.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (i GoogleInstanceService) UpdateNetworks(id string, instanceNetworks GoogleInstanceNetworks) error {
 	instance, found, err := i.Find(id, "")
 	if err != nil {
@@ -54,19 +67,7 @@ func (i GoogleInstanceService) UpdateNetworks(id string, instanceNetworks Google
 		return err
 	}
 
-	i.ConfigureNetworks(id, instanceNetworks)
-
-	return nil
-}
-
-func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
-	targetPoolName := instanceNetworks.TargetPool()
-	if targetPoolName == "" {
-		return nil
-	}
-
-	err := instanceNetworks.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
-	if err != nil {
+	if err := i.updateTargetPool(instance, instanceNetworks); err != nil {
 		return err
 	}
 
@@ -152,6 +153,32 @@ func (i GoogleInstanceService) updateTags(instance *compute.Instance, instanceNe
 	err = i.SetTags(instance.Name, instance.Zone, instanceTags)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+	targetPoolName := instanceNetworks.TargetPool()
+	currentTargetPool, _, err := instanceNetworks.targetPoolService.FindByInstance(instance.SelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	if targetPoolName != currentTargetPool {
+		if currentTargetPool != "" {
+			err := instanceNetworks.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink)
+			if err != nil {
+				return err
+			}
+		}
+
+		if targetPoolName != "" {
+			err := instanceNetworks.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
