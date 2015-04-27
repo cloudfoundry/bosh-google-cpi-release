@@ -34,7 +34,7 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 		return nil, bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}
 	if !found {
-		return nil, api.NewDiskNotFoundError(string(diskCID))
+		return nil, api.NewDiskNotFoundError(string(diskCID), false)
 	}
 
 	// Atach the Disk to the VM

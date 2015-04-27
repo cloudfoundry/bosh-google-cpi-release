@@ -90,7 +90,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 
 	imageFile, err := os.Open(imagePath)
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Reading stemcell image")
+		return "", bosherr.WrapErrorf(err, "Reading stemcell image file")
 	}
 	defer imageFile.Close()
 

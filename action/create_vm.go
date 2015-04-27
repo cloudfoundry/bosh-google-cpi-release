@@ -3,6 +3,7 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/address"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
 	"github.com/frodenas/bosh-google-cpi/google/image"
@@ -65,12 +66,12 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 			return "", bosherr.WrapError(err, "Creating vm")
 		}
 		if !found {
-			return "", bosherr.WrapErrorf(err, "Creating vm: disk '%s' not found", diskCID)
+			return "", api.NewDiskNotFoundError(string(diskCID), false)
 		}
 		zones[gutil.ResourceSplitter(disk.Zone)] = struct{}{}
 	}
 	if len(zones) > 1 {
-		return "", bosherr.Errorf("Can't use multiple zones: %v", zones)
+		return "", bosherr.Errorf("Creating vm: can't use multiple zones: '%v'", zones)
 	}
 
 	// Determine zone
@@ -121,7 +122,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Create VM
 	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryService.PublicEndpoint())
 	if err != nil {
-		return "", bosherr.WrapError(err, "Creating VM")
+		return "", api.NewVMCreationFailedError(true)
 	}
 
 	// Configure VM networks

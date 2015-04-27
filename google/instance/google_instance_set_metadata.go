@@ -3,6 +3,7 @@ package ginstance
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 	"google.golang.org/api/compute/v1"
 )
@@ -14,7 +15,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata GoogleInstanceM
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	// We need to reuse the original instance metadata fingerprint and items

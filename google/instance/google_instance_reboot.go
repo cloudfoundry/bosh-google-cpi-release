@@ -3,6 +3,7 @@ package ginstance
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
@@ -12,7 +13,7 @@ func (i GoogleInstanceService) Reboot(id string) error {
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Rebooting Google Instance '%s'", id)

@@ -1,8 +1,7 @@
 package ginstance
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
-
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
@@ -16,7 +15,7 @@ func (i GoogleInstanceService) AttachedDisks(id string) (GoogleInstanceAttachedD
 		return disks, err
 	}
 	if !found {
-		return nil, bosherr.Errorf("Google Instance '%s' not found", id)
+		api.NewVMNotFoundError(id)
 	}
 
 	for _, disk := range instance.Disks {

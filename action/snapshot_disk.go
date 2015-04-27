@@ -34,7 +34,7 @@ func (sd CreateSnapshot) Run(diskCID DiskCID, metadata SnapshotMetadata) (Snapsh
 		return "", bosherr.WrapErrorf(err, "Failed to find disk '%s'", diskCID)
 	}
 	if !found {
-		return "", api.NewDiskNotFoundError(string(diskCID))
+		return "", api.NewDiskNotFoundError(string(diskCID), false)
 	}
 
 	// Create the disk snapshot

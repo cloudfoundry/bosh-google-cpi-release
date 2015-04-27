@@ -3,6 +3,7 @@ package ginstance
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
@@ -13,7 +14,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	// Look up for the device name
@@ -24,7 +25,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 		}
 	}
 	if deviceName == "" {
-		return bosherr.Errorf("Google Disk '%s' is not attached to Google Instance '%s'", diskID, id)
+		return api.NewDiskNotAttachedError(id, diskID, false)
 	}
 
 	// Detach the disk

@@ -3,6 +3,7 @@ package gdisk
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
@@ -12,7 +13,7 @@ func (d GoogleDiskService) Delete(id string) error {
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Disk '%s' not found", id)
+		return api.NewDiskNotFoundError(id, false)
 	}
 
 	if disk.Status != googleDiskReadyStatus {

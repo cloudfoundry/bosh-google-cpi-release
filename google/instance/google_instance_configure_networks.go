@@ -17,7 +17,7 @@ func (i GoogleInstanceService) AddNetworkConfiguration(id string, instanceNetwor
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	if err := i.addToTargetPool(instance, instanceNetworks); err != nil {
@@ -46,7 +46,7 @@ func (i GoogleInstanceService) DeleteNetworkConfiguration(id string, instanceNet
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	if err := i.removeFromTargetPool(instance, instanceNetworks); err != nil {

@@ -6,6 +6,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 	"google.golang.org/api/compute/v1"
 )
@@ -53,7 +54,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 	}
 
 	if _, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
-		return "", bosherr.WrapErrorf(err, "Failed to create Google Instance")
+		return "", api.VMCreationFailedError{}
 	}
 
 	return vm.Name, nil
