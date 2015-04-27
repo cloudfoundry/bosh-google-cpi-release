@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-rm -rf out/*
+bin=$(dirname $0)
+
+echo -e "\n Cleaning..."
+$bin/env go clean -r ./...
