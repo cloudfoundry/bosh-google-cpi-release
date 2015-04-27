@@ -347,6 +347,25 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
+		addressService := gaddress.NewGoogleAddressService(
+			project,
+			computeService,
+			logger,
+		)
+
+		networkService := gnetwork.NewGoogleNetworkService(
+			project,
+			computeService,
+			logger,
+		)
+
+		targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+			project,
+			computeService,
+			operationService,
+			logger,
+		)
+
 		registryService := registry.NewRegistryService(
 			options.Registry,
 			logger,
@@ -354,7 +373,7 @@ var _ = Describe("ConcreteFactory", func() {
 
 		action, err := factory.Create("delete_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteVM(vmService, registryService)))
+		Expect(action).To(Equal(NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryService)))
 	})
 
 	It("reboot_vm", func() {

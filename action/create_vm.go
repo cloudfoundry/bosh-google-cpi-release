@@ -125,7 +125,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Configure VM networks
-	err = cv.vmService.ConfigureNetworks(vm, instanceNetworks)
+	err = cv.vmService.AddNetworkConfiguration(vm, instanceNetworks)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
 	}

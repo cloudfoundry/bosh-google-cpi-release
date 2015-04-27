@@ -11,7 +11,7 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-func (i GoogleInstanceService) ConfigureNetworks(id string, instanceNetworks GoogleInstanceNetworks) error {
+func (i GoogleInstanceService) AddNetworkConfiguration(id string, instanceNetworks GoogleInstanceNetworks) error {
 	instance, found, err := i.Find(id, "")
 	if err != nil {
 		return err
@@ -40,7 +40,39 @@ func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, insta
 	return nil
 }
 
-func (i GoogleInstanceService) UpdateNetworks(id string, instanceNetworks GoogleInstanceNetworks) error {
+func (i GoogleInstanceService) DeleteNetworkConfiguration(id string, instanceNetworks GoogleInstanceNetworks) error {
+	instance, found, err := i.Find(id, "")
+	if err != nil {
+		return err
+	}
+	if !found {
+		return bosherr.Errorf("Google Instance '%s' not found", id)
+	}
+
+	if err := i.removeFromTargetPool(instance, instanceNetworks); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) removeFromTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
+	targetPool, found, err := instanceNetworks.targetPoolService.FindByInstance(instance.SelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	if found {
+		err := instanceNetworks.targetPoolService.RemoveInstance(targetPool, instance.SelfLink)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, instanceNetworks GoogleInstanceNetworks) error {
 	instance, found, err := i.Find(id, "")
 	if err != nil {
 		return err
@@ -247,8 +279,6 @@ func (i GoogleInstanceService) updateTags(instance *compute.Instance, instanceNe
 }
 
 func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
-	targetPoolName := instanceNetworks.TargetPool()
-
 	// Check if instance is associated to a target pool
 	currentTargetPool, _, err := instanceNetworks.targetPoolService.FindByInstance(instance.SelfLink, "")
 	if err != nil {
@@ -256,6 +286,7 @@ func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, inst
 	}
 
 	// Check if target pool info has changed
+	targetPoolName := instanceNetworks.TargetPool()
 	if targetPoolName != currentTargetPool {
 		if currentTargetPool != "" {
 			err := instanceNetworks.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink)

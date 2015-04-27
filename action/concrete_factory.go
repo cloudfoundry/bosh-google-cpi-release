@@ -124,7 +124,7 @@ func NewConcreteFactory(
 			// VM management
 			"create_vm":          NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryService, options.Agent, googleClient.DefaultZone()),
 			"configure_networks": NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryService),
-			"delete_vm":          NewDeleteVM(vmService, registryService),
+			"delete_vm":          NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryService),
 			"reboot_vm":          NewRebootVM(vmService),
 			"set_vm_metadata":    NewSetVMMetadata(vmService),
 			"has_vm":             NewHasVM(vmService),
