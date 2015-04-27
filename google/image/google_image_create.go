@@ -59,6 +59,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 		return "", bosherr.WrapErrorf(err, "Generating random Google Image name")
 	}
 
+	// Create a temporary bucket
 	imageName := fmt.Sprintf("%s-%s", googleImageNamePrefix, uuidStr)
 	bucket := &storage.Bucket{
 		Name: imageName,
@@ -70,6 +71,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	}
 	defer i.deleteBucket(imageName)
 
+	// Upload the image file to the previously created bucket
 	objectName := fmt.Sprintf("%s.tar.gz", imageName)
 
 	var objectAccessControl []*storage.ObjectAccessControl
@@ -99,6 +101,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	}
 	defer i.deleteObject(imageName, objectName)
 
+	// Create the image
 	image, err := i.Create(imageName, description, imageObject.MediaLink)
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Image from Tarball")

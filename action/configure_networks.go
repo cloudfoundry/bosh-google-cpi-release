@@ -42,7 +42,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 		return "", bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}
 
-	// Configure networks
+	// Update networks
 	err := rv.vmService.UpdateNetworks(string(vmCID), instanceNetworks)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)

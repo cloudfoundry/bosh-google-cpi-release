@@ -59,6 +59,7 @@ func NewGoogleInstanceNetworks(
 func (in GoogleInstanceNetworks) DynamicNetwork() InstanceNetwork {
 	for _, net := range in.networks {
 		if net.IsDynamic() {
+			// There can only be 1 dynamic network
 			return net
 		}
 	}
@@ -69,6 +70,7 @@ func (in GoogleInstanceNetworks) DynamicNetwork() InstanceNetwork {
 func (in GoogleInstanceNetworks) VipNetwork() InstanceNetwork {
 	for _, net := range in.networks {
 		if net.IsVip() {
+			// There can only be 1 vip network
 			return net
 		}
 	}
@@ -104,11 +106,10 @@ func (in GoogleInstanceNetworks) NetworkInterfaces() ([]*compute.NetworkInterfac
 		return nil, bosherr.WrapErrorf(err, "Network Interfaces: Network '%s' does not exists", dynamicNetwork.NetworkName)
 	}
 
-	vipNetwork := in.VipNetwork()
-
 	var networkInterfaces []*compute.NetworkInterface
 	var accessConfigs []*compute.AccessConfig
 
+	vipNetwork := in.VipNetwork()
 	if dynamicNetwork.EphemeralExternalIP || vipNetwork.IP != "" {
 		accessConfig := &compute.AccessConfig{
 			Name: "External NAT",
@@ -119,6 +120,7 @@ func (in GoogleInstanceNetworks) NetworkInterfaces() ([]*compute.NetworkInterfac
 		}
 		accessConfigs = append(accessConfigs, accessConfig)
 	}
+
 	networkInterface := &compute.NetworkInterface{
 		Network:       network.SelfLink,
 		AccessConfigs: accessConfigs,

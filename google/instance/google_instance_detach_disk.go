@@ -7,6 +7,7 @@ import (
 )
 
 func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
+	// Find the instance
 	instance, found, err := i.Find(id, "")
 	if err != nil {
 		return err
@@ -15,6 +16,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 		return bosherr.Errorf("Google Instance '%s' not found", id)
 	}
 
+	// Look up for the device name
 	var deviceName string
 	for _, attachedDisk := range instance.Disks {
 		if gutil.ResourceSplitter(attachedDisk.Source) == diskID {
@@ -25,6 +27,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 		return bosherr.Errorf("Google Disk '%s' is not attached to Google Instance '%s'", diskID, id)
 	}
 
+	// Detach the disk
 	i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Disk '%s' from Google Instance '%s'", diskID, id)
 	operation, err := i.computeService.Instances.DetachDisk(i.project, gutil.ResourceSplitter(instance.Zone), id, deviceName).Do()
 	if err != nil {

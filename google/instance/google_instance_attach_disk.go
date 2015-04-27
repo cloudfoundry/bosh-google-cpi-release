@@ -8,6 +8,7 @@ import (
 )
 
 func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, error) {
+	// Find the instance
 	instance, found, err := i.Find(id, "")
 	if err != nil {
 		return "", err
@@ -22,6 +23,7 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, e
 		Type:   "PERSISTENT",
 	}
 
+	// Attach the disk
 	i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
 	operation, err := i.computeService.Instances.AttachDisk(i.project, gutil.ResourceSplitter(instance.Zone), id, disk).Do()
 	if err != nil {
@@ -32,6 +34,7 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, e
 		return "", bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
 	}
 
+	// Find the instance again, as we need to get the new attached disks infor
 	instance, found, err = i.Find(id, "")
 	if err != nil {
 		return "", err
@@ -40,6 +43,7 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, e
 		return "", bosherr.WrapErrorf(err, "Google Instance '%s' does not exists", id)
 	}
 
+	// Look up for the device name
 	var deviceName string
 	for _, attachedDisk := range instance.Disks {
 		if attachedDisk.Source == diskLink {

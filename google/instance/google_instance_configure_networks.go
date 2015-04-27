@@ -121,6 +121,7 @@ func (i GoogleInstanceService) updateVipAddress(instance *compute.Instance, ipAd
 	networkInterface := instance.NetworkInterfaces[0].Name
 
 	if instanceExternalIP == "" || instanceExternalIP != ipAddress {
+		// If the instance has an external IP, detach it
 		if instanceExternalIP != "" {
 			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
 			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
@@ -129,6 +130,7 @@ func (i GoogleInstanceService) updateVipAddress(instance *compute.Instance, ipAd
 			}
 		}
 
+		// Attach the vip IP to the instance
 		accessConfig := &compute.AccessConfig{
 			Name:  "External NAT",
 			Type:  "ONE_TO_ONE_NAT",
@@ -155,6 +157,7 @@ func (i GoogleInstanceService) updateEphemeralExternalIP(instance *compute.Insta
 	networkInterface := instance.NetworkInterfaces[0].Name
 
 	if instanceNetworks.EphemeralExternalIP() {
+		// If the instance doesn't have an external IP, attach an ephemeral one
 		if instanceExternalIP == "" {
 			accessConfig := &compute.AccessConfig{
 				Name: "External NAT",
@@ -170,18 +173,21 @@ func (i GoogleInstanceService) updateEphemeralExternalIP(instance *compute.Insta
 			return nil
 		}
 
+		// Check if the instance external IP is an static IP address
 		_, found, err := instanceNetworks.addressService.FindByIP(instanceExternalIP)
 		if err != nil {
 			return nil
 		}
 
 		if found {
+			// Detach the static IP from the instance
 			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
 			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
 			if err != nil {
 				return err
 			}
 
+			// Attach an ephemeral IP to the instance
 			accessConfig := &compute.AccessConfig{
 				Name: "External NAT",
 				Type: "ONE_TO_ONE_NAT",
@@ -196,6 +202,7 @@ func (i GoogleInstanceService) updateEphemeralExternalIP(instance *compute.Insta
 			return nil
 		}
 	} else {
+		// If the instance has an external IP, detach it from the instance
 		if instanceExternalIP != "" {
 			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
 			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
@@ -241,11 +248,14 @@ func (i GoogleInstanceService) updateTags(instance *compute.Instance, instanceNe
 
 func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
 	targetPoolName := instanceNetworks.TargetPool()
+
+	// Check if instance is associated to a target pool
 	currentTargetPool, _, err := instanceNetworks.targetPoolService.FindByInstance(instance.SelfLink, "")
 	if err != nil {
 		return err
 	}
 
+	// Check if target pool info has changed
 	if targetPoolName != currentTargetPool {
 		if currentTargetPool != "" {
 			err := instanceNetworks.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink)
