@@ -3,6 +3,7 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/address"
 	"github.com/frodenas/bosh-google-cpi/google/instance"
 	"github.com/frodenas/bosh-google-cpi/google/network"
@@ -45,6 +46,9 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	// Update networks
 	err := rv.vmService.UpdateNetworkConfiguration(string(vmCID), instanceNetworks)
 	if err != nil {
+		if _, ok := err.(api.CloudError); ok {
+			return nil, err
+		}
 		return nil, bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}
 

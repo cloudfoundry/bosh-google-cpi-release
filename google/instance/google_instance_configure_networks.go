@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"sort"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
-
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 	"google.golang.org/api/compute/v1"
@@ -78,7 +76,7 @@ func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, instanceNet
 		return err
 	}
 	if !found {
-		return bosherr.Errorf("Google Instance '%s' not found", id)
+		return api.NewVMNotFoundError(id)
 	}
 
 	if err = i.updateNetwork(instance, instanceNetworks); err != nil {

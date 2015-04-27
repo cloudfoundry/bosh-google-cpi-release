@@ -15,7 +15,7 @@ func (i GoogleInstanceService) AttachedDisks(id string) (GoogleInstanceAttachedD
 		return disks, err
 	}
 	if !found {
-		api.NewVMNotFoundError(id)
+		return disks, api.NewVMNotFoundError(id)
 	}
 
 	for _, disk := range instance.Disks {

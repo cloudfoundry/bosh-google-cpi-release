@@ -122,12 +122,18 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Create VM
 	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryService.PublicEndpoint())
 	if err != nil {
-		return "", api.NewVMCreationFailedError(true)
+		if _, ok := err.(api.CloudError); ok {
+			return "", err
+		}
+		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
 	// Configure VM networks
 	err = cv.vmService.AddNetworkConfiguration(vm, instanceNetworks)
 	if err != nil {
+		if _, ok := err.(api.CloudError); ok {
+			return "", err
+		}
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 

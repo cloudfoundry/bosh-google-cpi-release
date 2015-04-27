@@ -3,6 +3,7 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
 	"github.com/frodenas/bosh-google-cpi/google/instance"
 	"github.com/frodenas/bosh-google-cpi/registry"
@@ -30,6 +31,9 @@ func (dd DetachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	// Detach the disk
 	err := dd.vmService.DetachDisk(string(vmCID), string(diskCID))
 	if err != nil {
+		if _, ok := err.(api.CloudError); ok {
+			return nil, err
+		}
 		return nil, bosherr.WrapErrorf(err, "Detaching disk '%s' from vm '%s", diskCID, vmCID)
 	}
 

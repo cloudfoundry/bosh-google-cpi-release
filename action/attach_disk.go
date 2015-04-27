@@ -40,6 +40,9 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	// Atach the Disk to the VM
 	deviceName, err := ad.vmService.AttachDisk(string(vmCID), disk.SelfLink)
 	if err != nil {
+		if _, ok := err.(api.CloudError); ok {
+			return nil, err
+		}
 		return nil, bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}
 

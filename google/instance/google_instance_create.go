@@ -50,11 +50,11 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %#v", vm)
 	operation, err := i.computeService.Instances.Insert(i.project, gutil.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Failed to create Google Instance")
+		return "", api.NewVMCreationFailedError(true)
 	}
 
 	if _, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
-		return "", api.VMCreationFailedError{}
+		return "", api.NewVMCreationFailedError(true)
 	}
 
 	return vm.Name, nil
