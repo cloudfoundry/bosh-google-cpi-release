@@ -6,7 +6,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
-func (i GoogleInstanceService) DetachDisk(id string, diskId string) error {
+func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 	instance, found, err := i.Find(id, "")
 	if err != nil {
 		return err
@@ -17,22 +17,22 @@ func (i GoogleInstanceService) DetachDisk(id string, diskId string) error {
 
 	var deviceName string
 	for _, attachedDisk := range instance.Disks {
-		if gutil.ResourceSplitter(attachedDisk.Source) == diskId {
+		if gutil.ResourceSplitter(attachedDisk.Source) == diskID {
 			deviceName = attachedDisk.DeviceName
 		}
 	}
 	if deviceName == "" {
-		return bosherr.Errorf("Google Disk '%s' is not attached to Google Instance '%s'", diskId, id)
+		return bosherr.Errorf("Google Disk '%s' is not attached to Google Instance '%s'", diskID, id)
 	}
 
-	i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Disk '%s' from Google Instance '%s'", diskId, id)
+	i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Disk '%s' from Google Instance '%s'", diskID, id)
 	operation, err := i.computeService.Instances.DetachDisk(i.project, gutil.ResourceSplitter(instance.Zone), id, deviceName).Do()
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Failed to detach Google Disk '%s' from Google Instance '%s'", diskId, id)
+		return bosherr.WrapErrorf(err, "Failed to detach Google Disk '%s' from Google Instance '%s'", diskID, id)
 	}
 
 	if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to detach Google Disk '%s' from Google Instance '%s'", diskId, id)
+		return bosherr.WrapErrorf(err, "Failed to detach Google Disk '%s' from Google Instance '%s'", diskID, id)
 	}
 
 	return nil

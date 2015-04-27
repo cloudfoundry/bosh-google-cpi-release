@@ -7,11 +7,11 @@ import (
 	. "github.com/frodenas/bosh-google-cpi/registry"
 )
 
-var _ = Describe("RegistryOptions", func() {
+var _ = Describe("Options", func() {
 	var (
-		options RegistryOptions
+		options Options
 
-		validOptions = RegistryOptions{
+		validOptions = Options{
 			Schema:   "http",
 			Host:     "fake-host",
 			Port:     5555,

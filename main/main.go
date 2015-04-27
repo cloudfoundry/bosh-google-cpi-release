@@ -68,7 +68,7 @@ func buildDispatcher(
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,
 ) (bgcdisp.Dispatcher, error) {
-	googleClient, err := gclient.NewGoogleClient(config.Google.Project, config.Google.JsonKey, config.Google.DefaultZone)
+	googleClient, err := gclient.NewGoogleClient(config.Google.Project, config.Google.JSONKey, config.Google.DefaultZone)
 	if err != nil {
 		return nil, err
 	}

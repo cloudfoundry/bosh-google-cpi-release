@@ -75,7 +75,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Determine zone
 	zone := cv.defaultZone
-	for k, _ := range zones {
+	for k := range zones {
 		zone = k
 		break
 	}

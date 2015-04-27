@@ -17,7 +17,7 @@ type Config struct {
 
 type GoogleConfig struct {
 	Project     string `json:"project"`
-	JsonKey     string `json:"json_key"`
+	JSONKey     string `json:"json_key"`
 	DefaultZone string `json:"default_zone"`
 }
 
@@ -61,8 +61,8 @@ func (c GoogleConfig) Validate() error {
 		return bosherr.Error("Must provide a non-empty Project")
 	}
 
-	if c.JsonKey == "" {
-		return bosherr.Error("Must provide a non-empty JsonKey")
+	if c.JSONKey == "" {
+		return bosherr.Error("Must provide a non-empty JSONKey")
 	}
 
 	if c.DefaultZone == "" {

@@ -14,30 +14,30 @@ import (
 const RegistryServiceLogTag = "RegistryService"
 
 type RegistryService struct {
-	registryOptions RegistryOptions
-	logger          boshlog.Logger
+	options Options
+	logger  boshlog.Logger
 }
 
 func NewRegistryService(
-	registryOptions RegistryOptions,
+	options Options,
 	logger boshlog.Logger,
 ) RegistryService {
 	return RegistryService{
-		registryOptions: registryOptions,
-		logger:          logger,
+		options: options,
+		logger:  logger,
 	}
 }
 
 func (r RegistryService) Endpoint() string {
-	return fmt.Sprintf("%s://%s:%s@%s:%d", r.registryOptions.Schema, r.registryOptions.Username, r.registryOptions.Password, r.registryOptions.Host, r.registryOptions.Port)
+	return fmt.Sprintf("%s://%s:%s@%s:%d", r.options.Schema, r.options.Username, r.options.Password, r.options.Host, r.options.Port)
 }
 
 func (r RegistryService) PublicEndpoint() string {
-	return fmt.Sprintf("%s://%s:%d", r.registryOptions.Schema, r.registryOptions.Host, r.registryOptions.Port)
+	return fmt.Sprintf("%s://%s:%d", r.options.Schema, r.options.Host, r.options.Port)
 }
 
-func (r RegistryService) Delete(instanceId string) error {
-	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceId)
+func (r RegistryService) Delete(instanceID string) error {
+	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceID)
 	r.logger.Debug(RegistryServiceLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("DELETE", endpoint, nil)
@@ -60,8 +60,8 @@ func (r RegistryService) Delete(instanceId string) error {
 	return nil
 }
 
-func (r RegistryService) Fetch(instanceId string) (AgentSettings, error) {
-	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceId)
+func (r RegistryService) Fetch(instanceID string) (AgentSettings, error) {
+	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceID)
 	r.logger.Debug(RegistryServiceLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
 	httpClient := http.Client{}
@@ -97,13 +97,13 @@ func (r RegistryService) Fetch(instanceId string) (AgentSettings, error) {
 	return agentSettings, nil
 }
 
-func (r RegistryService) Update(instanceId string, agentSet AgentSettings) error {
+func (r RegistryService) Update(instanceID string, agentSet AgentSettings) error {
 	settingsJSON, err := json.Marshal(agentSet)
 	if err != nil {
 		return bosherr.WrapError(err, "Marshalling agent settings")
 	}
 
-	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceId)
+	endpoint := fmt.Sprintf("%s/instances/%s/settings", r.Endpoint(), instanceID)
 	r.logger.Debug(RegistryServiceLogTag, "Updating registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 
 	putPayload := bytes.NewReader(settingsJSON)

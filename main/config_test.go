@@ -17,7 +17,7 @@ import (
 
 var validGoogleConfig = GoogleConfig{
 	Project:     "fake-project",
-	JsonKey:     "{}",
+	JSONKey:     "{}",
 	DefaultZone: "fake-default-zone",
 }
 
@@ -29,7 +29,7 @@ var validActionsOptions = bgcaction.ConcreteFactoryOptions{
 			Type: "fake-blobstore-type",
 		},
 	},
-	Registry: registry.RegistryOptions{
+	Registry: registry.Options{
 		Schema:   "http",
 		Host:     "fake-host",
 		Port:     5555,
@@ -107,7 +107,7 @@ var _ = Describe("Config", func() {
 
 		It("returns error if actions section is not valid", func() {
 			config.Actions.Agent = registry.AgentOptions{}
-			config.Actions.Registry = registry.RegistryOptions{}
+			config.Actions.Registry = registry.Options{}
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
@@ -139,12 +139,12 @@ var _ = Describe("GoogleConfig", func() {
 			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty Project"))
 		})
 
-		It("returns error if JsonKey is empty", func() {
-			config.JsonKey = ""
+		It("returns error if JSONKey is empty", func() {
+			config.JSONKey = ""
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty JsonKey"))
+			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty JSONKey"))
 		})
 
 		It("returns error if DefaultZone is empty", func() {

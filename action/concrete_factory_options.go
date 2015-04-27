@@ -8,7 +8,7 @@ import (
 
 type ConcreteFactoryOptions struct {
 	Agent    registry.AgentOptions
-	Registry registry.RegistryOptions
+	Registry registry.Options
 }
 
 func (o ConcreteFactoryOptions) Validate() error {

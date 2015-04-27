@@ -38,7 +38,7 @@ func (i GoogleImageService) Create(name string, description string, sourceURL st
 	return image.Name, nil
 }
 
-func (i GoogleImageService) CreateFromUrl(sourceURL string, description string) (string, error) {
+func (i GoogleImageService) CreateFromURL(sourceURL string, description string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Generating random Google Image name")

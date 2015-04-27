@@ -20,7 +20,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 					Type: "fake-blobstore-type",
 				},
 			},
-			Registry: registry.RegistryOptions{
+			Registry: registry.Options{
 				Schema:   "http",
 				Host:     "fake-host",
 				Port:     5555,
@@ -49,7 +49,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 		})
 
 		It("returns error if registry section is not valid", func() {
-			options.Registry = registry.RegistryOptions{}
+			options.Registry = registry.Options{}
 
 			err := options.Validate()
 			Expect(err).To(HaveOccurred())

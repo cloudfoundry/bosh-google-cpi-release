@@ -9,7 +9,7 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-func (s GoogleSnapshotService) Create(diskId string, description string, zone string) (string, error) {
+func (s GoogleSnapshotService) Create(diskID string, description string, zone string) (string, error) {
 	uuidStr, err := s.uuidGen.Generate()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Generating random Google Snapshot name")
@@ -22,11 +22,11 @@ func (s GoogleSnapshotService) Create(diskId string, description string, zone st
 	snapshot := &compute.Snapshot{
 		Name:        fmt.Sprintf("%s-%s", googleSnapshotNamePrefix, uuidStr),
 		Description: description,
-		SourceDisk:  diskId,
+		SourceDisk:  diskID,
 	}
 
 	s.logger.Debug(googleSnapshotServiceLogTag, "Creating Google Snapshot with params: %#v", snapshot)
-	operation, err := s.computeService.Disks.CreateSnapshot(s.project, gutil.ResourceSplitter(zone), diskId, snapshot).Do()
+	operation, err := s.computeService.Disks.CreateSnapshot(s.project, gutil.ResourceSplitter(zone), diskID, snapshot).Do()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Snapshot")
 	}

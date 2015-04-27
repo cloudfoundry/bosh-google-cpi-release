@@ -17,7 +17,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 	}
 
 	instanceName := fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
-	canIpForward := instanceNetworks.CanIpForward()
+	canIPForward := instanceNetworks.CanIPForward()
 	diskParams := i.createDiskParams(vmProps.Stemcell)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, instanceNetworks)
 	if err != nil {
@@ -37,7 +37,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 	vm := &compute.Instance{
 		Name:              instanceName,
 		Description:       googleInstanceDescription,
-		CanIpForward:      canIpForward,
+		CanIpForward:      canIPForward,
 		Disks:             diskParams,
 		MachineType:       vmProps.MachineType,
 		Metadata:          metadataParams,
@@ -79,8 +79,8 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 	registryEndpoint := GoogleUserDataRegistryEndpoint{Endpoint: regEndpoint}
 	userData := GoogleUserData{Instance: instanceName, Registry: registryEndpoint}
 
-	if networkDns := instanceNetworks.Dns(); len(networkDns) > 0 {
-		userData.Dns = GoogleUserDataDnsItems{NameServers: networkDns}
+	if networkDNS := instanceNetworks.DNS(); len(networkDNS) > 0 {
+		userData.DNS = GoogleUserDataDNSItems{NameServers: networkDNS}
 	}
 
 	ud, err := json.Marshal(userData)

@@ -54,7 +54,7 @@ type GoogleInstanceServiceScopes []string
 type GoogleUserData struct {
 	Instance GoogleUserDataInstanceName     `json:"instance"`
 	Registry GoogleUserDataRegistryEndpoint `json:"registry"`
-	Dns      GoogleUserDataDnsItems         `json:"dns,omitempty"`
+	DNS      GoogleUserDataDNSItems         `json:"dns,omitempty"`
 }
 
 type GoogleUserDataInstanceName struct {
@@ -65,6 +65,6 @@ type GoogleUserDataRegistryEndpoint struct {
 	Endpoint string `json:"endpoint"`
 }
 
-type GoogleUserDataDnsItems struct {
+type GoogleUserDataDNSItems struct {
 	NameServers []string `json:"nameserver,omitempty"`
 }

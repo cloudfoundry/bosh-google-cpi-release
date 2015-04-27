@@ -23,7 +23,7 @@ import (
 	"google.golang.org/api/storage/v1"
 )
 
-var _ = Describe("concreteFactory", func() {
+var _ = Describe("ConcreteFactory", func() {
 	var (
 		project        string
 		defaultZone    string
@@ -34,7 +34,7 @@ var _ = Describe("concreteFactory", func() {
 		logger         boshlog.Logger
 
 		options = ConcreteFactoryOptions{
-			Registry: registry.RegistryOptions{
+			Registry: registry.Options{
 				Schema:   "http",
 				Host:     "fake-host",
 				Port:     5555,

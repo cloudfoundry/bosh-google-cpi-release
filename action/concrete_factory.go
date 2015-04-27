@@ -20,7 +20,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/registry"
 )
 
-type concreteFactory struct {
+type ConcreteFactory struct {
 	availableActions map[string]Action
 }
 
@@ -29,7 +29,7 @@ func NewConcreteFactory(
 	uuidGen boshuuid.Generator,
 	options ConcreteFactoryOptions,
 	logger boshlog.Logger,
-) concreteFactory {
+) ConcreteFactory {
 	operationService := goperation.NewGoogleOperationService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
@@ -105,7 +105,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	return concreteFactory{
+	return ConcreteFactory{
 		availableActions: map[string]Action{
 			// Disk management
 			"create_disk": NewCreateDisk(diskService, diskTypeService, vmService, googleClient.DefaultZone()),
@@ -133,7 +133,7 @@ func NewConcreteFactory(
 	}
 }
 
-func (f concreteFactory) Create(method string) (Action, error) {
+func (f ConcreteFactory) Create(method string) (Action, error) {
 	action, found := f.availableActions[method]
 	if !found {
 		return nil, bosherr.Errorf("Could not create action with method %s", method)

@@ -76,13 +76,13 @@ func (in GoogleInstanceNetworks) VipNetwork() InstanceNetwork {
 	return InstanceNetwork{}
 }
 
-func (in GoogleInstanceNetworks) CanIpForward() bool {
+func (in GoogleInstanceNetworks) CanIPForward() bool {
 	dynamicNetwork := in.DynamicNetwork()
 
 	return dynamicNetwork.IPForwarding
 }
 
-func (in GoogleInstanceNetworks) Dns() []string {
+func (in GoogleInstanceNetworks) DNS() []string {
 	dynamicNetwork := in.DynamicNetwork()
 
 	return dynamicNetwork.DNS
@@ -157,17 +157,15 @@ func (in GoogleInstanceNetworks) Validate() error {
 		if net.IsDynamic() {
 			if dnet {
 				return bosherr.Error("Only one dynamic network is allowed")
-			} else {
-				dnet = true
 			}
+			dnet = true
 		}
 
 		if net.IsVip() {
 			if vnet {
 				return bosherr.Error("Only one VIP network is allowed")
-			} else {
-				vnet = true
 			}
+			vnet = true
 		}
 	}
 

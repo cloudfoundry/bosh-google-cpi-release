@@ -18,28 +18,28 @@ var _ = Describe("RegistryService", func() {
 	var (
 		logger               boshlog.Logger
 		registryService      RegistryService
-		registryServer       *registryServer
+		registryServer       *RegistryServer
 		instanceID           string
 		expectedAgentSet     AgentSettings
 		expectedAgentSetJSON []byte
 	)
 
 	BeforeEach(func() {
-		registryOptions := RegistryOptions{
+		options := Options{
 			Schema:   "http",
 			Host:     "127.0.0.1",
 			Port:     6307,
 			Username: "fake-username",
 			Password: "fake-password",
 		}
-		registryServer = NewRegistryServer(registryOptions)
+		registryServer = NewRegistryServer(options)
 		readyCh := make(chan struct{})
 		go registryServer.Start(readyCh)
 		<-readyCh
 
 		instanceID = "fake-instance-id"
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		registryService = NewRegistryService(registryOptions, logger)
+		registryService = NewRegistryService(options, logger)
 
 		expectedAgentSet = AgentSettings{AgentID: "fake-agent-id"}
 		var err error
@@ -105,20 +105,20 @@ var _ = Describe("RegistryService", func() {
 
 })
 
-type registryServer struct {
+type RegistryServer struct {
 	InstanceSettings []byte
-	options          RegistryOptions
+	options          Options
 	listener         net.Listener
 }
 
-func NewRegistryServer(options RegistryOptions) *registryServer {
-	return &registryServer{
+func NewRegistryServer(options Options) *RegistryServer {
+	return &RegistryServer{
 		InstanceSettings: []byte{},
 		options:          options,
 	}
 }
 
-func (s *registryServer) Start(readyCh chan struct{}) error {
+func (s *RegistryServer) Start(readyCh chan struct{}) error {
 	var err error
 	s.listener, err = net.Listen("tcp", fmt.Sprintf("%s:%d", s.options.Host, s.options.Port))
 	if err != nil {
@@ -135,7 +135,7 @@ func (s *registryServer) Start(readyCh chan struct{}) error {
 	return httpServer.Serve(s.listener)
 }
 
-func (s *registryServer) Stop() error {
+func (s *RegistryServer) Stop() error {
 	// if client keeps connection alive, server will still be running
 	s.InstanceSettings = nil
 
@@ -147,7 +147,7 @@ func (s *registryServer) Stop() error {
 	return nil
 }
 
-func (s *registryServer) instanceHandler(w http.ResponseWriter, req *http.Request) {
+func (s *RegistryServer) instanceHandler(w http.ResponseWriter, req *http.Request) {
 	if !s.isAuthorized(req) {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
@@ -190,7 +190,7 @@ func (s *registryServer) instanceHandler(w http.ResponseWriter, req *http.Reques
 	}
 }
 
-func (s *registryServer) isAuthorized(req *http.Request) bool {
+func (s *RegistryServer) isAuthorized(req *http.Request) bool {
 	auth := s.options.Username + ":" + s.options.Password
 	expectedAuthorizationHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 

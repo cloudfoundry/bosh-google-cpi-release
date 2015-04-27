@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 )
 
-type RegistryOptions struct {
+type Options struct {
 	Schema   string
 	Host     string
 	Port     int
@@ -12,7 +12,7 @@ type RegistryOptions struct {
 	Password string
 }
 
-func (o RegistryOptions) Validate() error {
+func (o Options) Validate() error {
 	if o.Schema == "" {
 		return bosherr.Error("Must provide a non-empty Schema")
 	}
