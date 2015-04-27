@@ -122,8 +122,7 @@ func (r JSONCaller) getMethodArgType(methodType reflect.Type, index int) (argTyp
 func (r JSONCaller) extractReturns(values []reflect.Value) (value interface{}, err error) {
 	errValue := values[1]
 	if !errValue.IsNil() {
-		errorValues := errValue.MethodByName("Error").Call([]reflect.Value{})
-		err = bosherr.Error(errorValues[0].String())
+		err = errValue.Interface().(error)
 	}
 
 	value = values[0].Interface()
