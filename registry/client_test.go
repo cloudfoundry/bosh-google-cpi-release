@@ -66,6 +66,7 @@ var _ = Describe("RegistryClient", func() {
 
 		Context("when settings for instance do not exist", func() {
 			It("returns an error", func() {
+				Expect(registryServer.InstanceSettings).To(Equal([]byte{}))
 				err := registryClient.Delete(instanceID)
 				Expect(err).To(HaveOccurred())
 			})
@@ -87,6 +88,7 @@ var _ = Describe("RegistryClient", func() {
 
 		Context("when settings for instance do not exist", func() {
 			It("returns an error", func() {
+				Expect(registryServer.InstanceSettings).To(Equal([]byte{}))
 				agentSet, err := registryClient.Fetch(instanceID)
 				Expect(err).To(HaveOccurred())
 				Expect(agentSet).To(Equal(AgentSettings{}))
@@ -102,7 +104,6 @@ var _ = Describe("RegistryClient", func() {
 			Expect(registryServer.InstanceSettings).To(Equal(expectedAgentSetJSON))
 		})
 	})
-
 })
 
 type RegistryServer struct {

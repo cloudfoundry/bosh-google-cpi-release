@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 )
 
 const RegistryClientLogTag = "RegistryClient"
+const RegistryClientMaxAttemps = 5
+const RegistryClientRetryDelay = 5
 
 type Client struct {
 	options Options
@@ -40,13 +43,13 @@ func (c Client) Delete(instanceID string) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.Endpoint(), instanceID)
 	c.logger.Debug(RegistryClientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
 
+	httpClient := http.Client{}
 	request, err := http.NewRequest("DELETE", endpoint, nil)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating DELETE request for registry endpoint '%s'", endpoint)
 	}
 
-	httpClient := http.Client{}
-	httpResponse, err := httpClient.Do(request)
+	httpResponse, err := c.doHTTPRequest(httpClient, request)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Deleting agent settings from registry endpoint '%s'", endpoint)
 	}
@@ -65,7 +68,12 @@ func (c Client) Fetch(instanceID string) (AgentSettings, error) {
 	c.logger.Debug(RegistryClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
 	httpClient := http.Client{}
-	httpResponse, err := httpClient.Get(endpoint)
+	request, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		return AgentSettings{}, bosherr.WrapErrorf(err, "Creating GET request for registry endpoint '%s'", endpoint)
+	}
+
+	httpResponse, err := c.doHTTPRequest(httpClient, request)
 	if err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Fetching agent settings from registry endpoint '%s'", endpoint)
 	}
@@ -106,14 +114,14 @@ func (c Client) Update(instanceID string, agentSet AgentSettings) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.Endpoint(), instanceID)
 	c.logger.Debug(RegistryClientLogTag, "Updating registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 
+	httpClient := http.Client{}
 	putPayload := bytes.NewReader(settingsJSON)
 	request, err := http.NewRequest("PUT", endpoint, putPayload)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating PUT request for registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 	}
 
-	httpClient := http.Client{}
-	httpResponse, err := httpClient.Do(request)
+	httpResponse, err := c.doHTTPRequest(httpClient, request)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Updating registry endpoint '%s' with agent settings: '%s'", endpoint, settingsJSON)
 	}
@@ -125,4 +133,19 @@ func (c Client) Update(instanceID string, agentSet AgentSettings) error {
 	}
 
 	return nil
+}
+
+func (c Client) doHTTPRequest(httpClient http.Client, request *http.Request) (httpResponse *http.Response, err error) {
+	retryDelay := time.Duration(RegistryClientRetryDelay) * time.Second
+
+	for attempt := 0; attempt < RegistryClientMaxAttemps; attempt++ {
+		httpResponse, err = httpClient.Do(request)
+		if err == nil {
+			return httpResponse, nil
+		}
+		c.logger.Debug(RegistryClientLogTag, "Performing registry HTTP call #%d got error '%v'", attempt, err)
+		time.Sleep(retryDelay)
+	}
+
+	return nil, err
 }
