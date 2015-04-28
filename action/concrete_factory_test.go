@@ -136,14 +136,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryService := registry.NewRegistryService(
+		registryClient := registry.NewClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("attach_disk")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewAttachDisk(diskService, vmService, registryService)))
+		Expect(action).To(Equal(NewAttachDisk(diskService, vmService, registryClient)))
 	})
 
 	It("detach_disk", func() {
@@ -163,14 +163,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryService := registry.NewRegistryService(
+		registryClient := registry.NewClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("detach_disk")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDetachDisk(diskService, vmService, registryService)))
+		Expect(action).To(Equal(NewDetachDisk(diskService, vmService, registryClient)))
 	})
 
 	It("snapshot_disk", func() {
@@ -290,14 +290,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryService := registry.NewRegistryService(
+		registryClient := registry.NewClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("create_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryService, options.Agent, defaultZone)))
+		Expect(action).To(Equal(NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryClient, options.Agent, defaultZone)))
 	})
 
 	It("configure_networks", func() {
@@ -328,14 +328,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryService := registry.NewRegistryService(
+		registryClient := registry.NewClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("configure_networks")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryService)))
+		Expect(action).To(Equal(NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryClient)))
 	})
 
 	It("delete_vm", func() {
@@ -366,14 +366,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryService := registry.NewRegistryService(
+		registryClient := registry.NewClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("delete_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryService)))
+		Expect(action).To(Equal(NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryClient)))
 	})
 
 	It("reboot_vm", func() {

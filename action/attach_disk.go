@@ -10,20 +10,20 @@ import (
 )
 
 type AttachDisk struct {
-	diskService     gdisk.GoogleDiskService
-	vmService       ginstance.GoogleInstanceService
-	registryService registry.RegistryService
+	diskService    gdisk.GoogleDiskService
+	vmService      ginstance.GoogleInstanceService
+	registryClient registry.Client
 }
 
 func NewAttachDisk(
 	diskService gdisk.GoogleDiskService,
 	vmService ginstance.GoogleInstanceService,
-	registryService registry.RegistryService,
+	registryClient registry.Client,
 ) AttachDisk {
 	return AttachDisk{
-		diskService:     diskService,
-		vmService:       vmService,
-		registryService: registryService,
+		diskService:    diskService,
+		vmService:      vmService,
+		registryClient: registryClient,
 	}
 }
 
@@ -47,14 +47,14 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	}
 
 	// Read VM agent settings
-	agentSettings, err := ad.registryService.Fetch(string(vmCID))
+	agentSettings, err := ad.registryClient.Fetch(string(vmCID))
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}
 
 	// Update VM agent settings
 	newAgentSettings := agentSettings.AttachPersistentDisk(string(diskCID), deviceName)
-	err = ad.registryService.Update(string(vmCID), newAgentSettings)
+	err = ad.registryClient.Update(string(vmCID), newAgentSettings)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}

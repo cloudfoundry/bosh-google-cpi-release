@@ -76,7 +76,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	registryService := registry.NewRegistryService(
+	registryClient := registry.NewClient(
 		options.Registry,
 		logger,
 	)
@@ -110,8 +110,8 @@ func NewConcreteFactory(
 			// Disk management
 			"create_disk": NewCreateDisk(diskService, diskTypeService, vmService, googleClient.DefaultZone()),
 			"delete_disk": NewDeleteDisk(diskService),
-			"attach_disk": NewAttachDisk(diskService, vmService, registryService),
-			"detach_disk": NewDetachDisk(diskService, vmService, registryService),
+			"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
+			"detach_disk": NewDetachDisk(diskService, vmService, registryClient),
 
 			// Snapshot management
 			"snapshot_disk":   NewSnapshotDisk(snapshotService, diskService),
@@ -122,9 +122,9 @@ func NewConcreteFactory(
 			"delete_stemcell": NewDeleteStemcell(stemcellService),
 
 			// VM management
-			"create_vm":          NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryService, options.Agent, googleClient.DefaultZone()),
-			"configure_networks": NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryService),
-			"delete_vm":          NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryService),
+			"create_vm":          NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryClient, options.Agent, googleClient.DefaultZone()),
+			"configure_networks": NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryClient),
+			"delete_vm":          NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryClient),
 			"reboot_vm":          NewRebootVM(vmService),
 			"set_vm_metadata":    NewSetVMMetadata(vmService),
 			"has_vm":             NewHasVM(vmService),

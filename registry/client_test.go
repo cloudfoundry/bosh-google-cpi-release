@@ -14,10 +14,10 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 )
 
-var _ = Describe("RegistryService", func() {
+var _ = Describe("RegistryClient", func() {
 	var (
 		logger               boshlog.Logger
-		registryService      RegistryService
+		registryClient       Client
 		registryServer       *RegistryServer
 		instanceID           string
 		expectedAgentSet     AgentSettings
@@ -39,7 +39,7 @@ var _ = Describe("RegistryService", func() {
 
 		instanceID = "fake-instance-id"
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		registryService = NewRegistryService(options, logger)
+		registryClient = NewClient(options, logger)
 
 		expectedAgentSet = AgentSettings{AgentID: "fake-agent-id"}
 		var err error
@@ -58,7 +58,7 @@ var _ = Describe("RegistryService", func() {
 			})
 
 			It("deletes settings in the registry", func() {
-				err := registryService.Delete(instanceID)
+				err := registryClient.Delete(instanceID)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(registryServer.InstanceSettings).To(Equal([]byte{}))
 			})
@@ -66,7 +66,7 @@ var _ = Describe("RegistryService", func() {
 
 		Context("when settings for instance do not exist", func() {
 			It("returns an error", func() {
-				err := registryService.Delete(instanceID)
+				err := registryClient.Delete(instanceID)
 				Expect(err).To(HaveOccurred())
 			})
 		})
@@ -79,7 +79,7 @@ var _ = Describe("RegistryService", func() {
 			})
 
 			It("fetches settings from the registry", func() {
-				agentSet, err := registryService.Fetch(instanceID)
+				agentSet, err := registryClient.Fetch(instanceID)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(agentSet).To(Equal(expectedAgentSet))
 			})
@@ -87,7 +87,7 @@ var _ = Describe("RegistryService", func() {
 
 		Context("when settings for instance do not exist", func() {
 			It("returns an error", func() {
-				agentSet, err := registryService.Fetch(instanceID)
+				agentSet, err := registryClient.Fetch(instanceID)
 				Expect(err).To(HaveOccurred())
 				Expect(agentSet).To(Equal(AgentSettings{}))
 			})
@@ -97,7 +97,7 @@ var _ = Describe("RegistryService", func() {
 	Describe("Update", func() {
 		It("updates settings in the registry", func() {
 			Expect(registryServer.InstanceSettings).To(Equal([]byte{}))
-			err := registryService.Update(instanceID, expectedAgentSet)
+			err := registryClient.Update(instanceID, expectedAgentSet)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(registryServer.InstanceSettings).To(Equal(expectedAgentSetJSON))
 		})

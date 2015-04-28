@@ -16,7 +16,7 @@ type ConfigureNetworks struct {
 	addressService    gaddress.GoogleAddressService
 	networkService    gnetwork.GoogleNetworkService
 	targetPoolService gtargetpool.GoogleTargetPoolService
-	registryService   registry.RegistryService
+	registryClient    registry.Client
 }
 
 func NewConfigureNetworks(
@@ -24,14 +24,14 @@ func NewConfigureNetworks(
 	addressService gaddress.GoogleAddressService,
 	networkService gnetwork.GoogleNetworkService,
 	targetPoolService gtargetpool.GoogleTargetPoolService,
-	registryService registry.RegistryService,
+	registryClient registry.Client,
 ) ConfigureNetworks {
 	return ConfigureNetworks{
 		vmService:         vmService,
 		addressService:    addressService,
 		networkService:    networkService,
 		targetPoolService: targetPoolService,
-		registryService:   registryService,
+		registryClient:    registryClient,
 	}
 }
 
@@ -53,7 +53,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	}
 
 	// Read VM agent settings
-	agentSettings, err := rv.registryService.Fetch(string(vmCID))
+	agentSettings, err := rv.registryClient.Fetch(string(vmCID))
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}
@@ -61,7 +61,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	// Update VM agent settings
 	agentNetworks := networks.AsAgentNetworks()
 	newAgentSettings := agentSettings.ConfigureNetworks(agentNetworks)
-	err = rv.registryService.Update(string(vmCID), newAgentSettings)
+	err = rv.registryClient.Update(string(vmCID), newAgentSettings)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}

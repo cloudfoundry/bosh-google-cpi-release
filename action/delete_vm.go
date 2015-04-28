@@ -16,7 +16,7 @@ type DeleteVM struct {
 	addressService    gaddress.GoogleAddressService
 	networkService    gnetwork.GoogleNetworkService
 	targetPoolService gtargetpool.GoogleTargetPoolService
-	registryService   registry.RegistryService
+	registryClient    registry.Client
 }
 
 func NewDeleteVM(
@@ -24,14 +24,14 @@ func NewDeleteVM(
 	addressService gaddress.GoogleAddressService,
 	networkService gnetwork.GoogleNetworkService,
 	targetPoolService gtargetpool.GoogleTargetPoolService,
-	registryService registry.RegistryService,
+	registryClient registry.Client,
 ) DeleteVM {
 	return DeleteVM{
 		vmService:         vmService,
 		addressService:    addressService,
 		networkService:    networkService,
 		targetPoolService: targetPoolService,
-		registryService:   registryService,
+		registryClient:    registryClient,
 	}
 }
 
@@ -59,7 +59,7 @@ func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	}
 
 	// Delete the VM agent settings
-	err = dv.registryService.Delete(string(vmCID))
+	err = dv.registryClient.Delete(string(vmCID))
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Deleting vm '%s'", vmCID)
 	}

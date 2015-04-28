@@ -10,20 +10,20 @@ import (
 )
 
 type DetachDisk struct {
-	diskService     gdisk.GoogleDiskService
-	vmService       ginstance.GoogleInstanceService
-	registryService registry.RegistryService
+	diskService    gdisk.GoogleDiskService
+	vmService      ginstance.GoogleInstanceService
+	registryClient registry.Client
 }
 
 func NewDetachDisk(
 	diskService gdisk.GoogleDiskService,
 	vmService ginstance.GoogleInstanceService,
-	registryService registry.RegistryService,
+	registryClient registry.Client,
 ) DetachDisk {
 	return DetachDisk{
-		diskService:     diskService,
-		vmService:       vmService,
-		registryService: registryService,
+		diskService:    diskService,
+		vmService:      vmService,
+		registryClient: registryClient,
 	}
 }
 
@@ -38,14 +38,14 @@ func (dd DetachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	}
 
 	// Read VM agent settings
-	agentSettings, err := dd.registryService.Fetch(string(vmCID))
+	agentSettings, err := dd.registryClient.Fetch(string(vmCID))
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Detaching disk '%s' from vm '%s", diskCID, vmCID)
 	}
 
 	// Update VM agent settings
 	newAgentSettings := agentSettings.DetachPersistentDisk(string(diskCID))
-	err = dd.registryService.Update(string(vmCID), newAgentSettings)
+	err = dd.registryClient.Update(string(vmCID), newAgentSettings)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Detaching disk '%s' from vm '%s", diskCID, vmCID)
 	}

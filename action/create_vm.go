@@ -23,7 +23,7 @@ type CreateVM struct {
 	networkService     gnetwork.GoogleNetworkService
 	stemcellService    gimage.GoogleImageService
 	targetPoolService  gtargetpool.GoogleTargetPoolService
-	registryService    registry.RegistryService
+	registryClient     registry.Client
 	agentOptions       registry.AgentOptions
 	defaultZone        string
 }
@@ -36,7 +36,7 @@ func NewCreateVM(
 	networkService gnetwork.GoogleNetworkService,
 	stemcellService gimage.GoogleImageService,
 	targetPoolService gtargetpool.GoogleTargetPoolService,
-	registryService registry.RegistryService,
+	registryClient registry.Client,
 	agentOptions registry.AgentOptions,
 	defaultZone string,
 ) CreateVM {
@@ -48,7 +48,7 @@ func NewCreateVM(
 		networkService:     networkService,
 		stemcellService:    stemcellService,
 		targetPoolService:  targetPoolService,
-		registryService:    registryService,
+		registryClient:     registryClient,
 		agentOptions:       agentOptions,
 		defaultZone:        defaultZone,
 	}
@@ -120,7 +120,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Create VM
-	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryService.PublicEndpoint())
+	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryClient.PublicEndpoint())
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err
@@ -140,7 +140,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Create VM settings
 	agentNetworks := networks.AsAgentNetworks()
 	agentSettings := registry.NewAgentSettingsForVM(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
-	err = cv.registryService.Update(vm, agentSettings)
+	err = cv.registryClient.Update(vm, agentSettings)
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating VM")
 	}
