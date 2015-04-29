@@ -32,10 +32,18 @@ func (i GoogleImageService) Create(name string, description string, sourceURL st
 	}
 
 	if _, err = i.operationService.Waiter(operation, "", ""); err != nil {
+		i.cleanUp(image.Name)
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
 	}
 
 	return image.Name, nil
+}
+
+func (i GoogleImageService) cleanUp(id string) {
+	err := i.Delete(id)
+	if err != nil {
+		i.logger.Debug(googleImageServiceLogTag, "Failed cleaning up Google Image '%s': %#v", id, err)
+	}
 }
 
 func (i GoogleImageService) CreateFromURL(sourceURL string, description string) (string, error) {

@@ -13,6 +13,7 @@ const googleImageServiceLogTag = "GoogleImageService"
 const googleImageNamePrefix = "stemcell"
 const googleImageDescription = "Image managed by BOSH"
 const googleImageReadyStatus = "READY"
+const googleImageFailedStatus = "FAILED"
 
 type GoogleImageService struct {
 	project          string

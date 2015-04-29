@@ -13,7 +13,7 @@ func (i GoogleImageService) Delete(id string) error {
 		return bosherr.WrapErrorf(err, "Google Image '%s' does not exists", id)
 	}
 
-	if image.Status != googleImageReadyStatus {
+	if image.Status != googleImageReadyStatus && image.Status != googleImageFailedStatus {
 		return bosherr.WrapErrorf(err, "Cannot delete Google Image '%s', status is '%s'", id, image.Status)
 	}
 
