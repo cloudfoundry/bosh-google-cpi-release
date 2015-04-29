@@ -12,6 +12,7 @@ const googleDiskServiceLogTag = "GoogleDiskService"
 const googleDiskNamePrefix = "disk"
 const googleDiskDescription = "Disk managed by BOSH"
 const googleDiskReadyStatus = "READY"
+const googleDiskFailedStatus = "FAILED"
 
 type GoogleDiskService struct {
 	project          string

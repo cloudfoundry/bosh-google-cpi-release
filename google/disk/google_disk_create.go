@@ -32,8 +32,16 @@ func (d GoogleDiskService) Create(size int, diskType string, zone string) (strin
 	}
 
 	if _, err = d.operationService.Waiter(operation, zone, ""); err != nil {
+		d.cleanUp(disk.Name)
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Disk")
 	}
 
 	return disk.Name, nil
+}
+
+func (d GoogleDiskService) cleanUp(id string) {
+	err := d.Delete(id)
+	if err != nil {
+		d.logger.Debug(googleDiskServiceLogTag, "Failed cleaning up Google Disk '%s': %#v", id, err)
+	}
 }

@@ -16,7 +16,7 @@ func (d GoogleDiskService) Delete(id string) error {
 		return api.NewDiskNotFoundError(id, false)
 	}
 
-	if disk.Status != googleDiskReadyStatus {
+	if disk.Status != googleDiskReadyStatus && disk.Status != googleDiskFailedStatus {
 		return bosherr.WrapErrorf(err, "Cannot delete Google Disk '%s', status is '%s'", id, disk.Status)
 	}
 
