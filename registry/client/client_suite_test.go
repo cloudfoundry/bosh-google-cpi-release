@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestRegistryService(t *testing.T) {
+func TestRegistryClient(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Registry Service Suite")
+	RunSpecs(t, "Registry Client Suite")
 }

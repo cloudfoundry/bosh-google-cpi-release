@@ -8,7 +8,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/instance"
 	"github.com/frodenas/bosh-google-cpi/google/network"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type ConfigureNetworks struct {

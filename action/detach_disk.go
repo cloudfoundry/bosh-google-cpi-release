@@ -6,7 +6,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
 	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type DetachDisk struct {

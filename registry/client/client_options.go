@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 )
 
-type Options struct {
+type ClientOptions struct {
 	Schema   string
 	Host     string
 	Port     int
@@ -12,7 +12,7 @@ type Options struct {
 	Password string
 }
 
-func (o Options) Validate() error {
+func (o ClientOptions) Validate() error {
 	if o.Schema == "" {
 		return bosherr.Error("Must provide a non-empty Schema")
 	}

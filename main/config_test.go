@@ -12,7 +12,7 @@ import (
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
 
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 var validGoogleConfig = GoogleConfig{
@@ -29,7 +29,7 @@ var validActionsOptions = bgcaction.ConcreteFactoryOptions{
 			Type: "fake-blobstore-type",
 		},
 	},
-	Registry: registry.Options{
+	Registry: registry.ClientOptions{
 		Schema:   "http",
 		Host:     "fake-host",
 		Port:     5555,
@@ -107,7 +107,7 @@ var _ = Describe("Config", func() {
 
 		It("returns error if actions section is not valid", func() {
 			config.Actions.Agent = registry.AgentOptions{}
-			config.Actions.Registry = registry.Options{}
+			config.Actions.Registry = registry.ClientOptions{}
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())

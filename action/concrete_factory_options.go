@@ -3,12 +3,12 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type ConcreteFactoryOptions struct {
 	Agent    registry.AgentOptions
-	Registry registry.Options
+	Registry registry.ClientOptions
 }
 
 func (o ConcreteFactoryOptions) Validate() error {

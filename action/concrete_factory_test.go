@@ -18,7 +18,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/operation"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
 )
@@ -34,7 +34,7 @@ var _ = Describe("ConcreteFactory", func() {
 		logger         boshlog.Logger
 
 		options = ConcreteFactoryOptions{
-			Registry: registry.Options{
+			Registry: registry.ClientOptions{
 				Schema:   "http",
 				Host:     "fake-host",
 				Port:     5555,

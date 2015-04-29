@@ -16,8 +16,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/operation"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
-
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type ConcreteFactory struct {

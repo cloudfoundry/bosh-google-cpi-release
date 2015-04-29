@@ -25,7 +25,7 @@ var _ = Describe("RegistryClient", func() {
 	)
 
 	BeforeEach(func() {
-		options := Options{
+		options := ClientOptions{
 			Schema:   "http",
 			Host:     "127.0.0.1",
 			Port:     6307,
@@ -108,11 +108,11 @@ var _ = Describe("RegistryClient", func() {
 
 type RegistryServer struct {
 	InstanceSettings []byte
-	options          Options
+	options          ClientOptions
 	listener         net.Listener
 }
 
-func NewRegistryServer(options Options) *RegistryServer {
+func NewRegistryServer(options ClientOptions) *RegistryServer {
 	return &RegistryServer{
 		InstanceSettings: []byte{},
 		options:          options,

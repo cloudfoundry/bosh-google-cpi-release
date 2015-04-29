@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/frodenas/bosh-google-cpi/registry"
+	. "github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 var _ = Describe("AgentSettings", func() {

@@ -4,14 +4,14 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/frodenas/bosh-google-cpi/registry"
+	. "github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
-var _ = Describe("Options", func() {
+var _ = Describe("ClientOptions", func() {
 	var (
-		options Options
+		options ClientOptions
 
-		validOptions = Options{
+		validOptions = ClientOptions{
 			Schema:   "http",
 			Host:     "fake-host",
 			Port:     5555,

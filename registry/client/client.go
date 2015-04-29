@@ -17,12 +17,12 @@ const RegistryClientMaxAttemps = 5
 const RegistryClientRetryDelay = 5
 
 type Client struct {
-	options Options
+	options ClientOptions
 	logger  boshlog.Logger
 }
 
 func NewClient(
-	options Options,
+	options ClientOptions,
 	logger boshlog.Logger,
 ) Client {
 	return Client{

@@ -12,7 +12,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/network"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
 	"github.com/frodenas/bosh-google-cpi/google/util"
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type CreateVM struct {

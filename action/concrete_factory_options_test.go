@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/frodenas/bosh-google-cpi/action"
-	"github.com/frodenas/bosh-google-cpi/registry"
+	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 var _ = Describe("ConcreteFactoryOptions", func() {
@@ -20,7 +20,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 					Type: "fake-blobstore-type",
 				},
 			},
-			Registry: registry.Options{
+			Registry: registry.ClientOptions{
 				Schema:   "http",
 				Host:     "fake-host",
 				Port:     5555,
@@ -49,7 +49,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 		})
 
 		It("returns error if registry section is not valid", func() {
-			options.Registry = registry.Options{}
+			options.Registry = registry.ClientOptions{}
 
 			err := options.Validate()
 			Expect(err).To(HaveOccurred())
