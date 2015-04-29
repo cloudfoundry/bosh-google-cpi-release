@@ -12,6 +12,7 @@ const googleSnapshotServiceLogTag = "GoogleSnapshotService"
 const googleSnapshotNamePrefix = "snapshot"
 const googleSnapshotDescription = "Snapshot managed by BOSH"
 const googleSnapshotReadyStatus = "READY"
+const googleSnapshotFailedStatus = "FAILED"
 
 type GoogleSnapshotService struct {
 	project          string

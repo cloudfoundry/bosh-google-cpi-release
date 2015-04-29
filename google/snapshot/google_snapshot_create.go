@@ -32,8 +32,16 @@ func (s GoogleSnapshotService) Create(diskID string, description string, zone st
 	}
 
 	if _, err = s.operationService.Waiter(operation, zone, ""); err != nil {
+		s.cleanUp(snapshot.Name)
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Snapshot")
 	}
 
 	return snapshot.Name, nil
+}
+
+func (s GoogleSnapshotService) cleanUp(id string) {
+	err := s.Delete(id)
+	if err != nil {
+		s.logger.Debug(googleSnapshotServiceLogTag, "Failed cleaning up Google Snapshot '%s': %#v", id, err)
+	}
 }

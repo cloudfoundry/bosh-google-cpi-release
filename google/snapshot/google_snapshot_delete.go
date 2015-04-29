@@ -13,7 +13,7 @@ func (s GoogleSnapshotService) Delete(id string) error {
 		return bosherr.WrapErrorf(err, "Google Snapshot '%s' does not exists", id)
 	}
 
-	if snapshot.Status != googleSnapshotReadyStatus {
+	if snapshot.Status != googleSnapshotReadyStatus && snapshot.Status != googleSnapshotFailedStatus {
 		return bosherr.WrapErrorf(err, "Cannot delete Google Snapshot '%s', status is '%s'", id, snapshot.Status)
 	}
 
