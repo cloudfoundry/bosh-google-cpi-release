@@ -13,11 +13,8 @@ result=0
 
 bin=$(dirname $0)
 
-# Travis randomly kills go builds when using -race
-race=$([ "$TRAVIS" != "true" ] && echo "-race")
-
 echo -e "\n Formatting packages..."
-$bin/go fmt ./...
+$bin/gofmt
 let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
@@ -28,12 +25,8 @@ echo -e "\n Checking with golint..."
 $bin/golint
 let "result+=$?"
 
-echo -e "\n Installing ginkgo..."
-$bin/go install github.com/onsi/ginkgo/ginkgo
-let "result+=$?"
-
 echo -e "\n Testing packages..."
-$bin/env ginkgo -r $race $bin/..
+$bin/ginkgo
 let "result+=$?"
 
 echo -e "\n Running build script to confirm everything compiles..."

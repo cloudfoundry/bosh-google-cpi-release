@@ -1,0 +1,5 @@
+#!/bin/bash
+
+bin=$(dirname $0)
+
+$bin/go fmt ./...
