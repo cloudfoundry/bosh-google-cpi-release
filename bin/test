@@ -21,7 +21,7 @@ $bin/go fmt ./...
 let "result+=$?"
 
 echo -e "\n Vetting packages for potential issues..."
-$bin/go vet ./...
+$bin/govet
 let "result+=$?"
 
 echo -e "\n Checking with golint..."
