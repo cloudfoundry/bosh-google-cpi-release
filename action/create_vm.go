@@ -128,6 +128,13 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
+	// If any of the below code fails, we must delete the created vm
+	defer func() {
+		if err != nil {
+			cv.vmService.CleanUp(vm)
+		}
+	}()
+
 	// Configure VM networks
 	err = cv.vmService.AddNetworkConfiguration(vm, instanceNetworks)
 	if err != nil {

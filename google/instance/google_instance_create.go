@@ -54,10 +54,18 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 	}
 
 	if _, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
+		i.CleanUp(vm.Name)
 		return "", api.NewVMCreationFailedError(true)
 	}
 
 	return vm.Name, nil
+}
+
+func (i GoogleInstanceService) CleanUp(id string) {
+	err := i.Delete(id)
+	if err != nil {
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed cleaning up Google Instance '%s': %#v", id, err)
+	}
 }
 
 func (i GoogleInstanceService) createDiskParams(stemcell string) []*compute.AttachedDisk {
