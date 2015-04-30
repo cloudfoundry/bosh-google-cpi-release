@@ -5,3 +5,4 @@ set -e
 bin=$(dirname $0)
 
 $bin/go build -o $bin/../out/cpi github.com/frodenas/bosh-google-cpi/main
+$bin/go build -o $bin/../out/registry github.com/frodenas/bosh-google-cpi/registry
