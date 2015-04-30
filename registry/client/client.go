@@ -2,6 +2,8 @@ package registry
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -43,7 +45,11 @@ func (c Client) Delete(instanceID string) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.Endpoint(), instanceID)
 	c.logger.Debug(RegistryClientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
 
-	httpClient := http.Client{}
+	httpClient, err := c.httpClient()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Creating HTTP Client")
+	}
+
 	request, err := http.NewRequest("DELETE", endpoint, nil)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating DELETE request for registry endpoint '%s'", endpoint)
@@ -67,7 +73,11 @@ func (c Client) Fetch(instanceID string) (AgentSettings, error) {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.Endpoint(), instanceID)
 	c.logger.Debug(RegistryClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
-	httpClient := http.Client{}
+	httpClient, err := c.httpClient()
+	if err != nil {
+		return AgentSettings{}, bosherr.WrapErrorf(err, "Creating HTTP Client")
+	}
+
 	request, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Creating GET request for registry endpoint '%s'", endpoint)
@@ -114,7 +124,11 @@ func (c Client) Update(instanceID string, agentSet AgentSettings) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.Endpoint(), instanceID)
 	c.logger.Debug(RegistryClientLogTag, "Updating registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 
-	httpClient := http.Client{}
+	httpClient, err := c.httpClient()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Creating HTTP Client")
+	}
+
 	putPayload := bytes.NewReader(settingsJSON)
 	request, err := http.NewRequest("PUT", endpoint, putPayload)
 	if err != nil {
@@ -148,4 +162,36 @@ func (c Client) doHTTPRequest(httpClient http.Client, request *http.Request) (ht
 	}
 
 	return nil, err
+}
+
+func (c Client) httpClient() (http.Client, error) {
+	httpClient := http.Client{}
+
+	if c.options.Schema == "https" {
+		certificates, err := tls.LoadX509KeyPair(c.options.TLS.CertFile, c.options.TLS.KeyFile)
+		if err != nil {
+			return httpClient, bosherr.WrapError(err, "Loading X509 Key Pair")
+		}
+
+		certPool := x509.NewCertPool()
+		if c.options.TLS.CACertFile != "" {
+			caCert, err := ioutil.ReadFile(c.options.TLS.CACertFile)
+			if err != nil {
+				return httpClient, bosherr.WrapError(err, "Loading CA certificate")
+			}
+			if !certPool.AppendCertsFromPEM(caCert) {
+				return httpClient, bosherr.WrapError(err, "Invalid CA Certificate")
+			}
+		}
+
+		tlsConfig := &tls.Config{
+			Certificates:       []tls.Certificate{certificates},
+			InsecureSkipVerify: c.options.TLS.InsecureSkipVerify,
+			RootCAs:            certPool,
+		}
+
+		httpClient.Transport = &http.Transport{TLSClientConfig: tlsConfig}
+	}
+
+	return httpClient, nil
 }

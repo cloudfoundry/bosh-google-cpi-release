@@ -5,11 +5,19 @@ import (
 )
 
 type ClientOptions struct {
-	Schema   string
-	Host     string
-	Port     int
-	Username string
-	Password string
+	Schema   string    `json:"schema,omitempty"`
+	Host     string    `json:"host,omitempty"`
+	Port     int       `json:"port,omitempty"`
+	Username string    `json:"username,omitempty"`
+	Password string    `json:"password,omitempty"`
+	TLS      TLSConfig `json:"tls,omitempty"`
+}
+
+type TLSConfig struct {
+	InsecureSkipVerify bool   `json:"insecure_skip_verify,omitempty"`
+	CertFile           string `json:"certfile,omitempty"`
+	KeyFile            string `json:"keyfile,omitempty"`
+	CACertFile         string `json:"cacertfile,omitempty"`
 }
 
 func (o ClientOptions) Validate() error {
@@ -31,6 +39,25 @@ func (o ClientOptions) Validate() error {
 
 	if o.Password == "" {
 		return bosherr.Error("Must provide a non-empty Password")
+	}
+
+	if o.Schema == "https" {
+		err := o.TLS.Validate()
+		if err != nil {
+			return bosherr.WrapError(err, "Validating TLS configuration")
+		}
+	}
+
+	return nil
+}
+
+func (o TLSConfig) Validate() error {
+	if o.CertFile == "" {
+		return bosherr.Error("Must provide a non-empty CertFile")
+	}
+
+	if o.KeyFile == "" {
+		return bosherr.Error("Must provide a non-empty KeyFile")
 	}
 
 	return nil
