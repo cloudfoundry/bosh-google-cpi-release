@@ -84,12 +84,12 @@ func (i GoogleInstanceService) createDiskParams(stemcell string) []*compute.Atta
 }
 
 func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint string, instanceNetworks GoogleInstanceNetworks) (*compute.Metadata, error) {
-	instanceName := GoogleUserDataInstanceName{Name: name}
+	serverName := GoogleUserDataServerName{Name: name}
 	registryEndpoint := GoogleUserDataRegistryEndpoint{Endpoint: regEndpoint}
-	userData := GoogleUserData{Instance: instanceName, Registry: registryEndpoint}
+	userData := GoogleUserData{Server: serverName, Registry: registryEndpoint}
 
 	if networkDNS := instanceNetworks.DNS(); len(networkDNS) > 0 {
-		userData.DNS = GoogleUserDataDNSItems{NameServers: networkDNS}
+		userData.DNS = GoogleUserDataDNSItems{NameServer: networkDNS}
 	}
 
 	ud, err := json.Marshal(userData)
