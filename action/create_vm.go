@@ -6,6 +6,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/address"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type"
 	"github.com/frodenas/bosh-google-cpi/google/image"
 	"github.com/frodenas/bosh-google-cpi/google/instance"
 	"github.com/frodenas/bosh-google-cpi/google/machine_type"
@@ -19,6 +20,7 @@ type CreateVM struct {
 	vmService          ginstance.GoogleInstanceService
 	addressService     gaddress.GoogleAddressService
 	diskService        gdisk.GoogleDiskService
+	diskTypeService    gdisktype.GoogleDiskTypeService
 	machineTypeService gmachinetype.GoogleMachineTypeService
 	networkService     gnetwork.GoogleNetworkService
 	stemcellService    gimage.GoogleImageService
@@ -32,6 +34,7 @@ func NewCreateVM(
 	vmService ginstance.GoogleInstanceService,
 	addressService gaddress.GoogleAddressService,
 	diskService gdisk.GoogleDiskService,
+	diskTypeService gdisktype.GoogleDiskTypeService,
 	machineTypeService gmachinetype.GoogleMachineTypeService,
 	networkService gnetwork.GoogleNetworkService,
 	stemcellService gimage.GoogleImageService,
@@ -44,6 +47,7 @@ func NewCreateVM(
 		vmService:          vmService,
 		addressService:     addressService,
 		diskService:        diskService,
+		diskTypeService:    diskTypeService,
 		machineTypeService: machineTypeService,
 		networkService:     networkService,
 		stemcellService:    stemcellService,
@@ -102,6 +106,20 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapErrorf(err, "Creating vm: Machine Type '%s' does not exists", cloudProps.MachineType)
 	}
 
+	// Find the Disk Type (if provided)
+	var diskType string
+	if cloudProps.RootDiskSizeType != "" {
+		dt, found, err := cv.diskTypeService.Find(cloudProps.RootDiskSizeType, zone)
+		if err != nil {
+			return "", bosherr.WrapError(err, "Creating vm")
+		}
+		if !found {
+			return "", bosherr.WrapErrorf(err, "Creating vm: Root Disk Type '%s' does not exists", cloudProps.RootDiskSizeType)
+		}
+
+		diskType = dt.SelfLink
+	}
+
 	// Parse networks
 	vmNetworks := networks.AsGoogleInstanceNetworks()
 	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, cv.addressService, cv.networkService, cv.targetPoolService)
@@ -114,6 +132,8 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		Zone:              zone,
 		Stemcell:          stemcell.SelfLink,
 		MachineType:       machineType.SelfLink,
+		RootDiskSizeGb:    cloudProps.RootDiskSizeGb,
+		RootDiskSizeType:  diskType,
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
 		ServiceScopes:     ginstance.GoogleInstanceServiceScopes(cloudProps.ServiceScopes),

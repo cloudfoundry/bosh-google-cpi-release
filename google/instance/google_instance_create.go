@@ -11,6 +11,8 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
+const defaultRootDiskSizeGb = 10
+
 func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
@@ -19,7 +21,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 
 	instanceName := fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
 	canIPForward := instanceNetworks.CanIPForward()
-	diskParams := i.createDiskParams(vmProps.Stemcell)
+	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskSizeType)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, instanceNetworks)
 	if err != nil {
 		return "", err
@@ -68,15 +70,22 @@ func (i GoogleInstanceService) CleanUp(id string) {
 	}
 }
 
-func (i GoogleInstanceService) createDiskParams(stemcell string) []*compute.AttachedDisk {
+func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, diskType string) []*compute.AttachedDisk {
 	var disks []*compute.AttachedDisk
 
+	if diskSize == 0 {
+		diskSize = defaultRootDiskSizeGb
+	}
 	disk := &compute.AttachedDisk{
-		AutoDelete:       true,
-		Boot:             true,
-		InitializeParams: &compute.AttachedDiskInitializeParams{SourceImage: stemcell},
-		Mode:             "READ_WRITE",
-		Type:             "PERSISTENT",
+		AutoDelete: true,
+		Boot:       true,
+		InitializeParams: &compute.AttachedDiskInitializeParams{
+			DiskSizeGb:  int64(diskSize),
+			DiskType:    diskType,
+			SourceImage: stemcell,
+		},
+		Mode: "READ_WRITE",
+		Type: "PERSISTENT",
 	}
 	disks = append(disks, disk)
 

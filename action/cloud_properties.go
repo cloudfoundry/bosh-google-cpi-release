@@ -32,6 +32,8 @@ type StemcellCloudProperties struct {
 type VMCloudProperties struct {
 	Zone              string          `json:"zone,omitempty"`
 	MachineType       string          `json:"machine_type,omitempty"`
+	RootDiskSizeGb    int             `json:"root_disk_size_gb,omitempty"`
+	RootDiskSizeType  string          `json:"root_disk_size_type,omitempty"`
 	AutomaticRestart  bool            `json:"automatic_restart,omitempty"`
 	OnHostMaintenance string          `json:"on_host_maintenance,omitempty"`
 	ServiceScopes     VMServiceScopes `json:"service_scopes,omitempty"`

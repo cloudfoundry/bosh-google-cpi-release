@@ -44,6 +44,8 @@ type GoogleInstanceProperties struct {
 	Zone              string
 	Stemcell          string
 	MachineType       string
+	RootDiskSizeGb    int
+	RootDiskSizeType  string
 	AutomaticRestart  bool
 	OnHostMaintenance string
 	ServiceScopes     GoogleInstanceServiceScopes

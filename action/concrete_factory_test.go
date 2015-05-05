@@ -102,7 +102,12 @@ var _ = Describe("ConcreteFactory", func() {
 
 		action, err := factory.Create("create_disk")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateDisk(diskService, diskTypeService, vmService, defaultZone)))
+		Expect(action).To(Equal(NewCreateDisk(
+			diskService,
+			diskTypeService,
+			vmService,
+			defaultZone,
+		)))
 	})
 
 	It("delete_disk", func() {
@@ -262,6 +267,12 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
+		diskTypeService := gdisktype.NewGoogleDiskTypeService(
+			project,
+			computeService,
+			logger,
+		)
+
 		machineTypeService := gmachinetype.NewGoogleMachineTypeService(
 			project,
 			computeService,
@@ -297,7 +308,18 @@ var _ = Describe("ConcreteFactory", func() {
 
 		action, err := factory.Create("create_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateVM(vmService, addressService, diskService, machineTypeService, networkService, stemcellService, targetPoolService, registryClient, options.Agent, defaultZone)))
+		Expect(action).To(Equal(NewCreateVM(
+			vmService,
+			addressService,
+			diskService,
+			diskTypeService,
+			machineTypeService,
+			networkService,
+			stemcellService,
+			targetPoolService,
+			registryClient,
+			options.Agent, defaultZone,
+		)))
 	})
 
 	It("configure_networks", func() {
@@ -335,7 +357,13 @@ var _ = Describe("ConcreteFactory", func() {
 
 		action, err := factory.Create("configure_networks")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewConfigureNetworks(vmService, addressService, networkService, targetPoolService, registryClient)))
+		Expect(action).To(Equal(NewConfigureNetworks(
+			vmService,
+			addressService,
+			networkService,
+			targetPoolService,
+			registryClient,
+		)))
 	})
 
 	It("delete_vm", func() {
@@ -373,7 +401,13 @@ var _ = Describe("ConcreteFactory", func() {
 
 		action, err := factory.Create("delete_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryClient)))
+		Expect(action).To(Equal(NewDeleteVM(
+			vmService,
+			addressService,
+			networkService,
+			targetPoolService,
+			registryClient,
+		)))
 	})
 
 	It("reboot_vm", func() {
