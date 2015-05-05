@@ -18,10 +18,12 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, e
 		return "", api.NewVMNotFoundError(id)
 	}
 
+	deviceName := gutil.ResourceSplitter(diskLink)
 	disk := &compute.AttachedDisk{
-		Mode:   "READ_WRITE",
-		Source: diskLink,
-		Type:   "PERSISTENT",
+		DeviceName: deviceName,
+		Mode:       "READ_WRITE",
+		Source:     diskLink,
+		Type:       "PERSISTENT",
 	}
 
 	// Attach the disk
@@ -33,26 +35,6 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, e
 
 	if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
 		return "", bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
-	}
-
-	// Find the instance again, as we need to get the new attached disks infor
-	instance, found, err = i.Find(id, "")
-	if err != nil {
-		return "", err
-	}
-	if !found {
-		return "", api.NewVMNotFoundError(id)
-	}
-
-	// Look up for the device name
-	var deviceName string
-	for _, attachedDisk := range instance.Disks {
-		if attachedDisk.Source == diskLink {
-			deviceName = attachedDisk.DeviceName
-		}
-	}
-	if deviceName == "" {
-		return "", bosherr.WrapErrorf(err, "Google Disk '%s' has not been successfully attached to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
 	}
 
 	return deviceName, nil
