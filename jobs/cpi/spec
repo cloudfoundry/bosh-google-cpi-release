@@ -7,42 +7,50 @@ packages:
 templates:
   bin/cpi.erb: bin/cpi
   config/cpi.json.erb: config/cpi.json
+  config/registry.cacertfile.erb: config/registry.cacertfile
+  config/registry.certfile.erb: config/registry.certfile
+  config/registry.keyfile.erb: config/registry.keyfile
 
 properties:
-  cpi.google.project:
+  google.project:
     description: "Google Compute Engine project"
-  cpi.google.json_key:
+  google.json_key:
     description: "Google Compute Engine JSON key"
-  cpi.google.default_zone:
-    description: "Google Compute Engine default Zone"
-  cpi.google.access_key_id:
-    description: "Google Cloud Storage access key id"
-  cpi.google.secret_access_key:
-    description: "Google Cloud Storage secret access key"
+  google.default_zone:
+    description: "Google Compute Engine Default Zone"
 
-  cpi.agent.mbus:
+  agent.mbus:
     description: "Mbus URL used by deployed BOSH agents"
-  cpi.agent.ntp:
+  agent.ntp:
     description: "NTP configuration used by deployed BOSH agents"
     default: []
-  cpi.agent.blobstore.provider:
+  agent.blobstore.provider:
     description: "Provider type for the blobstore used by deployed BOSH agents (e.g. dav, s3)"
     default: "dav"
-  cpi.agent.blobstore.options:
+  agent.blobstore.options:
     description: "Options for the blobstore used by deployed BOSH agents"
     default: {}
 
-  cpi.registry.schema:
-    description: "Schema of registry"
+  registry.schema:
+    description: "Registry Schema"
     default: "http"
-  cpi.registry.host:
-    description: "Hostname of registry"
-  cpi.registry.port:
-    description: "Port of registry"
+  registry.host:
+    description: "Registry Hostname"
+  registry.port:
+    description: "Registry Port"
     default: 25889
-  cpi.registry.username:
-    description: "Username for registry"
+  registry.username:
+    description: "Registry Username"
     default: "admin"
-  cpi.registry.password:
-    description: "Password for registry"
+  registry.password:
+    description: "Registry Password"
     default: "admin"
+  registry.tls.insecure_skip_verify:
+    description: "Skip Registry server's certificate chain and host name verification"
+    default: true
+  registry.tls.cert:
+    description: "Registry Certificate (PEM format)"
+  registry.tls.key:
+    description: "Registry Key (PEM format)"
+  registry.tls.cacert:
+    description: "Registry Root CA certificates (PEM format)"
