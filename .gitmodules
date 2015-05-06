@@ -1,0 +1,3 @@
+[submodule "src/bosh-google-cpi"]
+	path = src/bosh-google-cpi
+	url = https://github.com/frodenas/bosh-google-cpi.git
