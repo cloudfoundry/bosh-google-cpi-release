@@ -108,13 +108,13 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Find the Disk Type (if provided)
 	var diskType string
-	if cloudProps.RootDiskSizeType != "" {
-		dt, found, err := cv.diskTypeService.Find(cloudProps.RootDiskSizeType, zone)
+	if cloudProps.RootDiskType != "" {
+		dt, found, err := cv.diskTypeService.Find(cloudProps.RootDiskType, zone)
 		if err != nil {
 			return "", bosherr.WrapError(err, "Creating vm")
 		}
 		if !found {
-			return "", bosherr.WrapErrorf(err, "Creating vm: Root Disk Type '%s' does not exists", cloudProps.RootDiskSizeType)
+			return "", bosherr.WrapErrorf(err, "Creating vm: Root Disk Type '%s' does not exists", cloudProps.RootDiskType)
 		}
 
 		diskType = dt.SelfLink
@@ -133,7 +133,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		Stemcell:          stemcell.SelfLink,
 		MachineType:       machineType.SelfLink,
 		RootDiskSizeGb:    cloudProps.RootDiskSizeGb,
-		RootDiskSizeType:  diskType,
+		RootDiskType:      diskType,
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
 		ServiceScopes:     ginstance.GoogleInstanceServiceScopes(cloudProps.ServiceScopes),

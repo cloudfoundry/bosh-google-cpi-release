@@ -21,7 +21,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 
 	instanceName := fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
 	canIPForward := instanceNetworks.CanIPForward()
-	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskSizeType)
+	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskType)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, instanceNetworks)
 	if err != nil {
 		return "", err
