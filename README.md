@@ -8,88 +8,81 @@ This is NOT presently a production ready [BOSH Google CPI](https://github.com/fr
 
 ## Usage
 
-### Install the BOSH micro CLI:
+### Prerequisites:
 
-Install the *experimental* [BOSH micro CLI](https://github.com/cloudfoundry/bosh-init/blob/master/docs/build.md) tool in your workstation.
+* A [Google Compute Engine](https://cloud.google.com/compute/) account
+* A GCE Static IP Address
+* A GCE SSH keypair
 
-### Create and download the required BOSH micro CLI artifacts
+### Install the bosh-init CLI:
 
-#### Create a deployment directory
+Install the [bosh-init](https://bosh.io/docs/install-bosh-init.html) tool in your workstation.
 
-Create a deployment directory:
+### Create a deployment directory
+
+Create a deployment directory to store all artifacts:
 
 ```
-mkdir google-micro-deployment
-cd google-micro-deployment
+mkdir google-bosh-deployment
+cd google-bosh-deployment
 ```
 
-#### Create a BOSH micro CLI deployment manifest
+### Download the BOSH Google CPI BOSH release
 
-Create a `google-cpi-manifest.yml` deployment manifest file inside the previously created deployment directory with the following properties:
+Download the BOSH Google CPI BOSH release inside the previously created deployment directory:
+
+```
+TBD
+```
+
+### Create a deployment manifest
+
+Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following properties:
 
 ```
 ---
-name: micro
+name: bosh
 
-networks:
-  - name: default
-    type: dynamic
-    cloud_properties:
-      network_name: __GCE_NETWORK_NAME__
-      tags:
-        - bosh
-  - name: vip
-    type: vip
+releases:
+  - name: bosh
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=162
+    sha1: 1ee7554d712bde135a945595c8e071aa94c4033d
+  - name: bosh-google-cpi
+    url: file://./bosh-google-cpi-1.tgz
+    sha1: 6545812c1c8245331b8c420f886dafd24b866eed
 
 resource_pools:
-  - name: default
-    network: default
+  - name: vms
+    network: private
+    stemcell:
+      url: http://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-2962-google-kvm-ubuntu-trusty-go_agent.tgz
+      sha1: 9d6a27b448a31ad291df538e08087535deedc886
     cloud_properties:
-      machine_type: __GCE_MACHINE_TYPE__
+      machine_type: n1-standard-2
+      root_disk_size_gb: 10
+      root_disk_type: pd-standard
 
-cloud_provider:
-  name: micro-google
+disk_pools:
+  - name: disks
+    disk_size: 32_768
+    cloud_properties:
+      type: pd-standard
 
-  template:
-    name: cpi
-    release: bosh-google-cpi
+networks:
+  - name: private
+    type: dynamic
+    cloud_properties:
+      network_name: default
+      tags:
+        - bosh
 
-  ssh_tunnel:
-    host: __STATIC_IP__
-    port: 22
-    user: __USER__
-    private_key: __PRIVATE_KEY_PATH__
-
-  registry: &registry
-    schema: http
-    host: 127.0.0.1
-    port: 25777
-    username: admin
-    password: admin
-
-  mbus: https://mbus-user:mbus-password@__STATIC_IP__:6868
-
-  properties:
-    cpi:
-      google: &google_properties
-        project: __GCE_PROJECT__
-        json_key: __GCE_JSON_KEY__
-        default_zone: __GCE_DEFAULT_ZONE__
-        access_key_id: __GCS_ACCESS_KEY_ID__
-        secret_access_key: __GCS_SECRET_ACCESS_KEY__
-      agent:
-        mbus: https://mbus-user:mbus-password@0.0.0.0:6868
-        ntp: ["169.254.169.254"]
-        blobstore:
-          provider: local
-          options:
-            blobstore_path: /var/vcap/micro_bosh/data/cache
-      registry: *registry
+  - name: public
+    type: vip
 
 jobs:
   - name: bosh
     instances: 1
-    persistent_disk: 32768
+
     templates:
       - name: nats
         release: bosh
@@ -105,95 +98,116 @@ jobs:
         release: bosh
       - name: health_monitor
         release: bosh
-      - name: registry
-        release: bosh
+      - name: cpi
+        release: bosh-google-cpi
+
+    resource_pool: vms
+    persistent_disk_pool: disks
+
     networks:
-      - name: default
-      - name: vip
+      - name: private
+      - name: public
         static_ips:
-          - __STATIC_IP__
+          - __STATIC_IP__ # <--- Replace with the static IP
 
     properties:
       nats:
-        user: "nats"
-        password: "nats"
-        auth_timeout: 3
-        address: __STATIC_IP__
+        address: 127.0.0.1
+        user: nats
+        password: nats
+
       redis:
-        address: "127.0.0.1"
-        password: "redis"
-        port: 25255
-      postgres: &bosh_db
-        adapter: "postgres"
-        user: "postgres"
-        password: "postgres"
-        host: "127.0.0.1"
-        database: "bosh"
-        port: 5432
+        listen_address: 127.0.0.1
+        address: 127.0.0.1
+        password: redis
+
+      postgres: &db
+        adapter: postgres
+        host: 127.0.0.1
+        user: postgres
+        password: postgres
+        database: bosh
+
+      dns:
+        address: __STATIC_IP__ # <--- Replace with the static IP
+        domain_name: microbosh
+        db: *db
+        recursor: 8.8.8.8
+
       blobstore:
-        address: __STATIC_IP__
+        address: __STATIC_IP__ # <--- Replace with the static IP
+        provider: dav
         director:
-          user: "director"
-          password: "director"
+          user: director
+          password: director
         agent:
-          user: "agent"
-          password: "agent"
-        provider: "dav"
+          user: agent
+          password: agent
+
       director:
-        address: "127.0.0.1"
-        name: "micro"
-        port: 25555
-        db: *bosh_db
-        backend_port: 25556
+        address: 127.0.0.1
+        name: micro-google
+        db: *db
         cpi_job: cpi
-      registry:
-        address: __STATIC_IP__
-        db: *bosh_db
-        http:
-          user: "admin"
-          password: "admin"
-          port: 25777
+
       hm:
         http:
-          user: "hm"
-          password: "hm"
+          user: hm
+          password: hm
         director_account:
-          user: "admin"
-          password: "admin"
-      dns:
-        address: __STATIC_IP__
-        domain_name: "microbosh"
-        db: *bosh_db
-      ntp: []
-      google: *google_properties
-```
+          user: admin
+          password: admin
+        resurrector_enabled: true
 
-#### Download the BOSH Google Stemcell
+      ntp: &ntp
+        - 169.254.169.254
 
-Download the BOSH Google Stemcell inside the previously created deployment directory:
+      google: &google_properties
+        project: __GCE_PROJECT__ # <--- Replace with your GCE project
+        json_key: __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key
+        default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
-```
-wget http://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-2479-google-kvm-ubuntu-trusty.tgz
-```
+      agent:
+        mbus: nats://nats:nats@__STATIC_IP__:4222 # <--- Replace with the static IP
+        ntp: *ntp
 
-#### Download the BOSH Google CPI BOSH release
+      registry:
+        host: __STATIC_IP__ # <--- Replace with the static IP
+        username: registry
+        password: registry
+        port: 25777
 
-TBD
+cloud_provider:
+  template:
+    name: cpi
+    release: bosh-google-cpi
 
-#### Download the BOSH release
+  ssh_tunnel:
+    host: __STATIC_IP__ # <--- Replace with the static IP
+    port: 22
+    user: __SSH_USER__ # <--- Replace with the user corresponding to your private SSH key
+    private_key: __PRIVATE_KEY_PATH__ # <--- Replace with the location of your google_compute_engine SSH private key
 
-Download the BOSH release inside the previously created deployment directory:
+  mbus: https://mbus:mbus@__STATIC_IP__:6868 # <--- Replace with the static IP
 
-```
-curl -L -J -O https://bosh.io/d/github.com/cloudfoundry/bosh?v=158
+  properties:
+    google: *google_properties
+    agent:
+      mbus: https://mbus:mbus@0.0.0.0:6868
+      ntp: *ntp
+      blobstore:
+        provider: local
+        options:
+          blobstore_path: /var/vcap/micro_bosh/data/cache
+
 ```
 
 ### Deploy
 
-Using the previous created deployment manifest and the downloaded artifacts, now we can deploy it:
+Using the previously created deployment manifest, now we can deploy it:
 
 ```
-bosh-init deploy google-cpi-manifest.yml light-bosh-stemcell-2479-google-kvm-ubuntu-trusty.tgz bosh-google-cpi-1.tgz bosh-158.tgz
+bosh-init deploy google-bosh-manifest.yml
 ```
 
 ## Contributing
