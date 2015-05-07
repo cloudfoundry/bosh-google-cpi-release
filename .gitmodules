@@ -1,3 +1,6 @@
 [submodule "src/bosh-google-cpi"]
 	path = src/bosh-google-cpi
 	url = https://github.com/frodenas/bosh-google-cpi.git
+[submodule "src/bosh-registry"]
+	path = src/bosh-registry
+	url = https://github.com/frodenas/bosh-registry.git
