@@ -45,8 +45,8 @@ name: bosh
 
 releases:
   - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=162
-    sha1: 1ee7554d712bde135a945595c8e071aa94c4033d
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=163
+    sha1: c0bdfcd479b306c98fdf7e5cb93b882d637c0ec7
   - name: bosh-google-cpi
     url: file://./bosh-google-cpi-1.tgz
     sha1: 6545812c1c8245331b8c420f886dafd24b866eed
@@ -99,6 +99,8 @@ jobs:
       - name: health_monitor
         release: bosh
       - name: cpi
+        release: bosh-google-cpi
+      - name: registry
         release: bosh-google-cpi
 
     resource_pool: vms
