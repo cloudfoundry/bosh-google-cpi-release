@@ -31,8 +31,8 @@ properties:
     description: "Options for the blobstore used by deployed BOSH agents"
     default: {}
 
-  registry.schema:
-    description: "Registry Schema"
+  registry.protocol:
+    description: "Registry Protocol (http|https)"
     default: "http"
   registry.host:
     description: "Registry Hostname"
@@ -45,12 +45,13 @@ properties:
   registry.password:
     description: "Registry Password"
     default: "admin"
-  registry.tls.insecure_skip_verify:
+
+  registry.client.tls.insecure_skip_verify:
     description: "Skip Registry server's certificate chain and host name verification"
     default: true
-  registry.tls.cert:
-    description: "Registry Certificate (PEM format)"
-  registry.tls.key:
-    description: "Registry Key (PEM format)"
-  registry.tls.cacert:
-    description: "Registry Root CA certificates (PEM format)"
+  registry.client.tls.cert:
+    description: "Registry Client Certificate (PEM format)"
+  registry.client.tls.key:
+    description: "Registry Client Key (PEM format)"
+  registry.client.tls.cacert:
+    description: "Registry Client Root CA certificates (PEM format)"

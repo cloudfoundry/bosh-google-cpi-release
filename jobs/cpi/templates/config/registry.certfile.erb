@@ -1,1 +1,1 @@
-<% if_p('registry.tls.cert') do |cert| %><% if cert.index("\n").nil? %><%= cert.gsub('\\n', "\n") %><% else %><%= cert %><% end %><% end %>
+<% if_p('registry.client.tls.cert') do |cert| %><% if cert.index("\n").nil? %><%= cert.gsub('\\n', "\n") %><% else %><%= cert %><% end %><% end %>

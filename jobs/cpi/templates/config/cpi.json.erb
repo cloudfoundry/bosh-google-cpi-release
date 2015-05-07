@@ -15,13 +15,13 @@ JSON.dump(
       },
     },
     "registry" => {
-      "schema" => p("registry.schema"),
+      "protocol" => p("registry.protocol"),
       "host" => p("registry.host"),
       "port" => p("registry.port"),
       "username" => p("registry.username"),
       "password" => p("registry.password"),
       "tls" => {
-        "insecure_skip_verify" => p("registry.tls.insecure_skip_verify"),
+        "insecure_skip_verify" => p("registry.client.tls.insecure_skip_verify"),
         "certfile" => "/var/vcap/jobs/cpi/config/registry.certfile",
         "keyfile" => "/var/vcap/jobs/cpi/config/registry.keyfile",
         "cacertfile" => "/var/vcap/jobs/cpi/config/registry.cacertfile",
