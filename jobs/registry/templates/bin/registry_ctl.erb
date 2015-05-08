@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set directories
-PACKAGE_DIR=/var/vcap/packages/registry
+PACKAGE_DIR=/var/vcap/packages/bosh-registry
 JOB_DIR=/var/vcap/jobs/registry
 LOG_DIR=/var/vcap/sys/log/registry
 RUN_DIR=/var/vcap/sys/run/registry
@@ -29,7 +29,7 @@ case $1 in
       ${PACKAGE_DIR}/bin/registry \
       -configPath=${JOB_DIR}/config/registry.json \
       >>${LOG_DIR}/registry.stdout.log \
-      2>>${LOG_DIR}/rregistry.stderr.log
+      2>>${LOG_DIR}/registry.stderr.log
     ;;
 
   stop)
