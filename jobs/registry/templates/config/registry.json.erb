@@ -12,10 +12,10 @@ JSON.dump(
       "cacertfile" => "/var/vcap/jobs/registry/config/registry.cacertfile",
     }
   },
-  "store": {
-    "adapter": p("registry.store.adapter"),
-    "options": {
-      "dbfile": "/var/vcap/store/registry/registry.db"
+  "store" => {
+    "adapter" => p("registry.store.adapter"),
+    "options" => {
+      "dbfile" => "/var/vcap/store/registry/registry.db"
     }
   }
 )
