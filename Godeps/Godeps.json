@@ -6,11 +6,6 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/boltdb/bolt",
-			"Comment": "v1.0-19-g00c6357",
-			"Rev": "00c635718fa0592764453e60194451889876eea0"
-		},
-		{
 			"ImportPath": "github.com/cloudfoundry/bosh-agent/errors",
 			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
 		},
@@ -27,8 +22,8 @@
 			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
 		},
 		{
-			"ImportPath": "github.com/mitchellh/mapstructure",
-			"Rev": "442e588f213303bec7936deba67901f8fc8f18b1"
+			"ImportPath": "github.com/frodenas/bosh-registry/client",
+			"Rev": "2b7d1d2646acbe7f754b16965ec9609cc8e4d194"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
