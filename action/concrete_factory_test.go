@@ -7,6 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/frodenas/bosh-google-cpi/action"
+
+	"github.com/frodenas/bosh-registry/client"
+
 	"github.com/frodenas/bosh-google-cpi/google/address"
 	"github.com/frodenas/bosh-google-cpi/google/client"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
@@ -18,7 +21,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/operation"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
-	"github.com/frodenas/bosh-google-cpi/registry/client"
+
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
 )
@@ -35,7 +38,7 @@ var _ = Describe("ConcreteFactory", func() {
 
 		options = ConcreteFactoryOptions{
 			Registry: registry.ClientOptions{
-				Schema:   "http",
+				Protocol: "http",
 				Host:     "fake-host",
 				Port:     5555,
 				Username: "fake-username",

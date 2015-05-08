@@ -3,7 +3,7 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/registry/client"
+	"github.com/frodenas/bosh-registry/client"
 )
 
 type ConcreteFactoryOptions struct {

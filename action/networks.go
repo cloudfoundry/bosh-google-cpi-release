@@ -1,8 +1,9 @@
 package action
 
 import (
+	"github.com/frodenas/bosh-registry/client"
+
 	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type Networks map[string]Network

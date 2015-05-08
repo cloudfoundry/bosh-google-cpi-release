@@ -3,6 +3,8 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
+	"github.com/frodenas/bosh-registry/client"
+
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/address"
 	"github.com/frodenas/bosh-google-cpi/google/disk"
@@ -13,7 +15,6 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/network"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool"
 	"github.com/frodenas/bosh-google-cpi/google/util"
-	"github.com/frodenas/bosh-google-cpi/registry/client"
 )
 
 type CreateVM struct {
@@ -140,7 +141,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Create VM
-	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryClient.PublicEndpoint())
+	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryClient.Endpoint())
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err
@@ -166,7 +167,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Create VM settings
 	agentNetworks := networks.AsAgentNetworks()
-	agentSettings := registry.NewAgentSettingsForVM(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
+	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
 	err = cv.registryClient.Update(vm, agentSettings)
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating VM")

@@ -12,7 +12,7 @@ import (
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
 
-	"github.com/frodenas/bosh-google-cpi/registry/client"
+	"github.com/frodenas/bosh-registry/client"
 )
 
 var validGoogleConfig = GoogleConfig{
@@ -30,7 +30,7 @@ var validActionsOptions = bgcaction.ConcreteFactoryOptions{
 		},
 	},
 	Registry: registry.ClientOptions{
-		Schema:   "http",
+		Protocol: "http",
 		Host:     "fake-host",
 		Port:     5555,
 		Username: "fake-username",

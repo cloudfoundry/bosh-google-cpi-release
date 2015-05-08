@@ -5,7 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/frodenas/bosh-google-cpi/action"
-	"github.com/frodenas/bosh-google-cpi/registry/client"
+
+	"github.com/frodenas/bosh-registry/client"
 )
 
 var _ = Describe("ConcreteFactoryOptions", func() {
@@ -21,7 +22,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 				},
 			},
 			Registry: registry.ClientOptions{
-				Schema:   "http",
+				Protocol: "http",
 				Host:     "fake-host",
 				Port:     5555,
 				Username: "fake-username",
