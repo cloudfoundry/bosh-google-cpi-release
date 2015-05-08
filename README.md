@@ -55,8 +55,8 @@ resource_pools:
   - name: vms
     network: private
     stemcell:
-      url: http://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-2962-google-kvm-ubuntu-trusty-go_agent.tgz
-      sha1: 9d6a27b448a31ad291df538e08087535deedc886
+      url: http://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-2968-google-kvm-ubuntu-trusty-go_agent.tgz
+      sha1: ce5a64c3ecef4fd3e6bd633260dfaa7de76540eb
     cloud_properties:
       machine_type: n1-standard-2
       root_disk_size_gb: 10
