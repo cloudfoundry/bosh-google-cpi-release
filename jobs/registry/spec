@@ -20,7 +20,7 @@ properties:
     default: "0.0.0.0"
   registry.port:
     description: "Registry Port"
-    default: 25889
+    default: 25777
   registry.username:
     description: "Registry Username"
     default: "admin"

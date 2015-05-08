@@ -38,7 +38,7 @@ properties:
     description: "Registry Hostname"
   registry.port:
     description: "Registry Port"
-    default: 25889
+    default: 25777
   registry.username:
     description: "Registry Username"
     default: "admin"

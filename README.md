@@ -172,12 +172,16 @@ jobs:
       agent:
         mbus: nats://nats:nats@__STATIC_IP__:4222 # <--- Replace with the static IP
         ntp: *ntp
+        blobstore:
+           options:
+             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the
+             user: agent
+             password: agent
 
       registry:
         host: __STATIC_IP__ # <--- Replace with the static IP
         username: registry
         password: registry
-        port: 25777
 
 cloud_provider:
   template:
