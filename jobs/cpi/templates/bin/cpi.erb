@@ -8,8 +8,13 @@ LOGS_DIR=/var/vcap/sys/log
 # Invoke CPI
 cmd="${PACKAGES_DIR}/bosh-google-cpi/bin/cpi -configPath=${JOBS_DIR}/cpi/config/cpi.json"
 if [ -d ${LOGS_DIR} ]; then
-  mkdir -p ${LOGS_DIR}/cpi
-  exec $cmd 2>>${LOGS_DIR}/cpi/cpi.stderr.log <&0
+  ##
+  # cpi is executed as vcap user and doesn't have privilegues to write in logs dir
+  #
+  # mkdir -p ${LOGS_DIR}/cpi
+  # exec $cmd 2>>${LOGS_DIR}/cpi/cpi.stderr.log <&0
+  ##
+  exec $cmd <&0
 else
   exec $cmd <&0
 fi
