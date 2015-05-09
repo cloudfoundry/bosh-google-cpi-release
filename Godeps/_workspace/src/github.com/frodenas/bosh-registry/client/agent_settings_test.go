@@ -92,10 +92,10 @@ var _ = Describe("AgentSettings", func() {
 	})
 
 	Describe("AttachPersistentDisk", func() {
-		It("sets persistent disk device name for given disk id on an empty agent settings", func() {
+		It("sets persistent disk device name and path for given disk id on an empty agent settings", func() {
 			agentSettings := AgentSettings{}
 
-			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-disk-device-name")
+			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-disk-device-name", "fake-disk-path")
 
 			Expect(newAgentSettings).To(Equal(AgentSettings{
 				Disks: DisksSettings{
@@ -103,25 +103,27 @@ var _ = Describe("AgentSettings", func() {
 						"fake-disk-id": PersistentSettings{
 							ID:       "fake-disk-id",
 							VolumeID: "fake-disk-device-name",
+							Path:     "fake-disk-path",
 						},
 					},
 				},
 			}))
 		})
 
-		It("sets persistent disk device name for given disk id", func() {
+		It("sets persistent disk device name and path for given disk id", func() {
 			agentSettings := AgentSettings{
 				Disks: DisksSettings{
 					Persistent: map[string]PersistentSettings{
 						"fake-other-disk-id": PersistentSettings{
 							ID:       "fake-other-disk-id",
 							VolumeID: "fake-other-disk-device-name",
+							Path:     "fake-other-disk-path",
 						},
 					},
 				},
 			}
 
-			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-disk-device-name")
+			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-disk-device-name", "fake-disk-path")
 
 			Expect(newAgentSettings).To(Equal(AgentSettings{
 				Disks: DisksSettings{
@@ -129,29 +131,32 @@ var _ = Describe("AgentSettings", func() {
 						"fake-other-disk-id": PersistentSettings{
 							ID:       "fake-other-disk-id",
 							VolumeID: "fake-other-disk-device-name",
+							Path:     "fake-other-disk-path",
 						},
 						"fake-disk-id": PersistentSettings{
 							ID:       "fake-disk-id",
 							VolumeID: "fake-disk-device-name",
+							Path:     "fake-disk-path",
 						},
 					},
 				},
 			}))
 		})
 
-		It("overwrites persistent disk device name for given disk id", func() {
+		It("overwrites persistent disk device name and path for given disk id", func() {
 			agentSettings := AgentSettings{
 				Disks: DisksSettings{
 					Persistent: map[string]PersistentSettings{
 						"fake-disk-id": PersistentSettings{
 							ID:       "fake-disk-id",
 							VolumeID: "fake-disk-device-name",
+							Path:     "fake-disk-path",
 						},
 					},
 				},
 			}
 
-			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-new-disk-device-name")
+			newAgentSettings := agentSettings.AttachPersistentDisk("fake-disk-id", "fake-new-disk-device-name", "fake-new-disk-path")
 
 			Expect(newAgentSettings).To(Equal(AgentSettings{
 				Disks: DisksSettings{
@@ -159,6 +164,7 @@ var _ = Describe("AgentSettings", func() {
 						"fake-disk-id": PersistentSettings{
 							ID:       "fake-disk-id",
 							VolumeID: "fake-new-disk-device-name",
+							Path:     "fake-new-disk-path",
 						},
 					},
 				},
@@ -231,6 +237,7 @@ var _ = Describe("AgentSettings", func() {
 						"fake-disk-id": PersistentSettings{
 							ID:       "fake-disk-id",
 							VolumeID: "fake-disk-device-name",
+							Path:     "fake-disk-path",
 						},
 					},
 				},
@@ -252,6 +259,7 @@ var _ = Describe("AgentSettings", func() {
 						"fake-other-disk-id": PersistentSettings{
 							ID:       "fake-other-disk-id",
 							VolumeID: "fake-other-disk-device-name",
+							Path:     "fake-other-disk-path",
 						},
 					},
 				},
@@ -265,6 +273,7 @@ var _ = Describe("AgentSettings", func() {
 						"fake-other-disk-id": PersistentSettings{
 							ID:       "fake-other-disk-id",
 							VolumeID: "fake-other-disk-device-name",
+							Path:     "fake-other-disk-path",
 						},
 					},
 				},

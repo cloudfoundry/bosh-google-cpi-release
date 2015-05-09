@@ -7,23 +7,23 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-agent/errors",
-			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
+			"Rev": "863a5879b88d626f5bacafce2fdc6927144b4f50"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-agent/logger",
-			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
+			"Rev": "863a5879b88d626f5bacafce2fdc6927144b4f50"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-agent/system",
-			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
+			"Rev": "863a5879b88d626f5bacafce2fdc6927144b4f50"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-agent/uuid",
-			"Rev": "f138939456bb8c72c2c15bc1f287d18e0fc65a70"
+			"Rev": "863a5879b88d626f5bacafce2fdc6927144b4f50"
 		},
 		{
 			"ImportPath": "github.com/frodenas/bosh-registry/client",
-			"Rev": "2b7d1d2646acbe7f754b16965ec9609cc8e4d194"
+			"Rev": "66634bc85628e1636ab7d90cd0799d6b5b399873"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
