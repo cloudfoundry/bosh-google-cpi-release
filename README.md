@@ -174,7 +174,7 @@ jobs:
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the
+             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the static IP
              user: agent
              password: agent
 
