@@ -14,9 +14,9 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 )
 
-const registryClientLogTag = "RegistryClient"
-const registryClientMaxAttemps = 5
-const registryClientRetryDelay = 5
+const clientLogTag = "RegistryClient"
+const clientMaxAttemps = 5
+const clientRetryDelay = 5
 
 // Client represents a BOSH Registry Client.
 type Client struct {
@@ -38,7 +38,7 @@ func NewClient(
 // Delete deletes the instance settings for a given instance ID.
 func (c Client) Delete(instanceID string) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.EndpointWithCredentials(), instanceID)
-	c.logger.Debug(registryClientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Debug(clientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("DELETE", endpoint, nil)
 	if err != nil {
@@ -56,7 +56,7 @@ func (c Client) Delete(instanceID string) error {
 		return bosherr.Errorf("Received status code '%d' when deleting agent settings from registry endpoint '%s'", httpResponse.StatusCode, endpoint)
 	}
 
-	c.logger.Debug(registryClientLogTag, "Deleted agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Debug(clientLogTag, "Deleted agent settings from registry endpoint '%s'", endpoint)
 	return nil
 }
 
@@ -73,7 +73,7 @@ func (c Client) EndpointWithCredentials() string {
 // Fetch gets the agent settings for a given instance ID.
 func (c Client) Fetch(instanceID string) (AgentSettings, error) {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.EndpointWithCredentials(), instanceID)
-	c.logger.Debug(registryClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Debug(clientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
@@ -108,7 +108,7 @@ func (c Client) Fetch(instanceID string) (AgentSettings, error) {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	}
 
-	c.logger.Debug(registryClientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
+	c.logger.Debug(clientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	return agentSettings, nil
 }
 
@@ -120,7 +120,7 @@ func (c Client) Update(instanceID string, agentSettings AgentSettings) error {
 	}
 
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.EndpointWithCredentials(), instanceID)
-	c.logger.Debug(registryClientLogTag, "Updating registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
+	c.logger.Debug(clientLogTag, "Updating registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 
 	putPayload := bytes.NewReader(settingsJSON)
 	request, err := http.NewRequest("PUT", endpoint, putPayload)
@@ -139,7 +139,7 @@ func (c Client) Update(instanceID string, agentSettings AgentSettings) error {
 		return bosherr.Errorf("Received status code '%d' when updating registry endpoint '%s' with agent settings: '%s'", httpResponse.StatusCode, endpoint, settingsJSON)
 	}
 
-	c.logger.Debug(registryClientLogTag, "Updated registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
+	c.logger.Debug(clientLogTag, "Updated registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 	return nil
 }
 
@@ -149,13 +149,13 @@ func (c Client) doRequest(request *http.Request) (httpResponse *http.Response, e
 		return nil, bosherr.WrapErrorf(err, "Creating HTTP Client")
 	}
 
-	retryDelay := time.Duration(registryClientRetryDelay) * time.Second
-	for attempt := 0; attempt < registryClientMaxAttemps; attempt++ {
+	retryDelay := time.Duration(clientRetryDelay) * time.Second
+	for attempt := 0; attempt < clientMaxAttemps; attempt++ {
 		httpResponse, err = httpClient.Do(request)
 		if err == nil {
 			return httpResponse, nil
 		}
-		c.logger.Debug(registryClientLogTag, "Performing registry HTTP call #%d got error '%v'", attempt, err)
+		c.logger.Debug(clientLogTag, "Performing registry HTTP call #%d got error '%v'", attempt, err)
 		time.Sleep(retryDelay)
 	}
 

@@ -72,7 +72,7 @@ var _ = Describe("ClientOptions", func() {
 	})
 })
 
-var _ = Describe("TLSOptions", func() {
+var _ = Describe("ClientTLSOptions", func() {
 	var (
 		options ClientOptions
 
@@ -82,7 +82,7 @@ var _ = Describe("TLSOptions", func() {
 			Port:     25777,
 			Username: "fake-username",
 			Password: "fake-password",
-			TLS: TLSConfig{
+			TLS: ClientTLSOptions{
 				CertFile: "fake-certificate",
 				KeyFile:  "fake-key",
 			},

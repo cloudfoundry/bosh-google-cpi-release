@@ -22,11 +22,11 @@ type ClientOptions struct {
 	Password string `json:"password,omitempty"`
 
 	// BOSH Registry TLS options (only when using protocol https)
-	TLS TLSConfig `json:"tls,omitempty"`
+	TLS ClientTLSOptions `json:"tls,omitempty"`
 }
 
-// TLSConfig are the TLS options used to create a BOSH Registry client.
-type TLSConfig struct {
+// ClientTLSOptions are the TLS options used to create a BOSH Registry client.
+type ClientTLSOptions struct {
 	// If the Client must skip the verification of the server certificates
 	InsecureSkipVerify bool `json:"insecure_skip_verify,omitempty"`
 
@@ -73,7 +73,7 @@ func (o ClientOptions) Validate() error {
 }
 
 // Validate validates the TLS options.
-func (o TLSConfig) Validate() error {
+func (o ClientTLSOptions) Validate() error {
 	if o.CertFile == "" {
 		return bosherr.Error("Must provide a non-empty CertFile")
 	}

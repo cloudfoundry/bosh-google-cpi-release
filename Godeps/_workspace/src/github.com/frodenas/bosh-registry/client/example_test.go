@@ -3,7 +3,7 @@ package registry_test
 import (
 	"fmt"
 
-	. "github.com/frodenas/bosh-registry/client"
+	"github.com/frodenas/bosh-registry/client"
 
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 )
@@ -11,7 +11,7 @@ import (
 func Example() {
 	var err error
 
-	clientOptions := ClientOptions{
+	clientOptions := registry.ClientOptions{
 		Protocol: "http",
 		Host:     "127.0.0.1",
 		Port:     25777,
@@ -19,14 +19,14 @@ func Example() {
 		Password: "password",
 	}
 	logger := boshlog.NewLogger(boshlog.LevelDebug)
-	registryClient := NewClient(clientOptions, logger)
+	registryClient := registry.NewClient(clientOptions, logger)
 
 	instanceID := "instance-id"
 
-	networksSettings := NetworksSettings{}
-	envSettings := EnvSettings{}
-	agentOptions := AgentOptions{}
-	settings := NewAgentSettings("agent-id", "vm-id", networksSettings, envSettings, agentOptions)
+	networksSettings := registry.NetworksSettings{}
+	envSettings := registry.EnvSettings{}
+	agentOptions := registry.AgentOptions{}
+	settings := registry.NewAgentSettings("agent-id", "vm-id", networksSettings, envSettings, agentOptions)
 
 	// Set the agent settings for a VM
 	fmt.Printf("Updating settings for instance '%s' with '%#v'", instanceID, settings)
