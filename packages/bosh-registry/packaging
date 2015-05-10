@@ -18,4 +18,4 @@ bin/build-linux-amd64
 # Copy BOSH Registry package
 echo "Copying BOSH Registry..."
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-registry/out/* ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-registry/out/bosh-registry ${BOSH_INSTALL_TARGET}/bin/
