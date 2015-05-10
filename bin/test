@@ -13,6 +13,10 @@ result=0
 
 bin=$(dirname $0)
 
+echo -e "\n Cleaning..."
+$bin/clean
+let "result+=$?"
+
 echo -e "\n Formatting packages..."
 $bin/gofmt
 let "result+=$?"

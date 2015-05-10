@@ -3,5 +3,4 @@ set -e
 
 bin=$(dirname $0)
 
-echo -e "\n Cleaning..."
 $bin/go clean -r ./...
