@@ -8,13 +8,28 @@ This is NOT presently a production ready [BOSH Google CPI](https://github.com/fr
 
 ## Usage
 
-### Prerequisites:
+I am assuming you are familiar with [BOSH](http://bosh.io/) and its terminology. If not, please take a look at the [BOSH documentation](http://bosh.io/docs) before running this procedure.
 
-* A [Google Compute Engine](https://cloud.google.com/compute/) account
-* A GCE Static IP Address
-* A GCE SSH keypair
+### Setup the [Google Cloud Platform](https://cloud.google.com/) environment
 
-### Install the bosh-init CLI:
+* [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine, if you haven't already.
+* Create a [service account](https://developers.google.com/console/help/new/#serviceaccounts) and secure store the downloaded **JSON Key**.
+* [Download and Install](https://cloud.google.com/compute/docs/gcloud-compute/#install) the gcloud command line tool.
+* Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
+
+```
+$ gcloud compute addresses create bosh --region us-central1
+```
+
+* Create a new firewall and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
+
+```
+$ gcloud compute firewall-rules create bosh --description "BOSH" --target-tags bosh --allow tcp:22 tcp:4222 tcp:6868 tcp:25250 tcp:25555 tcp:25777 udp:53
+```
+
+* Create ypur [SSH keys](https://cloud.google.com/compute/docs/instances#sshing) if you haven't already.
+
+### Install the bosh-init CLI
 
 Install the [bosh-init](https://bosh.io/docs/install-bosh-init.html) tool in your workstation.
 
@@ -23,8 +38,8 @@ Install the [bosh-init](https://bosh.io/docs/install-bosh-init.html) tool in you
 Create a deployment directory to store all artifacts:
 
 ```
-mkdir google-bosh-deployment
-cd google-bosh-deployment
+$ mkdir google-bosh-deployment
+$ cd google-bosh-deployment
 ```
 
 ### Download the BOSH Google CPI BOSH release
@@ -45,11 +60,11 @@ name: bosh
 
 releases:
   - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=163
-    sha1: c0bdfcd479b306c98fdf7e5cb93b882d637c0ec7
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=164
+    sha1: 619385f93dc67f2b67f332a90bdf5d5b36842d7f
   - name: bosh-google-cpi
     url: file://./bosh-google-cpi-1.tgz
-    sha1: 6545812c1c8245331b8c420f886dafd24b866eed
+    sha1: ad8648f3914654b3e7c1da61befb3e5cd84f5e50
 
 resource_pools:
   - name: vms
@@ -59,7 +74,7 @@ resource_pools:
       sha1: ce5a64c3ecef4fd3e6bd633260dfaa7de76540eb
     cloud_properties:
       machine_type: n1-standard-2
-      root_disk_size_gb: 10
+      root_disk_size_gb: 40
       root_disk_type: pd-standard
 
 disk_pools:
@@ -213,7 +228,7 @@ cloud_provider:
 Using the previously created deployment manifest, now we can deploy it:
 
 ```
-bosh-init deploy google-bosh-manifest.yml
+$ bosh-init deploy google-bosh-manifest.yml
 ```
 
 ## Contributing
@@ -271,7 +286,7 @@ You can now create final releases for everyone to enjoy!
 ```
 bosh create release
 # test this dev release
-git commit -m "updated BOSH Google CPI"
+git commit -m "updated BOSH Google CPI release"
 bosh create release --final
 git commit -m "creating vXYZ release"
 git tag vXYZ
