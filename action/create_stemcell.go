@@ -5,17 +5,17 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/image"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
 )
 
 const googleInfrastructure = "google"
 
 type CreateStemcell struct {
-	stemcellService gimage.GoogleImageService
+	stemcellService gimage.ImageService
 }
 
 func NewCreateStemcell(
-	stemcellService gimage.GoogleImageService,
+	stemcellService gimage.ImageService,
 ) CreateStemcell {
 	return CreateStemcell{
 		stemcellService: stemcellService,

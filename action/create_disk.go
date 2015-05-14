@@ -4,23 +4,23 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/disk_type"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
 type CreateDisk struct {
-	diskService     gdisk.GoogleDiskService
-	diskTypeService gdisktype.GoogleDiskTypeService
-	vmService       ginstance.GoogleInstanceService
+	diskService     gdisk.DiskService
+	diskTypeService gdisktype.DiskTypeService
+	vmService       ginstance.InstanceService
 	defaultZone     string
 }
 
 func NewCreateDisk(
-	diskService gdisk.GoogleDiskService,
-	diskTypeService gdisktype.GoogleDiskTypeService,
-	vmService ginstance.GoogleInstanceService,
+	diskService gdisk.DiskService,
+	diskTypeService gdisktype.DiskTypeService,
+	vmService ginstance.InstanceService,
 	defaultZone string,
 ) CreateDisk {
 	return CreateDisk{

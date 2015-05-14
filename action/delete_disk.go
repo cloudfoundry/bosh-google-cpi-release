@@ -4,15 +4,15 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 )
 
 type DeleteDisk struct {
-	diskService gdisk.GoogleDiskService
+	diskService gdisk.DiskService
 }
 
 func NewDeleteDisk(
-	diskService gdisk.GoogleDiskService,
+	diskService gdisk.DiskService,
 ) DeleteDisk {
 	return DeleteDisk{
 		diskService: diskService,

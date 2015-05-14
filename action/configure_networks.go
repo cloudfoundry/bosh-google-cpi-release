@@ -6,10 +6,10 @@ import (
 	"github.com/frodenas/bosh-registry/client"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/address"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/google/network"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 )
 
 type ConfigureNetworks struct {
@@ -38,7 +38,7 @@ func NewConfigureNetworks(
 
 func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, error) {
 	// Parse networks
-	vmNetworks := networks.AsGoogleInstanceNetworks()
+	vmNetworks := networks.AsInstanceServiceNetworks()
 	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, rv.addressService, rv.networkService, rv.targetPoolService)
 	if err := instanceNetworks.Validate(); err != nil {
 		return "", bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
@@ -60,7 +60,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	}
 
 	// Update VM agent settings
-	agentNetworks := networks.AsAgentNetworks()
+	agentNetworks := networks.AsRegistryNetworks()
 	newAgentSettings := agentSettings.ConfigureNetworks(agentNetworks)
 	err = rv.registryClient.Update(string(vmCID), newAgentSettings)
 	if err != nil {

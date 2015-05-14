@@ -3,15 +3,15 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/snapshot"
+	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
 )
 
 type DeleteSnapshot struct {
-	snapshotService gsnapshot.GoogleSnapshotService
+	snapshotService gsnapshot.SnapshotService
 }
 
 func NewDeleteSnapshot(
-	snapshotService gsnapshot.GoogleSnapshotService,
+	snapshotService gsnapshot.SnapshotService,
 ) DeleteSnapshot {
 	return DeleteSnapshot{
 		snapshotService: snapshotService,

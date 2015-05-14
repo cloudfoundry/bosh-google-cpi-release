@@ -6,19 +6,19 @@ import (
 	"github.com/frodenas/bosh-registry/client"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 type AttachDisk struct {
-	diskService    gdisk.GoogleDiskService
-	vmService      ginstance.GoogleInstanceService
+	diskService    gdisk.DiskService
+	vmService      ginstance.InstanceService
 	registryClient registry.Client
 }
 
 func NewAttachDisk(
-	diskService gdisk.GoogleDiskService,
-	vmService ginstance.GoogleInstanceService,
+	diskService gdisk.DiskService,
+	vmService ginstance.InstanceService,
 	registryClient registry.Client,
 ) AttachDisk {
 	return AttachDisk{

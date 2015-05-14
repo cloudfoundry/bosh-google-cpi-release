@@ -4,15 +4,15 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 type RebootVM struct {
-	vmService ginstance.GoogleInstanceService
+	vmService ginstance.InstanceService
 }
 
 func NewRebootVM(
-	vmService ginstance.GoogleInstanceService,
+	vmService ginstance.InstanceService,
 ) RebootVM {
 	return RebootVM{
 		vmService: vmService,

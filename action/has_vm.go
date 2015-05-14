@@ -3,15 +3,15 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 type HasVM struct {
-	vmService ginstance.GoogleInstanceService
+	vmService ginstance.InstanceService
 }
 
 func NewHasVM(
-	vmService ginstance.GoogleInstanceService,
+	vmService ginstance.InstanceService,
 ) HasVM {
 	return HasVM{
 		vmService: vmService,

@@ -6,14 +6,14 @@ import (
 	"github.com/frodenas/bosh-registry/client"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/address"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/disk_type"
-	"github.com/frodenas/bosh-google-cpi/google/image"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/google/machine_type"
-	"github.com/frodenas/bosh-google-cpi/google/network"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 	"github.com/frodenas/bosh-google-cpi/google/util"
 )
 
@@ -122,7 +122,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Parse networks
-	vmNetworks := networks.AsGoogleInstanceNetworks()
+	vmNetworks := networks.AsInstanceServiceNetworks()
 	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, cv.addressService, cv.networkService, cv.targetPoolService)
 	if err = instanceNetworks.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
@@ -141,7 +141,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Create VM
-	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryClient.Endpoint())
+	vm, err := cv.vmService.Create(vmProps, instanceNetworks, "cv.registryClient.Endpoint()")
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err
@@ -166,7 +166,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Create VM settings
-	agentNetworks := networks.AsAgentNetworks()
+	agentNetworks := networks.AsRegistryNetworks()
 	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
 	err = cv.registryClient.Update(vm, agentSettings)
 	if err != nil {

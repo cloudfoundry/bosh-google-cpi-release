@@ -6,10 +6,10 @@ import (
 	"github.com/frodenas/bosh-registry/client"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/address"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/google/network"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 )
 
 type DeleteVM struct {
@@ -39,7 +39,7 @@ func NewDeleteVM(
 func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	// Delete VM networks
 	var networks Networks
-	vmNetworks := networks.AsGoogleInstanceNetworks()
+	vmNetworks := networks.AsInstanceServiceNetworks()
 	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, dv.addressService, dv.networkService, dv.targetPoolService)
 
 	err := dv.vmService.DeleteNetworkConfiguration(string(vmCID), instanceNetworks)

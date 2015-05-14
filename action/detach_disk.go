@@ -6,23 +6,19 @@ import (
 	"github.com/frodenas/bosh-registry/client"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 type DetachDisk struct {
-	diskService    gdisk.GoogleDiskService
-	vmService      ginstance.GoogleInstanceService
+	vmService      ginstance.InstanceService
 	registryClient registry.Client
 }
 
 func NewDetachDisk(
-	diskService gdisk.GoogleDiskService,
-	vmService ginstance.GoogleInstanceService,
+	vmService ginstance.InstanceService,
 	registryClient registry.Client,
 ) DetachDisk {
 	return DetachDisk{
-		diskService:    diskService,
 		vmService:      vmService,
 		registryClient: registryClient,
 	}

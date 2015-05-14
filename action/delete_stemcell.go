@@ -3,15 +3,15 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/image"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
 )
 
 type DeleteStemcell struct {
-	stemcellService gimage.GoogleImageService
+	stemcellService gimage.ImageService
 }
 
 func NewDeleteStemcell(
-	stemcellService gimage.GoogleImageService,
+	stemcellService gimage.ImageService,
 ) DeleteStemcell {
 	return DeleteStemcell{
 		stemcellService: stemcellService,

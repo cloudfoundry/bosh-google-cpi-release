@@ -6,26 +6,26 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/snapshot"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
 )
 
-type CreateSnapshot struct {
-	snapshotService gsnapshot.GoogleSnapshotService
-	diskService     gdisk.GoogleDiskService
+type SnapshotDisk struct {
+	snapshotService gsnapshot.SnapshotService
+	diskService     gdisk.DiskService
 }
 
 func NewSnapshotDisk(
-	snapshotService gsnapshot.GoogleSnapshotService,
-	diskService gdisk.GoogleDiskService,
-) CreateSnapshot {
-	return CreateSnapshot{
+	snapshotService gsnapshot.SnapshotService,
+	diskService gdisk.DiskService,
+) SnapshotDisk {
+	return SnapshotDisk{
 		snapshotService: snapshotService,
 		diskService:     diskService,
 	}
 }
 
-func (sd CreateSnapshot) Run(diskCID DiskCID, metadata SnapshotMetadata) (SnapshotCID, error) {
+func (sd SnapshotDisk) Run(diskCID DiskCID, metadata SnapshotMetadata) (SnapshotCID, error) {
 	var description string
 
 	// Find the disk

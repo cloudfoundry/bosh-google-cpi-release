@@ -7,17 +7,17 @@ import (
 
 	"github.com/frodenas/bosh-registry/client"
 
-	"github.com/frodenas/bosh-google-cpi/google/address"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/client"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/disk_type"
-	"github.com/frodenas/bosh-google-cpi/google/image"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/google/machine_type"
-	"github.com/frodenas/bosh-google-cpi/google/network"
-	"github.com/frodenas/bosh-google-cpi/google/operation"
-	"github.com/frodenas/bosh-google-cpi/google/snapshot"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
+	"github.com/frodenas/bosh-google-cpi/google/operation_service"
+	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 )
 
 type ConcreteFactory struct {
@@ -76,7 +76,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	registryClient := registry.NewClient(
+	registryClient := registry.NewHTTPClient(
 		options.Registry,
 		logger,
 	)
@@ -116,7 +116,7 @@ func NewConcreteFactory(
 			),
 			"delete_disk": NewDeleteDisk(diskService),
 			"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
-			"detach_disk": NewDetachDisk(diskService, vmService, registryClient),
+			"detach_disk": NewDetachDisk(vmService, registryClient),
 
 			// Snapshot management
 			"snapshot_disk":   NewSnapshotDisk(snapshotService, diskService),

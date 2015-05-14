@@ -10,17 +10,17 @@ import (
 
 	"github.com/frodenas/bosh-registry/client"
 
-	"github.com/frodenas/bosh-google-cpi/google/address"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/client"
-	"github.com/frodenas/bosh-google-cpi/google/disk"
-	"github.com/frodenas/bosh-google-cpi/google/disk_type"
-	"github.com/frodenas/bosh-google-cpi/google/image"
-	"github.com/frodenas/bosh-google-cpi/google/instance"
-	"github.com/frodenas/bosh-google-cpi/google/machine_type"
-	"github.com/frodenas/bosh-google-cpi/google/network"
-	"github.com/frodenas/bosh-google-cpi/google/operation"
-	"github.com/frodenas/bosh-google-cpi/google/snapshot"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
+	"github.com/frodenas/bosh-google-cpi/google/operation_service"
+	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
@@ -144,7 +144,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient := registry.NewClient(
+		registryClient := registry.NewHTTPClient(
 			options.Registry,
 			logger,
 		)
@@ -155,14 +155,6 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("detach_disk", func() {
-		diskService := gdisk.NewGoogleDiskService(
-			project,
-			computeService,
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		vmService := ginstance.NewGoogleInstanceService(
 			project,
 			computeService,
@@ -171,14 +163,14 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient := registry.NewClient(
+		registryClient := registry.NewHTTPClient(
 			options.Registry,
 			logger,
 		)
 
 		action, err := factory.Create("detach_disk")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDetachDisk(diskService, vmService, registryClient)))
+		Expect(action).To(Equal(NewDetachDisk(vmService, registryClient)))
 	})
 
 	It("snapshot_disk", func() {
@@ -304,7 +296,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient := registry.NewClient(
+		registryClient := registry.NewHTTPClient(
 			options.Registry,
 			logger,
 		)
@@ -353,7 +345,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient := registry.NewClient(
+		registryClient := registry.NewHTTPClient(
 			options.Registry,
 			logger,
 		)
@@ -397,7 +389,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient := registry.NewClient(
+		registryClient := registry.NewHTTPClient(
 			options.Registry,
 			logger,
 		)

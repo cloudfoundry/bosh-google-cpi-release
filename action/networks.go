@@ -3,7 +3,7 @@ package action
 import (
 	"github.com/frodenas/bosh-registry/client"
 
-	"github.com/frodenas/bosh-google-cpi/google/instance"
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 type Networks map[string]Network
@@ -18,7 +18,7 @@ type Network struct {
 	CloudProperties NetworkCloudProperties `json:"cloud_properties,omitempty"`
 }
 
-func (ns Networks) AsGoogleInstanceNetworks() ginstance.InstanceNetworks {
+func (ns Networks) AsInstanceServiceNetworks() ginstance.InstanceNetworks {
 	networks := ginstance.InstanceNetworks{}
 
 	for netName, network := range ns {
@@ -40,7 +40,7 @@ func (ns Networks) AsGoogleInstanceNetworks() ginstance.InstanceNetworks {
 	return networks
 }
 
-func (ns Networks) AsAgentNetworks() registry.NetworksSettings {
+func (ns Networks) AsRegistryNetworks() registry.NetworksSettings {
 	networksSettings := registry.NetworksSettings{}
 
 	for netName, network := range ns {
