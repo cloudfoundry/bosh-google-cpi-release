@@ -1,4 +1,4 @@
-# BOSH Google Compute Engine CPI
+# BOSH Google Compute Engine CPI [![Build Status](https://travis-ci.org/frodenas/bosh-google-cpi.png)](https://travis-ci.org/frodenas/bosh-google-cpi)
 
 This is an **experimental** external [BOSH CPI](http://bosh.io/docs/bosh-components.html#cpi) for [Google Compute Engine](https://cloud.google.com/compute/).
 
