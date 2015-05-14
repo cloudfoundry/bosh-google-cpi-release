@@ -6,7 +6,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -25,7 +25,7 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, s
 		return deviceName, devicePath, api.NewVMNotFoundError(id)
 	}
 
-	deviceName = gutil.ResourceSplitter(diskLink)
+	deviceName = util.ResourceSplitter(diskLink)
 	disk := &compute.AttachedDisk{
 		DeviceName: deviceName,
 		Mode:       "READ_WRITE",
@@ -34,14 +34,14 @@ func (i GoogleInstanceService) AttachDisk(id string, diskLink string) (string, s
 	}
 
 	// Attach the disk
-	i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
-	operation, err := i.computeService.Instances.AttachDisk(i.project, gutil.ResourceSplitter(instance.Zone), id, disk).Do()
+	i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Disk '%s' to Google Instance '%s'", util.ResourceSplitter(diskLink), id)
+	operation, err := i.computeService.Instances.AttachDisk(i.project, util.ResourceSplitter(instance.Zone), id, disk).Do()
 	if err != nil {
-		return deviceName, devicePath, bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
+		return deviceName, devicePath, bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", util.ResourceSplitter(diskLink), id)
 	}
 
 	if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
-		return deviceName, devicePath, bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", gutil.ResourceSplitter(diskLink), id)
+		return deviceName, devicePath, bosherr.WrapErrorf(err, "Failed to attach Google Disk '%s' to Google Instance '%s'", util.ResourceSplitter(diskLink), id)
 	}
 
 	// Find the instance again, as we need to get the new attached disks info

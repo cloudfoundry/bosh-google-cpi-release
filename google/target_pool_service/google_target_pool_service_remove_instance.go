@@ -3,7 +3,7 @@ package gtargetpool
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -23,7 +23,7 @@ func (t GoogleTargetPoolService) RemoveInstance(id string, vmLink string) error 
 		}
 	}
 	if !attached {
-		t.logger.Debug(googleTargetPoolServiceLogTag, "Google Instance '%s' is not attached to Google Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+		t.logger.Debug(googleTargetPoolServiceLogTag, "Google Instance '%s' is not attached to Google Target Pool '%s'", util.ResourceSplitter(vmLink), id)
 		return nil
 	}
 
@@ -32,14 +32,14 @@ func (t GoogleTargetPoolService) RemoveInstance(id string, vmLink string) error 
 	instances = append(instances, instance)
 	targetPoolsRequest := &compute.TargetPoolsRemoveInstanceRequest{Instances: instances}
 
-	t.logger.Debug(googleTargetPoolServiceLogTag, "Removing Google Instance '%s' from Google Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
-	operation, err := t.computeService.TargetPools.RemoveInstance(t.project, gutil.ResourceSplitter(targetPool.Region), id, targetPoolsRequest).Do()
+	t.logger.Debug(googleTargetPoolServiceLogTag, "Removing Google Instance '%s' from Google Target Pool '%s'", util.ResourceSplitter(vmLink), id)
+	operation, err := t.computeService.TargetPools.RemoveInstance(t.project, util.ResourceSplitter(targetPool.Region), id, targetPoolsRequest).Do()
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance '%s' from Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance '%s' from Target Pool '%s'", util.ResourceSplitter(vmLink), id)
 	}
 
 	if _, err = t.operationService.Waiter(operation, "", targetPool.Region); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance '%s' from Target Pool '%s'", gutil.ResourceSplitter(vmLink), id)
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance '%s' from Target Pool '%s'", util.ResourceSplitter(vmLink), id)
 	}
 
 	return nil

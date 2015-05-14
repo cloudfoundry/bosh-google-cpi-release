@@ -17,7 +17,7 @@ const googleDiskFailedStatus = "FAILED"
 type GoogleDiskService struct {
 	project          string
 	computeService   *compute.Service
-	operationService goperation.GoogleOperationService
+	operationService goperation.OperationService
 	uuidGen          boshuuid.Generator
 	logger           boshlog.Logger
 }
@@ -25,7 +25,7 @@ type GoogleDiskService struct {
 func NewGoogleDiskService(
 	project string,
 	computeService *compute.Service,
-	operationService goperation.GoogleOperationService,
+	operationService goperation.OperationService,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleDiskService {

@@ -14,33 +14,35 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 type CreateVM struct {
-	vmService          ginstance.GoogleInstanceService
-	addressService     gaddress.GoogleAddressService
-	diskService        gdisk.GoogleDiskService
-	diskTypeService    gdisktype.GoogleDiskTypeService
-	machineTypeService gmachinetype.GoogleMachineTypeService
-	networkService     gnetwork.GoogleNetworkService
-	stemcellService    gimage.GoogleImageService
-	targetPoolService  gtargetpool.GoogleTargetPoolService
+	vmService          ginstance.InstanceService
+	addressService     gaddress.AddressService
+	diskService        gdisk.DiskService
+	diskTypeService    gdisktype.DiskTypeService
+	machineTypeService gmachinetype.MachineTypeService
+	networkService     gnetwork.NetworkService
+	stemcellService    gimage.ImageService
+	targetPoolService  gtargetpool.TargetPoolService
 	registryClient     registry.Client
+	registryOptions    registry.ClientOptions
 	agentOptions       registry.AgentOptions
 	defaultZone        string
 }
 
 func NewCreateVM(
-	vmService ginstance.GoogleInstanceService,
-	addressService gaddress.GoogleAddressService,
-	diskService gdisk.GoogleDiskService,
-	diskTypeService gdisktype.GoogleDiskTypeService,
-	machineTypeService gmachinetype.GoogleMachineTypeService,
-	networkService gnetwork.GoogleNetworkService,
-	stemcellService gimage.GoogleImageService,
-	targetPoolService gtargetpool.GoogleTargetPoolService,
+	vmService ginstance.InstanceService,
+	addressService gaddress.AddressService,
+	diskService gdisk.DiskService,
+	diskTypeService gdisktype.DiskTypeService,
+	machineTypeService gmachinetype.MachineTypeService,
+	networkService gnetwork.NetworkService,
+	stemcellService gimage.ImageService,
+	targetPoolService gtargetpool.TargetPoolService,
 	registryClient registry.Client,
+	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
 	defaultZone string,
 ) CreateVM {
@@ -54,6 +56,7 @@ func NewCreateVM(
 		stemcellService:    stemcellService,
 		targetPoolService:  targetPoolService,
 		registryClient:     registryClient,
+		registryOptions:    registryOptions,
 		agentOptions:       agentOptions,
 		defaultZone:        defaultZone,
 	}
@@ -73,7 +76,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		if !found {
 			return "", api.NewDiskNotFoundError(string(diskCID), false)
 		}
-		zones[gutil.ResourceSplitter(disk.Zone)] = struct{}{}
+		zones[util.ResourceSplitter(disk.Zone)] = struct{}{}
 	}
 	if len(zones) > 1 {
 		return "", bosherr.Errorf("Creating vm: can't use multiple zones: '%v'", zones)
@@ -129,7 +132,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Parse VM properties
-	vmProps := &ginstance.GoogleInstanceProperties{
+	vmProps := &ginstance.InstanceProperties{
 		Zone:              zone,
 		Stemcell:          stemcell.SelfLink,
 		MachineType:       machineType.SelfLink,
@@ -137,11 +140,11 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		RootDiskType:      diskType,
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
-		ServiceScopes:     ginstance.GoogleInstanceServiceScopes(cloudProps.ServiceScopes),
+		ServiceScopes:     ginstance.InstanceServiceScopes(cloudProps.ServiceScopes),
 	}
 
 	// Create VM
-	vm, err := cv.vmService.Create(vmProps, instanceNetworks, "cv.registryClient.Endpoint()")
+	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryOptions.Endpoint())
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err

@@ -14,10 +14,13 @@ import (
 
 var _ = Describe("GetDisks", func() {
 	var (
-		err       error
+		err               error
+		attachedDisksList []string
+		disks             ginstance.InstanceAttachedDisks
+
 		vmService *instancefakes.FakeInstanceService
-		getDisks  GetDisks
-		disks     ginstance.InstanceAttachedDisks
+
+		getDisks GetDisks
 	)
 
 	BeforeEach(func() {
@@ -26,10 +29,12 @@ var _ = Describe("GetDisks", func() {
 	})
 
 	Describe("Run", func() {
-		It("returns the list of attached disks", func() {
-			attachedDisksList := []string{"fake-disk-1", "fake-disk-2"}
+		BeforeEach(func() {
+			attachedDisksList = []string{"fake-disk-1", "fake-disk-2"}
 			vmService.AttachedDisksList = ginstance.InstanceAttachedDisks(attachedDisksList)
+		})
 
+		It("returns the list of attached disks", func() {
 			disks, err = getDisks.Run("fake-vm-id")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(vmService.AttachedDisksCalled).To(BeTrue())
@@ -37,6 +42,10 @@ var _ = Describe("GetDisks", func() {
 		})
 
 		Context("when there are not any attached disk", func() {
+			BeforeEach(func() {
+				vmService.AttachedDisksList = ginstance.InstanceAttachedDisks{}
+			})
+
 			It("returns an empty array", func() {
 				disks, err = getDisks.Run("fake-vm-id")
 				Expect(err).NotTo(HaveOccurred())

@@ -1,4 +1,4 @@
-package gaddress_test
+package util_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestAddressService(t *testing.T) {
+func TestUtil(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Address Service Suite")
+	RunSpecs(t, "Util Suite")
 }

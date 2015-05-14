@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -26,7 +26,7 @@ func (s GoogleSnapshotService) Create(diskID string, description string, zone st
 	}
 
 	s.logger.Debug(googleSnapshotServiceLogTag, "Creating Google Snapshot with params: %#v", snapshot)
-	operation, err := s.computeService.Disks.CreateSnapshot(s.project, gutil.ResourceSplitter(zone), diskID, snapshot).Do()
+	operation, err := s.computeService.Disks.CreateSnapshot(s.project, util.ResourceSplitter(zone), diskID, snapshot).Do()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Snapshot")
 	}

@@ -6,7 +6,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -25,10 +25,10 @@ func (o GoogleOperationService) Waiter(operation *compute.Operation, zone string
 			if region == "" {
 				operation, err = o.computeService.GlobalOperations.Get(o.project, operation.Name).Do()
 			} else {
-				operation, err = o.computeService.RegionOperations.Get(o.project, gutil.ResourceSplitter(region), operation.Name).Do()
+				operation, err = o.computeService.RegionOperations.Get(o.project, util.ResourceSplitter(region), operation.Name).Do()
 			}
 		} else {
-			operation, err = o.computeService.ZoneOperations.Get(o.project, gutil.ResourceSplitter(zone), operation.Name).Do()
+			operation, err = o.computeService.ZoneOperations.Get(o.project, util.ResourceSplitter(zone), operation.Name).Do()
 		}
 
 		if err != nil {

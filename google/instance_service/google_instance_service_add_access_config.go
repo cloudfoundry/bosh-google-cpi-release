@@ -3,13 +3,13 @@ package ginstance
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
 func (i GoogleInstanceService) AddAccessConfig(id string, zone string, networkInterface string, accessConfig *compute.AccessConfig) error {
 	i.logger.Debug(googleInstanceServiceLogTag, "Adding access config for Google Instance '%s'", id)
-	operation, err := i.computeService.Instances.AddAccessConfig(i.project, gutil.ResourceSplitter(zone), id, networkInterface, accessConfig).Do()
+	operation, err := i.computeService.Instances.AddAccessConfig(i.project, util.ResourceSplitter(zone), id, networkInterface, accessConfig).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to add access config for Google Instance '%s'", id)
 	}

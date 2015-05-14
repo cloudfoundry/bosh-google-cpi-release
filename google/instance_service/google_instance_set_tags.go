@@ -3,13 +3,13 @@ package ginstance
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
 func (i GoogleInstanceService) SetTags(id string, zone string, instanceTags *compute.Tags) error {
 	i.logger.Debug(googleInstanceServiceLogTag, "Setting tags for Google Instance '%s'", id)
-	operation, err := i.computeService.Instances.SetTags(i.project, gutil.ResourceSplitter(zone), id, instanceTags).Do()
+	operation, err := i.computeService.Instances.SetTags(i.project, util.ResourceSplitter(zone), id, instanceTags).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
 	}

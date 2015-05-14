@@ -2,7 +2,7 @@ package ginstance
 
 import (
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 func (i GoogleInstanceService) AttachedDisks(id string) (InstanceAttachedDisks, error) {
@@ -20,7 +20,7 @@ func (i GoogleInstanceService) AttachedDisks(id string) (InstanceAttachedDisks, 
 
 	for _, disk := range instance.Disks {
 		if disk.Boot != true {
-			disks = append(disks, gutil.ResourceSplitter(disk.Source))
+			disks = append(disks, util.ResourceSplitter(disk.Source))
 		}
 	}
 

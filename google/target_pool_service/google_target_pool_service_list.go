@@ -3,7 +3,7 @@ package gtargetpool
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -27,7 +27,7 @@ func (t GoogleTargetPoolService) List(region string) ([]*compute.TargetPool, err
 	}
 
 	t.logger.Debug(googleTargetPoolServiceLogTag, "Listing Google Target Pools in region '%s'", region)
-	targetPoolList, err := t.computeService.TargetPools.List(t.project, gutil.ResourceSplitter(region)).Do()
+	targetPoolList, err := t.computeService.TargetPools.List(t.project, util.ResourceSplitter(region)).Do()
 	if err != nil {
 		return targetPools, bosherr.WrapErrorf(err, "Failed to list Google Target Pools in region '%s'", region)
 	}

@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -26,7 +26,7 @@ func (d GoogleDiskService) Create(size int, diskType string, zone string) (strin
 	}
 
 	d.logger.Debug(googleDiskServiceLogTag, "Creating Google Disk with params: %#v", disk)
-	operation, err := d.computeService.Disks.Insert(d.project, gutil.ResourceSplitter(zone), disk).Do()
+	operation, err := d.computeService.Disks.Insert(d.project, util.ResourceSplitter(zone), disk).Do()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Failed to create Google Disk")
 	}

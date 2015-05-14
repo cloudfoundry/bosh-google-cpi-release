@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -40,7 +40,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata InstanceMetadat
 	metadata.Items = metadataItems
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Setting metadata for Google Instance '%s'", id)
-	operation, err := i.computeService.Instances.SetMetadata(i.project, gutil.ResourceSplitter(instance.Zone), id, metadata).Do()
+	operation, err := i.computeService.Instances.SetMetadata(i.project, util.ResourceSplitter(instance.Zone), id, metadata).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set metadata for Google Instance '%s'", id)
 	}

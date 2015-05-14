@@ -17,29 +17,31 @@ import (
 
 var _ = Describe("SnapshotDisk", func() {
 	var (
-		err             error
+		err        error
+		metadata   SnapshotMetadata
+		snapshotID SnapshotCID
+
 		diskService     *diskfakes.FakeDiskService
 		snapshotService *snapshotfakes.FakeSnapshotService
-		snapshotDisk    SnapshotDisk
-		metadata        SnapshotMetadata
-		snapshotID      SnapshotCID
+
+		snapshotDisk SnapshotDisk
 	)
 
 	BeforeEach(func() {
 		diskService = &diskfakes.FakeDiskService{}
 		snapshotService = &snapshotfakes.FakeSnapshotService{}
 		snapshotDisk = NewSnapshotDisk(snapshotService, diskService)
-		metadata = SnapshotMetadata{Deployment: "fake-deployment", Job: "fake-job", Index: "fake-index"}
 	})
 
 	Describe("Run", func() {
-		Context("creates a snaphot", func() {
-			BeforeEach(func() {
-				diskService.FindFound = true
-				diskService.FindDisk = &compute.Disk{Zone: "fake-disk-zone"}
-				snapshotService.CreateID = "fake-snapshot-id"
-			})
+		BeforeEach(func() {
+			diskService.FindFound = true
+			diskService.FindDisk = &compute.Disk{Zone: "fake-disk-zone"}
+			snapshotService.CreateID = "fake-snapshot-id"
+			metadata = SnapshotMetadata{Deployment: "fake-deployment", Job: "fake-job", Index: "fake-index"}
+		})
 
+		Context("creates a snaphot", func() {
 			It("with the proper description", func() {
 				snapshotID, err = snapshotDisk.Run("fake-disk-id", metadata)
 				Expect(err).NotTo(HaveOccurred())
@@ -69,16 +71,6 @@ var _ = Describe("SnapshotDisk", func() {
 			})
 		})
 
-		It("returns an error if disk is not found", func() {
-			diskService.FindFound = false
-
-			_, err = snapshotDisk.Run("fake-disk-id", metadata)
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(api.NewDiskNotFoundError("fake-disk-id", false).Error()))
-			Expect(diskService.FindCalled).To(BeTrue())
-			Expect(snapshotService.CreateCalled).To(BeFalse())
-		})
-
 		It("returns an error if diskService find call returns an error", func() {
 			diskService.FindErr = errors.New("fake-disk-service-error")
 
@@ -89,9 +81,17 @@ var _ = Describe("SnapshotDisk", func() {
 			Expect(snapshotService.CreateCalled).To(BeFalse())
 		})
 
+		It("returns an error if disk is not found", func() {
+			diskService.FindFound = false
+
+			_, err = snapshotDisk.Run("fake-disk-id", metadata)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal(api.NewDiskNotFoundError("fake-disk-id", false).Error()))
+			Expect(diskService.FindCalled).To(BeTrue())
+			Expect(snapshotService.CreateCalled).To(BeFalse())
+		})
+
 		It("returns an error if snapshotService create call returns an error", func() {
-			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{Zone: "fake-zone"}
 			snapshotService.CreateErr = errors.New("fake-snapshot-service-error")
 
 			_, err = snapshotDisk.Run("fake-disk-id", metadata)

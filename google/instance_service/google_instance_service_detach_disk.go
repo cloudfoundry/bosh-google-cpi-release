@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
@@ -20,7 +20,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 	// Look up for the device name
 	var deviceName string
 	for _, attachedDisk := range instance.Disks {
-		if gutil.ResourceSplitter(attachedDisk.Source) == diskID {
+		if util.ResourceSplitter(attachedDisk.Source) == diskID {
 			deviceName = attachedDisk.DeviceName
 		}
 	}
@@ -30,7 +30,7 @@ func (i GoogleInstanceService) DetachDisk(id string, diskID string) error {
 
 	// Detach the disk
 	i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Disk '%s' from Google Instance '%s'", diskID, id)
-	operation, err := i.computeService.Instances.DetachDisk(i.project, gutil.ResourceSplitter(instance.Zone), id, deviceName).Do()
+	operation, err := i.computeService.Instances.DetachDisk(i.project, util.ResourceSplitter(instance.Zone), id, deviceName).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to detach Google Disk '%s' from Google Instance '%s'", diskID, id)
 	}

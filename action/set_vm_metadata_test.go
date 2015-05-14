@@ -14,10 +14,12 @@ import (
 
 var _ = Describe("SetVMMetadata", func() {
 	var (
-		err           error
-		vmService     *instancefakes.FakeInstanceService
+		err        error
+		vmMetadata VMMetadata
+
+		vmService *instancefakes.FakeInstanceService
+
 		setVMMetadata SetVMMetadata
-		vmMetadata    VMMetadata
 	)
 
 	BeforeEach(func() {

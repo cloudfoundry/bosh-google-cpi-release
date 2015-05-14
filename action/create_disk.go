@@ -7,7 +7,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 type CreateDisk struct {
@@ -62,7 +62,7 @@ func (cd CreateDisk) Run(size int, cloudProps DiskCloudProperties, vmCID VMCID) 
 	}
 
 	// Create the Disk
-	disk, err := cd.diskService.Create(gutil.ConvertMib2Gib(size), diskType, zone)
+	disk, err := cd.diskService.Create(util.ConvertMib2Gib(size), diskType, zone)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating disk")
 	}

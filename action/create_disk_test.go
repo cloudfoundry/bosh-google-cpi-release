@@ -18,19 +18,19 @@ import (
 
 var _ = Describe("CreateDisk", func() {
 	var (
-		err             error
+		err        error
+		diskCID    DiskCID
+		vmCID      VMCID
+		cloudProps DiskCloudProperties
+
 		diskService     *diskfakes.FakeDiskService
 		diskTypeService *disktypefakes.FakeDiskTypeService
 		vmService       *instancefakes.FakeInstanceService
-		createDisk      CreateDisk
-		cloudProps      DiskCloudProperties
-		diskCID         DiskCID
-		vmCID           VMCID
+
+		createDisk CreateDisk
 	)
 
 	BeforeEach(func() {
-		vmCID = ""
-		cloudProps = DiskCloudProperties{}
 		diskService = &diskfakes.FakeDiskService{}
 		diskTypeService = &disktypefakes.FakeDiskTypeService{}
 		vmService = &instancefakes.FakeInstanceService{}
@@ -38,9 +38,13 @@ var _ = Describe("CreateDisk", func() {
 	})
 
 	Describe("Run", func() {
-		It("creates the disk", func() {
+		BeforeEach(func() {
+			vmCID = ""
+			cloudProps = DiskCloudProperties{}
 			diskService.CreateID = "fake-disk-id"
+		})
 
+		It("creates the disk", func() {
 			diskCID, err = createDisk.Run(32768, cloudProps, vmCID)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(vmService.FindCalled).To(BeFalse())
@@ -66,13 +70,11 @@ var _ = Describe("CreateDisk", func() {
 		Context("when vmCID is set", func() {
 			BeforeEach(func() {
 				vmCID = VMCID("fake-vm-cid")
+				vmService.FindFound = true
 				vmService.FindInstance = &compute.Instance{Zone: "fake-instance-zone"}
 			})
 
 			It("creates the disk at the vm zone", func() {
-				diskService.CreateID = "fake-disk-id"
-				vmService.FindFound = true
-
 				diskCID, err = createDisk.Run(32768, cloudProps, vmCID)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.FindCalled).To(BeTrue())
@@ -110,13 +112,11 @@ var _ = Describe("CreateDisk", func() {
 		Context("when disk type is set", func() {
 			BeforeEach(func() {
 				cloudProps = DiskCloudProperties{DiskType: "fake-disk-type"}
+				diskTypeService.FindFound = true
 				diskTypeService.FindDiskType = &compute.DiskType{SelfLink: "fake-disk-type-self-link"}
 			})
 
 			It("creates the disk using the appropiate disk type", func() {
-				diskService.CreateID = "fake-disk-id"
-				diskTypeService.FindFound = true
-
 				diskCID, err = createDisk.Run(32768, cloudProps, vmCID)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.FindCalled).To(BeFalse())
@@ -144,7 +144,7 @@ var _ = Describe("CreateDisk", func() {
 
 				_, err = createDisk.Run(32768, cloudProps, vmCID)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("does not exists"))
+				Expect(err.Error()).To(ContainSubstring("Disk Type 'fake-disk-type' does not exists"))
 				Expect(vmService.FindCalled).To(BeFalse())
 				Expect(diskTypeService.FindCalled).To(BeTrue())
 				Expect(diskService.CreateCalled).To(BeFalse())

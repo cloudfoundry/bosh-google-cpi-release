@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -105,7 +105,7 @@ func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, instanceNet
 func (i GoogleInstanceService) updateNetwork(instance *compute.Instance, instanceNetworks GoogleInstanceNetworks) error {
 	// If the network has changed we need to recreate the VM
 	dynamicNetwork := instanceNetworks.DynamicNetwork()
-	if gutil.ResourceSplitter(instance.NetworkInterfaces[0].Network) != dynamicNetwork.NetworkName {
+	if util.ResourceSplitter(instance.NetworkInterfaces[0].Network) != dynamicNetwork.NetworkName {
 		i.logger.Debug(googleInstanceServiceLogTag, "Changing network for Google Instance '%s' not supported", instance.Name)
 		return api.NotSupportedError{}
 	}

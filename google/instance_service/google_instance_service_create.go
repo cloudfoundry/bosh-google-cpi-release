@@ -7,13 +7,13 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
 const defaultRootDiskSizeGb = 10
 
-func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
+func (i GoogleInstanceService) Create(vmProps *InstanceProperties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
@@ -50,7 +50,7 @@ func (i GoogleInstanceService) Create(vmProps *GoogleInstanceProperties, instanc
 		Tags:              tagsParams,
 	}
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %#v", vm)
-	operation, err := i.computeService.Instances.Insert(i.project, gutil.ResourceSplitter(vmProps.Zone), vm).Do()
+	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		return "", api.NewVMCreationFailedError(true)
 	}
@@ -127,7 +127,7 @@ func (i GoogleInstanceService) createSchedulingParams(automaticRestart bool, onH
 	return scheduling
 }
 
-func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes GoogleInstanceServiceScopes) []*compute.ServiceAccount {
+func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes InstanceServiceScopes) []*compute.ServiceAccount {
 	var serviceAccounts []*compute.ServiceAccount
 
 	if len(serviceScopes) > 0 {

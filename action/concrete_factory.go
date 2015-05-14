@@ -137,6 +137,7 @@ func NewConcreteFactory(
 				stemcellService,
 				targetPoolService,
 				registryClient,
+				options.Registry,
 				options.Agent,
 				googleClient.DefaultZone(),
 			),

@@ -313,7 +313,9 @@ var _ = Describe("ConcreteFactory", func() {
 			stemcellService,
 			targetPoolService,
 			registryClient,
-			options.Agent, defaultZone,
+			options.Registry,
+			options.Agent,
+			defaultZone,
 		)))
 	})
 

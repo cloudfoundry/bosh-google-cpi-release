@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
 )
@@ -30,7 +30,7 @@ func (t GoogleTargetPoolService) Find(id string, region string) (*compute.Target
 	}
 
 	t.logger.Debug(googleTargetPoolServiceLogTag, "Finding Google Target Pool '%s' in region '%s'", id, region)
-	targetPool, err := t.computeService.TargetPools.Get(t.project, gutil.ResourceSplitter(region), id).Do()
+	targetPool, err := t.computeService.TargetPools.Get(t.project, util.ResourceSplitter(region), id).Do()
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return &compute.TargetPool{}, false, nil

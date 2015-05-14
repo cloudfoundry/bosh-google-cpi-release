@@ -13,16 +13,20 @@ import (
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-registry/client"
 	"google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("AttachDisk", func() {
 	var (
-		err            error
+		err                   error
+		expectedAgentSettings registry.AgentSettings
+
 		diskService    *diskfakes.FakeDiskService
 		vmService      *instancefakes.FakeInstanceService
 		registryClient *registryfakes.FakeClient
-		attachDisk     AttachDisk
+
+		attachDisk AttachDisk
 	)
 
 	BeforeEach(func() {
@@ -33,28 +37,33 @@ var _ = Describe("AttachDisk", func() {
 	})
 
 	Describe("Run", func() {
-		It("attaches the disk", func() {
+		BeforeEach(func() {
 			diskService.FindFound = true
 			diskService.FindDisk = &compute.Disk{SelfLink: "fake-self-link"}
+			vmService.AttachDiskDeviceName = "fake-disk-device-name"
+			vmService.AttachDiskDevicePath = "fake-disk-device-path"
+			registryClient.FetchSettings = registry.AgentSettings{}
+			expectedAgentSettings = registry.AgentSettings{
+				Disks: registry.DisksSettings{
+					Persistent: map[string]registry.PersistentSettings{
+						"fake-disk-id": {
+							ID:       "fake-disk-id",
+							VolumeID: "fake-disk-device-name",
+							Path:     "fake-disk-device-path",
+						},
+					},
+				},
+			}
+		})
 
+		It("attaches the disk", func() {
 			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(diskService.FindCalled).To(BeTrue())
 			Expect(vmService.AttachDiskCalled).To(BeTrue())
 			Expect(registryClient.FetchCalled).To(BeTrue())
 			Expect(registryClient.UpdateCalled).To(BeTrue())
-		})
-
-		It("returns an error if disk is not found", func() {
-			diskService.FindFound = false
-
-			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(Equal(api.NewDiskNotFoundError("fake-disk-id", false).Error()))
-			Expect(diskService.FindCalled).To(BeTrue())
-			Expect(vmService.AttachDiskCalled).To(BeFalse())
-			Expect(registryClient.FetchCalled).To(BeFalse())
-			Expect(registryClient.UpdateCalled).To(BeFalse())
+			Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 		})
 
 		It("returns an error if diskService find call returns an error", func() {
@@ -69,9 +78,19 @@ var _ = Describe("AttachDisk", func() {
 			Expect(registryClient.UpdateCalled).To(BeFalse())
 		})
 
+		It("returns an error if disk is not found", func() {
+			diskService.FindFound = false
+
+			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(Equal(api.NewDiskNotFoundError("fake-disk-id", false).Error()))
+			Expect(diskService.FindCalled).To(BeTrue())
+			Expect(vmService.AttachDiskCalled).To(BeFalse())
+			Expect(registryClient.FetchCalled).To(BeFalse())
+			Expect(registryClient.UpdateCalled).To(BeFalse())
+		})
+
 		It("returns an error if vmService attach disk call returns an error", func() {
-			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{SelfLink: "fake-self-link"}
 			vmService.AttachDiskErr = errors.New("fake-vm-service-error")
 
 			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
@@ -84,8 +103,6 @@ var _ = Describe("AttachDisk", func() {
 		})
 
 		It("returns an error if registryClient fetch call returns an error", func() {
-			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{SelfLink: "fake-self-link"}
 			registryClient.FetchErr = errors.New("fake-registry-client-error")
 
 			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
@@ -98,8 +115,6 @@ var _ = Describe("AttachDisk", func() {
 		})
 
 		It("returns an error if registryClient update call returns an error", func() {
-			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{SelfLink: "fake-self-link"}
 			registryClient.UpdateErr = errors.New("fake-registry-client-error")
 
 			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")

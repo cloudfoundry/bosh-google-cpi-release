@@ -13,11 +13,12 @@ import (
 
 var _ = Describe("CreateStemcell", func() {
 	var (
-		err             error
+		err         error
+		stemcellCID StemcellCID
+		cloudProps  StemcellCloudProperties
+
 		stemcellService *imagefakes.FakeImageService
 		createStemcell  CreateStemcell
-		cloudProps      StemcellCloudProperties
-		stemcellCID     StemcellCID
 	)
 
 	BeforeEach(func() {
@@ -26,13 +27,17 @@ var _ = Describe("CreateStemcell", func() {
 	})
 
 	Describe("Run", func() {
+		BeforeEach(func() {
+			cloudProps = StemcellCloudProperties{
+				Name:           "fake-stemcell-name",
+				Version:        "fake-stemcell-version",
+				Infrastructure: "google",
+			}
+		})
+
 		Context("when infrastructure is not google", func() {
 			BeforeEach(func() {
-				cloudProps = StemcellCloudProperties{
-					Name:           "fake-stemcell-name",
-					Version:        "fake-stemcell-version",
-					Infrastructure: "fake-insfrastructure",
-				}
+				cloudProps.Infrastructure = "fake-insfrastructure"
 			})
 
 			It("returns an error", func() {
@@ -46,17 +51,11 @@ var _ = Describe("CreateStemcell", func() {
 
 		Context("from a source url", func() {
 			BeforeEach(func() {
-				cloudProps = StemcellCloudProperties{
-					Name:           "fake-stemcell-name",
-					Version:        "fake-stemcell-version",
-					Infrastructure: "google",
-					SourceURL:      "fake-source-url",
-				}
+				cloudProps.SourceURL = "fake-source-url"
+				stemcellService.CreateFromURLID = "fake-stemcell-id"
 			})
 
 			It("creates the stemcell", func() {
-				stemcellService.CreateFromURLID = "fake-stemcell-id"
-
 				stemcellCID, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stemcellService.CreateFromURLCalled).To(BeTrue())
@@ -79,16 +78,10 @@ var _ = Describe("CreateStemcell", func() {
 
 		Context("from a stemcell tarball", func() {
 			BeforeEach(func() {
-				cloudProps = StemcellCloudProperties{
-					Name:           "fake-stemcell-name",
-					Version:        "fake-stemcell-version",
-					Infrastructure: "google",
-				}
+				stemcellService.CreateFromTarballID = "fake-stemcell-id"
 			})
 
 			It("creates the stemcell", func() {
-				stemcellService.CreateFromTarballID = "fake-stemcell-id"
-
 				stemcellCID, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(stemcellService.CreateFromTarballCalled).To(BeTrue())

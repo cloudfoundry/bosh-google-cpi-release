@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 func (d GoogleDiskService) Delete(id string) error {
@@ -21,7 +21,7 @@ func (d GoogleDiskService) Delete(id string) error {
 	}
 
 	d.logger.Debug(googleDiskServiceLogTag, "Deleting Google Disk '%s'", id)
-	operation, err := d.computeService.Disks.Delete(d.project, gutil.ResourceSplitter(disk.Zone), id).Do()
+	operation, err := d.computeService.Disks.Delete(d.project, util.ResourceSplitter(disk.Zone), id).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to delete Google Disk '%s'", id)
 	}

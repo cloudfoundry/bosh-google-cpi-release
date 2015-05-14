@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
 )
@@ -30,13 +30,13 @@ func (i GoogleInstanceService) Find(id string, zone string) (*compute.Instance, 
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Finding Google Instance '%s' in zone '%s'", id, zone)
-	instance, err := i.computeService.Instances.Get(i.project, gutil.ResourceSplitter(zone), id).Do()
+	instance, err := i.computeService.Instances.Get(i.project, util.ResourceSplitter(zone), id).Do()
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return &compute.Instance{}, false, nil
 		}
 
-		return &compute.Instance{}, false, bosherr.WrapErrorf(err, "Failed to find Google Instance '%s' in zone '%s'", id, gutil.ResourceSplitter(zone))
+		return &compute.Instance{}, false, bosherr.WrapErrorf(err, "Failed to find Google Instance '%s' in zone '%s'", id, util.ResourceSplitter(zone))
 	}
 
 	return instance, true, nil

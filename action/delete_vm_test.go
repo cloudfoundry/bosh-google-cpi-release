@@ -18,13 +18,15 @@ import (
 
 var _ = Describe("DeleteVM", func() {
 	var (
-		err               error
+		err error
+
 		vmService         *instancefakes.FakeInstanceService
 		addressService    *addressfakes.FakeAddressService
 		networkService    *networkfakes.FakeNetworkService
 		targetPoolService *targetpoolfakes.FakeTargetPoolService
 		registryClient    *registryfakes.FakeClient
-		deleteVM          DeleteVM
+
+		deleteVM DeleteVM
 	)
 
 	BeforeEach(func() {

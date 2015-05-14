@@ -13,9 +13,11 @@ import (
 
 var _ = Describe("RebootVM", func() {
 	var (
-		err       error
+		err error
+
 		vmService *instancefakes.FakeInstanceService
-		rebootVM  RebootVM
+
+		rebootVM RebootVM
 	)
 
 	BeforeEach(func() {

@@ -13,9 +13,11 @@ import (
 
 var _ = Describe("DeleteStemcell", func() {
 	var (
-		err             error
+		err error
+
 		stemcellService *imagefakes.FakeImageService
-		deleteStemcell  DeleteStemcell
+
+		deleteStemcell DeleteStemcell
 	)
 
 	BeforeEach(func() {

@@ -19,7 +19,7 @@ type GoogleImageService struct {
 	project          string
 	computeService   *compute.Service
 	storageService   *storage.Service
-	operationService goperation.GoogleOperationService
+	operationService goperation.OperationService
 	uuidGen          boshuuid.Generator
 	logger           boshlog.Logger
 }
@@ -28,7 +28,7 @@ func NewGoogleImageService(
 	project string,
 	computeService *compute.Service,
 	storageService *storage.Service,
-	operationService goperation.GoogleOperationService,
+	operationService goperation.OperationService,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleImageService {

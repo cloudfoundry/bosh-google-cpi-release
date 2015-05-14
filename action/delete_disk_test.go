@@ -13,9 +13,11 @@ import (
 
 var _ = Describe("DeleteDisk", func() {
 	var (
-		err         error
+		err error
+
 		diskService *diskfakes.FakeDiskService
-		deleteDisk  DeleteDisk
+
+		deleteDisk DeleteDisk
 	)
 
 	BeforeEach(func() {

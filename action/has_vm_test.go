@@ -13,10 +13,12 @@ import (
 
 var _ = Describe("HasVM", func() {
 	var (
-		err       error
-		found     bool
+		err   error
+		found bool
+
 		vmService *instancefakes.FakeInstanceService
-		hasVM     HasVM
+
+		hasVM HasVM
 	)
 
 	BeforeEach(func() {

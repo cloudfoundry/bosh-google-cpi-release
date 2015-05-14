@@ -13,9 +13,11 @@ import (
 
 var _ = Describe("DeleteSnapshot", func() {
 	var (
-		err             error
+		err error
+
 		snapshotService *snapshotfakes.FakeSnapshotService
-		deleteSnapshot  DeleteSnapshot
+
+		deleteSnapshot DeleteSnapshot
 	)
 
 	BeforeEach(func() {

@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
 )
@@ -30,13 +30,13 @@ func (d GoogleDiskService) Find(id string, zone string) (*compute.Disk, bool, er
 	}
 
 	d.logger.Debug(googleDiskServiceLogTag, "Finding Google Disk '%s' in zone '%s'", id, zone)
-	disk, err := d.computeService.Disks.Get(d.project, gutil.ResourceSplitter(zone), id).Do()
+	disk, err := d.computeService.Disks.Get(d.project, util.ResourceSplitter(zone), id).Do()
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return &compute.Disk{}, false, nil
 		}
 
-		return &compute.Disk{}, false, bosherr.WrapErrorf(err, "Failed to find Google Disk '%s' in zone '%s'", id, gutil.ResourceSplitter(zone))
+		return &compute.Disk{}, false, bosherr.WrapErrorf(err, "Failed to find Google Disk '%s' in zone '%s'", id, util.ResourceSplitter(zone))
 	}
 
 	return disk, true, nil

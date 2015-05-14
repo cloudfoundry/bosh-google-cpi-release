@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 )
 
 func (i GoogleInstanceService) Delete(id string) error {
@@ -17,7 +17,7 @@ func (i GoogleInstanceService) Delete(id string) error {
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Deleting Google Instance '%s'", id)
-	operation, err := i.computeService.Instances.Delete(i.project, gutil.ResourceSplitter(instance.Zone), id).Do()
+	operation, err := i.computeService.Instances.Delete(i.project, util.ResourceSplitter(instance.Zone), id).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to delete Google Instance '%s'", id)
 	}

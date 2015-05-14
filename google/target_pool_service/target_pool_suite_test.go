@@ -1,4 +1,4 @@
-package gtargetpool
+package gtargetpool_test
 
 import (
 	"testing"

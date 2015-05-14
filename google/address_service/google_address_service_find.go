@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-google-cpi/google/util"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
 )
@@ -30,7 +30,7 @@ func (a GoogleAddressService) Find(id string, region string) (*compute.Address, 
 	}
 
 	a.logger.Debug(googleAddressServiceLogTag, "Finding Google Address '%s' in region '%s'", id, region)
-	address, err := a.computeService.Addresses.Get(a.project, gutil.ResourceSplitter(region), id).Do()
+	address, err := a.computeService.Addresses.Get(a.project, util.ResourceSplitter(region), id).Do()
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return &compute.Address{}, false, nil

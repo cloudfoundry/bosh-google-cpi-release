@@ -10,20 +10,41 @@ import (
 
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
+
+	"github.com/frodenas/bosh-registry/client"
 )
 
 var _ = Describe("DetachDisk", func() {
 	var (
-		err            error
+		err                   error
+		expectedAgentSettings registry.AgentSettings
+
 		vmService      *instancefakes.FakeInstanceService
 		registryClient *registryfakes.FakeClient
-		detachDisk     DetachDisk
+
+		detachDisk DetachDisk
 	)
 
 	BeforeEach(func() {
 		vmService = &instancefakes.FakeInstanceService{}
 		registryClient = &registryfakes.FakeClient{}
 		detachDisk = NewDetachDisk(vmService, registryClient)
+		registryClient.FetchSettings = registry.AgentSettings{
+			Disks: registry.DisksSettings{
+				Persistent: map[string]registry.PersistentSettings{
+					"fake-disk-id": {
+						ID:       "fake-disk-id",
+						VolumeID: "fake-disk-device-name",
+						Path:     "fake-disk-device-path",
+					},
+				},
+			},
+		}
+		expectedAgentSettings = registry.AgentSettings{
+			Disks: registry.DisksSettings{
+				Persistent: map[string]registry.PersistentSettings{},
+			},
+		}
 	})
 
 	Describe("Run", func() {
@@ -33,6 +54,7 @@ var _ = Describe("DetachDisk", func() {
 			Expect(vmService.DetachDiskCalled).To(BeTrue())
 			Expect(registryClient.FetchCalled).To(BeTrue())
 			Expect(registryClient.UpdateCalled).To(BeTrue())
+			Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 		})
 
 		It("returns an error if vmService detach disk call returns an error", func() {
