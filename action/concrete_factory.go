@@ -158,6 +158,12 @@ func NewConcreteFactory(
 			"set_vm_metadata": NewSetVMMetadata(vmService),
 			"has_vm":          NewHasVM(vmService),
 			"get_disks":       NewGetDisks(vmService),
+
+			// Others:
+			"ping": NewPing(),
+
+			// Not implemented:
+			// current_vm_id
 		},
 	}
 }

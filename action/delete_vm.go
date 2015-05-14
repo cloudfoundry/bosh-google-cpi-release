@@ -13,18 +13,18 @@ import (
 )
 
 type DeleteVM struct {
-	vmService         ginstance.GoogleInstanceService
-	addressService    gaddress.GoogleAddressService
-	networkService    gnetwork.GoogleNetworkService
-	targetPoolService gtargetpool.GoogleTargetPoolService
+	vmService         ginstance.InstanceService
+	addressService    gaddress.AddressService
+	networkService    gnetwork.NetworkService
+	targetPoolService gtargetpool.TargetPoolService
 	registryClient    registry.Client
 }
 
 func NewDeleteVM(
-	vmService ginstance.GoogleInstanceService,
-	addressService gaddress.GoogleAddressService,
-	networkService gnetwork.GoogleNetworkService,
-	targetPoolService gtargetpool.GoogleTargetPoolService,
+	vmService ginstance.InstanceService,
+	addressService gaddress.AddressService,
+	networkService gnetwork.NetworkService,
+	targetPoolService gtargetpool.TargetPoolService,
 	registryClient registry.Client,
 ) DeleteVM {
 	return DeleteVM{

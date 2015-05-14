@@ -461,8 +461,20 @@ var _ = Describe("ConcreteFactory", func() {
 		Expect(action).To(Equal(NewGetDisks(vmService)))
 	})
 
-	It("returns error because ping is not official CPI method if action is ping", func() {
+	It("ping", func() {
 		action, err := factory.Create("ping")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(action).To(Equal(NewPing()))
+	})
+
+	It("when action is current_vm_id returns an error because this CPI does not implement the method", func() {
+		action, err := factory.Create("current_vm_id")
+		Expect(err).To(HaveOccurred())
+		Expect(action).To(BeNil())
+	})
+
+	It("when action is wrong returns an error because it is not an official CPI method", func() {
+		action, err := factory.Create("wrong")
 		Expect(err).To(HaveOccurred())
 		Expect(action).To(BeNil())
 	})
