@@ -64,16 +64,16 @@ Create a configuration file:
 | google.project                            | Y          | String        | Google Compute Engine [Project](https://cloud.google.com/compute/docs/projects)
 | google.json_key                           | Y          | String        | Google Compute Engine [JSON key](https://developers.google.com/console/help/new/#serviceaccounts)
 | google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
-| actions.agent.mbus.endpoint               | Y          | String        | [BOSH Mbus](http://bosh.io/docs/bosh-components.html#nats) URL used by deployed BOSH agents
+| actions.agent.mbus.endpoint               | Y          | String        | [BOSH Message Bus](http://bosh.io/docs/bosh-components.html#nats) URL used by deployed BOSH agents
 | actions.agent.ntp                         | Y          | Array&lt;String&gt; | List of NTP servers used by deployed BOSH agents
-| actions.agent.blobstore.type              | Y          | String        | Provider type for the [blobstore](http://bosh.io/docs/bosh-components.html#blobstore) used by deployed BOSH agents (e.g. dav, s3)
-| actions.agent.blobstore.options           | Y          | Hash          | Options for the [blobstore](http://bosh.io/docs/bosh-components.html#blobstore) used by deployed BOSH agents
+| actions.agent.blobstore.type              | Y          | String        | Provider type for the [BOSH Blobstore](http://bosh.io/docs/bosh-components.html#blobstore) used by deployed BOSH agents (e.g. dav, s3)
+| actions.agent.blobstore.options           | Y          | Hash          | Options for the [BOSH Blobstore](http://bosh.io/docs/bosh-components.html#blobstore) used by deployed BOSH agents
 | actions.registry.protocol                 | Y          | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) Protocol (`http` or `https`)
 | actions.registry.host                     | Y          | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) Host
 | actions.registry.port                     | Y          | Integer       | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) port
 | actions.registry.username                 | Y          | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) username
 | actions.registry.password                 | Y          | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) password
-| actions.registry.tls.insecure_skip_verify | When https | Boolean       | Skip [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry)server's certificate chain and host name verification
+| actions.registry.tls.insecure_skip_verify | When https | Boolean       | Skip [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) server's certificate chain and host name verification
 | actions.registry.tls.certfile             | When https | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) Client Certificate (PEM format) file location
 | actions.registry.tls.keyfile              | When https | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) Client Key (PEM format) file location
 | actions.registry.tls.cacertfile           | When https | String        | [BOSH Registry](http://bosh.io/docs/bosh-components.html#registry) Client Root CA certificates (PEM format) file location
@@ -119,7 +119,7 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | root_disk_size_gb   | N        | Integer       | The size (in Gb) of the instance root disk (default is `10Gb`)
 | root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
 | automatic_restart   | N        | Boolean       | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
-| on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are 'MIGRATE' (default) or 'TERMINATE')
+| on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
 | service_scopes      | N        | Array&lt;String&gt; | [Authorization scope names](https://cloud.google.com/compute/docs/authentication#aliases) for your default service account that determine the level of access your instance has to other Google services (no scope is assigned to the instance by default)
 
 ### BOSH Persistent Disks options

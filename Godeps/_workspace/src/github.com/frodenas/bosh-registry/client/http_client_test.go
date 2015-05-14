@@ -2,7 +2,6 @@ package registry_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +18,7 @@ import (
 	"github.com/frodenas/bosh-registry/server/fakes"
 )
 
-var _ = Describe("Client", func() {
+var _ = Describe("HTTPClient", func() {
 	var (
 		err error
 
@@ -29,7 +28,7 @@ var _ = Describe("Client", func() {
 
 		options ClientOptions
 		logger  boshlog.Logger
-		client  Client
+		client  HTTPClient
 
 		instanceID           string
 		expectedAgentSet     AgentSettings
@@ -65,7 +64,7 @@ var _ = Describe("Client", func() {
 				Username: "fake-username",
 				Password: "fake-password",
 			}
-			client = NewClient(options, logger)
+			client = NewHTTPClient(options, logger)
 		})
 
 		AfterEach(func() {
@@ -91,20 +90,6 @@ var _ = Describe("Client", func() {
 					err = client.Delete(instanceID)
 					Expect(err).ToNot(HaveOccurred())
 				})
-			})
-		})
-
-		Describe("Endpoint", func() {
-			It("returns the BOSH Registry endpoint", func() {
-				endpoint := client.Endpoint()
-				Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%d", options.Protocol, options.Host, options.Port)))
-			})
-		})
-
-		Describe("EndpointWithCredentials", func() {
-			It("returns the BOSH Registry endpoint with credentials", func() {
-				endpoint := client.EndpointWithCredentials()
-				Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%s@%s:%d", options.Protocol, options.Username, options.Password, options.Host, options.Port)))
 			})
 		})
 
@@ -164,7 +149,7 @@ var _ = Describe("Client", func() {
 					CACertFile:         "../test/assets/ca.pem",
 				},
 			}
-			client = NewClient(options, logger)
+			client = NewHTTPClient(options, logger)
 		})
 
 		AfterEach(func() {
@@ -177,20 +162,6 @@ var _ = Describe("Client", func() {
 				err = client.Delete(instanceID)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(instanceHandler.InstanceSettings).To(Equal([]byte{}))
-			})
-		})
-
-		Describe("Endpoint", func() {
-			It("returns the BOSH Registry endpoint", func() {
-				endpoint := client.Endpoint()
-				Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%d", options.Protocol, options.Host, options.Port)))
-			})
-		})
-
-		Describe("EndpointWithCredentials", func() {
-			It("returns the BOSH Registry endpoint with credentials", func() {
-				endpoint := client.EndpointWithCredentials()
-				Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%s@%s:%d", options.Protocol, options.Username, options.Password, options.Host, options.Port)))
 			})
 		})
 

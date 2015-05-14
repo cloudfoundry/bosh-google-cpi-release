@@ -1,6 +1,8 @@
 package registry
 
 import (
+	"fmt"
+
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 )
 
@@ -38,6 +40,16 @@ type ClientTLSOptions struct {
 
 	// Roor CA certificate file (PEM format)
 	CACertFile string `json:"cacertfile,omitempty"`
+}
+
+// Endpoint returns the BOSH Registry endpoint.
+func (o ClientOptions) Endpoint() string {
+	return fmt.Sprintf("%s://%s:%d", o.Protocol, o.Host, o.Port)
+}
+
+// EndpointWithCredentials returns the BOSH Registry endpoint including credentials.
+func (o ClientOptions) EndpointWithCredentials() string {
+	return fmt.Sprintf("%s://%s:%s@%s:%d", o.Protocol, o.Username, o.Password, o.Host, o.Port)
 }
 
 // Validate validates the Client options.

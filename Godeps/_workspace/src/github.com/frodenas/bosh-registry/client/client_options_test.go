@@ -1,6 +1,8 @@
 package registry_test
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -20,11 +22,25 @@ var _ = Describe("ClientOptions", func() {
 		}
 	)
 
-	Describe("Validate", func() {
-		BeforeEach(func() {
-			options = validOptions
-		})
+	BeforeEach(func() {
+		options = validOptions
+	})
 
+	Describe("Endpoint", func() {
+		It("returns the BOSH Registry endpoint", func() {
+			endpoint := options.Endpoint()
+			Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%d", validOptions.Protocol, validOptions.Host, validOptions.Port)))
+		})
+	})
+
+	Describe("EndpointWithCredentials", func() {
+		It("returns the BOSH Registry endpoint with credentials", func() {
+			endpoint := options.EndpointWithCredentials()
+			Expect(endpoint).To(Equal(fmt.Sprintf("%s://%s:%s@%s:%d", validOptions.Protocol, validOptions.Username, validOptions.Password, validOptions.Host, validOptions.Port)))
+		})
+	})
+
+	Describe("Validate", func() {
 		It("does not return error if all fields are valid", func() {
 			err := options.Validate()
 			Expect(err).ToNot(HaveOccurred())
@@ -89,11 +105,11 @@ var _ = Describe("ClientTLSOptions", func() {
 		}
 	)
 
-	Describe("Validate", func() {
-		BeforeEach(func() {
-			options = validOptions
-		})
+	BeforeEach(func() {
+		options = validOptions
+	})
 
+	Describe("Validate", func() {
 		It("does not return error if all fields are valid", func() {
 			err := options.Validate()
 			Expect(err).ToNot(HaveOccurred())

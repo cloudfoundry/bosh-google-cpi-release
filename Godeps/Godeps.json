@@ -23,7 +23,7 @@
 		},
 		{
 			"ImportPath": "github.com/frodenas/bosh-registry/client",
-			"Rev": "0c41fdafcc8f9fa0bb96e5a3b5e66548cb1ca67e"
+			"Rev": "e99e99b1e8a63739f45cf1aa89a1289751802633"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",

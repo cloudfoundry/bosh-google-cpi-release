@@ -19,7 +19,7 @@ func Example() {
 		Password: "password",
 	}
 	logger := boshlog.NewLogger(boshlog.LevelDebug)
-	registryClient := registry.NewClient(clientOptions, logger)
+	registryClient := registry.NewHTTPClient(clientOptions, logger)
 
 	instanceID := "instance-id"
 
