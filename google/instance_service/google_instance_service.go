@@ -1,4 +1,4 @@
-package ginstance
+package instance
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

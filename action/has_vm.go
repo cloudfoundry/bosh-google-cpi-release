@@ -7,11 +7,11 @@ import (
 )
 
 type HasVM struct {
-	vmService ginstance.InstanceService
+	vmService instance.Service
 }
 
 func NewHasVM(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 ) HasVM {
 	return HasVM{
 		vmService: vmService,

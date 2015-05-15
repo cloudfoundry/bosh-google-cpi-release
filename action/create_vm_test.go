@@ -39,9 +39,9 @@ var _ = Describe("CreateVM", func() {
 		env                      Environment
 		registryOptions          registry.ClientOptions
 		agentOptions             registry.AgentOptions
-		expectedVMProps          *ginstance.InstanceProperties
-		vmNetworks               ginstance.InstanceNetworks
-		expectedInstanceNetworks ginstance.GoogleInstanceNetworks
+		expectedVMProps          *instance.Properties
+		vmNetworks               instance.Networks
+		expectedInstanceNetworks instance.GoogleInstanceNetworks
 		expectedAgentSettings    registry.AgentSettings
 
 		vmService          *instancefakes.FakeInstanceService
@@ -135,7 +135,7 @@ var _ = Describe("CreateVM", func() {
 				},
 			}
 
-			expectedVMProps = &ginstance.InstanceProperties{
+			expectedVMProps = &instance.Properties{
 				Zone:              "fake-default-zone",
 				Stemcell:          "fake-image-self-link",
 				MachineType:       "fake-machine-type-self-link",
@@ -147,7 +147,7 @@ var _ = Describe("CreateVM", func() {
 			}
 
 			vmNetworks = networks.AsInstanceServiceNetworks()
-			expectedInstanceNetworks = ginstance.NewGoogleInstanceNetworks(
+			expectedInstanceNetworks = instance.NewGoogleInstanceNetworks(
 				vmNetworks,
 				addressService,
 				networkService,

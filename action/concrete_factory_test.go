@@ -95,7 +95,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -136,7 +136,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -155,7 +155,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("detach_disk", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -240,7 +240,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("create_vm", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -320,7 +320,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("configure_networks", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -364,7 +364,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_vm", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -408,7 +408,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("reboot_vm", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -422,7 +422,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("set_vm_metadata", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -436,7 +436,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("has_vm", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,
@@ -450,7 +450,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("get_disks", func() {
-		vmService := ginstance.NewGoogleInstanceService(
+		vmService := instance.NewGoogleInstanceService(
 			project,
 			computeService,
 			operationService,

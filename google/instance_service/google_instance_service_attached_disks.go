@@ -1,14 +1,14 @@
-package ginstance
+package instance
 
 import (
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/util"
 )
 
-func (i GoogleInstanceService) AttachedDisks(id string) (InstanceAttachedDisks, error) {
+func (i GoogleInstanceService) AttachedDisks(id string) (AttachedDisks, error) {
 	i.logger.Debug(googleInstanceServiceLogTag, "Finding Google Disks attached to Google Instance '%s'", id)
 
-	var disks InstanceAttachedDisks
+	var disks AttachedDisks
 
 	instance, found, err := i.Find(id, "")
 	if err != nil {

@@ -1,4 +1,4 @@
-package ginstance
+package instance
 
 import (
 	"regexp"
@@ -14,14 +14,14 @@ import (
 const googleMaxTagLength = 63
 
 type GoogleInstanceNetworks struct {
-	networks          InstanceNetworks
+	networks          Networks
 	addressService    address.Service
 	networkService    network.Service
 	targetPoolService targetpool.Service
 }
 
 func NewGoogleInstanceNetworks(
-	networks InstanceNetworks,
+	networks Networks,
 	addressService address.Service,
 	networkService network.Service,
 	targetPoolService targetpool.Service,
@@ -34,7 +34,7 @@ func NewGoogleInstanceNetworks(
 	}
 }
 
-func (in GoogleInstanceNetworks) DynamicNetwork() InstanceNetwork {
+func (in GoogleInstanceNetworks) DynamicNetwork() Network {
 	for _, net := range in.networks {
 		if net.IsDynamic() {
 			// There can only be 1 dynamic network
@@ -42,10 +42,10 @@ func (in GoogleInstanceNetworks) DynamicNetwork() InstanceNetwork {
 		}
 	}
 
-	return InstanceNetwork{}
+	return Network{}
 }
 
-func (in GoogleInstanceNetworks) VipNetwork() InstanceNetwork {
+func (in GoogleInstanceNetworks) VipNetwork() Network {
 	for _, net := range in.networks {
 		if net.IsVip() {
 			// There can only be 1 vip network
@@ -53,7 +53,7 @@ func (in GoogleInstanceNetworks) VipNetwork() InstanceNetwork {
 		}
 	}
 
-	return InstanceNetwork{}
+	return Network{}
 }
 
 func (in GoogleInstanceNetworks) CanIPForward() bool {

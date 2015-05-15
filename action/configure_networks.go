@@ -13,7 +13,7 @@ import (
 )
 
 type ConfigureNetworks struct {
-	vmService         ginstance.InstanceService
+	vmService         instance.Service
 	addressService    address.Service
 	networkService    network.Service
 	targetPoolService targetpool.Service
@@ -21,7 +21,7 @@ type ConfigureNetworks struct {
 }
 
 func NewConfigureNetworks(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 	addressService address.Service,
 	networkService network.Service,
 	targetPoolService targetpool.Service,
@@ -39,7 +39,7 @@ func NewConfigureNetworks(
 func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, error) {
 	// Parse networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
-	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, rv.addressService, rv.networkService, rv.targetPoolService)
+	instanceNetworks := instance.NewGoogleInstanceNetworks(vmNetworks, rv.addressService, rv.networkService, rv.targetPoolService)
 	if err := instanceNetworks.Validate(); err != nil {
 		return "", bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}

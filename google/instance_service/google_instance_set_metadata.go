@@ -1,4 +1,4 @@
-package ginstance
+package instance
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
@@ -8,7 +8,7 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-func (i GoogleInstanceService) SetMetadata(id string, vmMetadata InstanceMetadata) error {
+func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
 	// Find the instance
 	instance, found, err := i.Find(id, "")
 	if err != nil {

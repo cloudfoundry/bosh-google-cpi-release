@@ -18,7 +18,7 @@ import (
 )
 
 type CreateVM struct {
-	vmService          ginstance.InstanceService
+	vmService          instance.Service
 	addressService     address.Service
 	diskService        disk.Service
 	diskTypeService    disktype.Service
@@ -33,7 +33,7 @@ type CreateVM struct {
 }
 
 func NewCreateVM(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 	addressService address.Service,
 	diskService disk.Service,
 	diskTypeService disktype.Service,
@@ -126,13 +126,13 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Parse networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
-	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, cv.addressService, cv.networkService, cv.targetPoolService)
+	instanceNetworks := instance.NewGoogleInstanceNetworks(vmNetworks, cv.addressService, cv.networkService, cv.targetPoolService)
 	if err = instanceNetworks.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
 	// Parse VM properties
-	vmProps := &ginstance.InstanceProperties{
+	vmProps := &instance.Properties{
 		Zone:              zone,
 		Stemcell:          stemcell.SelfLink,
 		MachineType:       machineType.SelfLink,
@@ -140,7 +140,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		RootDiskType:      diskType,
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
-		ServiceScopes:     ginstance.InstanceServiceScopes(cloudProps.ServiceScopes),
+		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 	}
 
 	// Create VM

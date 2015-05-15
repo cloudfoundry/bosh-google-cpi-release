@@ -10,12 +10,12 @@ import (
 )
 
 type DetachDisk struct {
-	vmService      ginstance.InstanceService
+	vmService      instance.Service
 	registryClient registry.Client
 }
 
 func NewDetachDisk(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 	registryClient registry.Client,
 ) DetachDisk {
 	return DetachDisk{

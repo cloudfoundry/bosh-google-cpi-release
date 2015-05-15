@@ -90,7 +90,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	vmService := ginstance.NewGoogleInstanceService(
+	vmService := instance.NewGoogleInstanceService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,

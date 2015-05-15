@@ -19,15 +19,15 @@ type FakeInstanceService struct {
 
 	AttachedDisksCalled bool
 	AttachedDisksErr    error
-	AttachedDisksList   ginstance.InstanceAttachedDisks
+	AttachedDisksList   instance.AttachedDisks
 
 	CleanUpCalled bool
 
 	CreateCalled           bool
 	CreateErr              error
 	CreateID               string
-	CreateVMProps          *ginstance.InstanceProperties
-	CreateInstanceNetworks ginstance.GoogleInstanceNetworks
+	CreateVMProps          *instance.Properties
+	CreateInstanceNetworks instance.GoogleInstanceNetworks
 	CreateRegistryEndpoint string
 
 	DeleteCalled bool
@@ -52,7 +52,7 @@ type FakeInstanceService struct {
 
 	SetMetadataCalled     bool
 	SetMetadataErr        error
-	SetMetadataVMMetadata ginstance.InstanceMetadata
+	SetMetadataVMMetadata instance.Metadata
 
 	SetTagsCalled bool
 	SetTagsErr    error
@@ -66,7 +66,7 @@ func (i *FakeInstanceService) AddAccessConfig(id string, zone string, networkInt
 	return i.AddAccessConfigErr
 }
 
-func (i *FakeInstanceService) AddNetworkConfiguration(id string, instanceNetworks ginstance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) AddNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
 	i.AddNetworkConfigurationCalled = true
 	return i.AddNetworkConfigurationErr
 }
@@ -76,7 +76,7 @@ func (i *FakeInstanceService) AttachDisk(id string, diskLink string) (string, st
 	return i.AttachDiskDeviceName, i.AttachDiskDevicePath, i.AttachDiskErr
 }
 
-func (i *FakeInstanceService) AttachedDisks(id string) (ginstance.InstanceAttachedDisks, error) {
+func (i *FakeInstanceService) AttachedDisks(id string) (instance.AttachedDisks, error) {
 	i.AttachedDisksCalled = true
 	return i.AttachedDisksList, i.AttachedDisksErr
 }
@@ -86,7 +86,7 @@ func (i *FakeInstanceService) CleanUp(id string) {
 	return
 }
 
-func (i *FakeInstanceService) Create(vmProps *ginstance.InstanceProperties, instanceNetworks ginstance.GoogleInstanceNetworks, registryEndpoint string) (string, error) {
+func (i *FakeInstanceService) Create(vmProps *instance.Properties, instanceNetworks instance.GoogleInstanceNetworks, registryEndpoint string) (string, error) {
 	i.CreateCalled = true
 	i.CreateVMProps = vmProps
 	i.CreateInstanceNetworks = instanceNetworks
@@ -104,7 +104,7 @@ func (i *FakeInstanceService) DeleteAccessConfig(id string, zone string, network
 	return i.DeleteErr
 }
 
-func (i *FakeInstanceService) DeleteNetworkConfiguration(id string, instanceNetworks ginstance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) DeleteNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
 	i.DeleteNetworkConfigurationCalled = true
 	return i.DeleteNetworkConfigurationErr
 }
@@ -124,7 +124,7 @@ func (i *FakeInstanceService) Reboot(id string) error {
 	return i.RebootErr
 }
 
-func (i *FakeInstanceService) SetMetadata(id string, vmMetadata ginstance.InstanceMetadata) error {
+func (i *FakeInstanceService) SetMetadata(id string, vmMetadata instance.Metadata) error {
 	i.SetMetadataCalled = true
 	i.SetMetadataVMMetadata = vmMetadata
 	return i.SetMetadataErr
@@ -135,7 +135,7 @@ func (i *FakeInstanceService) SetTags(id string, zone string, instanceTags *comp
 	return i.SetTagsErr
 }
 
-func (i *FakeInstanceService) UpdateNetworkConfiguration(id string, instanceNetworks ginstance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) UpdateNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
 	i.UpdateNetworkConfigurationCalled = true
 	return i.UpdateNetworkConfigurationErr
 }

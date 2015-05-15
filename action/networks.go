@@ -18,11 +18,11 @@ type Network struct {
 	CloudProperties NetworkCloudProperties `json:"cloud_properties,omitempty"`
 }
 
-func (ns Networks) AsInstanceServiceNetworks() ginstance.InstanceNetworks {
-	networks := ginstance.InstanceNetworks{}
+func (ns Networks) AsInstanceServiceNetworks() instance.Networks {
+	networks := instance.Networks{}
 
 	for netName, network := range ns {
-		networks[netName] = ginstance.InstanceNetwork{
+		networks[netName] = instance.Network{
 			Type:                network.Type,
 			IP:                  network.IP,
 			Gateway:             network.Gateway,
@@ -30,7 +30,7 @@ func (ns Networks) AsInstanceServiceNetworks() ginstance.InstanceNetworks {
 			DNS:                 network.DNS,
 			Default:             network.Default,
 			NetworkName:         network.CloudProperties.NetworkName,
-			Tags:                ginstance.InstanceNetworkTags(network.CloudProperties.Tags),
+			Tags:                instance.NetworkTags(network.CloudProperties.Tags),
 			EphemeralExternalIP: network.CloudProperties.EphemeralExternalIP,
 			IPForwarding:        network.CloudProperties.IPForwarding,
 			TargetPool:          network.CloudProperties.TargetPool,

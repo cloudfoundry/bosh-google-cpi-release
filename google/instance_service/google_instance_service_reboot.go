@@ -1,4 +1,4 @@
-package ginstance
+package instance
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"

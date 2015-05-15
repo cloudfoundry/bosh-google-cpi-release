@@ -8,11 +8,11 @@ import (
 )
 
 type GetDisks struct {
-	vmService ginstance.InstanceService
+	vmService instance.Service
 }
 
 func NewGetDisks(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 ) GetDisks {
 	return GetDisks{
 		vmService: vmService,

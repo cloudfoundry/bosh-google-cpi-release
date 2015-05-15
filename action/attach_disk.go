@@ -12,13 +12,13 @@ import (
 
 type AttachDisk struct {
 	diskService    disk.Service
-	vmService      ginstance.InstanceService
+	vmService      instance.Service
 	registryClient registry.Client
 }
 
 func NewAttachDisk(
 	diskService disk.Service,
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 	registryClient registry.Client,
 ) AttachDisk {
 	return AttachDisk{

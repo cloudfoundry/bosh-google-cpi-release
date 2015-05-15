@@ -1,8 +1,8 @@
-package ginstance
+package instance
 
-type InstanceNetworks map[string]InstanceNetwork
+type Networks map[string]Network
 
-type InstanceNetwork struct {
+type Network struct {
 	Type                string
 	IP                  string
 	Gateway             string
@@ -10,14 +10,14 @@ type InstanceNetwork struct {
 	DNS                 []string
 	Default             []string
 	NetworkName         string
-	Tags                InstanceNetworkTags
+	Tags                NetworkTags
 	EphemeralExternalIP bool
 	IPForwarding        bool
 	TargetPool          string
 }
 
-type InstanceNetworkTags []string
+type NetworkTags []string
 
-func (n InstanceNetwork) IsDynamic() bool { return n.Type == "dynamic" }
+func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
 
-func (n InstanceNetwork) IsVip() bool { return n.Type == "vip" }
+func (n Network) IsVip() bool { return n.Type == "vip" }

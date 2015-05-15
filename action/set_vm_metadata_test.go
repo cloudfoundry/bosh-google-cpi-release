@@ -38,7 +38,7 @@ var _ = Describe("SetVMMetadata", func() {
 			_, err = setVMMetadata.Run("fake-vm-id", vmMetadata)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(vmService.SetMetadataCalled).To(BeTrue())
-			Expect(vmService.SetMetadataVMMetadata).To(Equal(ginstance.InstanceMetadata(vmMetadata)))
+			Expect(vmService.SetMetadataVMMetadata).To(Equal(instance.Metadata(vmMetadata)))
 		})
 
 		It("returns an error if vmService set metadata call returns an error", func() {

@@ -42,8 +42,8 @@ var _ = Describe("Networks", func() {
 
 	Describe("AsInstanceServiceNetworks", func() {
 		It("returns networks for the instance service", func() {
-			expectedInstanceNetworks := ginstance.InstanceNetworks{
-				"fake-network-1-name": ginstance.InstanceNetwork{
+			expectedInstanceNetworks := instance.Networks{
+				"fake-network-1-name": instance.Network{
 					Type:                "fake-network-1-type",
 					IP:                  "fake-network-1-ip",
 					Gateway:             "fake-network-1-gateway",
@@ -51,12 +51,12 @@ var _ = Describe("Networks", func() {
 					DNS:                 []string{"fake-network-1-dns"},
 					Default:             []string{"fake-network-1-default"},
 					NetworkName:         "fake-network-1-cloud-network-name",
-					Tags:                ginstance.InstanceNetworkTags([]string{"fake-network-1-cloud-network-tag"}),
+					Tags:                instance.NetworkTags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 					TargetPool:          "fake-network-1-cloud-target-pool",
 				},
-				"fake-network-2-name": ginstance.InstanceNetwork{
+				"fake-network-2-name": instance.Network{
 					Type: "fake-network-2-type",
 					IP:   "fake-network-2-ip",
 				},

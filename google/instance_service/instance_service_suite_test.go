@@ -1,4 +1,4 @@
-package ginstance_test
+package instance_test
 
 import (
 	"testing"

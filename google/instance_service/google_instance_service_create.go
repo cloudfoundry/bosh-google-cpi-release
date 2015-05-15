@@ -1,4 +1,4 @@
-package ginstance
+package instance
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ import (
 
 const defaultRootDiskSizeGb = 10
 
-func (i GoogleInstanceService) Create(vmProps *InstanceProperties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
+func (i GoogleInstanceService) Create(vmProps *Properties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
@@ -127,7 +127,7 @@ func (i GoogleInstanceService) createSchedulingParams(automaticRestart bool, onH
 	return scheduling
 }
 
-func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes InstanceServiceScopes) []*compute.ServiceAccount {
+func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes ServiceScopes) []*compute.ServiceAccount {
 	var serviceAccounts []*compute.ServiceAccount
 
 	if len(serviceScopes) > 0 {

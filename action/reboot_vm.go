@@ -8,11 +8,11 @@ import (
 )
 
 type RebootVM struct {
-	vmService ginstance.InstanceService
+	vmService instance.Service
 }
 
 func NewRebootVM(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 ) RebootVM {
 	return RebootVM{
 		vmService: vmService,

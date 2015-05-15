@@ -13,7 +13,7 @@ import (
 )
 
 type DeleteVM struct {
-	vmService         ginstance.InstanceService
+	vmService         instance.Service
 	addressService    address.Service
 	networkService    network.Service
 	targetPoolService targetpool.Service
@@ -21,7 +21,7 @@ type DeleteVM struct {
 }
 
 func NewDeleteVM(
-	vmService ginstance.InstanceService,
+	vmService instance.Service,
 	addressService address.Service,
 	networkService network.Service,
 	targetPoolService targetpool.Service,
@@ -40,7 +40,7 @@ func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	// Delete VM networks
 	var networks Networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
-	instanceNetworks := ginstance.NewGoogleInstanceNetworks(vmNetworks, dv.addressService, dv.networkService, dv.targetPoolService)
+	instanceNetworks := instance.NewGoogleInstanceNetworks(vmNetworks, dv.addressService, dv.networkService, dv.targetPoolService)
 
 	err := dv.vmService.DeleteNetworkConfiguration(string(vmCID), instanceNetworks)
 	if err != nil {
