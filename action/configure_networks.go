@@ -3,13 +3,13 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-registry/client"
-
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
+
+	"github.com/frodenas/bosh-registry/client"
 )
 
 type ConfigureNetworks struct {

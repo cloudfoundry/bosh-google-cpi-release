@@ -3,11 +3,11 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
-	"github.com/frodenas/bosh-registry/client"
-
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+
+	"github.com/frodenas/bosh-registry/client"
 )
 
 type AttachDisk struct {

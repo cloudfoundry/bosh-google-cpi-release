@@ -5,8 +5,6 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 	boshuuid "github.com/cloudfoundry/bosh-agent/uuid"
 
-	"github.com/frodenas/bosh-registry/client"
-
 	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/client"
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
@@ -18,6 +16,8 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
+
+	"github.com/frodenas/bosh-registry/client"
 )
 
 type ConcreteFactory struct {

@@ -16,6 +16,7 @@ import (
 	machinetypefakes "github.com/frodenas/bosh-google-cpi/google/machine_type_service/fakes"
 	networkfakes "github.com/frodenas/bosh-google-cpi/google/network_service/fakes"
 	targetpoolfakes "github.com/frodenas/bosh-google-cpi/google/target_pool_service/fakes"
+
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
@@ -24,6 +25,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/image_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
+
 	"github.com/frodenas/bosh-registry/client"
 )
 

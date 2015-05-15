@@ -8,8 +8,9 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/action"
 
-	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
+
+	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 )
 
 var _ = Describe("SetVMMetadata", func() {

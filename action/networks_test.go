@@ -7,6 +7,7 @@ import (
 	. "github.com/frodenas/bosh-google-cpi/action"
 
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+
 	"github.com/frodenas/bosh-registry/client"
 )
 

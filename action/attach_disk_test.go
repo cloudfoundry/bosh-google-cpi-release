@@ -10,10 +10,12 @@ import (
 
 	diskfakes "github.com/frodenas/bosh-google-cpi/google/disk_service/fakes"
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
+
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
+
 	"github.com/frodenas/bosh-registry/client"
 )
 
