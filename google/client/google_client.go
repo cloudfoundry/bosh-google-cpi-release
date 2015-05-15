@@ -1,4 +1,4 @@
-package gclient
+package client
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"

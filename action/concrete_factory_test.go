@@ -8,6 +8,8 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/action"
 
+	clientfakes "github.com/frodenas/bosh-google-cpi/google/client/fakes"
+
 	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/client"
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
@@ -21,20 +23,13 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 
 	"github.com/frodenas/bosh-registry/client"
-
-	"google.golang.org/api/compute/v1"
-	"google.golang.org/api/storage/v1"
 )
 
 var _ = Describe("ConcreteFactory", func() {
 	var (
-		project        string
-		defaultZone    string
-		uuidGen        *fakeuuid.FakeGenerator
-		computeService *compute.Service
-		storageService *storage.Service
-		googleClient   gclient.GoogleClient
-		logger         boshlog.Logger
+		uuidGen      *fakeuuid.FakeGenerator
+		googleClient client.GoogleClient
+		logger       boshlog.Logger
 
 		options = ConcreteFactoryOptions{
 			Registry: registry.ClientOptions{
@@ -54,7 +49,7 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	BeforeEach(func() {
-		//googleClient = fakewrdnclient.New()
+		googleClient = clientfakes.NewFakeGoogleClient()
 		uuidGen = &fakeuuid.FakeGenerator{}
 		logger = boshlog.NewLogger(boshlog.LevelNone)
 
@@ -68,8 +63,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	BeforeEach(func() {
 		operationService = operation.NewGoogleOperationService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 	})
@@ -82,22 +77,22 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("create_disk", func() {
 		diskService := disk.NewGoogleDiskService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		diskTypeService := disktype.NewGoogleDiskTypeService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -109,14 +104,14 @@ var _ = Describe("ConcreteFactory", func() {
 			diskService,
 			diskTypeService,
 			vmService,
-			defaultZone,
+			googleClient.DefaultZone(),
 		)))
 	})
 
 	It("delete_disk", func() {
 		diskService := disk.NewGoogleDiskService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -129,16 +124,16 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("attach_disk", func() {
 		diskService := disk.NewGoogleDiskService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -156,8 +151,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("detach_disk", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -175,16 +170,16 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("snapshot_disk", func() {
 		snapshotService := snapshot.NewGoogleSnapshotService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		diskService := disk.NewGoogleDiskService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -197,8 +192,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("delete_snapshot", func() {
 		snapshotService := snapshot.NewGoogleSnapshotService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -211,9 +206,9 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("create_stemcell", func() {
 		stemcellService := image.NewGoogleImageService(
-			project,
-			computeService,
-			storageService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			googleClient.StorageService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -226,9 +221,9 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("delete_stemcell", func() {
 		stemcellService := image.NewGoogleImageService(
-			project,
-			computeService,
-			storageService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			googleClient.StorageService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -241,57 +236,57 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("create_vm", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		addressService := address.NewGoogleAddressService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		diskService := disk.NewGoogleDiskService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		diskTypeService := disktype.NewGoogleDiskTypeService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		machineTypeService := machinetype.NewGoogleMachineTypeService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		networkService := network.NewGoogleNetworkService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		stemcellService := image.NewGoogleImageService(
-			project,
-			computeService,
-			storageService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			googleClient.StorageService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
@@ -315,34 +310,34 @@ var _ = Describe("ConcreteFactory", func() {
 			registryClient,
 			options.Registry,
 			options.Agent,
-			defaultZone,
+			googleClient.DefaultZone(),
 		)))
 	})
 
 	It("configure_networks", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		addressService := address.NewGoogleAddressService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		networkService := network.NewGoogleNetworkService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
@@ -365,28 +360,28 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("delete_vm", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
 		)
 
 		addressService := address.NewGoogleAddressService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		networkService := network.NewGoogleNetworkService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			logger,
 		)
 
 		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
@@ -409,8 +404,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("reboot_vm", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -423,8 +418,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("set_vm_metadata", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -437,8 +432,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("has_vm", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -451,8 +446,8 @@ var _ = Describe("ConcreteFactory", func() {
 
 	It("get_disks", func() {
 		vmService := instance.NewGoogleInstanceService(
-			project,
-			computeService,
+			googleClient.Project(),
+			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
 			logger,

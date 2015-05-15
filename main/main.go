@@ -12,7 +12,7 @@ import (
 	bgcdisp "github.com/frodenas/bosh-google-cpi/api/dispatcher"
 	bgctrans "github.com/frodenas/bosh-google-cpi/api/transport"
 
-	gclient "github.com/frodenas/bosh-google-cpi/google/client"
+	"github.com/frodenas/bosh-google-cpi/google/client"
 )
 
 const mainLogTag = "main"
@@ -68,7 +68,7 @@ func buildDispatcher(
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,
 ) (bgcdisp.Dispatcher, error) {
-	googleClient, err := gclient.NewGoogleClient(config.Google.Project, config.Google.JSONKey, config.Google.DefaultZone)
+	googleClient, err := client.NewGoogleClient(config.Google.Project, config.Google.JSONKey, config.Google.DefaultZone)
 	if err != nil {
 		return nil, err
 	}

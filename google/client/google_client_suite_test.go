@@ -1,4 +1,4 @@
-package gclient_test
+package client_test
 
 import (
 	"testing"

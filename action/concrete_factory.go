@@ -25,7 +25,7 @@ type ConcreteFactory struct {
 }
 
 func NewConcreteFactory(
-	googleClient gclient.GoogleClient,
+	googleClient client.GoogleClient,
 	uuidGen boshuuid.Generator,
 	options ConcreteFactoryOptions,
 	logger boshlog.Logger,
