@@ -13,6 +13,7 @@ import (
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -113,7 +114,7 @@ var _ = Describe("CreateDisk", func() {
 			BeforeEach(func() {
 				cloudProps = DiskCloudProperties{DiskType: "fake-disk-type"}
 				diskTypeService.FindFound = true
-				diskTypeService.FindDiskType = &compute.DiskType{SelfLink: "fake-disk-type-self-link"}
+				diskTypeService.FindDiskType = gdisktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 			})
 
 			It("creates the disk using the appropiate disk type", func() {

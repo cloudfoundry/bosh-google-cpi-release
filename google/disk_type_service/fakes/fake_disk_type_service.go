@@ -1,17 +1,17 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 )
 
 type FakeDiskTypeService struct {
 	FindCalled   bool
 	FindFound    bool
-	FindDiskType *compute.DiskType
+	FindDiskType gdisktype.DiskType
 	FindErr      error
 }
 
-func (d *FakeDiskTypeService) Find(id string, zone string) (*compute.DiskType, bool, error) {
+func (d *FakeDiskTypeService) Find(id string, zone string) (gdisktype.DiskType, bool, error) {
 	d.FindCalled = true
 	return d.FindDiskType, d.FindFound, d.FindErr
 }
