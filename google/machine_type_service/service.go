@@ -1,5 +1,5 @@
-package gmachinetype
+package machinetype
 
-type MachineTypeService interface {
+type Service interface {
 	Find(id string, zone string) (MachineType, bool, error)
 }

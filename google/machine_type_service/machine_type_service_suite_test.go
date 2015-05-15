@@ -1,4 +1,4 @@
-package gmachinetype_test
+package machinetype_test
 
 import (
 	"testing"

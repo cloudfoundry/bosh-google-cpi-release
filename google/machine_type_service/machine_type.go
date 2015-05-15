@@ -1,4 +1,4 @@
-package gmachinetype
+package machinetype
 
 type MachineType struct {
 	Name     string

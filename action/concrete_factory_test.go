@@ -268,7 +268,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		machineTypeService := gmachinetype.NewGoogleMachineTypeService(
+		machineTypeService := machinetype.NewGoogleMachineTypeService(
 			project,
 			computeService,
 			logger,

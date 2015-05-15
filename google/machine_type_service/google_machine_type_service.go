@@ -1,4 +1,4 @@
-package gmachinetype
+package machinetype
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

@@ -7,11 +7,11 @@ import (
 type FakeMachineTypeService struct {
 	FindCalled      bool
 	FindFound       bool
-	FindMachineType gmachinetype.MachineType
+	FindMachineType machinetype.MachineType
 	FindErr         error
 }
 
-func (d *FakeMachineTypeService) Find(id string, zone string) (gmachinetype.MachineType, bool, error) {
+func (d *FakeMachineTypeService) Find(id string, zone string) (machinetype.MachineType, bool, error) {
 	d.FindCalled = true
 	return d.FindMachineType, d.FindFound, d.FindErr
 }

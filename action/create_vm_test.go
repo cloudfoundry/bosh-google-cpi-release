@@ -104,7 +104,7 @@ var _ = Describe("CreateVM", func() {
 
 			diskService.FindDisk = disk.Disk{Zone: "fake-disk-zone"}
 			stemcellService.FindImage = gimage.Image{SelfLink: "fake-image-self-link"}
-			machineTypeService.FindMachineType = gmachinetype.MachineType{SelfLink: "fake-machine-type-self-link"}
+			machineTypeService.FindMachineType = machinetype.MachineType{SelfLink: "fake-machine-type-self-link"}
 			diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 
 			cloudProps = VMCloudProperties{

@@ -56,7 +56,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	machineTypeService := gmachinetype.NewGoogleMachineTypeService(
+	machineTypeService := machinetype.NewGoogleMachineTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,
