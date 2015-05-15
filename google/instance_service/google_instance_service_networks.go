@@ -16,14 +16,14 @@ const googleMaxTagLength = 63
 type GoogleInstanceNetworks struct {
 	networks          InstanceNetworks
 	addressService    address.Service
-	networkService    gnetwork.NetworkService
+	networkService    network.Service
 	targetPoolService gtargetpool.TargetPoolService
 }
 
 func NewGoogleInstanceNetworks(
 	networks InstanceNetworks,
 	addressService address.Service,
-	networkService gnetwork.NetworkService,
+	networkService network.Service,
 	targetPoolService gtargetpool.TargetPoolService,
 ) GoogleInstanceNetworks {
 	return GoogleInstanceNetworks{

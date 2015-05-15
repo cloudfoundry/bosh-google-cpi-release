@@ -1,4 +1,4 @@
-package gnetwork
+package network
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"

@@ -1,4 +1,4 @@
-package gnetwork_test
+package network_test
 
 import (
 	"testing"

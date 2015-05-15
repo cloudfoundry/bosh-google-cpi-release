@@ -62,7 +62,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	networkService := gnetwork.NewGoogleNetworkService(
+	networkService := network.NewGoogleNetworkService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,

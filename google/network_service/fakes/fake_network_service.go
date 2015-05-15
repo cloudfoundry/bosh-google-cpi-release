@@ -7,11 +7,11 @@ import (
 type FakeNetworkService struct {
 	FindCalled  bool
 	FindFound   bool
-	FindNetwork gnetwork.Network
+	FindNetwork network.Network
 	FindErr     error
 }
 
-func (n *FakeNetworkService) Find(id string) (gnetwork.Network, bool, error) {
+func (n *FakeNetworkService) Find(id string) (network.Network, bool, error) {
 	n.FindCalled = true
 	return n.FindNetwork, n.FindFound, n.FindErr
 }

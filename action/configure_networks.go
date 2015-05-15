@@ -15,7 +15,7 @@ import (
 type ConfigureNetworks struct {
 	vmService         ginstance.InstanceService
 	addressService    address.Service
-	networkService    gnetwork.NetworkService
+	networkService    network.Service
 	targetPoolService gtargetpool.TargetPoolService
 	registryClient    registry.Client
 }
@@ -23,7 +23,7 @@ type ConfigureNetworks struct {
 func NewConfigureNetworks(
 	vmService ginstance.InstanceService,
 	addressService address.Service,
-	networkService gnetwork.NetworkService,
+	networkService network.Service,
 	targetPoolService gtargetpool.TargetPoolService,
 	registryClient registry.Client,
 ) ConfigureNetworks {

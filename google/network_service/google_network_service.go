@@ -1,4 +1,4 @@
-package gnetwork
+package network
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

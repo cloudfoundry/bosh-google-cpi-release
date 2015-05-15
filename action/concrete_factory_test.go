@@ -274,7 +274,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		networkService := gnetwork.NewGoogleNetworkService(
+		networkService := network.NewGoogleNetworkService(
 			project,
 			computeService,
 			logger,
@@ -334,7 +334,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		networkService := gnetwork.NewGoogleNetworkService(
+		networkService := network.NewGoogleNetworkService(
 			project,
 			computeService,
 			logger,
@@ -378,7 +378,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		networkService := gnetwork.NewGoogleNetworkService(
+		networkService := network.NewGoogleNetworkService(
 			project,
 			computeService,
 			logger,

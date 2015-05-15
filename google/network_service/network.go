@@ -1,4 +1,4 @@
-package gnetwork
+package network
 
 type Network struct {
 	Name     string
