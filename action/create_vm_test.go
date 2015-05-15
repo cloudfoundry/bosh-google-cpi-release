@@ -22,6 +22,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
+	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
 	"github.com/frodenas/bosh-registry/client"
 	"google.golang.org/api/compute/v1"
 )
@@ -101,7 +102,7 @@ var _ = Describe("CreateVM", func() {
 
 			diskService.FindDisk = gdisk.Disk{Zone: "fake-disk-zone"}
 			stemcellService.FindImage = &compute.Image{SelfLink: "fake-image-self-link"}
-			machineTypeService.FindMachineType = &compute.MachineType{SelfLink: "fake-machine-type-self-link"}
+			machineTypeService.FindMachineType = gmachinetype.MachineType{SelfLink: "fake-machine-type-self-link"}
 			diskTypeService.FindDiskType = gdisktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 
 			cloudProps = VMCloudProperties{
