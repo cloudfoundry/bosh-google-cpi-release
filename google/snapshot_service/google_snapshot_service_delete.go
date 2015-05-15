@@ -1,4 +1,4 @@
-package gsnapshot
+package snapshot
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"

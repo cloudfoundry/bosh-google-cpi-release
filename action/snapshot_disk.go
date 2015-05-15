@@ -11,12 +11,12 @@ import (
 )
 
 type SnapshotDisk struct {
-	snapshotService gsnapshot.SnapshotService
+	snapshotService snapshot.Service
 	diskService     disk.Service
 }
 
 func NewSnapshotDisk(
-	snapshotService gsnapshot.SnapshotService,
+	snapshotService snapshot.Service,
 	diskService disk.Service,
 ) SnapshotDisk {
 	return SnapshotDisk{

@@ -7,11 +7,11 @@ import (
 )
 
 type DeleteSnapshot struct {
-	snapshotService gsnapshot.SnapshotService
+	snapshotService snapshot.Service
 }
 
 func NewDeleteSnapshot(
-	snapshotService gsnapshot.SnapshotService,
+	snapshotService snapshot.Service,
 ) DeleteSnapshot {
 	return DeleteSnapshot{
 		snapshotService: snapshotService,

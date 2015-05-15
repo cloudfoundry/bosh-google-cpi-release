@@ -1,4 +1,4 @@
-package gsnapshot
+package snapshot
 
 type Snapshot struct {
 	Name     string

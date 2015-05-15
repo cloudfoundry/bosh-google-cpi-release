@@ -1,4 +1,4 @@
-package gsnapshot_test
+package snapshot_test
 
 import (
 	"testing"

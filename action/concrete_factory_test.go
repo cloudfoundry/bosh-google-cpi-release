@@ -174,7 +174,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("snapshot_disk", func() {
-		snapshotService := gsnapshot.NewGoogleSnapshotService(
+		snapshotService := snapshot.NewGoogleSnapshotService(
 			project,
 			computeService,
 			operationService,
@@ -196,7 +196,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_snapshot", func() {
-		snapshotService := gsnapshot.NewGoogleSnapshotService(
+		snapshotService := snapshot.NewGoogleSnapshotService(
 			project,
 			computeService,
 			operationService,

@@ -68,7 +68,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	snapshotService := gsnapshot.NewGoogleSnapshotService(
+	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,

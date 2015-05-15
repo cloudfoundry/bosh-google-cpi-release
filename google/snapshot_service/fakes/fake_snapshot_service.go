@@ -17,7 +17,7 @@ type FakeSnapshotService struct {
 
 	FindCalled   bool
 	FindFound    bool
-	FindSnapshot gsnapshot.Snapshot
+	FindSnapshot snapshot.Snapshot
 	FindErr      error
 }
 
@@ -34,7 +34,7 @@ func (s *FakeSnapshotService) Delete(id string) error {
 	return s.DeleteErr
 }
 
-func (s *FakeSnapshotService) Find(id string) (gsnapshot.Snapshot, bool, error) {
+func (s *FakeSnapshotService) Find(id string) (snapshot.Snapshot, bool, error) {
 	s.FindCalled = true
 	return s.FindSnapshot, s.FindFound, s.FindErr
 }
