@@ -89,7 +89,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		diskTypeService := gdisktype.NewGoogleDiskTypeService(
+		diskTypeService := disktype.NewGoogleDiskTypeService(
 			project,
 			computeService,
 			logger,
@@ -262,7 +262,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		diskTypeService := gdisktype.NewGoogleDiskTypeService(
+		diskTypeService := disktype.NewGoogleDiskTypeService(
 			project,
 			computeService,
 			logger,

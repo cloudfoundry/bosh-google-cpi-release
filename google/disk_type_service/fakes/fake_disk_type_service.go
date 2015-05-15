@@ -7,11 +7,11 @@ import (
 type FakeDiskTypeService struct {
 	FindCalled   bool
 	FindFound    bool
-	FindDiskType gdisktype.DiskType
+	FindDiskType disktype.DiskType
 	FindErr      error
 }
 
-func (d *FakeDiskTypeService) Find(id string, zone string) (gdisktype.DiskType, bool, error) {
+func (d *FakeDiskTypeService) Find(id string, zone string) (disktype.DiskType, bool, error) {
 	d.FindCalled = true
 	return d.FindDiskType, d.FindFound, d.FindErr
 }

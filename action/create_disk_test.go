@@ -115,7 +115,7 @@ var _ = Describe("CreateDisk", func() {
 			BeforeEach(func() {
 				cloudProps = DiskCloudProperties{DiskType: "fake-disk-type"}
 				diskTypeService.FindFound = true
-				diskTypeService.FindDiskType = gdisktype.DiskType{SelfLink: "fake-disk-type-self-link"}
+				diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 			})
 
 			It("creates the disk using the appropiate disk type", func() {

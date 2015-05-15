@@ -1,4 +1,4 @@
-package gdisktype
+package disktype
 
 type DiskType struct {
 	Name     string

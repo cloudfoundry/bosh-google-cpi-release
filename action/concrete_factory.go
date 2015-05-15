@@ -50,7 +50,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	diskTypeService := gdisktype.NewGoogleDiskTypeService(
+	diskTypeService := disktype.NewGoogleDiskTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,

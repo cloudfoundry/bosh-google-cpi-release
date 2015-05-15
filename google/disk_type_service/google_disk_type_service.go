@@ -1,4 +1,4 @@
-package gdisktype
+package disktype
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

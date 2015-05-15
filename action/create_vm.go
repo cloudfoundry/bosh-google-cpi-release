@@ -21,7 +21,7 @@ type CreateVM struct {
 	vmService          ginstance.InstanceService
 	addressService     address.Service
 	diskService        disk.Service
-	diskTypeService    gdisktype.DiskTypeService
+	diskTypeService    disktype.Service
 	machineTypeService gmachinetype.MachineTypeService
 	networkService     gnetwork.NetworkService
 	stemcellService    gimage.ImageService
@@ -36,7 +36,7 @@ func NewCreateVM(
 	vmService ginstance.InstanceService,
 	addressService address.Service,
 	diskService disk.Service,
-	diskTypeService gdisktype.DiskTypeService,
+	diskTypeService disktype.Service,
 	machineTypeService gmachinetype.MachineTypeService,
 	networkService gnetwork.NetworkService,
 	stemcellService gimage.ImageService,

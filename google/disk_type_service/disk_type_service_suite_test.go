@@ -1,4 +1,4 @@
-package gdisktype_test
+package disktype_test
 
 import (
 	"testing"

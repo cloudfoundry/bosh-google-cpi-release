@@ -1,5 +1,5 @@
-package gdisktype
+package disktype
 
-type DiskTypeService interface {
+type Service interface {
 	Find(id string, zone string) (DiskType, bool, error)
 }

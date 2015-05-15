@@ -1,4 +1,4 @@
-package gdisktype
+package disktype
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
