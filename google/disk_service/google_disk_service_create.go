@@ -1,4 +1,4 @@
-package gdisk
+package disk
 
 import (
 	"fmt"

@@ -42,7 +42,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	diskService := gdisk.NewGoogleDiskService(
+	diskService := disk.NewGoogleDiskService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,

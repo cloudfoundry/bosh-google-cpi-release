@@ -81,7 +81,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("create_disk", func() {
-		diskService := gdisk.NewGoogleDiskService(
+		diskService := disk.NewGoogleDiskService(
 			project,
 			computeService,
 			operationService,
@@ -114,7 +114,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_disk", func() {
-		diskService := gdisk.NewGoogleDiskService(
+		diskService := disk.NewGoogleDiskService(
 			project,
 			computeService,
 			operationService,
@@ -128,7 +128,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("attach_disk", func() {
-		diskService := gdisk.NewGoogleDiskService(
+		diskService := disk.NewGoogleDiskService(
 			project,
 			computeService,
 			operationService,
@@ -182,7 +182,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		diskService := gdisk.NewGoogleDiskService(
+		diskService := disk.NewGoogleDiskService(
 			project,
 			computeService,
 			operationService,
@@ -254,7 +254,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		diskService := gdisk.NewGoogleDiskService(
+		diskService := disk.NewGoogleDiskService(
 			project,
 			computeService,
 			operationService,

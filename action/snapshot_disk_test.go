@@ -36,7 +36,7 @@ var _ = Describe("SnapshotDisk", func() {
 	Describe("Run", func() {
 		BeforeEach(func() {
 			diskService.FindFound = true
-			diskService.FindDisk = gdisk.Disk{Zone: "fake-disk-zone"}
+			diskService.FindDisk = disk.Disk{Zone: "fake-disk-zone"}
 			snapshotService.CreateID = "fake-snapshot-id"
 			metadata = SnapshotMetadata{Deployment: "fake-deployment", Job: "fake-job", Index: "fake-index"}
 		})

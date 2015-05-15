@@ -11,14 +11,14 @@ import (
 )
 
 type CreateDisk struct {
-	diskService     gdisk.DiskService
+	diskService     disk.Service
 	diskTypeService gdisktype.DiskTypeService
 	vmService       ginstance.InstanceService
 	defaultZone     string
 }
 
 func NewCreateDisk(
-	diskService gdisk.DiskService,
+	diskService disk.Service,
 	diskTypeService gdisktype.DiskTypeService,
 	vmService ginstance.InstanceService,
 	defaultZone string,

@@ -17,7 +17,7 @@ type FakeDiskService struct {
 
 	FindCalled bool
 	FindFound  bool
-	FindDisk   gdisk.Disk
+	FindDisk   disk.Disk
 	FindErr    error
 }
 
@@ -34,7 +34,7 @@ func (d *FakeDiskService) Delete(id string) error {
 	return d.DeleteErr
 }
 
-func (d *FakeDiskService) Find(id string, zone string) (gdisk.Disk, bool, error) {
+func (d *FakeDiskService) Find(id string, zone string) (disk.Disk, bool, error) {
 	d.FindCalled = true
 	return d.FindDisk, d.FindFound, d.FindErr
 }

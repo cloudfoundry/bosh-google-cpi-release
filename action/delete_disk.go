@@ -8,11 +8,11 @@ import (
 )
 
 type DeleteDisk struct {
-	diskService gdisk.DiskService
+	diskService disk.Service
 }
 
 func NewDeleteDisk(
-	diskService gdisk.DiskService,
+	diskService disk.Service,
 ) DeleteDisk {
 	return DeleteDisk{
 		diskService: diskService,

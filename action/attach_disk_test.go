@@ -41,7 +41,7 @@ var _ = Describe("AttachDisk", func() {
 	Describe("Run", func() {
 		BeforeEach(func() {
 			diskService.FindFound = true
-			diskService.FindDisk = gdisk.Disk{SelfLink: "fake-self-link"}
+			diskService.FindDisk = disk.Disk{SelfLink: "fake-self-link"}
 			vmService.AttachDiskDeviceName = "fake-disk-device-name"
 			vmService.AttachDiskDevicePath = "fake-disk-device-path"
 			registryClient.FetchSettings = registry.AgentSettings{}

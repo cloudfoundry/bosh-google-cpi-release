@@ -102,7 +102,7 @@ var _ = Describe("CreateVM", func() {
 			stemcellService.FindFound = true
 			machineTypeService.FindFound = true
 
-			diskService.FindDisk = gdisk.Disk{Zone: "fake-disk-zone"}
+			diskService.FindDisk = disk.Disk{Zone: "fake-disk-zone"}
 			stemcellService.FindImage = gimage.Image{SelfLink: "fake-image-self-link"}
 			machineTypeService.FindMachineType = gmachinetype.MachineType{SelfLink: "fake-machine-type-self-link"}
 			diskTypeService.FindDiskType = gdisktype.DiskType{SelfLink: "fake-disk-type-self-link"}
