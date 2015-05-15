@@ -1,4 +1,4 @@
-package goperation
+package operation
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

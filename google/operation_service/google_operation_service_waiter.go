@@ -1,4 +1,4 @@
-package goperation
+package operation
 
 import (
 	"math"

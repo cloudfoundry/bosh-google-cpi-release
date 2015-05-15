@@ -12,14 +12,14 @@ const googleTargetPoolServiceLogTag = "GoogleTargetPoolService"
 type GoogleTargetPoolService struct {
 	project          string
 	computeService   *compute.Service
-	operationService goperation.OperationService
+	operationService operation.Service
 	logger           boshlog.Logger
 }
 
 func NewGoogleTargetPoolService(
 	project string,
 	computeService *compute.Service,
-	operationService goperation.OperationService,
+	operationService operation.Service,
 	logger boshlog.Logger,
 ) GoogleTargetPoolService {
 	return GoogleTargetPoolService{

@@ -17,7 +17,7 @@ const googleSnapshotFailedStatus = "FAILED"
 type GoogleSnapshotService struct {
 	project          string
 	computeService   *compute.Service
-	operationService goperation.OperationService
+	operationService operation.Service
 	uuidGen          boshuuid.Generator
 	logger           boshlog.Logger
 }
@@ -25,7 +25,7 @@ type GoogleSnapshotService struct {
 func NewGoogleSnapshotService(
 	project string,
 	computeService *compute.Service,
-	operationService goperation.OperationService,
+	operationService operation.Service,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleSnapshotService {

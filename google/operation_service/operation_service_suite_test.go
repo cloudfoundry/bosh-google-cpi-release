@@ -1,4 +1,4 @@
-package goperation_test
+package operation_test
 
 import (
 	"testing"

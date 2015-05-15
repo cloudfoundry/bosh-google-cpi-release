@@ -30,7 +30,7 @@ func NewConcreteFactory(
 	options ConcreteFactoryOptions,
 	logger boshlog.Logger,
 ) ConcreteFactory {
-	operationService := goperation.NewGoogleOperationService(
+	operationService := operation.NewGoogleOperationService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,

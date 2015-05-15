@@ -50,7 +50,7 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	var (
-		operationService goperation.GoogleOperationService
+		operationService operation.GoogleOperationService
 	)
 
 	BeforeEach(func() {
@@ -67,7 +67,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	BeforeEach(func() {
-		operationService = goperation.NewGoogleOperationService(
+		operationService = operation.NewGoogleOperationService(
 			project,
 			computeService,
 			logger,

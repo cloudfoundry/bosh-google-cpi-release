@@ -15,7 +15,7 @@ const googleInstanceDescription = "Instance managed by BOSH"
 type GoogleInstanceService struct {
 	project          string
 	computeService   *compute.Service
-	operationService goperation.OperationService
+	operationService operation.Service
 	uuidGen          boshuuid.Generator
 	logger           boshlog.Logger
 }
@@ -23,7 +23,7 @@ type GoogleInstanceService struct {
 func NewGoogleInstanceService(
 	project string,
 	computeService *compute.Service,
-	operationService goperation.OperationService,
+	operationService operation.Service,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleInstanceService {
