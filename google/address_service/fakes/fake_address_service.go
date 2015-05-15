@@ -1,27 +1,27 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
 )
 
 type FakeAddressService struct {
 	FindCalled  bool
 	FindFound   bool
-	FindAddress *compute.Address
+	FindAddress gaddress.Address
 	FindErr     error
 
 	FindByIPCalled  bool
 	FindByIPFound   bool
-	FindByIPAddress *compute.Address
+	FindByIPAddress gaddress.Address
 	FindByIPErr     error
 }
 
-func (n *FakeAddressService) Find(id string, region string) (*compute.Address, bool, error) {
+func (n *FakeAddressService) Find(id string, region string) (gaddress.Address, bool, error) {
 	n.FindCalled = true
 	return n.FindAddress, n.FindFound, n.FindErr
 }
 
-func (n *FakeAddressService) FindByIP(ipAddress string) (*compute.Address, bool, error) {
+func (n *FakeAddressService) FindByIP(ipAddress string) (gaddress.Address, bool, error) {
 	n.FindByIPCalled = true
 	return n.FindByIPAddress, n.FindByIPFound, n.FindByIPErr
 }
