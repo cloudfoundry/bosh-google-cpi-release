@@ -8,10 +8,7 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/action"
 
-	addressfakes "github.com/frodenas/bosh-google-cpi/google/address_service/fakes"
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
-	networkfakes "github.com/frodenas/bosh-google-cpi/google/network_service/fakes"
-	targetpoolfakes "github.com/frodenas/bosh-google-cpi/google/target_pool_service/fakes"
 
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 )
@@ -20,22 +17,16 @@ var _ = Describe("DeleteVM", func() {
 	var (
 		err error
 
-		vmService         *instancefakes.FakeInstanceService
-		addressService    *addressfakes.FakeAddressService
-		networkService    *networkfakes.FakeNetworkService
-		targetPoolService *targetpoolfakes.FakeTargetPoolService
-		registryClient    *registryfakes.FakeClient
+		vmService      *instancefakes.FakeInstanceService
+		registryClient *registryfakes.FakeClient
 
 		deleteVM DeleteVM
 	)
 
 	BeforeEach(func() {
 		vmService = &instancefakes.FakeInstanceService{}
-		addressService = &addressfakes.FakeAddressService{}
-		networkService = &networkfakes.FakeNetworkService{}
-		targetPoolService = &targetpoolfakes.FakeTargetPoolService{}
 		registryClient = &registryfakes.FakeClient{}
-		deleteVM = NewDeleteVM(vmService, addressService, networkService, targetPoolService, registryClient)
+		deleteVM = NewDeleteVM(vmService, registryClient)
 	})
 
 	Describe("Run", func() {

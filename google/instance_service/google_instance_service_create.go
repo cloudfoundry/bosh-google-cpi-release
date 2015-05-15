@@ -13,26 +13,26 @@ import (
 
 const defaultRootDiskSizeGb = 10
 
-func (i GoogleInstanceService) Create(vmProps *Properties, instanceNetworks GoogleInstanceNetworks, registryEndpoint string) (string, error) {
+func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
 	}
 
 	instanceName := fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
-	canIPForward := instanceNetworks.CanIPForward()
+	canIPForward := networks.CanIPForward()
 	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskType)
-	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, instanceNetworks)
+	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, networks)
 	if err != nil {
 		return "", err
 	}
-	networkInterfacesParams, err := instanceNetworks.NetworkInterfaces()
+	networkInterfacesParams, err := i.createNetworkInterfacesParams(networks)
 	if err != nil {
 		return "", err
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps.ServiceScopes)
-	tagsParams, err := instanceNetworks.Tags()
+	tagsParams, err := i.createTagsParams(networks)
 	if err != nil {
 		return "", err
 	}
@@ -92,12 +92,12 @@ func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, d
 	return disks
 }
 
-func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint string, instanceNetworks GoogleInstanceNetworks) (*compute.Metadata, error) {
+func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint string, networks Networks) (*compute.Metadata, error) {
 	serverName := GoogleUserDataServerName{Name: name}
 	registryEndpoint := GoogleUserDataRegistryEndpoint{Endpoint: regEndpoint}
 	userData := GoogleUserData{Server: serverName, Registry: registryEndpoint}
 
-	if networkDNS := instanceNetworks.DNS(); len(networkDNS) > 0 {
+	if networkDNS := networks.DNS(); len(networkDNS) > 0 {
 		userData.DNS = GoogleUserDataDNSItems{NameServer: networkDNS}
 	}
 
@@ -112,6 +112,39 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 	metadata := &compute.Metadata{Items: metadataItems}
 
 	return metadata, nil
+}
+
+func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) ([]*compute.NetworkInterface, error) {
+	network, found, err := i.networkService.Find(networks.NetworkName())
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, bosherr.WrapErrorf(err, "Network '%s' does not exists", networks.NetworkName())
+	}
+
+	var networkInterfaces []*compute.NetworkInterface
+	var accessConfigs []*compute.AccessConfig
+
+	vipNetwork := networks.VipNetwork()
+	if networks.EphemeralExternalIP() || vipNetwork.IP != "" {
+		accessConfig := &compute.AccessConfig{
+			Name: "External NAT",
+			Type: "ONE_TO_ONE_NAT",
+		}
+		if vipNetwork.IP != "" {
+			accessConfig.NatIP = vipNetwork.IP
+		}
+		accessConfigs = append(accessConfigs, accessConfig)
+	}
+
+	networkInterface := &compute.NetworkInterface{
+		Network:       network.SelfLink,
+		AccessConfigs: accessConfigs,
+	}
+	networkInterfaces = append(networkInterfaces, networkInterface)
+
+	return networkInterfaces, nil
 }
 
 func (i GoogleInstanceService) createSchedulingParams(automaticRestart bool, onHostMaintenance string) *compute.Scheduling {
@@ -143,4 +176,14 @@ func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes Service
 	}
 
 	return serviceAccounts
+}
+
+func (i GoogleInstanceService) createTagsParams(networks Networks) (*compute.Tags, error) {
+	tags := &compute.Tags{}
+
+	for _, tag := range networks.Tags() {
+		tags.Items = append(tags.Items, tag)
+	}
+
+	return tags, nil
 }

@@ -1,156 +1,296 @@
 package instance
 
 import (
-	"regexp"
+	"reflect"
+	"sort"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
-
-	"github.com/frodenas/bosh-google-cpi/google/address_service"
-	"github.com/frodenas/bosh-google-cpi/google/network_service"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
+	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
 
-const googleMaxTagLength = 63
-
-type GoogleInstanceNetworks struct {
-	networks          Networks
-	addressService    address.Service
-	networkService    network.Service
-	targetPoolService targetpool.Service
-}
-
-func NewGoogleInstanceNetworks(
-	networks Networks,
-	addressService address.Service,
-	networkService network.Service,
-	targetPoolService targetpool.Service,
-) GoogleInstanceNetworks {
-	return GoogleInstanceNetworks{
-		networks:          networks,
-		addressService:    addressService,
-		networkService:    networkService,
-		targetPoolService: targetPoolService,
-	}
-}
-
-func (in GoogleInstanceNetworks) DynamicNetwork() Network {
-	for _, net := range in.networks {
-		if net.IsDynamic() {
-			// There can only be 1 dynamic network
-			return net
-		}
-	}
-
-	return Network{}
-}
-
-func (in GoogleInstanceNetworks) VipNetwork() Network {
-	for _, net := range in.networks {
-		if net.IsVip() {
-			// There can only be 1 vip network
-			return net
-		}
-	}
-
-	return Network{}
-}
-
-func (in GoogleInstanceNetworks) CanIPForward() bool {
-	dynamicNetwork := in.DynamicNetwork()
-
-	return dynamicNetwork.IPForwarding
-}
-
-func (in GoogleInstanceNetworks) DNS() []string {
-	dynamicNetwork := in.DynamicNetwork()
-
-	return dynamicNetwork.DNS
-}
-
-func (in GoogleInstanceNetworks) EphemeralExternalIP() bool {
-	dynamicNetwork := in.DynamicNetwork()
-
-	return dynamicNetwork.EphemeralExternalIP
-}
-
-func (in GoogleInstanceNetworks) NetworkInterfaces() ([]*compute.NetworkInterface, error) {
-	dynamicNetwork := in.DynamicNetwork()
-	network, found, err := in.networkService.Find(dynamicNetwork.NetworkName)
+func (i GoogleInstanceService) AddNetworkConfiguration(id string, networks Networks) error {
+	instance, found, err := i.Find(id, "")
 	if err != nil {
-		return nil, bosherr.WrapError(err, "Network Interfaces")
+		return err
 	}
 	if !found {
-		return nil, bosherr.WrapErrorf(err, "Network Interfaces: Network '%s' does not exists", dynamicNetwork.NetworkName)
+		return api.NewVMNotFoundError(id)
 	}
 
-	var networkInterfaces []*compute.NetworkInterface
-	var accessConfigs []*compute.AccessConfig
+	if err := i.addToTargetPool(instance, networks); err != nil {
+		return err
+	}
 
-	vipNetwork := in.VipNetwork()
-	if dynamicNetwork.EphemeralExternalIP || vipNetwork.IP != "" {
+	return nil
+}
+
+func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, networks Networks) error {
+	if targetPoolName := networks.TargetPool(); targetPoolName != "" {
+		err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) DeleteNetworkConfiguration(id string) error {
+	instance, found, err := i.Find(id, "")
+	if err != nil {
+		return err
+	}
+	if !found {
+		return api.NewVMNotFoundError(id)
+	}
+
+	if err := i.removeFromTargetPool(instance); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) removeFromTargetPool(instance *compute.Instance) error {
+	targetPool, found, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	if found {
+		err := i.targetPoolService.RemoveInstance(targetPool, instance.SelfLink)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, networks Networks) error {
+	instance, found, err := i.Find(id, "")
+	if err != nil {
+		return err
+	}
+	if !found {
+		return api.NewVMNotFoundError(id)
+	}
+
+	if err = i.updateNetwork(instance, networks); err != nil {
+		return err
+	}
+
+	if err = i.updateIPForwarding(instance, networks); err != nil {
+		return err
+	}
+
+	if err = i.updateExternalIP(instance, networks); err != nil {
+		return err
+	}
+
+	if err = i.updateTags(instance, networks); err != nil {
+		return err
+	}
+
+	if err := i.updateTargetPool(instance, networks); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateNetwork(instance *compute.Instance, networks Networks) error {
+	// If the network has changed we need to recreate the VM
+	if util.ResourceSplitter(instance.NetworkInterfaces[0].Network) != networks.NetworkName() {
+		i.logger.Debug(googleInstanceServiceLogTag, "Changing network for Google Instance '%s' not supported", instance.Name)
+		return api.NotSupportedError{}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateIPForwarding(instance *compute.Instance, networks Networks) error {
+	// If IP Forwarding has changed we need to recreate the VM
+	if instance.CanIpForward != networks.CanIPForward() {
+		i.logger.Debug(googleInstanceServiceLogTag, "Changing IP Forwarding for Google Instance '%s' not supported", instance.Name)
+		return api.NotSupportedError{}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateExternalIP(instance *compute.Instance, networks Networks) error {
+	var err error
+
+	vipNetwork := networks.VipNetwork()
+	if vipNetwork.IP != "" {
+		err = i.updateVipAddress(instance, vipNetwork.IP)
+	} else {
+		err = i.updateEphemeralExternalIP(instance, networks)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateVipAddress(instance *compute.Instance, ipAddress string) error {
+	var instanceExternalIP, accessConfigName string
+	if len(instance.NetworkInterfaces[0].AccessConfigs) > 0 {
+		instanceExternalIP = instance.NetworkInterfaces[0].AccessConfigs[0].NatIP
+		accessConfigName = instance.NetworkInterfaces[0].AccessConfigs[0].Name
+	}
+
+	networkInterface := instance.NetworkInterfaces[0].Name
+
+	if instanceExternalIP == "" || instanceExternalIP != ipAddress {
+		// If the instance has an external IP, detach it
+		if instanceExternalIP != "" {
+			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
+			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
+			if err != nil {
+				return err
+			}
+		}
+
+		// Attach the vip IP to the instance
 		accessConfig := &compute.AccessConfig{
-			Name: "External NAT",
-			Type: "ONE_TO_ONE_NAT",
+			Name:  "External NAT",
+			Type:  "ONE_TO_ONE_NAT",
+			NatIP: ipAddress,
 		}
-		if vipNetwork.IP != "" {
-			accessConfig.NatIP = vipNetwork.IP
+
+		i.logger.Debug(googleInstanceServiceLogTag, "Attaching Google Static IP Address '%s' to Google Instance '%s'", ipAddress, instance.Name)
+		err := i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+		if err != nil {
+			return err
 		}
-		accessConfigs = append(accessConfigs, accessConfig)
 	}
 
-	networkInterface := &compute.NetworkInterface{
-		Network:       network.SelfLink,
-		AccessConfigs: accessConfigs,
-	}
-	networkInterfaces = append(networkInterfaces, networkInterface)
-
-	return networkInterfaces, nil
+	return nil
 }
 
-func (in GoogleInstanceNetworks) Tags() (*compute.Tags, error) {
-	tags := &compute.Tags{}
-
-	dynamicNetwork := in.DynamicNetwork()
-	pattern, _ := regexp.Compile("^[A-Za-z]+[A-Za-z0-9-]*[A-Za-z0-9]+$")
-	for _, tag := range dynamicNetwork.Tags {
-		if len(tag) > googleMaxTagLength || !pattern.MatchString(tag) {
-			return tags, bosherr.Errorf("Invalid tag '%s': does not comply with RFC1035", tag)
-		}
-		tags.Items = append(tags.Items, tag)
+func (i GoogleInstanceService) updateEphemeralExternalIP(instance *compute.Instance, networks Networks) error {
+	var instanceExternalIP, accessConfigName string
+	if len(instance.NetworkInterfaces[0].AccessConfigs) > 0 {
+		instanceExternalIP = instance.NetworkInterfaces[0].AccessConfigs[0].NatIP
+		accessConfigName = instance.NetworkInterfaces[0].AccessConfigs[0].Name
 	}
 
-	return tags, nil
-}
+	networkInterface := instance.NetworkInterfaces[0].Name
 
-func (in GoogleInstanceNetworks) TargetPool() string {
-	dynamicNetwork := in.DynamicNetwork()
-
-	return dynamicNetwork.TargetPool
-}
-
-func (in GoogleInstanceNetworks) Validate() error {
-	var dnet, vnet bool
-
-	// TODO: refactor & add more validations
-	for _, net := range in.networks {
-		if net.IsDynamic() {
-			if dnet {
-				return bosherr.Error("Only one dynamic network is allowed")
+	if networks.EphemeralExternalIP() {
+		// If the instance doesn't have an external IP, attach an ephemeral one
+		if instanceExternalIP == "" {
+			accessConfig := &compute.AccessConfig{
+				Name: "External NAT",
+				Type: "ONE_TO_ONE_NAT",
 			}
-			dnet = true
+
+			i.logger.Debug(googleInstanceServiceLogTag, "Attaching Ephemeral Google IP Address to Google Instance '%s'", instance.Name)
+			err := i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+			if err != nil {
+				return err
+			}
+
+			return nil
 		}
 
-		if net.IsVip() {
-			if vnet {
-				return bosherr.Error("Only one VIP network is allowed")
-			}
-			vnet = true
+		// Check if the instance external IP is an static IP address
+		_, found, err := i.addressService.FindByIP(instanceExternalIP)
+		if err != nil {
+			return nil
 		}
+
+		if found {
+			// Detach the static IP from the instance
+			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
+			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
+			if err != nil {
+				return err
+			}
+
+			// Attach an ephemeral IP to the instance
+			accessConfig := &compute.AccessConfig{
+				Name: "External NAT",
+				Type: "ONE_TO_ONE_NAT",
+			}
+
+			i.logger.Debug(googleInstanceServiceLogTag, "Attaching Ephemeral Google IP Address to Google Instance '%s'", instance.Name)
+			err = i.AddAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfig)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	} else {
+		// If the instance has an external IP, detach it from the instance
+		if instanceExternalIP != "" {
+			i.logger.Debug(googleInstanceServiceLogTag, "Detaching Google Static IP Address '%s' from Google Instance '%s'", instanceExternalIP, instance.Name)
+			err := i.DeleteAccessConfig(instance.Name, instance.Zone, networkInterface, accessConfigName)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	}
 
-	if !dnet {
-		return bosherr.Error("At least one 'dynamic' network should be defined")
+	return nil
+}
+
+func (i GoogleInstanceService) updateTags(instance *compute.Instance, networks Networks) error {
+	// Parset network tags
+	networkTags := networks.Tags()
+
+	// Check if tags have changed
+	sort.Strings(networkTags)
+	sort.Strings(instance.Tags.Items)
+	if reflect.DeepEqual(networkTags, instance.Tags.Items) {
+		return nil
+	}
+
+	// Override the instance tags preserving the original fingerprint
+	instanceTags := &compute.Tags{
+		Fingerprint: instance.Tags.Fingerprint,
+		Items:       networkTags,
+	}
+
+	// Update the instance tags
+	err := i.SetTags(instance.Name, instance.Zone, instanceTags)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, networks Networks) error {
+	// Check if instance is associated to a target pool
+	currentTargetPool, _, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	// Check if target pool info has changed
+	targetPoolName := networks.TargetPool()
+	if targetPoolName != currentTargetPool {
+		if currentTargetPool != "" {
+			err := i.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink)
+			if err != nil {
+				return err
+			}
+		}
+
+		if targetPoolName != "" {
+			err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

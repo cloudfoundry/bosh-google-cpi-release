@@ -8,14 +8,11 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/action"
 
-	addressfakes "github.com/frodenas/bosh-google-cpi/google/address_service/fakes"
 	diskfakes "github.com/frodenas/bosh-google-cpi/google/disk_service/fakes"
 	disktypefakes "github.com/frodenas/bosh-google-cpi/google/disk_type_service/fakes"
 	imagefakes "github.com/frodenas/bosh-google-cpi/google/image_service/fakes"
 	instancefakes "github.com/frodenas/bosh-google-cpi/google/instance_service/fakes"
 	machinetypefakes "github.com/frodenas/bosh-google-cpi/google/machine_type_service/fakes"
-	networkfakes "github.com/frodenas/bosh-google-cpi/google/network_service/fakes"
-	targetpoolfakes "github.com/frodenas/bosh-google-cpi/google/target_pool_service/fakes"
 
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
@@ -40,18 +37,14 @@ var _ = Describe("CreateVM", func() {
 		registryOptions          registry.ClientOptions
 		agentOptions             registry.AgentOptions
 		expectedVMProps          *instance.Properties
-		vmNetworks               instance.Networks
-		expectedInstanceNetworks instance.GoogleInstanceNetworks
+		expectedInstanceNetworks instance.Networks
 		expectedAgentSettings    registry.AgentSettings
 
 		vmService          *instancefakes.FakeInstanceService
-		addressService     *addressfakes.FakeAddressService
 		diskService        *diskfakes.FakeDiskService
 		diskTypeService    *disktypefakes.FakeDiskTypeService
 		machineTypeService *machinetypefakes.FakeMachineTypeService
-		networkService     *networkfakes.FakeNetworkService
 		stemcellService    *imagefakes.FakeImageService
-		targetPoolService  *targetpoolfakes.FakeTargetPoolService
 		registryClient     *registryfakes.FakeClient
 
 		createVM CreateVM
@@ -59,13 +52,10 @@ var _ = Describe("CreateVM", func() {
 
 	BeforeEach(func() {
 		vmService = &instancefakes.FakeInstanceService{}
-		addressService = &addressfakes.FakeAddressService{}
 		diskService = &diskfakes.FakeDiskService{}
 		diskTypeService = &disktypefakes.FakeDiskTypeService{}
 		machineTypeService = &machinetypefakes.FakeMachineTypeService{}
-		networkService = &networkfakes.FakeNetworkService{}
 		stemcellService = &imagefakes.FakeImageService{}
-		targetPoolService = &targetpoolfakes.FakeTargetPoolService{}
 		registryClient = &registryfakes.FakeClient{}
 		registryOptions = registry.ClientOptions{
 			Protocol: "http",
@@ -82,13 +72,10 @@ var _ = Describe("CreateVM", func() {
 		}
 		createVM = NewCreateVM(
 			vmService,
-			addressService,
 			diskService,
 			diskTypeService,
 			machineTypeService,
-			networkService,
 			stemcellService,
-			targetPoolService,
 			registryClient,
 			registryOptions,
 			agentOptions,
@@ -146,13 +133,7 @@ var _ = Describe("CreateVM", func() {
 				ServiceScopes:     []string{},
 			}
 
-			vmNetworks = networks.AsInstanceServiceNetworks()
-			expectedInstanceNetworks = instance.NewGoogleInstanceNetworks(
-				vmNetworks,
-				addressService,
-				networkService,
-				targetPoolService,
-			)
+			expectedInstanceNetworks = networks.AsInstanceServiceNetworks()
 
 			expectedAgentSettings = registry.AgentSettings{
 				AgentID: "fake-agent-id",
@@ -194,7 +175,7 @@ var _ = Describe("CreateVM", func() {
 			Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 			Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 			Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
-			Expect(vmService.CreateInstanceNetworks).To(Equal(expectedInstanceNetworks))
+			Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 			Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
 		})
 
@@ -347,7 +328,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
-				Expect(vmService.CreateInstanceNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
 			})
 
@@ -404,7 +385,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
-				Expect(vmService.CreateInstanceNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
 			})
 		})
@@ -430,7 +411,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
-				Expect(vmService.CreateInstanceNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
 			})
 

@@ -27,7 +27,7 @@ type FakeInstanceService struct {
 	CreateErr              error
 	CreateID               string
 	CreateVMProps          *instance.Properties
-	CreateInstanceNetworks instance.GoogleInstanceNetworks
+	CreateNetworks         instance.Networks
 	CreateRegistryEndpoint string
 
 	DeleteCalled bool
@@ -66,7 +66,7 @@ func (i *FakeInstanceService) AddAccessConfig(id string, zone string, networkInt
 	return i.AddAccessConfigErr
 }
 
-func (i *FakeInstanceService) AddNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) AddNetworkConfiguration(id string, networks instance.Networks) error {
 	i.AddNetworkConfigurationCalled = true
 	return i.AddNetworkConfigurationErr
 }
@@ -86,10 +86,10 @@ func (i *FakeInstanceService) CleanUp(id string) {
 	return
 }
 
-func (i *FakeInstanceService) Create(vmProps *instance.Properties, instanceNetworks instance.GoogleInstanceNetworks, registryEndpoint string) (string, error) {
+func (i *FakeInstanceService) Create(vmProps *instance.Properties, networks instance.Networks, registryEndpoint string) (string, error) {
 	i.CreateCalled = true
 	i.CreateVMProps = vmProps
-	i.CreateInstanceNetworks = instanceNetworks
+	i.CreateNetworks = networks
 	i.CreateRegistryEndpoint = registryEndpoint
 	return i.CreateID, i.CreateErr
 }
@@ -104,7 +104,7 @@ func (i *FakeInstanceService) DeleteAccessConfig(id string, zone string, network
 	return i.DeleteErr
 }
 
-func (i *FakeInstanceService) DeleteNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) DeleteNetworkConfiguration(id string) error {
 	i.DeleteNetworkConfigurationCalled = true
 	return i.DeleteNetworkConfigurationErr
 }
@@ -135,7 +135,7 @@ func (i *FakeInstanceService) SetTags(id string, zone string, instanceTags *comp
 	return i.SetTagsErr
 }
 
-func (i *FakeInstanceService) UpdateNetworkConfiguration(id string, instanceNetworks instance.GoogleInstanceNetworks) error {
+func (i *FakeInstanceService) UpdateNetworkConfiguration(id string, networks instance.Networks) error {
 	i.UpdateNetworkConfigurationCalled = true
 	return i.UpdateNetworkConfigurationErr
 }

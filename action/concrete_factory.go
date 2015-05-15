@@ -68,16 +68,16 @@ func NewConcreteFactory(
 		logger,
 	)
 
+	registryClient := registry.NewHTTPClient(
+		options.Registry,
+		logger,
+	)
+
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
 		uuidGen,
-		logger,
-	)
-
-	registryClient := registry.NewHTTPClient(
-		options.Registry,
 		logger,
 	)
 
@@ -90,18 +90,21 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	vmService := instance.NewGoogleInstanceService(
-		googleClient.Project(),
-		googleClient.ComputeService(),
-		operationService,
-		uuidGen,
-		logger,
-	)
-
 	targetPoolService := targetpool.NewGoogleTargetPoolService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
+		logger,
+	)
+
+	vmService := instance.NewGoogleInstanceService(
+		googleClient.Project(),
+		googleClient.ComputeService(),
+		addressService,
+		networkService,
+		operationService,
+		targetPoolService,
+		uuidGen,
 		logger,
 	)
 
@@ -129,36 +132,21 @@ func NewConcreteFactory(
 			// VM management
 			"create_vm": NewCreateVM(
 				vmService,
-				addressService,
 				diskService,
 				diskTypeService,
 				machineTypeService,
-				networkService,
 				stemcellService,
-				targetPoolService,
 				registryClient,
 				options.Registry,
 				options.Agent,
 				googleClient.DefaultZone(),
 			),
-			"configure_networks": NewConfigureNetworks(
-				vmService,
-				addressService,
-				networkService,
-				targetPoolService,
-				registryClient,
-			),
-			"delete_vm": NewDeleteVM(
-				vmService,
-				addressService,
-				networkService,
-				targetPoolService,
-				registryClient,
-			),
-			"reboot_vm":       NewRebootVM(vmService),
-			"set_vm_metadata": NewSetVMMetadata(vmService),
-			"has_vm":          NewHasVM(vmService),
-			"get_disks":       NewGetDisks(vmService),
+			"configure_networks": NewConfigureNetworks(vmService, registryClient),
+			"delete_vm":          NewDeleteVM(vmService, registryClient),
+			"reboot_vm":          NewRebootVM(vmService),
+			"set_vm_metadata":    NewSetVMMetadata(vmService),
+			"has_vm":             NewHasVM(vmService),
+			"get_disks":          NewGetDisks(vmService),
 
 			// Others:
 			"ping": NewPing(),

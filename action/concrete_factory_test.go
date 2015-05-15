@@ -45,7 +45,17 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	var (
-		operationService operation.GoogleOperationService
+		operationService   operation.GoogleOperationService
+		addressService     address.Service
+		diskService        disk.Service
+		diskTypeService    disktype.Service
+		machineTypeService machinetype.Service
+		networkService     network.Service
+		snapshotService    snapshot.Service
+		registryClient     registry.Client
+		stemcellService    image.Service
+		targetPoolService  targetpool.Service
+		vmService          instance.Service
 	)
 
 	BeforeEach(func() {
@@ -67,6 +77,78 @@ var _ = Describe("ConcreteFactory", func() {
 			googleClient.ComputeService(),
 			logger,
 		)
+
+		addressService = address.NewGoogleAddressService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
+		diskService = disk.NewGoogleDiskService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			operationService,
+			uuidGen,
+			logger,
+		)
+
+		diskTypeService = disktype.NewGoogleDiskTypeService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
+		machineTypeService = machinetype.NewGoogleMachineTypeService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
+		networkService = network.NewGoogleNetworkService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
+		registryClient = registry.NewHTTPClient(
+			options.Registry,
+			logger,
+		)
+
+		snapshotService = snapshot.NewGoogleSnapshotService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			operationService,
+			uuidGen,
+			logger,
+		)
+
+		stemcellService = image.NewGoogleImageService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			googleClient.StorageService(),
+			operationService,
+			uuidGen,
+			logger,
+		)
+
+		targetPoolService = targetpool.NewGoogleTargetPoolService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			operationService,
+			logger,
+		)
+
+		vmService = instance.NewGoogleInstanceService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			addressService,
+			networkService,
+			operationService,
+			targetPoolService,
+			uuidGen,
+			logger,
+		)
 	})
 
 	It("returns error if action cannot be created", func() {
@@ -76,28 +158,6 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("create_disk", func() {
-		diskService := disk.NewGoogleDiskService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		diskTypeService := disktype.NewGoogleDiskTypeService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("create_disk")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateDisk(
@@ -109,204 +169,56 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_disk", func() {
-		diskService := disk.NewGoogleDiskService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("delete_disk")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteDisk(diskService)))
 	})
 
 	It("attach_disk", func() {
-		diskService := disk.NewGoogleDiskService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		registryClient := registry.NewHTTPClient(
-			options.Registry,
-			logger,
-		)
-
 		action, err := factory.Create("attach_disk")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewAttachDisk(diskService, vmService, registryClient)))
 	})
 
 	It("detach_disk", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		registryClient := registry.NewHTTPClient(
-			options.Registry,
-			logger,
-		)
-
 		action, err := factory.Create("detach_disk")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDetachDisk(vmService, registryClient)))
 	})
 
 	It("snapshot_disk", func() {
-		snapshotService := snapshot.NewGoogleSnapshotService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		diskService := disk.NewGoogleDiskService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("snapshot_disk")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewSnapshotDisk(snapshotService, diskService)))
 	})
 
 	It("delete_snapshot", func() {
-		snapshotService := snapshot.NewGoogleSnapshotService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("delete_snapshot")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteSnapshot(snapshotService)))
 	})
 
 	It("create_stemcell", func() {
-		stemcellService := image.NewGoogleImageService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			googleClient.StorageService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("create_stemcell")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateStemcell(stemcellService)))
 	})
 
 	It("delete_stemcell", func() {
-		stemcellService := image.NewGoogleImageService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			googleClient.StorageService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("delete_stemcell")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteStemcell(stemcellService)))
 	})
 
 	It("create_vm", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		addressService := address.NewGoogleAddressService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		diskService := disk.NewGoogleDiskService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		diskTypeService := disktype.NewGoogleDiskTypeService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		machineTypeService := machinetype.NewGoogleMachineTypeService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		networkService := network.NewGoogleNetworkService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		stemcellService := image.NewGoogleImageService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			googleClient.StorageService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			logger,
-		)
-
-		registryClient := registry.NewHTTPClient(
-			options.Registry,
-			logger,
-		)
-
 		action, err := factory.Create("create_vm")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateVM(
 			vmService,
-			addressService,
 			diskService,
 			diskTypeService,
 			machineTypeService,
-			networkService,
 			stemcellService,
-			targetPoolService,
 			registryClient,
 			options.Registry,
 			options.Agent,
@@ -315,144 +227,36 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("configure_networks", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		addressService := address.NewGoogleAddressService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		networkService := network.NewGoogleNetworkService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			logger,
-		)
-
-		registryClient := registry.NewHTTPClient(
-			options.Registry,
-			logger,
-		)
-
 		action, err := factory.Create("configure_networks")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewConfigureNetworks(
-			vmService,
-			addressService,
-			networkService,
-			targetPoolService,
-			registryClient,
-		)))
+		Expect(action).To(Equal(NewConfigureNetworks(vmService, registryClient)))
 	})
 
 	It("delete_vm", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		addressService := address.NewGoogleAddressService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		networkService := network.NewGoogleNetworkService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			logger,
-		)
-
-		targetPoolService := targetpool.NewGoogleTargetPoolService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			logger,
-		)
-
-		registryClient := registry.NewHTTPClient(
-			options.Registry,
-			logger,
-		)
-
 		action, err := factory.Create("delete_vm")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteVM(
-			vmService,
-			addressService,
-			networkService,
-			targetPoolService,
-			registryClient,
-		)))
+		Expect(action).To(Equal(NewDeleteVM(vmService, registryClient)))
 	})
 
 	It("reboot_vm", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("reboot_vm")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewRebootVM(vmService)))
 	})
 
 	It("set_vm_metadata", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("set_vm_metadata")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewSetVMMetadata(vmService)))
 	})
 
 	It("has_vm", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("has_vm")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewHasVM(vmService)))
 	})
 
 	It("get_disks", func() {
-		vmService := instance.NewGoogleInstanceService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
 		action, err := factory.Create("get_disks")
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewGetDisks(vmService)))

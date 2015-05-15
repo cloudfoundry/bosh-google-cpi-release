@@ -4,14 +4,11 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/image_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
-	"github.com/frodenas/bosh-google-cpi/google/network_service"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 	"github.com/frodenas/bosh-google-cpi/util"
 
 	"github.com/frodenas/bosh-registry/client"
@@ -19,13 +16,10 @@ import (
 
 type CreateVM struct {
 	vmService          instance.Service
-	addressService     address.Service
 	diskService        disk.Service
 	diskTypeService    disktype.Service
 	machineTypeService machinetype.Service
-	networkService     network.Service
 	stemcellService    image.Service
-	targetPoolService  targetpool.Service
 	registryClient     registry.Client
 	registryOptions    registry.ClientOptions
 	agentOptions       registry.AgentOptions
@@ -34,13 +28,10 @@ type CreateVM struct {
 
 func NewCreateVM(
 	vmService instance.Service,
-	addressService address.Service,
 	diskService disk.Service,
 	diskTypeService disktype.Service,
 	machineTypeService machinetype.Service,
-	networkService network.Service,
 	stemcellService image.Service,
-	targetPoolService targetpool.Service,
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
@@ -48,13 +39,10 @@ func NewCreateVM(
 ) CreateVM {
 	return CreateVM{
 		vmService:          vmService,
-		addressService:     addressService,
 		diskService:        diskService,
 		diskTypeService:    diskTypeService,
 		machineTypeService: machineTypeService,
-		networkService:     networkService,
 		stemcellService:    stemcellService,
-		targetPoolService:  targetPoolService,
 		registryClient:     registryClient,
 		registryOptions:    registryOptions,
 		agentOptions:       agentOptions,
@@ -126,8 +114,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Parse networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
-	instanceNetworks := instance.NewGoogleInstanceNetworks(vmNetworks, cv.addressService, cv.networkService, cv.targetPoolService)
-	if err = instanceNetworks.Validate(); err != nil {
+	if err = vmNetworks.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
@@ -144,7 +131,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Create VM
-	vm, err := cv.vmService.Create(vmProps, instanceNetworks, cv.registryOptions.Endpoint())
+	vm, err := cv.vmService.Create(vmProps, vmNetworks, cv.registryOptions.Endpoint())
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err
@@ -160,7 +147,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}()
 
 	// Configure VM networks
-	err = cv.vmService.AddNetworkConfiguration(vm, instanceNetworks)
+	err = cv.vmService.AddNetworkConfiguration(vm, vmNetworks)
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err

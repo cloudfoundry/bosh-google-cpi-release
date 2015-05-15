@@ -4,7 +4,10 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
 	boshuuid "github.com/cloudfoundry/bosh-agent/uuid"
 
+	"github.com/frodenas/bosh-google-cpi/google/address_service"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -13,26 +16,35 @@ const googleInstanceNamePrefix = "vm"
 const googleInstanceDescription = "Instance managed by BOSH"
 
 type GoogleInstanceService struct {
-	project          string
-	computeService   *compute.Service
-	operationService operation.Service
-	uuidGen          boshuuid.Generator
-	logger           boshlog.Logger
+	project           string
+	computeService    *compute.Service
+	addressService    address.Service
+	networkService    network.Service
+	operationService  operation.Service
+	targetPoolService targetpool.Service
+	uuidGen           boshuuid.Generator
+	logger            boshlog.Logger
 }
 
 func NewGoogleInstanceService(
 	project string,
 	computeService *compute.Service,
+	addressService address.Service,
+	networkService network.Service,
 	operationService operation.Service,
+	targetPoolService targetpool.Service,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleInstanceService {
 	return GoogleInstanceService{
-		project:          project,
-		computeService:   computeService,
-		operationService: operationService,
-		uuidGen:          uuidGen,
-		logger:           logger,
+		project:           project,
+		computeService:    computeService,
+		addressService:    addressService,
+		networkService:    networkService,
+		operationService:  operationService,
+		targetPoolService: targetPoolService,
+		uuidGen:           uuidGen,
+		logger:            logger,
 	}
 }
 

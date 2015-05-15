@@ -4,48 +4,35 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
-	"github.com/frodenas/bosh-google-cpi/google/network_service"
-	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 
 	"github.com/frodenas/bosh-registry/client"
 )
 
 type ConfigureNetworks struct {
-	vmService         instance.Service
-	addressService    address.Service
-	networkService    network.Service
-	targetPoolService targetpool.Service
-	registryClient    registry.Client
+	vmService      instance.Service
+	registryClient registry.Client
 }
 
 func NewConfigureNetworks(
 	vmService instance.Service,
-	addressService address.Service,
-	networkService network.Service,
-	targetPoolService targetpool.Service,
 	registryClient registry.Client,
 ) ConfigureNetworks {
 	return ConfigureNetworks{
-		vmService:         vmService,
-		addressService:    addressService,
-		networkService:    networkService,
-		targetPoolService: targetPoolService,
-		registryClient:    registryClient,
+		vmService:      vmService,
+		registryClient: registryClient,
 	}
 }
 
 func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, error) {
 	// Parse networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
-	instanceNetworks := instance.NewGoogleInstanceNetworks(vmNetworks, rv.addressService, rv.networkService, rv.targetPoolService)
-	if err := instanceNetworks.Validate(); err != nil {
+	if err := vmNetworks.Validate(); err != nil {
 		return "", bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}
 
 	// Update networks
-	err := rv.vmService.UpdateNetworkConfiguration(string(vmCID), instanceNetworks)
+	err := rv.vmService.UpdateNetworkConfiguration(string(vmCID), vmNetworks)
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
