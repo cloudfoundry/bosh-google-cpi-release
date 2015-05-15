@@ -81,7 +81,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	stemcellService := gimage.NewGoogleImageService(
+	stemcellService := image.NewGoogleImageService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		googleClient.StorageService(),

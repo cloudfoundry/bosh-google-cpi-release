@@ -1,4 +1,4 @@
-package gimage
+package image
 
 type Image struct {
 	Name     string

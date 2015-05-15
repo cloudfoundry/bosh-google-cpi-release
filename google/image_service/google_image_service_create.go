@@ -1,4 +1,4 @@
-package gimage
+package image
 
 import (
 	"fmt"

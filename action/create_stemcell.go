@@ -11,11 +11,11 @@ import (
 const googleInfrastructure = "google"
 
 type CreateStemcell struct {
-	stemcellService gimage.ImageService
+	stemcellService image.Service
 }
 
 func NewCreateStemcell(
-	stemcellService gimage.ImageService,
+	stemcellService image.Service,
 ) CreateStemcell {
 	return CreateStemcell{
 		stemcellService: stemcellService,

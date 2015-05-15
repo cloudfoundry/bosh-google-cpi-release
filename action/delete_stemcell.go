@@ -7,11 +7,11 @@ import (
 )
 
 type DeleteStemcell struct {
-	stemcellService gimage.ImageService
+	stemcellService image.Service
 }
 
 func NewDeleteStemcell(
-	stemcellService gimage.ImageService,
+	stemcellService image.Service,
 ) DeleteStemcell {
 	return DeleteStemcell{
 		stemcellService: stemcellService,

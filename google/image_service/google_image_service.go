@@ -1,4 +1,4 @@
-package gimage
+package image
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

@@ -1,6 +1,6 @@
-package gimage
+package image
 
-type ImageService interface {
+type Service interface {
 	CreateFromURL(sourceURL string, description string) (string, error)
 	CreateFromTarball(imagePath string, description string) (string, error)
 	Delete(id string) error

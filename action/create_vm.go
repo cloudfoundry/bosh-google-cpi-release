@@ -24,7 +24,7 @@ type CreateVM struct {
 	diskTypeService    disktype.Service
 	machineTypeService machinetype.Service
 	networkService     network.Service
-	stemcellService    gimage.ImageService
+	stemcellService    image.Service
 	targetPoolService  targetpool.Service
 	registryClient     registry.Client
 	registryOptions    registry.ClientOptions
@@ -39,7 +39,7 @@ func NewCreateVM(
 	diskTypeService disktype.Service,
 	machineTypeService machinetype.Service,
 	networkService network.Service,
-	stemcellService gimage.ImageService,
+	stemcellService image.Service,
 	targetPoolService targetpool.Service,
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,

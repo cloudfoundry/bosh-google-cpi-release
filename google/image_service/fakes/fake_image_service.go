@@ -22,7 +22,7 @@ type FakeImageService struct {
 
 	FindCalled bool
 	FindFound  bool
-	FindImage  gimage.Image
+	FindImage  image.Image
 	FindErr    error
 }
 
@@ -45,7 +45,7 @@ func (i *FakeImageService) Delete(id string) error {
 	return i.DeleteErr
 }
 
-func (i *FakeImageService) Find(id string) (gimage.Image, bool, error) {
+func (i *FakeImageService) Find(id string) (image.Image, bool, error) {
 	i.FindCalled = true
 	return i.FindImage, i.FindFound, i.FindErr
 }

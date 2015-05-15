@@ -210,7 +210,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("create_stemcell", func() {
-		stemcellService := gimage.NewGoogleImageService(
+		stemcellService := image.NewGoogleImageService(
 			project,
 			computeService,
 			storageService,
@@ -225,7 +225,7 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_stemcell", func() {
-		stemcellService := gimage.NewGoogleImageService(
+		stemcellService := image.NewGoogleImageService(
 			project,
 			computeService,
 			storageService,
@@ -280,7 +280,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		stemcellService := gimage.NewGoogleImageService(
+		stemcellService := image.NewGoogleImageService(
 			project,
 			computeService,
 			storageService,
