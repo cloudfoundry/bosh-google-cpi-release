@@ -19,6 +19,7 @@ import (
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-registry/client"
 	"google.golang.org/api/compute/v1"
@@ -97,7 +98,7 @@ var _ = Describe("CreateVM", func() {
 			stemcellService.FindFound = true
 			machineTypeService.FindFound = true
 
-			diskService.FindDisk = &compute.Disk{Zone: "fake-disk-zone"}
+			diskService.FindDisk = gdisk.Disk{Zone: "fake-disk-zone"}
 			stemcellService.FindImage = &compute.Image{SelfLink: "fake-image-self-link"}
 			machineTypeService.FindMachineType = &compute.MachineType{SelfLink: "fake-machine-type-self-link"}
 			diskTypeService.FindDiskType = &compute.DiskType{SelfLink: "fake-disk-type-self-link"}

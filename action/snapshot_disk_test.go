@@ -12,7 +12,7 @@ import (
 	snapshotfakes "github.com/frodenas/bosh-google-cpi/google/snapshot_service/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 )
 
 var _ = Describe("SnapshotDisk", func() {
@@ -36,7 +36,7 @@ var _ = Describe("SnapshotDisk", func() {
 	Describe("Run", func() {
 		BeforeEach(func() {
 			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{Zone: "fake-disk-zone"}
+			diskService.FindDisk = gdisk.Disk{Zone: "fake-disk-zone"}
 			snapshotService.CreateID = "fake-snapshot-id"
 			metadata = SnapshotMetadata{Deployment: "fake-deployment", Job: "fake-job", Index: "fake-index"}
 		})

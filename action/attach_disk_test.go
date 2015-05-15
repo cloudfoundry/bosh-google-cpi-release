@@ -13,8 +13,8 @@ import (
 	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
 
 	"github.com/frodenas/bosh-google-cpi/api"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-registry/client"
-	"google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("AttachDisk", func() {
@@ -39,7 +39,7 @@ var _ = Describe("AttachDisk", func() {
 	Describe("Run", func() {
 		BeforeEach(func() {
 			diskService.FindFound = true
-			diskService.FindDisk = &compute.Disk{SelfLink: "fake-self-link"}
+			diskService.FindDisk = gdisk.Disk{SelfLink: "fake-self-link"}
 			vmService.AttachDiskDeviceName = "fake-disk-device-name"
 			vmService.AttachDiskDevicePath = "fake-disk-device-path"
 			registryClient.FetchSettings = registry.AgentSettings{}

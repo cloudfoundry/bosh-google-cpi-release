@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 )
 
 type FakeDiskService struct {
@@ -17,7 +17,7 @@ type FakeDiskService struct {
 
 	FindCalled bool
 	FindFound  bool
-	FindDisk   *compute.Disk
+	FindDisk   gdisk.Disk
 	FindErr    error
 }
 
@@ -34,7 +34,7 @@ func (d *FakeDiskService) Delete(id string) error {
 	return d.DeleteErr
 }
 
-func (d *FakeDiskService) Find(id string, zone string) (*compute.Disk, bool, error) {
+func (d *FakeDiskService) Find(id string, zone string) (gdisk.Disk, bool, error) {
 	d.FindCalled = true
 	return d.FindDisk, d.FindFound, d.FindErr
 }
