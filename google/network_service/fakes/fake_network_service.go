@@ -1,17 +1,17 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/network_service"
 )
 
 type FakeNetworkService struct {
 	FindCalled  bool
 	FindFound   bool
-	FindNetwork *compute.Network
+	FindNetwork gnetwork.Network
 	FindErr     error
 }
 
-func (n *FakeNetworkService) Find(id string) (*compute.Network, bool, error) {
+func (n *FakeNetworkService) Find(id string) (gnetwork.Network, bool, error) {
 	n.FindCalled = true
 	return n.FindNetwork, n.FindFound, n.FindErr
 }
