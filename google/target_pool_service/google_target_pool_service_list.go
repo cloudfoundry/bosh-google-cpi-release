@@ -19,9 +19,10 @@ func (t GoogleTargetPoolService) List(region string) ([]TargetPool, error) {
 		for _, targetPoolList := range targetPoolAggregatedList.Items {
 			for _, targetPoolItem := range targetPoolList.TargetPools {
 				targetPool := TargetPool{
-					Name:     targetPoolItem.Name,
-					SelfLink: targetPoolItem.SelfLink,
-					Region:   targetPoolItem.Region,
+					Name:      targetPoolItem.Name,
+					Instances: targetPoolItem.Instances,
+					SelfLink:  targetPoolItem.SelfLink,
+					Region:    targetPoolItem.Region,
 				}
 				targetPools = append(targetPools, targetPool)
 			}
@@ -38,9 +39,10 @@ func (t GoogleTargetPoolService) List(region string) ([]TargetPool, error) {
 
 	for _, targetPoolItem := range targetPoolList.Items {
 		targetPool := TargetPool{
-			Name:     targetPoolItem.Name,
-			SelfLink: targetPoolItem.SelfLink,
-			Region:   targetPoolItem.Region,
+			Name:      targetPoolItem.Name,
+			Instances: targetPoolItem.Instances,
+			SelfLink:  targetPoolItem.SelfLink,
+			Region:    targetPoolItem.Region,
 		}
 		targetPools = append(targetPools, targetPool)
 	}

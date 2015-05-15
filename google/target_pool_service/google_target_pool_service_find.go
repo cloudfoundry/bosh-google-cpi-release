@@ -22,9 +22,10 @@ func (t GoogleTargetPoolService) Find(id string, region string) (TargetPool, boo
 			for _, targetPoolItem := range targetPoolItems.TargetPools {
 				// Return the first target pool (it can only be 1 target pool with the same name across all regions)
 				targetPool := TargetPool{
-					Name:     targetPoolItem.Name,
-					SelfLink: targetPoolItem.SelfLink,
-					Region:   targetPoolItem.Region,
+					Name:      targetPoolItem.Name,
+					Instances: targetPoolItem.Instances,
+					SelfLink:  targetPoolItem.SelfLink,
+					Region:    targetPoolItem.Region,
 				}
 				return targetPool, true, nil
 			}
@@ -44,9 +45,10 @@ func (t GoogleTargetPoolService) Find(id string, region string) (TargetPool, boo
 	}
 
 	targetPool := TargetPool{
-		Name:     targetPoolItem.Name,
-		SelfLink: targetPoolItem.SelfLink,
-		Region:   targetPoolItem.Region,
+		Name:      targetPoolItem.Name,
+		Instances: targetPoolItem.Instances,
+		SelfLink:  targetPoolItem.SelfLink,
+		Region:    targetPoolItem.Region,
 	}
 	return targetPool, true, nil
 }
