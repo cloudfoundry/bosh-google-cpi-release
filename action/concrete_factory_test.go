@@ -248,7 +248,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		addressService := gaddress.NewGoogleAddressService(
+		addressService := address.NewGoogleAddressService(
 			project,
 			computeService,
 			logger,
@@ -328,7 +328,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		addressService := gaddress.NewGoogleAddressService(
+		addressService := address.NewGoogleAddressService(
 			project,
 			computeService,
 			logger,
@@ -372,7 +372,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		addressService := gaddress.NewGoogleAddressService(
+		addressService := address.NewGoogleAddressService(
 			project,
 			computeService,
 			logger,

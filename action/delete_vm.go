@@ -14,7 +14,7 @@ import (
 
 type DeleteVM struct {
 	vmService         ginstance.InstanceService
-	addressService    gaddress.AddressService
+	addressService    address.Service
 	networkService    gnetwork.NetworkService
 	targetPoolService gtargetpool.TargetPoolService
 	registryClient    registry.Client
@@ -22,7 +22,7 @@ type DeleteVM struct {
 
 func NewDeleteVM(
 	vmService ginstance.InstanceService,
-	addressService gaddress.AddressService,
+	addressService address.Service,
 	networkService gnetwork.NetworkService,
 	targetPoolService gtargetpool.TargetPoolService,
 	registryClient registry.Client,

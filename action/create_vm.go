@@ -19,7 +19,7 @@ import (
 
 type CreateVM struct {
 	vmService          ginstance.InstanceService
-	addressService     gaddress.AddressService
+	addressService     address.Service
 	diskService        gdisk.DiskService
 	diskTypeService    gdisktype.DiskTypeService
 	machineTypeService gmachinetype.MachineTypeService
@@ -34,7 +34,7 @@ type CreateVM struct {
 
 func NewCreateVM(
 	vmService ginstance.InstanceService,
-	addressService gaddress.AddressService,
+	addressService address.Service,
 	diskService gdisk.DiskService,
 	diskTypeService gdisktype.DiskTypeService,
 	machineTypeService gmachinetype.MachineTypeService,

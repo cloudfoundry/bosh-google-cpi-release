@@ -36,7 +36,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	addressService := gaddress.NewGoogleAddressService(
+	addressService := address.NewGoogleAddressService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,
