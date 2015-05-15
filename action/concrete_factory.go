@@ -98,7 +98,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+	targetPoolService := targetpool.NewGoogleTargetPoolService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,

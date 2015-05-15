@@ -1,4 +1,4 @@
-package gtargetpool
+package targetpool
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"

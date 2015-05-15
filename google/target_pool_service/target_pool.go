@@ -1,4 +1,4 @@
-package gtargetpool
+package targetpool
 
 type TargetPool struct {
 	Name      string

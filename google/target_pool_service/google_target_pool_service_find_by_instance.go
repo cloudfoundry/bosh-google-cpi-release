@@ -1,4 +1,4 @@
-package gtargetpool
+package targetpool
 
 func (t GoogleTargetPoolService) FindByInstance(vmLink string, region string) (string, bool, error) {
 	// Unfortunatelly, there is no direct way to find what target pool is attached to an instance,

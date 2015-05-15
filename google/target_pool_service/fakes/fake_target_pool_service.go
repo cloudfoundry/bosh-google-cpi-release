@@ -10,7 +10,7 @@ type FakeTargetPoolService struct {
 
 	FindCalled     bool
 	FindFound      bool
-	FindTargetPool gtargetpool.TargetPool
+	FindTargetPool targetpool.TargetPool
 	FindErr        error
 
 	FindByInstanceCalled     bool
@@ -19,7 +19,7 @@ type FakeTargetPoolService struct {
 	FindByInstanceErr        error
 
 	ListCalled      bool
-	ListTargetPools []gtargetpool.TargetPool
+	ListTargetPools []targetpool.TargetPool
 	ListErr         error
 
 	RemoveInstanceCalled bool
@@ -31,7 +31,7 @@ func (t *FakeTargetPoolService) AddInstance(id string, vmLink string) error {
 	return t.AddInstanceErr
 }
 
-func (t *FakeTargetPoolService) Find(id string, region string) (gtargetpool.TargetPool, bool, error) {
+func (t *FakeTargetPoolService) Find(id string, region string) (targetpool.TargetPool, bool, error) {
 	t.FindCalled = true
 	return t.FindTargetPool, t.FindFound, t.FindErr
 }
@@ -41,7 +41,7 @@ func (t *FakeTargetPoolService) FindByInstance(vmLink string, region string) (st
 	return t.FindByInstanceTargetPool, t.FindByInstanceFound, t.FindByInstanceErr
 }
 
-func (t *FakeTargetPoolService) List(region string) ([]gtargetpool.TargetPool, error) {
+func (t *FakeTargetPoolService) List(region string) ([]targetpool.TargetPool, error) {
 	t.ListCalled = true
 	return t.ListTargetPools, t.ListErr
 }

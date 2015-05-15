@@ -17,14 +17,14 @@ type GoogleInstanceNetworks struct {
 	networks          InstanceNetworks
 	addressService    address.Service
 	networkService    network.Service
-	targetPoolService gtargetpool.TargetPoolService
+	targetPoolService targetpool.Service
 }
 
 func NewGoogleInstanceNetworks(
 	networks InstanceNetworks,
 	addressService address.Service,
 	networkService network.Service,
-	targetPoolService gtargetpool.TargetPoolService,
+	targetPoolService targetpool.Service,
 ) GoogleInstanceNetworks {
 	return GoogleInstanceNetworks{
 		networks:          networks,

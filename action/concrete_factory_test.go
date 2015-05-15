@@ -289,7 +289,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+		targetPoolService := targetpool.NewGoogleTargetPoolService(
 			project,
 			computeService,
 			operationService,
@@ -340,7 +340,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+		targetPoolService := targetpool.NewGoogleTargetPoolService(
 			project,
 			computeService,
 			operationService,
@@ -384,7 +384,7 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		targetPoolService := gtargetpool.NewGoogleTargetPoolService(
+		targetPoolService := targetpool.NewGoogleTargetPoolService(
 			project,
 			computeService,
 			operationService,

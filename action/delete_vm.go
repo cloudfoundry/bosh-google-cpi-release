@@ -16,7 +16,7 @@ type DeleteVM struct {
 	vmService         ginstance.InstanceService
 	addressService    address.Service
 	networkService    network.Service
-	targetPoolService gtargetpool.TargetPoolService
+	targetPoolService targetpool.Service
 	registryClient    registry.Client
 }
 
@@ -24,7 +24,7 @@ func NewDeleteVM(
 	vmService ginstance.InstanceService,
 	addressService address.Service,
 	networkService network.Service,
-	targetPoolService gtargetpool.TargetPoolService,
+	targetPoolService targetpool.Service,
 	registryClient registry.Client,
 ) DeleteVM {
 	return DeleteVM{

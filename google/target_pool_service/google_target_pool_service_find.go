@@ -1,4 +1,4 @@
-package gtargetpool
+package targetpool
 
 import (
 	"fmt"
