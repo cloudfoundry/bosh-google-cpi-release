@@ -4,11 +4,10 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 
 	"github.com/frodenas/bosh-google-cpi/util"
-	"google.golang.org/api/compute/v1"
 )
 
-func (t GoogleTargetPoolService) List(region string) ([]*compute.TargetPool, error) {
-	var targetPools []*compute.TargetPool
+func (t GoogleTargetPoolService) List(region string) ([]TargetPool, error) {
+	var targetPools []TargetPool
 
 	if region == "" {
 		t.logger.Debug(googleTargetPoolServiceLogTag, "Listing Google Target Pools")
@@ -18,7 +17,12 @@ func (t GoogleTargetPoolService) List(region string) ([]*compute.TargetPool, err
 		}
 
 		for _, targetPoolList := range targetPoolAggregatedList.Items {
-			for _, targetPool := range targetPoolList.TargetPools {
+			for _, targetPoolItem := range targetPoolList.TargetPools {
+				targetPool := TargetPool{
+					Name:     targetPoolItem.Name,
+					SelfLink: targetPoolItem.SelfLink,
+					Region:   targetPoolItem.Region,
+				}
 				targetPools = append(targetPools, targetPool)
 			}
 		}
@@ -32,7 +36,12 @@ func (t GoogleTargetPoolService) List(region string) ([]*compute.TargetPool, err
 		return targetPools, bosherr.WrapErrorf(err, "Failed to list Google Target Pools in region '%s'", region)
 	}
 
-	for _, targetPool := range targetPoolList.Items {
+	for _, targetPoolItem := range targetPoolList.Items {
+		targetPool := TargetPool{
+			Name:     targetPoolItem.Name,
+			SelfLink: targetPoolItem.SelfLink,
+			Region:   targetPoolItem.Region,
+		}
 		targetPools = append(targetPools, targetPool)
 	}
 

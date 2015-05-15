@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 )
 
 type FakeTargetPoolService struct {
@@ -10,7 +10,7 @@ type FakeTargetPoolService struct {
 
 	FindCalled     bool
 	FindFound      bool
-	FindTargetPool *compute.TargetPool
+	FindTargetPool gtargetpool.TargetPool
 	FindErr        error
 
 	FindByInstanceCalled     bool
@@ -19,7 +19,7 @@ type FakeTargetPoolService struct {
 	FindByInstanceErr        error
 
 	ListCalled      bool
-	ListTargetPools []*compute.TargetPool
+	ListTargetPools []gtargetpool.TargetPool
 	ListErr         error
 
 	RemoveInstanceCalled bool
@@ -31,7 +31,7 @@ func (t *FakeTargetPoolService) AddInstance(id string, vmLink string) error {
 	return t.AddInstanceErr
 }
 
-func (t *FakeTargetPoolService) Find(id string, region string) (*compute.TargetPool, bool, error) {
+func (t *FakeTargetPoolService) Find(id string, region string) (gtargetpool.TargetPool, bool, error) {
 	t.FindCalled = true
 	return t.FindTargetPool, t.FindFound, t.FindErr
 }
@@ -41,7 +41,7 @@ func (t *FakeTargetPoolService) FindByInstance(vmLink string, region string) (st
 	return t.FindByInstanceTargetPool, t.FindByInstanceFound, t.FindByInstanceErr
 }
 
-func (t *FakeTargetPoolService) List(region string) ([]*compute.TargetPool, error) {
+func (t *FakeTargetPoolService) List(region string) ([]gtargetpool.TargetPool, error) {
 	t.ListCalled = true
 	return t.ListTargetPools, t.ListErr
 }
