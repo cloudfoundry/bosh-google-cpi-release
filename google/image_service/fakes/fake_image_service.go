@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"google.golang.org/api/compute/v1"
+	"github.com/frodenas/bosh-google-cpi/google/image_service"
 )
 
 type FakeImageService struct {
@@ -22,7 +22,7 @@ type FakeImageService struct {
 
 	FindCalled bool
 	FindFound  bool
-	FindImage  *compute.Image
+	FindImage  gimage.Image
 	FindErr    error
 }
 
@@ -45,7 +45,7 @@ func (i *FakeImageService) Delete(id string) error {
 	return i.DeleteErr
 }
 
-func (i *FakeImageService) Find(id string) (*compute.Image, bool, error) {
+func (i *FakeImageService) Find(id string) (gimage.Image, bool, error) {
 	i.FindCalled = true
 	return i.FindImage, i.FindFound, i.FindErr
 }
