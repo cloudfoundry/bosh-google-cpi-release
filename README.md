@@ -35,19 +35,11 @@ Install the [bosh-init](https://bosh.io/docs/install-bosh-init.html) tool in you
 
 ### Create a deployment directory
 
-Create a deployment directory to store all artifacts:
+Create a deployment directory to store all `bosh-init` artifacts:
 
 ```
 $ mkdir google-bosh-deployment
 $ cd google-bosh-deployment
-```
-
-### Download the BOSH Google CPI BOSH release
-
-Download the BOSH Google CPI BOSH release inside the previously created deployment directory:
-
-```
-TBD
 ```
 
 ### Create a deployment manifest
