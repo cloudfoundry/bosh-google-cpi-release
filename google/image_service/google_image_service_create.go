@@ -10,35 +10,6 @@ import (
 	"google.golang.org/api/storage/v1"
 )
 
-func (i GoogleImageService) Create(name string, description string, sourceURL string) (string, error) {
-	if description == "" {
-		description = googleImageDescription
-	}
-
-	rawdisk := &compute.ImageRawDisk{
-		Source: sourceURL,
-	}
-
-	image := &compute.Image{
-		Name:        name,
-		Description: description,
-		RawDisk:     rawdisk,
-	}
-
-	i.logger.Debug(googleImageServiceLogTag, "Creating Google Image with params: %#v", image)
-	operation, err := i.computeService.Images.Insert(i.project, image).Do()
-	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
-	}
-
-	if _, err = i.operationService.Waiter(operation, "", ""); err != nil {
-		i.cleanUp(image.Name)
-		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
-	}
-
-	return image.Name, nil
-}
-
 func (i GoogleImageService) cleanUp(id string) {
 	err := i.Delete(id)
 	if err != nil {
@@ -53,7 +24,7 @@ func (i GoogleImageService) CreateFromURL(sourceURL string, description string) 
 	}
 
 	imageName := fmt.Sprintf("%s-%s", googleImageNamePrefix, uuidStr)
-	image, err := i.Create(imageName, description, sourceURL)
+	image, err := i.create(imageName, description, sourceURL)
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Image from URL")
 	}
@@ -110,12 +81,41 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	defer i.deleteObject(imageName, objectName)
 
 	// Create the image
-	image, err := i.Create(imageName, description, imageObject.MediaLink)
+	image, err := i.create(imageName, description, imageObject.MediaLink)
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Image from Tarball")
 	}
 
 	return image, nil
+}
+
+func (i GoogleImageService) create(name string, description string, sourceURL string) (string, error) {
+	if description == "" {
+		description = googleImageDescription
+	}
+
+	rawdisk := &compute.ImageRawDisk{
+		Source: sourceURL,
+	}
+
+	image := &compute.Image{
+		Name:        name,
+		Description: description,
+		RawDisk:     rawdisk,
+	}
+
+	i.logger.Debug(googleImageServiceLogTag, "Creating Google Image with params: %#v", image)
+	operation, err := i.computeService.Images.Insert(i.project, image).Do()
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
+	}
+
+	if _, err = i.operationService.Waiter(operation, "", ""); err != nil {
+		i.cleanUp(image.Name)
+		return "", bosherr.WrapErrorf(err, "Failed to create Google Image")
+	}
+
+	return image.Name, nil
 }
 
 func (i GoogleImageService) deleteObject(bucketName string, objectName string) error {
