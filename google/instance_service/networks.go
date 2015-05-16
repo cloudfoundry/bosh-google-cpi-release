@@ -54,6 +54,10 @@ func (n Network) validateTags() error {
 func (n Network) IsVip() bool { return n.Type == "vip" }
 
 func (n Network) validateVip() error {
+	if n.IP == "" {
+		return bosherr.Error("VIP Network must have an IP address")
+	}
+
 	return nil
 }
 
