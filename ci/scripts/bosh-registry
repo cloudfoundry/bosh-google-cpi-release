@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e -x
+
+export GOPATH=${PWD}/bosh-google-cpi-boshrelease
+export PATH=$GOPATH/bin:$PATH
+
+cd ${GOPATH}/src/github.com/frodenas/bosh-registry
+bin/test
