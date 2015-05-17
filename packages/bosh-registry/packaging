@@ -11,7 +11,7 @@ export PATH=${GOROOT}/bin:${PATH}
 # Build BOSH Registry package
 echo "Building BOSH Registry..."
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas
-mv ${BOSH_COMPILE_TARGET}/bosh-registry ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
+mv ${BOSH_COMPILE_TARGET}/github.com/frodenas/bosh-registry ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-registry
 bin/build-linux-amd64
 

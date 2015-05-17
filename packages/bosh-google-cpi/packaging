@@ -11,11 +11,11 @@ export PATH=${GOROOT}/bin:${PATH}
 # Build BOSH Google CPI package
 echo "Building BOSH Google CPI..."
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas
-mv ${BOSH_COMPILE_TARGET}/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
+mv ${BOSH_COMPILE_TARGET}/github.com/frodenas/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi
 bin/build-linux-amd64
 
 # Copy BOSH Google CPI package
 echo "Copying BOSH Google CPI..."
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi/out/* ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/
