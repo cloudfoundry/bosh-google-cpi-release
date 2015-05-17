@@ -2,6 +2,6 @@
 
 bin=$(dirname $0)
 
-go get -u github.com/onsi/ginkgo/ginkgo
+go install github.com/onsi/ginkgo/ginkgo
 
 $bin/env ginkgo -r -race $bin/..
