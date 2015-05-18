@@ -101,6 +101,7 @@ var _ = Describe("CreateVM", func() {
 				RootDiskType:      "",
 				AutomaticRestart:  true,
 				OnHostMaintenance: "TERMINATE",
+				Preemptible:       true,
 				ServiceScopes:     []string{},
 			}
 
@@ -130,6 +131,7 @@ var _ = Describe("CreateVM", func() {
 				RootDiskType:      "",
 				AutomaticRestart:  true,
 				OnHostMaintenance: "TERMINATE",
+				Preemptible:       true,
 				ServiceScopes:     []string{},
 			}
 

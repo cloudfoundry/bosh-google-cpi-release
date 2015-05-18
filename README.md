@@ -120,6 +120,7 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
 | automatic_restart   | N        | Boolean       | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
 | on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
+| preemptible         | N        | Boolean       | If the instances should be [preemptible](https://cloud.google.com/compute/docs/instances/preemptible) (`false` by default)
 | service_scopes      | N        | Array&lt;String&gt; | [Authorization scope names](https://cloud.google.com/compute/docs/authentication#aliases) for your default service account that determine the level of access your instance has to other Google services (no scope is assigned to the instance by default)
 
 ### BOSH Persistent Disks options

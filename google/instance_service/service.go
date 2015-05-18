@@ -34,6 +34,7 @@ type Properties struct {
 	RootDiskType      string
 	AutomaticRestart  bool
 	OnHostMaintenance string
+	Preemptible       bool
 	ServiceScopes     ServiceScopes
 }
 

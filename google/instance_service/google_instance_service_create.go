@@ -30,7 +30,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if err != nil {
 		return "", err
 	}
-	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance)
+	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps.ServiceScopes)
 	tagsParams, err := i.createTagsParams(networks)
 	if err != nil {
@@ -147,10 +147,15 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) 
 	return networkInterfaces, nil
 }
 
-func (i GoogleInstanceService) createSchedulingParams(automaticRestart bool, onHostMaintenance string) *compute.Scheduling {
+func (i GoogleInstanceService) createSchedulingParams(
+	automaticRestart bool,
+	onHostMaintenance string,
+	preemptible bool,
+) *compute.Scheduling {
 	scheduling := &compute.Scheduling{
 		AutomaticRestart:  automaticRestart,
 		OnHostMaintenance: onHostMaintenance,
+		Preemptible:       preemptible,
 	}
 
 	if onHostMaintenance == "" {

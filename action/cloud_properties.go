@@ -36,6 +36,7 @@ type VMCloudProperties struct {
 	RootDiskType      string          `json:"root_disk_type,omitempty"`
 	AutomaticRestart  bool            `json:"automatic_restart,omitempty"`
 	OnHostMaintenance string          `json:"on_host_maintenance,omitempty"`
+	Preemptible       bool            `json:"preemptible,omitempty"`
 	ServiceScopes     VMServiceScopes `json:"service_scopes,omitempty"`
 }
 
