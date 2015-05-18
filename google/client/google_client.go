@@ -10,7 +10,7 @@ import (
 )
 
 const computeScope = compute.ComputeScope
-const storageScope = storage.DevstorageFull_controlScope
+const storageScope = storage.DevstorageFullControlScope
 
 type GoogleClient struct {
 	project        string
