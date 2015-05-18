@@ -47,13 +47,13 @@ const (
 	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
 
 	// Manage your data and permissions in Google Cloud Storage
-	DevstorageFull_controlScope = "https://www.googleapis.com/auth/devstorage.full_control"
+	DevstorageFullControlScope = "https://www.googleapis.com/auth/devstorage.full_control"
 
 	// View your data in Google Cloud Storage
-	DevstorageRead_onlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+	DevstorageReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 
 	// Manage your data in Google Cloud Storage
-	DevstorageRead_writeScope = "https://www.googleapis.com/auth/devstorage.read_write"
+	DevstorageReadWriteScope = "https://www.googleapis.com/auth/devstorage.read_write"
 )
 
 func New(client *http.Client) (*Service, error) {
@@ -204,9 +204,8 @@ type Bucket struct {
 
 	// StorageClass: The bucket's storage class. This defines how objects in
 	// the bucket are stored and determines the SLA and the cost of storage.
-	// Typical values are STANDARD and DURABLE_REDUCED_AVAILABILITY.
-	// Defaults to STANDARD. See the developer's guide for the authoritative
-	// list.
+	// Values include STANDARD, NEARLINE and DURABLE_REDUCED_AVAILABILITY.
+	// Defaults to STANDARD. For more information, see storage classes.
 	StorageClass string `json:"storageClass,omitempty"`
 
 	// TimeCreated: Creation time of the bucket in RFC 3339 format.
@@ -329,19 +328,15 @@ type BucketAccessControl struct {
 	// - user-email
 	// - group-groupId
 	// - group-email
-	//
 	// - domain-domain
 	// - project-team-projectId
 	// - allUsers
-	// -
-	// allAuthenticatedUsers Examples:
-	// - The user liz@example.com would be
-	// user-liz@example.com.
+	// - allAuthenticatedUsers Examples:
+	// - The user liz@example.com would be user-liz@example.com.
 	// - The group example@googlegroups.com would be
 	// group-example@googlegroups.com.
-	// - To refer to all members of the
-	// Google Apps for Business domain example.com, the entity would be
-	// domain-example.com.
+	// - To refer to all members of the Google Apps for Business domain
+	// example.com, the entity would be domain-example.com.
 	Entity string `json:"entity,omitempty"`
 
 	// EntityId: The ID for the entity, if any.
@@ -498,7 +493,7 @@ type Object struct {
 	ContentType string `json:"contentType,omitempty"`
 
 	// Crc32c: CRC32c checksum, as described in RFC 4960, Appendix B;
-	// encoded using base64.
+	// encoded using base64 in big-endian byte order.
 	Crc32c string `json:"crc32c,omitempty"`
 
 	// Etag: HTTP 1.1 Entity tag for the object.
@@ -582,19 +577,15 @@ type ObjectAccessControl struct {
 	// - user-email
 	// - group-groupId
 	// - group-email
-	//
 	// - domain-domain
 	// - project-team-projectId
 	// - allUsers
-	// -
-	// allAuthenticatedUsers Examples:
-	// - The user liz@example.com would be
-	// user-liz@example.com.
+	// - allAuthenticatedUsers Examples:
+	// - The user liz@example.com would be user-liz@example.com.
 	// - The group example@googlegroups.com would be
 	// group-example@googlegroups.com.
-	// - To refer to all members of the
-	// Google Apps for Business domain example.com, the entity would be
-	// domain-example.com.
+	// - To refer to all members of the Google Apps for Business domain
+	// example.com, the entity would be domain-example.com.
 	Entity string `json:"entity,omitempty"`
 
 	// EntityId: The ID for the entity, if any.
@@ -659,6 +650,34 @@ type Objects struct {
 	// Prefixes: The list of prefixes of objects matching-but-not-listed up
 	// to and including the requested delimiter.
 	Prefixes []string `json:"prefixes,omitempty"`
+}
+
+type RewriteResponse struct {
+	// Done: true if the copy is finished; otherwise, false if the copy is
+	// in progress. This property is always present in the response.
+	Done bool `json:"done,omitempty"`
+
+	// Kind: The kind of item this is.
+	Kind string `json:"kind,omitempty"`
+
+	// ObjectSize: The total size of the object being copied in bytes. This
+	// property is always present in the response.
+	ObjectSize uint64 `json:"objectSize,omitempty,string"`
+
+	// Resource: A resource containing the metadata for the copied-to
+	// object. This property is present in the response only when copying
+	// completes.
+	Resource *Object `json:"resource,omitempty"`
+
+	// RewriteToken: A token to use in subsequent requests to continue
+	// copying data. This token is present in the response only when there
+	// is more data to copy.
+	RewriteToken string `json:"rewriteToken,omitempty"`
+
+	// TotalBytesRewritten: The total bytes written so far, which can be
+	// used to provide a waiting user with a progress indicator. This
+	// property is always present in the response.
+	TotalBytesRewritten uint64 `json:"totalBytesRewritten,omitempty,string"`
 }
 
 // method id "storage.bucketAccessControls.delete":
@@ -1326,6 +1345,10 @@ func (c *BucketsGetCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch int64
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit acl and defaultObjectAcl properties.
 func (c *BucketsGetCall) Projection(projection string) *BucketsGetCall {
 	c.opt_["projection"] = projection
 	return c
@@ -1448,6 +1471,17 @@ func (r *BucketsService) Insert(projectid string, bucket *Bucket) *BucketsInsert
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Project team owners get OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "private" - Project team owners get OWNER access.
+//   "projectPrivate" - Project team members get access according to
+// their roles.
+//   "publicRead" - Project team owners get OWNER access, and allUsers
+// get READER access.
+//   "publicReadWrite" - Project team owners get OWNER access, and
+// allUsers get WRITER access.
 func (c *BucketsInsertCall) PredefinedAcl(predefinedAcl string) *BucketsInsertCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -1456,6 +1490,19 @@ func (c *BucketsInsertCall) PredefinedAcl(predefinedAcl string) *BucketsInsertCa
 // PredefinedDefaultObjectAcl sets the optional parameter
 // "predefinedDefaultObjectAcl": Apply a predefined set of default
 // object access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *BucketsInsertCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAcl string) *BucketsInsertCall {
 	c.opt_["predefinedDefaultObjectAcl"] = predefinedDefaultObjectAcl
 	return c
@@ -1465,6 +1512,10 @@ func (c *BucketsInsertCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAc
 // properties to return. Defaults to noAcl, unless the bucket resource
 // specifies acl or defaultObjectAcl properties, when it defaults to
 // full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit acl and defaultObjectAcl properties.
 func (c *BucketsInsertCall) Projection(projection string) *BucketsInsertCall {
 	c.opt_["projection"] = projection
 	return c
@@ -1642,6 +1693,10 @@ func (c *BucketsListCall) Prefix(prefix string) *BucketsListCall {
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit acl and defaultObjectAcl properties.
 func (c *BucketsListCall) Projection(projection string) *BucketsListCall {
 	c.opt_["projection"] = projection
 	return c
@@ -1789,6 +1844,17 @@ func (c *BucketsPatchCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch int
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Project team owners get OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "private" - Project team owners get OWNER access.
+//   "projectPrivate" - Project team members get access according to
+// their roles.
+//   "publicRead" - Project team owners get OWNER access, and allUsers
+// get READER access.
+//   "publicReadWrite" - Project team owners get OWNER access, and
+// allUsers get WRITER access.
 func (c *BucketsPatchCall) PredefinedAcl(predefinedAcl string) *BucketsPatchCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -1797,6 +1863,19 @@ func (c *BucketsPatchCall) PredefinedAcl(predefinedAcl string) *BucketsPatchCall
 // PredefinedDefaultObjectAcl sets the optional parameter
 // "predefinedDefaultObjectAcl": Apply a predefined set of default
 // object access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *BucketsPatchCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAcl string) *BucketsPatchCall {
 	c.opt_["predefinedDefaultObjectAcl"] = predefinedDefaultObjectAcl
 	return c
@@ -1804,6 +1883,10 @@ func (c *BucketsPatchCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAcl
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit acl and defaultObjectAcl properties.
 func (c *BucketsPatchCall) Projection(projection string) *BucketsPatchCall {
 	c.opt_["projection"] = projection
 	return c
@@ -1998,6 +2081,17 @@ func (c *BucketsUpdateCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch in
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Project team owners get OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "private" - Project team owners get OWNER access.
+//   "projectPrivate" - Project team members get access according to
+// their roles.
+//   "publicRead" - Project team owners get OWNER access, and allUsers
+// get READER access.
+//   "publicReadWrite" - Project team owners get OWNER access, and
+// allUsers get WRITER access.
 func (c *BucketsUpdateCall) PredefinedAcl(predefinedAcl string) *BucketsUpdateCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -2006,6 +2100,19 @@ func (c *BucketsUpdateCall) PredefinedAcl(predefinedAcl string) *BucketsUpdateCa
 // PredefinedDefaultObjectAcl sets the optional parameter
 // "predefinedDefaultObjectAcl": Apply a predefined set of default
 // object access controls to this bucket.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *BucketsUpdateCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAcl string) *BucketsUpdateCall {
 	c.opt_["predefinedDefaultObjectAcl"] = predefinedDefaultObjectAcl
 	return c
@@ -2013,6 +2120,10 @@ func (c *BucketsUpdateCall) PredefinedDefaultObjectAcl(predefinedDefaultObjectAc
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit acl and defaultObjectAcl properties.
 func (c *BucketsUpdateCall) Projection(projection string) *BucketsUpdateCall {
 	c.opt_["projection"] = projection
 	return c
@@ -3510,6 +3621,19 @@ func (r *ObjectsService) Compose(destinationBucket string, destinationObject str
 // DestinationPredefinedAcl sets the optional parameter
 // "destinationPredefinedAcl": Apply a predefined set of access controls
 // to the destination object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *ObjectsComposeCall) DestinationPredefinedAcl(destinationPredefinedAcl string) *ObjectsComposeCall {
 	c.opt_["destinationPredefinedAcl"] = destinationPredefinedAcl
 	return c
@@ -3666,8 +3790,8 @@ type ObjectsCopyCall struct {
 	opt_              map[string]interface{}
 }
 
-// Copy: Copies an object to a specified location. Optionally overrides
-// metadata.
+// Copy: Copies a source object to a destination object. Optionally
+// overrides metadata.
 func (r *ObjectsService) Copy(sourceBucket string, sourceObject string, destinationBucket string, destinationObject string, object *Object) *ObjectsCopyCall {
 	c := &ObjectsCopyCall{s: r.s, opt_: make(map[string]interface{})}
 	c.sourceBucket = sourceBucket
@@ -3681,6 +3805,19 @@ func (r *ObjectsService) Copy(sourceBucket string, sourceObject string, destinat
 // DestinationPredefinedAcl sets the optional parameter
 // "destinationPredefinedAcl": Apply a predefined set of access controls
 // to the destination object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *ObjectsCopyCall) DestinationPredefinedAcl(destinationPredefinedAcl string) *ObjectsCopyCall {
 	c.opt_["destinationPredefinedAcl"] = destinationPredefinedAcl
 	return c
@@ -3759,6 +3896,10 @@ func (c *ObjectsCopyCall) IfSourceMetagenerationNotMatch(ifSourceMetagenerationN
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl, unless the object resource
 // specifies the acl property, when it defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsCopyCall) Projection(projection string) *ObjectsCopyCall {
 	c.opt_["projection"] = projection
 	return c
@@ -3850,7 +3991,7 @@ func (c *ObjectsCopyCall) Do() (*Object, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Copies an object to a specified location. Optionally overrides metadata.",
+	//   "description": "Copies a source object to a destination object. Optionally overrides metadata.",
 	//   "httpMethod": "POST",
 	//   "id": "storage.objects.copy",
 	//   "parameterOrder": [
@@ -4219,6 +4360,10 @@ func (c *ObjectsGetCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch int64
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsGetCall) Projection(projection string) *ObjectsGetCall {
 	c.opt_["projection"] = projection
 	return c
@@ -4434,6 +4579,19 @@ func (c *ObjectsInsertCall) Name(name string) *ObjectsInsertCall {
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *ObjectsInsertCall) PredefinedAcl(predefinedAcl string) *ObjectsInsertCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -4442,6 +4600,10 @@ func (c *ObjectsInsertCall) PredefinedAcl(predefinedAcl string) *ObjectsInsertCa
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl, unless the object resource
 // specifies the acl property, when it defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsInsertCall) Projection(projection string) *ObjectsInsertCall {
 	c.opt_["projection"] = projection
 	return c
@@ -4727,7 +4889,8 @@ func (c *ObjectsListCall) Delimiter(delimiter string) *ObjectsListCall {
 
 // MaxResults sets the optional parameter "maxResults": Maximum number
 // of items plus prefixes to return. As duplicate prefixes are omitted,
-// fewer total results may be returned than requested.
+// fewer total results may be returned than requested. The default value
+// of this parameter is 1,000 items.
 func (c *ObjectsListCall) MaxResults(maxResults int64) *ObjectsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
@@ -4750,13 +4913,18 @@ func (c *ObjectsListCall) Prefix(prefix string) *ObjectsListCall {
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsListCall) Projection(projection string) *ObjectsListCall {
 	c.opt_["projection"] = projection
 	return c
 }
 
 // Versions sets the optional parameter "versions": If true, lists all
-// versions of a file as distinct results.
+// versions of an object as distinct results. The default is false. For
+// more information, see Object Versioning.
 func (c *ObjectsListCall) Versions(versions bool) *ObjectsListCall {
 	c.opt_["versions"] = versions
 	return c
@@ -4835,7 +5003,7 @@ func (c *ObjectsListCall) Do() (*Objects, error) {
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
-	//       "description": "Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.",
+	//       "description": "Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested. The default value of this parameter is 1,000 items.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "minimum": "0",
@@ -4865,7 +5033,7 @@ func (c *ObjectsListCall) Do() (*Objects, error) {
 	//       "type": "string"
 	//     },
 	//     "versions": {
-	//       "description": "If true, lists all versions of a file as distinct results.",
+	//       "description": "If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }
@@ -4948,6 +5116,19 @@ func (c *ObjectsPatchCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch int
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *ObjectsPatchCall) PredefinedAcl(predefinedAcl string) *ObjectsPatchCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -4955,6 +5136,10 @@ func (c *ObjectsPatchCall) PredefinedAcl(predefinedAcl string) *ObjectsPatchCall
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsPatchCall) Projection(projection string) *ObjectsPatchCall {
 	c.opt_["projection"] = projection
 	return c
@@ -5125,6 +5310,400 @@ func (c *ObjectsPatchCall) Do() (*Object, error) {
 
 }
 
+// method id "storage.objects.rewrite":
+
+type ObjectsRewriteCall struct {
+	s                 *Service
+	sourceBucket      string
+	sourceObject      string
+	destinationBucket string
+	destinationObject string
+	object            *Object
+	opt_              map[string]interface{}
+}
+
+// Rewrite: Rewrites a source object to a destination object. Optionally
+// overrides metadata.
+func (r *ObjectsService) Rewrite(sourceBucket string, sourceObject string, destinationBucket string, destinationObject string, object *Object) *ObjectsRewriteCall {
+	c := &ObjectsRewriteCall{s: r.s, opt_: make(map[string]interface{})}
+	c.sourceBucket = sourceBucket
+	c.sourceObject = sourceObject
+	c.destinationBucket = destinationBucket
+	c.destinationObject = destinationObject
+	c.object = object
+	return c
+}
+
+// DestinationPredefinedAcl sets the optional parameter
+// "destinationPredefinedAcl": Apply a predefined set of access controls
+// to the destination object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
+func (c *ObjectsRewriteCall) DestinationPredefinedAcl(destinationPredefinedAcl string) *ObjectsRewriteCall {
+	c.opt_["destinationPredefinedAcl"] = destinationPredefinedAcl
+	return c
+}
+
+// IfGenerationMatch sets the optional parameter "ifGenerationMatch":
+// Makes the operation conditional on whether the destination object's
+// current generation matches the given value.
+func (c *ObjectsRewriteCall) IfGenerationMatch(ifGenerationMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifGenerationMatch"] = ifGenerationMatch
+	return c
+}
+
+// IfGenerationNotMatch sets the optional parameter
+// "ifGenerationNotMatch": Makes the operation conditional on whether
+// the destination object's current generation does not match the given
+// value.
+func (c *ObjectsRewriteCall) IfGenerationNotMatch(ifGenerationNotMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifGenerationNotMatch"] = ifGenerationNotMatch
+	return c
+}
+
+// IfMetagenerationMatch sets the optional parameter
+// "ifMetagenerationMatch": Makes the operation conditional on whether
+// the destination object's current metageneration matches the given
+// value.
+func (c *ObjectsRewriteCall) IfMetagenerationMatch(ifMetagenerationMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifMetagenerationMatch"] = ifMetagenerationMatch
+	return c
+}
+
+// IfMetagenerationNotMatch sets the optional parameter
+// "ifMetagenerationNotMatch": Makes the operation conditional on
+// whether the destination object's current metageneration does not
+// match the given value.
+func (c *ObjectsRewriteCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifMetagenerationNotMatch"] = ifMetagenerationNotMatch
+	return c
+}
+
+// IfSourceGenerationMatch sets the optional parameter
+// "ifSourceGenerationMatch": Makes the operation conditional on whether
+// the source object's generation matches the given value.
+func (c *ObjectsRewriteCall) IfSourceGenerationMatch(ifSourceGenerationMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifSourceGenerationMatch"] = ifSourceGenerationMatch
+	return c
+}
+
+// IfSourceGenerationNotMatch sets the optional parameter
+// "ifSourceGenerationNotMatch": Makes the operation conditional on
+// whether the source object's generation does not match the given
+// value.
+func (c *ObjectsRewriteCall) IfSourceGenerationNotMatch(ifSourceGenerationNotMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifSourceGenerationNotMatch"] = ifSourceGenerationNotMatch
+	return c
+}
+
+// IfSourceMetagenerationMatch sets the optional parameter
+// "ifSourceMetagenerationMatch": Makes the operation conditional on
+// whether the source object's current metageneration matches the given
+// value.
+func (c *ObjectsRewriteCall) IfSourceMetagenerationMatch(ifSourceMetagenerationMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifSourceMetagenerationMatch"] = ifSourceMetagenerationMatch
+	return c
+}
+
+// IfSourceMetagenerationNotMatch sets the optional parameter
+// "ifSourceMetagenerationNotMatch": Makes the operation conditional on
+// whether the source object's current metageneration does not match the
+// given value.
+func (c *ObjectsRewriteCall) IfSourceMetagenerationNotMatch(ifSourceMetagenerationNotMatch int64) *ObjectsRewriteCall {
+	c.opt_["ifSourceMetagenerationNotMatch"] = ifSourceMetagenerationNotMatch
+	return c
+}
+
+// MaxBytesRewrittenPerCall sets the optional parameter
+// "maxBytesRewrittenPerCall": The maximum number of bytes that will be
+// rewritten per rewrite request. Most callers shouldn't need to specify
+// this parameter - it is primarily in place to support testing. If
+// specified the value must be an integral multiple of 1 MiB (1048576).
+// Also, this only applies to requests where the source and destination
+// span locations and/or storage classes. Finally, this value must not
+// change across rewrite calls else you'll get an error that the
+// rewriteToken is invalid.
+func (c *ObjectsRewriteCall) MaxBytesRewrittenPerCall(maxBytesRewrittenPerCall int64) *ObjectsRewriteCall {
+	c.opt_["maxBytesRewrittenPerCall"] = maxBytesRewrittenPerCall
+	return c
+}
+
+// Projection sets the optional parameter "projection": Set of
+// properties to return. Defaults to noAcl, unless the object resource
+// specifies the acl property, when it defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
+func (c *ObjectsRewriteCall) Projection(projection string) *ObjectsRewriteCall {
+	c.opt_["projection"] = projection
+	return c
+}
+
+// RewriteToken sets the optional parameter "rewriteToken": Include this
+// field (from the previous rewrite response) on each rewrite request
+// after the first one, until the rewrite response 'done' flag is true.
+// Calls that provide a rewriteToken can omit all other request fields,
+// but if included those fields must match the values provided in the
+// first rewrite request.
+func (c *ObjectsRewriteCall) RewriteToken(rewriteToken string) *ObjectsRewriteCall {
+	c.opt_["rewriteToken"] = rewriteToken
+	return c
+}
+
+// SourceGeneration sets the optional parameter "sourceGeneration": If
+// present, selects a specific revision of the source object (as opposed
+// to the latest version, the default).
+func (c *ObjectsRewriteCall) SourceGeneration(sourceGeneration int64) *ObjectsRewriteCall {
+	c.opt_["sourceGeneration"] = sourceGeneration
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *ObjectsRewriteCall) Fields(s ...googleapi.Field) *ObjectsRewriteCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *ObjectsRewriteCall) Do() (*RewriteResponse, error) {
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.object)
+	if err != nil {
+		return nil, err
+	}
+	ctype := "application/json"
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["destinationPredefinedAcl"]; ok {
+		params.Set("destinationPredefinedAcl", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifGenerationMatch"]; ok {
+		params.Set("ifGenerationMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifGenerationNotMatch"]; ok {
+		params.Set("ifGenerationNotMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifMetagenerationMatch"]; ok {
+		params.Set("ifMetagenerationMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifMetagenerationNotMatch"]; ok {
+		params.Set("ifMetagenerationNotMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifSourceGenerationMatch"]; ok {
+		params.Set("ifSourceGenerationMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifSourceGenerationNotMatch"]; ok {
+		params.Set("ifSourceGenerationNotMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifSourceMetagenerationMatch"]; ok {
+		params.Set("ifSourceMetagenerationMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["ifSourceMetagenerationNotMatch"]; ok {
+		params.Set("ifSourceMetagenerationNotMatch", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["maxBytesRewrittenPerCall"]; ok {
+		params.Set("maxBytesRewrittenPerCall", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["projection"]; ok {
+		params.Set("projection", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["rewriteToken"]; ok {
+		params.Set("rewriteToken", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["sourceGeneration"]; ok {
+		params.Set("sourceGeneration", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"sourceBucket":      c.sourceBucket,
+		"sourceObject":      c.sourceObject,
+		"destinationBucket": c.destinationBucket,
+		"destinationObject": c.destinationObject,
+	})
+	req.Header.Set("Content-Type", ctype)
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *RewriteResponse
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Rewrites a source object to a destination object. Optionally overrides metadata.",
+	//   "httpMethod": "POST",
+	//   "id": "storage.objects.rewrite",
+	//   "parameterOrder": [
+	//     "sourceBucket",
+	//     "sourceObject",
+	//     "destinationBucket",
+	//     "destinationObject"
+	//   ],
+	//   "parameters": {
+	//     "destinationBucket": {
+	//       "description": "Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "destinationObject": {
+	//       "description": "Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "destinationPredefinedAcl": {
+	//       "description": "Apply a predefined set of access controls to the destination object.",
+	//       "enum": [
+	//         "authenticatedRead",
+	//         "bucketOwnerFullControl",
+	//         "bucketOwnerRead",
+	//         "private",
+	//         "projectPrivate",
+	//         "publicRead"
+	//       ],
+	//       "enumDescriptions": [
+	//         "Object owner gets OWNER access, and allAuthenticatedUsers get READER access.",
+	//         "Object owner gets OWNER access, and project team owners get OWNER access.",
+	//         "Object owner gets OWNER access, and project team owners get READER access.",
+	//         "Object owner gets OWNER access.",
+	//         "Object owner gets OWNER access, and project team members get access according to their roles.",
+	//         "Object owner gets OWNER access, and allUsers get READER access."
+	//       ],
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifGenerationMatch": {
+	//       "description": "Makes the operation conditional on whether the destination object's current generation matches the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifGenerationNotMatch": {
+	//       "description": "Makes the operation conditional on whether the destination object's current generation does not match the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifMetagenerationMatch": {
+	//       "description": "Makes the operation conditional on whether the destination object's current metageneration matches the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifMetagenerationNotMatch": {
+	//       "description": "Makes the operation conditional on whether the destination object's current metageneration does not match the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifSourceGenerationMatch": {
+	//       "description": "Makes the operation conditional on whether the source object's generation matches the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifSourceGenerationNotMatch": {
+	//       "description": "Makes the operation conditional on whether the source object's generation does not match the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifSourceMetagenerationMatch": {
+	//       "description": "Makes the operation conditional on whether the source object's current metageneration matches the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "ifSourceMetagenerationNotMatch": {
+	//       "description": "Makes the operation conditional on whether the source object's current metageneration does not match the given value.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxBytesRewrittenPerCall": {
+	//       "description": "The maximum number of bytes that will be rewritten per rewrite request. Most callers shouldn't need to specify this parameter - it is primarily in place to support testing. If specified the value must be an integral multiple of 1 MiB (1048576). Also, this only applies to requests where the source and destination span locations and/or storage classes. Finally, this value must not change across rewrite calls else you'll get an error that the rewriteToken is invalid.",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "projection": {
+	//       "description": "Set of properties to return. Defaults to noAcl, unless the object resource specifies the acl property, when it defaults to full.",
+	//       "enum": [
+	//         "full",
+	//         "noAcl"
+	//       ],
+	//       "enumDescriptions": [
+	//         "Include all properties.",
+	//         "Omit the acl property."
+	//       ],
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "rewriteToken": {
+	//       "description": "Include this field (from the previous rewrite response) on each rewrite request after the first one, until the rewrite response 'done' flag is true. Calls that provide a rewriteToken can omit all other request fields, but if included those fields must match the values provided in the first rewrite request.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "sourceBucket": {
+	//       "description": "Name of the bucket in which to find the source object.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "sourceGeneration": {
+	//       "description": "If present, selects a specific revision of the source object (as opposed to the latest version, the default).",
+	//       "format": "int64",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "sourceObject": {
+	//       "description": "Name of the source object.",
+	//       "location": "path",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "b/{sourceBucket}/o/{sourceObject}/rewriteTo/b/{destinationBucket}/o/{destinationObject}",
+	//   "request": {
+	//     "$ref": "Object"
+	//   },
+	//   "response": {
+	//     "$ref": "RewriteResponse"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/devstorage.full_control",
+	//     "https://www.googleapis.com/auth/devstorage.read_write"
+	//   ]
+	// }
+
+}
+
 // method id "storage.objects.update":
 
 type ObjectsUpdateCall struct {
@@ -5187,6 +5766,19 @@ func (c *ObjectsUpdateCall) IfMetagenerationNotMatch(ifMetagenerationNotMatch in
 
 // PredefinedAcl sets the optional parameter "predefinedAcl": Apply a
 // predefined set of access controls to this object.
+//
+// Possible values:
+//   "authenticatedRead" - Object owner gets OWNER access, and
+// allAuthenticatedUsers get READER access.
+//   "bucketOwnerFullControl" - Object owner gets OWNER access, and
+// project team owners get OWNER access.
+//   "bucketOwnerRead" - Object owner gets OWNER access, and project
+// team owners get READER access.
+//   "private" - Object owner gets OWNER access.
+//   "projectPrivate" - Object owner gets OWNER access, and project team
+// members get access according to their roles.
+//   "publicRead" - Object owner gets OWNER access, and allUsers get
+// READER access.
 func (c *ObjectsUpdateCall) PredefinedAcl(predefinedAcl string) *ObjectsUpdateCall {
 	c.opt_["predefinedAcl"] = predefinedAcl
 	return c
@@ -5194,6 +5786,10 @@ func (c *ObjectsUpdateCall) PredefinedAcl(predefinedAcl string) *ObjectsUpdateCa
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to full.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsUpdateCall) Projection(projection string) *ObjectsUpdateCall {
 	c.opt_["projection"] = projection
 	return c
@@ -5395,7 +5991,8 @@ func (c *ObjectsWatchAllCall) Delimiter(delimiter string) *ObjectsWatchAllCall {
 
 // MaxResults sets the optional parameter "maxResults": Maximum number
 // of items plus prefixes to return. As duplicate prefixes are omitted,
-// fewer total results may be returned than requested.
+// fewer total results may be returned than requested. The default value
+// of this parameter is 1,000 items.
 func (c *ObjectsWatchAllCall) MaxResults(maxResults int64) *ObjectsWatchAllCall {
 	c.opt_["maxResults"] = maxResults
 	return c
@@ -5418,13 +6015,18 @@ func (c *ObjectsWatchAllCall) Prefix(prefix string) *ObjectsWatchAllCall {
 
 // Projection sets the optional parameter "projection": Set of
 // properties to return. Defaults to noAcl.
+//
+// Possible values:
+//   "full" - Include all properties.
+//   "noAcl" - Omit the acl property.
 func (c *ObjectsWatchAllCall) Projection(projection string) *ObjectsWatchAllCall {
 	c.opt_["projection"] = projection
 	return c
 }
 
 // Versions sets the optional parameter "versions": If true, lists all
-// versions of a file as distinct results.
+// versions of an object as distinct results. The default is false. For
+// more information, see Object Versioning.
 func (c *ObjectsWatchAllCall) Versions(versions bool) *ObjectsWatchAllCall {
 	c.opt_["versions"] = versions
 	return c
@@ -5509,7 +6111,7 @@ func (c *ObjectsWatchAllCall) Do() (*Channel, error) {
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
-	//       "description": "Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested.",
+	//       "description": "Maximum number of items plus prefixes to return. As duplicate prefixes are omitted, fewer total results may be returned than requested. The default value of this parameter is 1,000 items.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "minimum": "0",
@@ -5539,7 +6141,7 @@ func (c *ObjectsWatchAllCall) Do() (*Channel, error) {
 	//       "type": "string"
 	//     },
 	//     "versions": {
-	//       "description": "If true, lists all versions of a file as distinct results.",
+	//       "description": "If true, lists all versions of an object as distinct results. The default is false. For more information, see Object Versioning.",
 	//       "location": "query",
 	//       "type": "boolean"
 	//     }

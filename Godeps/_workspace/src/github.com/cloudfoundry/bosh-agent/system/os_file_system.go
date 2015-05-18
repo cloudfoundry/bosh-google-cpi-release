@@ -2,17 +2,15 @@ package system
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-agent/errors"
 	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	osuser "os/user"
 )
 
 type osFileSystem struct {
@@ -21,44 +19,21 @@ type osFileSystem struct {
 }
 
 func NewOsFileSystem(logger boshlog.Logger) FileSystem {
-	return &osFileSystem{logger: logger, logTag: "File System"}
+	return osFileSystem{logger: logger, logTag: "File System"}
 }
 
-func (fs osFileSystem) HomeDir(username string) (string, error) {
+func (fs osFileSystem) HomeDir(username string) (homeDir string, err error) {
 	fs.logger.Debug(fs.logTag, "Getting HomeDir for %s", username)
 
-	homeDir, err := fs.runCommand(fmt.Sprintf("echo ~%s", username))
+	user, err := osuser.Lookup(username)
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Shelling out to get user '%s' home directory", username)
+		err = bosherr.WrapErrorf(err, "Looking up user %s", username)
+		return
 	}
-
-	if strings.HasPrefix(homeDir, "~") {
-		return "", bosherr.Errorf("Failed to get user '%s' home directory", username)
-	}
+	homeDir = user.HomeDir
 
 	fs.logger.Debug(fs.logTag, "HomeDir is %s", homeDir)
-	return homeDir, nil
-}
-
-func (fs osFileSystem) ExpandPath(path string) (string, error) {
-	fs.logger.Debug(fs.logTag, "Expanding path for '%s'", path)
-
-	var err error
-	if strings.IndexRune(path, '~') == 0 {
-		currentUserHome, err := fs.HomeDir("")
-		if err != nil {
-			return "", bosherr.WrapError(err, "Getting current user home dir")
-		}
-
-		path = filepath.Clean(strings.Replace(path, "~", currentUserHome, 1))
-	}
-
-	path, err = filepath.Abs(path)
-	if err != nil {
-		return "", bosherr.WrapError(err, "Getting absolute path")
-	}
-
-	return path, nil
+	return
 }
 
 func (fs osFileSystem) MkdirAll(path string, perm os.FileMode) (err error) {
@@ -66,35 +41,33 @@ func (fs osFileSystem) MkdirAll(path string, perm os.FileMode) (err error) {
 	return os.MkdirAll(path, perm)
 }
 
-func (fs osFileSystem) Chown(path, username string) error {
+func (fs osFileSystem) Chown(path, username string) (err error) {
 	fs.logger.Debug(fs.logTag, "Chown %s to user %s", path, username)
 
-	uid, err := fs.runCommand(fmt.Sprintf("id -u %s", username))
+	user, err := osuser.Lookup(username)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Getting user id for '%s'", username)
+		err = bosherr.WrapErrorf(err, "Looking up user %s", username)
+		return
 	}
 
-	uidAsInt, err := strconv.Atoi(uid)
+	uid, err := strconv.Atoi(user.Uid)
 	if err != nil {
-		return bosherr.WrapError(err, "Converting UID to integer")
+		err = bosherr.WrapError(err, "Converting UID to integer")
+		return
 	}
 
-	gid, err := fs.runCommand(fmt.Sprintf("id -g %s", username))
+	gid, err := strconv.Atoi(user.Gid)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Getting group id for '%s'", username)
+		err = bosherr.WrapError(err, "Converting GID to integer")
+		return
 	}
 
-	gidAsInt, err := strconv.Atoi(gid)
+	err = os.Chown(path, uid, gid)
 	if err != nil {
-		return bosherr.WrapError(err, "Converting GID to integer")
+		err = bosherr.WrapError(err, "Doing Chown")
+		return
 	}
-
-	err = os.Chown(path, uidAsInt, gidAsInt)
-	if err != nil {
-		return bosherr.WrapError(err, "Doing Chown")
-	}
-
-	return nil
+	return
 }
 
 func (fs osFileSystem) Chmod(path string, perm os.FileMode) (err error) {
@@ -361,15 +334,4 @@ func (fs osFileSystem) filesAreIdentical(newContent []byte, filePath string) boo
 	}
 
 	return bytes.Compare(newContent, existingContent) == 0
-}
-
-func (fs osFileSystem) runCommand(cmd string) (string, error) {
-	var stdout bytes.Buffer
-	shCmd := exec.Command("sh", "-c", cmd)
-	shCmd.Stdout = &stdout
-	if err := shCmd.Run(); err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(stdout.String()), nil
 }

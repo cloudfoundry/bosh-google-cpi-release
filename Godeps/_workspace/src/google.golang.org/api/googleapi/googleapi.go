@@ -153,14 +153,24 @@ func getMediaType(media io.Reader) (io.Reader, string) {
 		return media, typer.ContentType()
 	}
 
+	pr, pw := io.Pipe()
 	typ := "application/octet-stream"
-	buf := make([]byte, 1024)
-	n, err := media.Read(buf)
-	buf = buf[:n]
-	if err == nil {
-		typ = http.DetectContentType(buf)
+	buf, err := ioutil.ReadAll(io.LimitReader(media, 512))
+	if err != nil {
+		pw.CloseWithError(fmt.Errorf("error reading media: %v", err))
+		return pr, typ
 	}
-	return io.MultiReader(bytes.NewBuffer(buf), media), typ
+	typ = http.DetectContentType(buf)
+	mr := io.MultiReader(bytes.NewReader(buf), media)
+	go func() {
+		_, err = io.Copy(pw, mr)
+		if err != nil {
+			pw.CloseWithError(fmt.Errorf("error reading media: %v", err))
+			return
+		}
+		pw.Close()
+	}()
+	return pr, typ
 }
 
 // DetectMediaType detects and returns the content type of the provided media.
@@ -242,26 +252,33 @@ func ConditionallyIncludeMedia(media io.Reader, bodyp *io.Reader, ctypep *string
 	*bodyp = pr
 	*ctypep = "multipart/related; boundary=" + mpw.Boundary()
 	go func() {
-		defer pw.Close()
-		defer mpw.Close()
-
 		w, err := mpw.CreatePart(typeHeader(bodyType))
 		if err != nil {
+			mpw.Close()
+			pw.CloseWithError(fmt.Errorf("googleapi: body CreatePart failed: %v", err))
 			return
 		}
 		_, err = io.Copy(w, body)
 		if err != nil {
+			mpw.Close()
+			pw.CloseWithError(fmt.Errorf("googleapi: body Copy failed: %v", err))
 			return
 		}
 
 		w, err = mpw.CreatePart(typeHeader(mediaType))
 		if err != nil {
+			mpw.Close()
+			pw.CloseWithError(fmt.Errorf("googleapi: media CreatePart failed: %v", err))
 			return
 		}
 		_, err = io.Copy(w, media)
 		if err != nil {
+			mpw.Close()
+			pw.CloseWithError(fmt.Errorf("googleapi: media Copy failed: %v", err))
 			return
 		}
+		mpw.Close()
+		pw.Close()
 	}()
 	cancel = func() { pw.CloseWithError(errAborted) }
 	return cancel, true
@@ -297,7 +314,7 @@ type ResumableUpload struct {
 
 var (
 	// rangeRE matches the transfer status response from the server. $1 is the last byte index uploaded.
-	rangeRE = regexp.MustCompile(`^0\-(\d+)$`)
+	rangeRE = regexp.MustCompile(`^bytes=0\-(\d+)$`)
 	// chunkSize is the size of the chunks created during a resumable upload and should be a power of two.
 	// 1<<18 is the minimum size supported by the Google uploader, and there is no maximum.
 	chunkSize int64 = 1 << 18

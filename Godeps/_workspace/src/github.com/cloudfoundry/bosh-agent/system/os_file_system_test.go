@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	osuser "os/user"
 	"path/filepath"
 	"strings"
 
@@ -41,28 +40,7 @@ func init() {
 
 			homeDir, err := osFs.HomeDir("root")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(homeDir).To(ContainSubstring("/root"))
-		})
-
-		It("expand path", func() {
-			osFs, _ := createOsFs()
-
-			expandedPath, err := osFs.ExpandPath("~/fake-dir/fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
-
-			currentUser, err := osuser.Current()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(Equal(currentUser.HomeDir + "/fake-dir/fake-file.txt"))
-
-			expandedPath, err = osFs.ExpandPath("/fake-dir//fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(Equal("/fake-dir/fake-file.txt"))
-
-			expandedPath, err = osFs.ExpandPath("./fake-file.txt")
-			Expect(err).ToNot(HaveOccurred())
-			currentDir, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(expandedPath).To(Equal(currentDir + "/fake-file.txt"))
+			assert.Contains(GinkgoT(), homeDir, "/root")
 		})
 
 		It("mkdir all", func() {

@@ -53,13 +53,13 @@ const (
 	ComputeReadonlyScope = "https://www.googleapis.com/auth/compute.readonly"
 
 	// Manage your data and permissions in Google Cloud Storage
-	DevstorageFull_controlScope = "https://www.googleapis.com/auth/devstorage.full_control"
+	DevstorageFullControlScope = "https://www.googleapis.com/auth/devstorage.full_control"
 
 	// View your data in Google Cloud Storage
-	DevstorageRead_onlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
+	DevstorageReadOnlyScope = "https://www.googleapis.com/auth/devstorage.read_only"
 
 	// Manage your data in Google Cloud Storage
-	DevstorageRead_writeScope = "https://www.googleapis.com/auth/devstorage.read_write"
+	DevstorageReadWriteScope = "https://www.googleapis.com/auth/devstorage.read_write"
 )
 
 func New(client *http.Client) (*Service, error) {
@@ -91,7 +91,9 @@ func New(client *http.Client) (*Service, error) {
 	s.TargetHttpProxies = NewTargetHttpProxiesService(s)
 	s.TargetInstances = NewTargetInstancesService(s)
 	s.TargetPools = NewTargetPoolsService(s)
+	s.TargetVpnGateways = NewTargetVpnGatewaysService(s)
 	s.UrlMaps = NewUrlMapsService(s)
+	s.VpnTunnels = NewVpnTunnelsService(s)
 	s.ZoneOperations = NewZoneOperationsService(s)
 	s.Zones = NewZonesService(s)
 	return s, nil
@@ -150,7 +152,11 @@ type Service struct {
 
 	TargetPools *TargetPoolsService
 
+	TargetVpnGateways *TargetVpnGatewaysService
+
 	UrlMaps *UrlMapsService
+
+	VpnTunnels *VpnTunnelsService
 
 	ZoneOperations *ZoneOperationsService
 
@@ -380,12 +386,30 @@ type TargetPoolsService struct {
 	s *Service
 }
 
+func NewTargetVpnGatewaysService(s *Service) *TargetVpnGatewaysService {
+	rs := &TargetVpnGatewaysService{s: s}
+	return rs
+}
+
+type TargetVpnGatewaysService struct {
+	s *Service
+}
+
 func NewUrlMapsService(s *Service) *UrlMapsService {
 	rs := &UrlMapsService{s: s}
 	return rs
 }
 
 type UrlMapsService struct {
+	s *Service
+}
+
+func NewVpnTunnelsService(s *Service) *VpnTunnelsService {
+	rs := &VpnTunnelsService{s: s}
+	return rs
+}
+
+type VpnTunnelsService struct {
 	s *Service
 }
 
@@ -424,6 +448,9 @@ type AccessConfig struct {
 
 	// Type: The type of configuration. The default and only option is
 	// ONE_TO_ONE_NAT.
+	//
+	// Possible values:
+	//   "ONE_TO_ONE_NAT" (default)
 	Type string `json:"type,omitempty"`
 }
 
@@ -467,6 +494,10 @@ type Address struct {
 	// IN_USE or RESERVED. An address that is RESERVED is currently reserved
 	// and available to use. An IN_USE address is currently being used by
 	// another resource and is not available.
+	//
+	// Possible values:
+	//   "IN_USE"
+	//   "RESERVED"
 	Status string `json:"status,omitempty"`
 
 	// Users: [Output Only] The URLs of the resources that are using this
@@ -525,6 +556,22 @@ type AddressesScopedList struct {
 
 type AddressesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -558,11 +605,10 @@ type AttachedDisk struct {
 	// within the instance. This name can be used to reference the device
 	// for mounting, resizing, and so on, from within the instance.
 	//
-	// If not
-	// specified, the server chooses a default device name to apply to this
-	// disk, in the form persistent-disks-x, where x is a number assigned by
-	// Google Compute Engine. This field is only applicable for persistent
-	// disks.
+	// If not specified, the server chooses a default device name to apply
+	// to this disk, in the form persistent-disks-x, where x is a number
+	// assigned by Google Compute Engine. This field is only applicable for
+	// persistent disks.
 	DeviceName string `json:"deviceName,omitempty"`
 
 	// Index: Assigns a zero-based index to this disk, where 0 is reserved
@@ -576,10 +622,13 @@ type AttachedDisk struct {
 	// initialization parameters to create boot disks or local SSDs attached
 	// to the new instance.
 	//
-	// This property is mutually exclusive with the
-	// source property; you can only define one or the other, but not both.
+	// This property is mutually exclusive with the source property; you can
+	// only define one or the other, but not both.
 	InitializeParams *AttachedDiskInitializeParams `json:"initializeParams,omitempty"`
 
+	// Possible values:
+	//   "NVME"
+	//   "SCSI"
 	Interface string `json:"interface,omitempty"`
 
 	// Kind: [Output Only] Type of the resource. Always compute#attachedDisk
@@ -592,6 +641,10 @@ type AttachedDisk struct {
 	// Mode: The mode in which to attach this disk, either READ_WRITE or
 	// READ_ONLY. If not specified, the default is to attach the disk in
 	// READ_WRITE mode.
+	//
+	// Possible values:
+	//   "READ_ONLY"
+	//   "READ_WRITE"
 	Mode string `json:"mode,omitempty"`
 
 	// Source: Specifies a valid partial or full URL to an existing
@@ -601,6 +654,10 @@ type AttachedDisk struct {
 
 	// Type: Specifies the type of the disk, either SCRATCH or PERSISTENT.
 	// If not specified, the default is PERSISTENT.
+	//
+	// Possible values:
+	//   "PERSISTENT"
+	//   "SCRATCH"
 	Type string `json:"type,omitempty"`
 }
 
@@ -620,15 +677,14 @@ type AttachedDiskInitializeParams struct {
 	// https://www.googleapis.com/compute/v1/projects/project/zones
 	// /zone/diskTypes/pd-standard
 	//
-	// Other values include pd-ssd and
-	// local-ssd. If you define this field, you can provide either the full
-	// or partial URL. For example, the following are valid values:
+	// Other values include pd-ssd and local-ssd. If you define this field,
+	// you can provide either the full or partial URL. For example, the
+	// following are valid values:
 	// -
 	// https://www.googleapis.com/compute/v1/projects/project/zones/zone/disk
 	// Types/diskType
 	// - projects/project/zones/zone/diskTypes/diskType
-	// -
-	// zones/zone/diskTypes/diskType
+	// - zones/zone/diskTypes/diskType
 	DiskType string `json:"diskType,omitempty"`
 
 	// SourceImage: A source image used to create the disk. You can provide
@@ -638,14 +694,12 @@ type AttachedDiskInitializeParams struct {
 	//
 	// global/images/my-private-image
 	//
-	// Or you can provide an
-	// image from a publicly-available project. For example, to use a Debian
-	// image from the debian-cloud project, make sure to include the project
-	// in the
+	// Or you can provide an image from a publicly-available project. For
+	// example, to use a Debian image from the debian-cloud project, make
+	// sure to include the project in the
 	// URL:
 	//
 	// projects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD
-	//
 	//
 	// where vYYYYMMDD is the image version. The fully-qualified URL will
 	// also work in both cases.
@@ -655,6 +709,10 @@ type AttachedDiskInitializeParams struct {
 type Backend struct {
 	// BalancingMode: The balancing mode of this backend, default is
 	// UTILIZATION.
+	//
+	// Possible values:
+	//   "RATE"
+	//   "UTILIZATION"
 	BalancingMode string `json:"balancingMode,omitempty"`
 
 	// CapacityScaler: The multiplier (a value between 0 and 1e6) of the max
@@ -734,6 +792,8 @@ type BackendService struct {
 	// resource views referenced by this service. Required.
 	PortName string `json:"portName,omitempty"`
 
+	// Possible values:
+	//   "HTTP"
 	Protocol string `json:"protocol,omitempty"`
 
 	// SelfLink: Server defined URL for the resource (output only).
@@ -794,6 +854,11 @@ type DeprecationStatus struct {
 	// with a warning indicating the deprecated resource and recommending
 	// its replacement. Operations which use OBSOLETE or DELETED resources
 	// will be rejected and result in an error.
+	//
+	// Possible values:
+	//   "DELETED"
+	//   "DEPRECATED"
+	//   "OBSOLETE"
 	State string `json:"state,omitempty"`
 }
 
@@ -838,30 +903,27 @@ type Disk struct {
 	// sourceSnapshot parameter, or specify it alone to create an empty
 	// persistent disk.
 	//
-	// If you specify this field along with sourceImage or
-	// sourceSnapshot, the value of sizeGb must not be less than the size of
-	// the sourceImage or the size of the snapshot.
+	// If you specify this field along with sourceImage or sourceSnapshot,
+	// the value of sizeGb must not be less than the size of the sourceImage
+	// or the size of the snapshot.
 	SizeGb int64 `json:"sizeGb,omitempty,string"`
 
 	// SourceImage: The source image used to create this disk. If the source
 	// image is deleted from the system, this field will not be set, even if
 	// an image with the same name has been re-created.
 	//
-	// When creating a
-	// disk, you can provide a private (custom) image using the following
-	// input, and Compute Engine will use the corresponding image from your
-	// project. For example:
+	// When creating a disk, you can provide a private (custom) image using
+	// the following input, and Compute Engine will use the corresponding
+	// image from your project. For example:
 	//
 	// global/images/my-private-image
 	//
-	// Or you can
-	// provide an image from a publicly-available project. For example, to
-	// use a Debian image from the debian-cloud project, make sure to
-	// include the project in the
+	// Or you can provide an image from a publicly-available project. For
+	// example, to use a Debian image from the debian-cloud project, make
+	// sure to include the project in the
 	// URL:
 	//
 	// projects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD
-	//
 	//
 	// where vYYYYMMDD is the image version. The fully-qualified URL will
 	// also work in both cases.
@@ -882,8 +944,7 @@ type Disk struct {
 	// https://www.googleapis.com/compute/v1/projects/project/global/snapshot
 	// s/snapshot
 	// - projects/project/global/snapshots/snapshot
-	// -
-	// global/snapshots/snapshot
+	// - global/snapshots/snapshot
 	SourceSnapshot string `json:"sourceSnapshot,omitempty"`
 
 	// SourceSnapshotId: [Output Only] The unique ID of the snapshot used to
@@ -896,6 +957,12 @@ type Disk struct {
 
 	// Status: [Output Only] The status of disk creation. Applicable
 	// statuses includes: CREATING, FAILED, READY, RESTORING.
+	//
+	// Possible values:
+	//   "CREATING"
+	//   "FAILED"
+	//   "READY"
+	//   "RESTORING"
 	Status string `json:"status,omitempty"`
 
 	// Type: URL of the disk type resource describing which disk type to use
@@ -950,10 +1017,9 @@ type DiskMoveRequest struct {
 	// DestinationZone: The URL of the destination zone to move the disk to.
 	// This can be a full or partial URL. For example, the following are all
 	// valid URLs to a zone:
-	// -
-	// https://www.googleapis.com/compute/v1/projects/project/zones/zone
-	// -
-	// projects/project/zones/zone
+	// - https://www.googleapis.com/compute/v1/projects/project/zones/zone
+	//
+	// - projects/project/zones/zone
 	// - zones/zone
 	DestinationZone string `json:"destinationZone,omitempty"`
 
@@ -964,8 +1030,7 @@ type DiskMoveRequest struct {
 	// https://www.googleapis.com/compute/v1/projects/project/zones/zone/disk
 	// s/disk
 	// - projects/project/zones/zone/disks/disk
-	// -
-	// zones/zone/disks/disk
+	// - zones/zone/disks/disk
 	TargetDisk string `json:"targetDisk,omitempty"`
 }
 
@@ -1059,6 +1124,22 @@ type DiskTypesScopedList struct {
 
 type DiskTypesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -1088,6 +1169,22 @@ type DisksScopedList struct {
 
 type DisksScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -1142,15 +1239,14 @@ type Firewall struct {
 	// a firewall rule. If not specified when creating a firewall rule, the
 	// default network is used:
 	// global/networks/default
-	// If you choose to
-	// specify this property, you can specify the network as a full or
-	// partial URL. For example, the following are all valid URLs:
+	// If you choose to specify this property, you can specify the network
+	// as a full or partial URL. For example, the following are all valid
+	// URLs:
 	// -
 	// https://www.googleapis.com/compute/v1/projects/myproject/global/networ
 	// ks/my-network
 	// - projects/myproject/global/networks/my-network
-	// -
-	// global/networks/default
+	// - global/networks/default
 	Network string `json:"network,omitempty"`
 
 	// SelfLink: [Output Only] Server defined URL for the resource.
@@ -1160,19 +1256,18 @@ type Firewall struct {
 	// expressed in CIDR format. One or both of sourceRanges and sourceTags
 	// may be set.
 	//
-	// If both properties are set, an inbound connection is
-	// allowed if the range or the tag of the source matches the
-	// sourceRanges OR matches the sourceTags property; the connection does
-	// not need to match both properties.
+	// If both properties are set, an inbound connection is allowed if the
+	// range or the tag of the source matches the sourceRanges OR matches
+	// the sourceTags property; the connection does not need to match both
+	// properties.
 	SourceRanges []string `json:"sourceRanges,omitempty"`
 
 	// SourceTags: A list of instance tags which this rule applies to. One
 	// or both of sourceRanges and sourceTags may be set.
 	//
-	// If both
-	// properties are set, an inbound connection is allowed if the range or
-	// the tag of the source matches the sourceRanges OR matches the
-	// sourceTags property; the connection does not need to match both
+	// If both properties are set, an inbound connection is allowed if the
+	// range or the tag of the source matches the sourceRanges OR matches
+	// the sourceTags property; the connection does not need to match both
 	// properties.
 	SourceTags []string `json:"sourceTags,omitempty"`
 
@@ -1195,8 +1290,7 @@ type FirewallAllowed struct {
 	// integer or a range. If not specified, connections through any port
 	// are allowed
 	//
-	// Example inputs include: ["22"], ["80","443"], and
-	// ["12345-12349"].
+	// Example inputs include: ["22"], ["80","443"], and ["12345-12349"].
 	Ports []string `json:"ports,omitempty"`
 }
 
@@ -1231,6 +1325,13 @@ type ForwardingRule struct {
 
 	// IPProtocol: The IP protocol to which this rule applies, valid options
 	// are 'TCP', 'UDP', 'ESP', 'AH' or 'SCTP'.
+	//
+	// Possible values:
+	//   "AH"
+	//   "ESP"
+	//   "SCTP"
+	//   "TCP"
+	//   "UDP"
 	IPProtocol string `json:"IPProtocol,omitempty"`
 
 	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
@@ -1324,6 +1425,22 @@ type ForwardingRulesScopedList struct {
 
 type ForwardingRulesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -1348,6 +1465,10 @@ type HealthCheckReference struct {
 
 type HealthStatus struct {
 	// HealthState: Health state of the instance.
+	//
+	// Possible values:
+	//   "HEALTHY"
+	//   "UNHEALTHY"
 	HealthState string `json:"healthState,omitempty"`
 
 	// Instance: URL of the instance resource.
@@ -1502,8 +1623,7 @@ type Image struct {
 	// https://www.googleapis.com/compute/v1/projects/project/zones/zone/disk
 	// /disk
 	// - projects/project/zones/zone/disk/disk
-	// -
-	// zones/zone/disks/disk
+	// - zones/zone/disks/disk
 	SourceDisk string `json:"sourceDisk,omitempty"`
 
 	// SourceDiskId: The ID value of the disk used to create this image.
@@ -1513,12 +1633,20 @@ type Image struct {
 
 	// SourceType: The type of the image used to create this disk. The
 	// default and only value is RAW
+	//
+	// Possible values:
+	//   "RAW" (default)
 	SourceType string `json:"sourceType,omitempty"`
 
 	// Status: [Output Only] The status of the image. An image can be used
 	// to create other resources, such as instances, only after the image
 	// has been successfully created and the status is set to READY.
 	// Possible values are FAILED, PENDING, or READY.
+	//
+	// Possible values:
+	//   "FAILED"
+	//   "PENDING"
+	//   "READY"
 	Status string `json:"status,omitempty"`
 }
 
@@ -1527,6 +1655,9 @@ type ImageRawDisk struct {
 	// device, which should be TAR. This is just a container and
 	// transmission format and not a runtime format. Provided by the client
 	// when the disk image is created.
+	//
+	// Possible values:
+	//   "TAR"
 	ContainerType string `json:"containerType,omitempty"`
 
 	// Sha1Checksum: An optional SHA1 checksum of the disk image before
@@ -1564,6 +1695,9 @@ type Instance struct {
 	// to use this instance to forward routes. For more information, see
 	// Enabling IP Forwarding.
 	CanIpForward bool `json:"canIpForward,omitempty"`
+
+	// CpuPlatform: [Output Only] The CPU platform used by this instance.
+	CpuPlatform string `json:"cpuPlatform,omitempty"`
 
 	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
 	// format.
@@ -1627,6 +1761,14 @@ type Instance struct {
 	// Status: [Output Only] The status of the instance. One of the
 	// following values: PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED,
 	// TERMINATED.
+	//
+	// Possible values:
+	//   "PROVISIONING"
+	//   "RUNNING"
+	//   "STAGING"
+	//   "STOPPED"
+	//   "STOPPING"
+	//   "TERMINATED"
 	Status string `json:"status,omitempty"`
 
 	// StatusMessage: [Output Only] An optional, human-readable explanation
@@ -1689,10 +1831,9 @@ type InstanceMoveRequest struct {
 	// DestinationZone: The URL of the destination zone to move the instance
 	// to. This can be a full or partial URL. For example, the following are
 	// all valid URLs to a zone:
-	// -
-	// https://www.googleapis.com/compute/v1/projects/project/zones/zone
-	// -
-	// projects/project/zones/zone
+	// - https://www.googleapis.com/compute/v1/projects/project/zones/zone
+	//
+	// - projects/project/zones/zone
 	// - zones/zone
 	DestinationZone string `json:"destinationZone,omitempty"`
 
@@ -1703,62 +1844,59 @@ type InstanceMoveRequest struct {
 	// https://www.googleapis.com/compute/v1/projects/project/zones/zone/inst
 	// ances/instance
 	// - projects/project/zones/zone/instances/instance
-	// -
-	// zones/zone/instances/instance
+	// - zones/zone/instances/instance
 	TargetInstance string `json:"targetInstance,omitempty"`
 }
 
 type InstanceProperties struct {
-	// CanIpForward: Allows instances created based on this template to send
-	// packets with source IP addresses other than their own and receive
-	// packets with destination IP addresses other than their own. If these
-	// instances will be used as an IP gateway or it will be set as the
-	// next-hop in a Route resource, say true. If unsure, leave this set to
-	// false.
+	// CanIpForward: A boolean that specifies if instances created from this
+	// template can send packets with source IP addresses other than their
+	// own or receive packets with destination IP addresses other than their
+	// own. If you use these instances as an IP gateway or as the next-hop
+	// in a Route resource, specify true. Otherwise, specify false.
 	CanIpForward bool `json:"canIpForward,omitempty"`
 
-	// Description: An optional textual description for the instances
-	// created based on the instance template resource; provided by the
-	// client when the template is created.
+	// Description: An optional text description for the instances that are
+	// created from this instance template.
 	Description string `json:"description,omitempty"`
 
-	// Disks: Array of disks associated with instance created based on this
-	// template.
+	// Disks: An array of disks that are associated with the instances that
+	// are created from this template.
 	Disks []*AttachedDisk `json:"disks,omitempty"`
 
-	// MachineType: Name of the machine type resource describing which
-	// machine type to use to host the instances created based on this
-	// template; provided by the client when the instance template is
-	// created.
+	// MachineType: The machine type to use for instances that are created
+	// from this template.
 	MachineType string `json:"machineType,omitempty"`
 
-	// Metadata: Metadata key/value pairs assigned to instances created
-	// based on this template. Consists of custom metadata or predefined
-	// keys; see Instance documentation for more information.
+	// Metadata: The metadata key/value pairs to assign to instances that
+	// are created from this template. These pairs can consist of custom
+	// metadata or predefined keys. See Project and instance metadata for
+	// more information.
 	Metadata *Metadata `json:"metadata,omitempty"`
 
-	// NetworkInterfaces: Array of configurations for this interface. This
-	// specifies how this interface is configured to interact with other
-	// network services, such as connecting to the internet. Currently,
-	// ONE_TO_ONE_NAT is the only access config supported. If there are no
-	// accessConfigs specified, then this instances created based based on
-	// this template will have no external internet access.
+	// NetworkInterfaces: An array of network access configurations for this
+	// interface. This specifies how this interface is configured to
+	// interact with other network services, such as connecting to the
+	// internet. Currently, ONE_TO_ONE_NAT is the only supported access
+	// configuration. If you do not specify any access configurations, the
+	// instances that are created from this template will have no external
+	// internet access.
 	NetworkInterfaces []*NetworkInterface `json:"networkInterfaces,omitempty"`
 
-	// Scheduling: Scheduling options for the instances created based on
-	// this template.
+	// Scheduling: A list of scheduling options for the instances that are
+	// created from this template.
 	Scheduling *Scheduling `json:"scheduling,omitempty"`
 
-	// ServiceAccounts: A list of service accounts each with specified
-	// scopes, for which access tokens are to be made available to the
-	// instances created based on this template, through metadata queries.
+	// ServiceAccounts: A list of service accounts with specified scopes.
+	// Access tokens for these service accounts are available to the
+	// instances that are created from this template. Use metadata queries
+	// to obtain the access tokens for these instances.
 	ServiceAccounts []*ServiceAccount `json:"serviceAccounts,omitempty"`
 
-	// Tags: A list of tags to be applied to the instances created based on
-	// this template used to identify valid sources or targets for network
-	// firewalls. Provided by the client on instance creation. The tags can
-	// be later modified by the setTags method. Each tag within the list
-	// must comply with RFC1035.
+	// Tags: A list of tags to apply to the instances that are created from
+	// this template. The tags identify valid sources or targets for network
+	// firewalls. The setTags method can modify this list of tags. Each tag
+	// within the list must comply with RFC1035.
 	Tags *Tags `json:"tags,omitempty"`
 }
 
@@ -1767,50 +1905,52 @@ type InstanceReference struct {
 }
 
 type InstanceTemplate struct {
-	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
-	// only).
+	// CreationTimestamp: [Output Only] The creation timestamp for this
+	// instance template in RFC3339 text format.
 	CreationTimestamp string `json:"creationTimestamp,omitempty"`
 
-	// Description: An optional textual description of the instance template
-	// resource; provided by the client when the resource is created.
+	// Description: An optional text description for the instance template.
 	Description string `json:"description,omitempty"`
 
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] A unique identifier for this instance template. The
+	// server defines this identifier.
 	Id uint64 `json:"id,omitempty,string"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] The resource type, which is always
+	// compute#instanceTemplate for instance templates.
 	Kind string `json:"kind,omitempty"`
 
-	// Name: Name of the instance template resource; provided by the client
-	// when the resource is created. The name must be 1-63 characters long,
-	// and comply with RFC1035
+	// Name: The name of the instance template. The name must be 1-63
+	// characters long, and comply with RFC1035.
 	Name string `json:"name,omitempty"`
 
-	// Properties: The instance properties portion of this instance template
+	// Properties: The instance properties for the instance template
 	// resource.
 	Properties *InstanceProperties `json:"properties,omitempty"`
 
-	// SelfLink: Server defined URL for the resource (output only).
+	// SelfLink: [Output Only] The URL for this instance template. The
+	// server defines this URL.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
 type InstanceTemplateList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] A unique identifier for this instance template. The
+	// server defines this identifier.
 	Id string `json:"id,omitempty"`
 
 	// Items: A list of InstanceTemplate resources.
 	Items []*InstanceTemplate `json:"items,omitempty"`
 
-	// Kind: Type of resource.
+	// Kind: [Output Only] The resource type, which is always
+	// compute#instanceTemplatesListResponse for instance template lists.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token that is used to continue a
+	// truncated list request.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] The URL for this instance template list. The
+	// server defines this URL.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
@@ -1825,6 +1965,22 @@ type InstancesScopedList struct {
 
 type InstancesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -1972,6 +2128,22 @@ type MachineTypesScopedList struct {
 
 type MachineTypesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -2081,15 +2253,13 @@ type NetworkInterface struct {
 	//
 	// global/networks/default
 	//
-	// If you specify
-	// this property, you can specify the network as a full or partial URL.
-	// For example, the following are all valid URLs:
+	// If you specify this property, you can specify the network as a full
+	// or partial URL. For example, the following are all valid URLs:
 	// -
 	// https://www.googleapis.com/compute/v1/projects/project/global/networks
 	// /network
 	// - projects/project/global/networks/network
-	// -
-	// global/networks/default
+	// - global/networks/default
 	Network string `json:"network,omitempty"`
 
 	// NetworkIP: [Output Only] An optional IPV4 internal network address
@@ -2120,7 +2290,7 @@ type NetworkList struct {
 type Operation struct {
 	// ClientOperationId: [Output Only] An optional identifier specified by
 	// the client when the mutation was initiated. Must be unique for all
-	// operation resources in the project
+	// operation resources in the project.
 	ClientOperationId string `json:"clientOperationId,omitempty"`
 
 	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -2165,8 +2335,8 @@ type Operation struct {
 	// Progress: [Output Only] An optional progress indicator that ranges
 	// from 0 to 100. There is no requirement that this be linear or support
 	// any granularity of operations. This should not be used to guess at
-	// when the operation will be complete. This number should be
-	// monotonically increasing as the operation progresses.
+	// when the operation will be complete. This number should monotonically
+	// increase as the operation progresses.
 	Progress int64 `json:"progress,omitempty"`
 
 	// Region: [Output Only] URL of the region where the operation resides.
@@ -2182,6 +2352,11 @@ type Operation struct {
 
 	// Status: [Output Only] Status of the operation. Can be one of the
 	// following: PENDING, RUNNING, or DONE.
+	//
+	// Possible values:
+	//   "DONE"
+	//   "PENDING"
+	//   "RUNNING"
 	Status string `json:"status,omitempty"`
 
 	// StatusMessage: [Output Only] An optional textual description of the
@@ -2228,6 +2403,22 @@ type OperationErrorErrors struct {
 
 type OperationWarnings struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -2296,6 +2487,22 @@ type OperationsScopedList struct {
 
 type OperationsScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -2381,6 +2588,29 @@ type Quota struct {
 	Limit float64 `json:"limit,omitempty"`
 
 	// Metric: [Output Only] Name of the quota metric.
+	//
+	// Possible values:
+	//   "BACKEND_SERVICES"
+	//   "CPUS"
+	//   "DISKS_TOTAL_GB"
+	//   "FIREWALLS"
+	//   "FORWARDING_RULES"
+	//   "HEALTH_CHECKS"
+	//   "IMAGES"
+	//   "INSTANCES"
+	//   "IN_USE_ADDRESSES"
+	//   "LOCAL_SSD_TOTAL_GB"
+	//   "NETWORKS"
+	//   "ROUTES"
+	//   "SNAPSHOTS"
+	//   "SSD_TOTAL_GB"
+	//   "STATIC_ADDRESSES"
+	//   "TARGET_HTTP_PROXIES"
+	//   "TARGET_INSTANCES"
+	//   "TARGET_POOLS"
+	//   "TARGET_VPN_GATEWAYS"
+	//   "URL_MAPS"
+	//   "VPN_TUNNELS"
 	Metric string `json:"metric,omitempty"`
 
 	// Usage: [Output Only] Current usage of this metric.
@@ -2417,6 +2647,10 @@ type Region struct {
 	SelfLink string `json:"selfLink,omitempty"`
 
 	// Status: [Output Only] Status of the region, either UP or DOWN.
+	//
+	// Possible values:
+	//   "DOWN"
+	//   "UP"
 	Status string `json:"status,omitempty"`
 
 	// Zones: [Output Only] A list of zones available in this region, in the
@@ -2494,8 +2728,13 @@ type Route struct {
 	// matching packets.
 	NextHopNetwork string `json:"nextHopNetwork,omitempty"`
 
+	// NextHopVpnTunnel: The URL to a VpnTunnel that should handle matching
+	// packets.
+	NextHopVpnTunnel string `json:"nextHopVpnTunnel,omitempty"`
+
 	// Priority: Breaks ties between Routes of equal specificity. Routes
 	// with smaller values win when tied with routes with larger values.
+	// Default value is 1000. A valid range is between 0 and 65535.
 	Priority int64 `json:"priority,omitempty"`
 
 	// SelfLink: Server defined URL for the resource (output only).
@@ -2511,6 +2750,22 @@ type Route struct {
 
 type RouteWarnings struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -2557,7 +2812,14 @@ type Scheduling struct {
 	// OnHostMaintenance: Defines the maintenance behavior for this
 	// instance. The default behavior is MIGRATE. For more information, see
 	// Setting maintenance behavior.
+	//
+	// Possible values:
+	//   "MIGRATE"
+	//   "TERMINATE"
 	OnHostMaintenance string `json:"onHostMaintenance,omitempty"`
+
+	// Preemptible: Whether the Instance is preemptible.
+	Preemptible bool `json:"preemptible,omitempty"`
 }
 
 type SerialPortOutput struct {
@@ -2622,6 +2884,13 @@ type Snapshot struct {
 	SourceDiskId string `json:"sourceDiskId,omitempty"`
 
 	// Status: The status of the persistent disk snapshot (output only).
+	//
+	// Possible values:
+	//   "CREATING"
+	//   "DELETING"
+	//   "FAILED"
+	//   "READY"
+	//   "UPLOADING"
 	Status string `json:"status,omitempty"`
 
 	// StorageBytes: A size of the the storage used by the snapshot. As
@@ -2632,6 +2901,10 @@ type Snapshot struct {
 	// StorageBytesStatus: An indicator whether storageBytes is in a stable
 	// state, or it is being adjusted as a result of shared storage
 	// reallocation.
+	//
+	// Possible values:
+	//   "UPDATING"
+	//   "UP_TO_DATE"
 	StorageBytesStatus string `json:"storageBytesStatus,omitempty"`
 }
 
@@ -2662,8 +2935,7 @@ type Tags struct {
 	// always provide an up-to-date fingerprint hash in order to update or
 	// change metadata.
 	//
-	// To see the latest fingerprint, make get() request
-	// to the instance.
+	// To see the latest fingerprint, make get() request to the instance.
 	Fingerprint string `json:"fingerprint,omitempty"`
 
 	// Items: An array of tags. Each tag must be 1-63 characters long, and
@@ -2746,6 +3018,9 @@ type TargetInstance struct {
 
 	// NatPolicy: NAT option controlling how IPs are NAT'ed to the VM.
 	// Currently only NO_NAT (default value) is supported.
+	//
+	// Possible values:
+	//   "NO_NAT"
 	NatPolicy string `json:"natPolicy,omitempty"`
 
 	// SelfLink: Server defined URL for the resource (output only).
@@ -2805,6 +3080,22 @@ type TargetInstancesScopedList struct {
 
 type TargetInstancesScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -2834,12 +3125,11 @@ type TargetPool struct {
 	// in the primary pool is at or below 'failoverRatio', traffic arriving
 	// at the load-balanced IP will be directed to the backup pool.
 	//
-	// In case
-	// where 'failoverRatio' and 'backupPool' are not set, or all the VMs in
-	// the backup pool are unhealthy, the traffic will be directed back to
-	// the primary pool in the "force" mode, where traffic will be spread to
-	// the healthy VMs with the best effort, or to all VMs when no VM is
-	// healthy.
+	// In case where 'failoverRatio' and 'backupPool' are not set, or all
+	// the VMs in the backup pool are unhealthy, the traffic will be
+	// directed back to the primary pool in the "force" mode, where traffic
+	// will be spread to the healthy VMs with the best effort, or to all VMs
+	// when no VM is healthy.
 	BackupPool string `json:"backupPool,omitempty"`
 
 	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
@@ -2855,17 +3145,16 @@ type TargetPool struct {
 	// not as a backup pool to some other target pool). The value of the
 	// field must be in [0, 1].
 	//
-	// If set, 'backupPool' must also be set. They
-	// together define the fallback behavior of the primary target pool: if
-	// the ratio of the healthy VMs in the primary pool is at or below this
-	// number, traffic arriving at the load-balanced IP will be directed to
-	// the backup pool.
+	// If set, 'backupPool' must also be set. They together define the
+	// fallback behavior of the primary target pool: if the ratio of the
+	// healthy VMs in the primary pool is at or below this number, traffic
+	// arriving at the load-balanced IP will be directed to the backup
+	// pool.
 	//
-	// In case where 'failoverRatio' is not set or all the
-	// VMs in the backup pool are unhealthy, the traffic will be directed
-	// back to the primary pool in the "force" mode, where traffic will be
-	// spread to the healthy VMs with the best effort, or to all VMs when no
-	// VM is healthy.
+	// In case where 'failoverRatio' is not set or all the VMs in the backup
+	// pool are unhealthy, the traffic will be directed back to the primary
+	// pool in the "force" mode, where traffic will be spread to the healthy
+	// VMs with the best effort, or to all VMs when no VM is healthy.
 	FailoverRatio float64 `json:"failoverRatio,omitempty"`
 
 	// HealthChecks: A list of URLs to the HttpHealthCheck resource. A
@@ -2905,6 +3194,11 @@ type TargetPool struct {
 	// 'CLIENT_IP_PROTO': Connections from the same client IP with the same
 	// IP protocol will go to the same VM in the pool while that VM remains
 	// healthy.
+	//
+	// Possible values:
+	//   "CLIENT_IP"
+	//   "CLIENT_IP_PROTO"
+	//   "NONE"
 	SessionAffinity string `json:"sessionAffinity,omitempty"`
 }
 
@@ -2984,6 +3278,22 @@ type TargetPoolsScopedList struct {
 
 type TargetPoolsScopedListWarning struct {
 	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
 	Code string `json:"code,omitempty"`
 
 	// Data: [Output Only] Metadata for this warning in key: value format.
@@ -3004,6 +3314,145 @@ type TargetPoolsScopedListWarningData struct {
 
 type TargetReference struct {
 	Target string `json:"target,omitempty"`
+}
+
+type TargetVpnGateway struct {
+	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+	// format.
+	CreationTimestamp string `json:"creationTimestamp,omitempty"`
+
+	// Description: An optional textual description of the resource.
+	// Provided by the client when the resource is created.
+	Description string `json:"description,omitempty"`
+
+	// ForwardingRules: [Output Only] A list of URLs to the ForwardingRule
+	// resources. ForwardingRules are created using
+	// compute.forwardingRules.insert and associated to a VPN gateway.
+	ForwardingRules []string `json:"forwardingRules,omitempty"`
+
+	// Id: [Output Only] Unique identifier for the resource. Defined by the
+	// server.
+	Id uint64 `json:"id,omitempty,string"`
+
+	// Kind: [Output Only] Type of resource. Always compute#targetVpnGateway
+	// for target VPN gateways.
+	Kind string `json:"kind,omitempty"`
+
+	// Name: Name of the resource. Provided by the client when the resource
+	// is created. The name must be 1-63 characters long and comply with
+	// RFC1035.
+	Name string `json:"name,omitempty"`
+
+	// Network: URL of the network to which this VPN gateway is attached.
+	// Provided by the client when the VPN gateway is created.
+	Network string `json:"network,omitempty"`
+
+	// Region: [Output Only] URL of the region where the target VPN gateway
+	// resides.
+	Region string `json:"region,omitempty"`
+
+	// SelfLink: [Output Only] Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+
+	// Status: [Output Only] The status of the VPN gateway.
+	//
+	// Possible values:
+	//   "CREATING"
+	//   "DELETING"
+	//   "FAILED"
+	//   "READY"
+	Status string `json:"status,omitempty"`
+
+	// Tunnels: [Output Only] A list of URLs to VpnTunnel resources.
+	// VpnTunnels are created using compute.vpntunnels.insert and associated
+	// to a VPN gateway.
+	Tunnels []string `json:"tunnels,omitempty"`
+}
+
+type TargetVpnGatewayAggregatedList struct {
+	// Id: [Output Only] Unique identifier for the resource. Defined by the
+	// server.
+	Id string `json:"id,omitempty"`
+
+	// Items: A map of scoped target vpn gateway lists.
+	Items map[string]TargetVpnGatewaysScopedList `json:"items,omitempty"`
+
+	// Kind: [Output Only] Type of resource. Always compute#targetVpnGateway
+	// for target VPN gateways.
+	Kind string `json:"kind,omitempty"`
+
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
+	NextPageToken string `json:"nextPageToken,omitempty"`
+
+	// SelfLink: [Output Only] Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+}
+
+type TargetVpnGatewayList struct {
+	// Id: [Output Only] Unique identifier for the resource. Defined by the
+	// server.
+	Id string `json:"id,omitempty"`
+
+	// Items: [Output Only] A list of TargetVpnGateway resources.
+	Items []*TargetVpnGateway `json:"items,omitempty"`
+
+	// Kind: [Output Only] Type of resource. Always compute#targetVpnGateway
+	// for target VPN gateways.
+	Kind string `json:"kind,omitempty"`
+
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
+	NextPageToken string `json:"nextPageToken,omitempty"`
+
+	// SelfLink: [Output Only] Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+}
+
+type TargetVpnGatewaysScopedList struct {
+	// TargetVpnGateways: [Output Only] List of target vpn gateways
+	// contained in this scope.
+	TargetVpnGateways []*TargetVpnGateway `json:"targetVpnGateways,omitempty"`
+
+	// Warning: [Output Only] Informational warning which replaces the list
+	// of addresses when the list is empty.
+	Warning *TargetVpnGatewaysScopedListWarning `json:"warning,omitempty"`
+}
+
+type TargetVpnGatewaysScopedListWarning struct {
+	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
+	Code string `json:"code,omitempty"`
+
+	// Data: [Output Only] Metadata for this warning in key: value format.
+	Data []*TargetVpnGatewaysScopedListWarningData `json:"data,omitempty"`
+
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
+	Message string `json:"message,omitempty"`
+}
+
+type TargetVpnGatewaysScopedListWarningData struct {
+	// Key: [Output Only] A key for the warning data.
+	Key string `json:"key,omitempty"`
+
+	// Value: [Output Only] A warning data value corresponding to the key.
+	Value string `json:"value,omitempty"`
 }
 
 type TestFailure struct {
@@ -3139,6 +3588,162 @@ type UsageExportLocation struct {
 	ReportNamePrefix string `json:"reportNamePrefix,omitempty"`
 }
 
+type VpnTunnel struct {
+	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+	// format.
+	CreationTimestamp string `json:"creationTimestamp,omitempty"`
+
+	// Description: An optional textual description of the resource.
+	// Provided by the client when the resource is created.
+	Description string `json:"description,omitempty"`
+
+	// DetailedStatus: [Output Only] Detailed status message for the VPN
+	// tunnel.
+	DetailedStatus string `json:"detailedStatus,omitempty"`
+
+	// Id: [Output Only] Unique identifier for the resource. Defined by the
+	// server.
+	Id uint64 `json:"id,omitempty,string"`
+
+	// IkeNetworks: IKE networks to use when establishing the VPN tunnel
+	// with peer VPN gateway. The value should be a CIDR formatted string,
+	// for example: 192.168.0.0/16. The ranges should be disjoint.
+	IkeNetworks []string `json:"ikeNetworks,omitempty"`
+
+	// IkeVersion: IKE protocol version to use when establishing the VPN
+	// tunnel with peer VPN gateway. Acceptable IKE versions are 1 or 2.
+	// Default version is 2.
+	IkeVersion int64 `json:"ikeVersion,omitempty"`
+
+	// Kind: [Output Only] Type of resource. Always compute#vpnTunnel for
+	// VPN tunnels.
+	Kind string `json:"kind,omitempty"`
+
+	// Name: Name of the resource. Provided by the client when the resource
+	// is created. The name must be 1-63 characters long and comply with
+	// RFC1035.
+	Name string `json:"name,omitempty"`
+
+	// PeerIp: IP address of the peer VPN gateway.
+	PeerIp string `json:"peerIp,omitempty"`
+
+	// Region: [Output Only] URL of the region where the VPN tunnel resides.
+	Region string `json:"region,omitempty"`
+
+	// SelfLink: [Output Only] Server defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+
+	// SharedSecret: Shared secret used to set the secure session between
+	// the GCE VPN gateway and the peer VPN gateway.
+	SharedSecret string `json:"sharedSecret,omitempty"`
+
+	// SharedSecretHash: Hash of the shared secret.
+	SharedSecretHash string `json:"sharedSecretHash,omitempty"`
+
+	// Status: [Output Only] The status of the VPN tunnel.
+	//
+	// Possible values:
+	//   "AUTHORIZATION_ERROR"
+	//   "DEPROVISIONING"
+	//   "ESTABLISHED"
+	//   "FAILED"
+	//   "FIRST_HANDSHAKE"
+	//   "NEGOTIATION_FAILURE"
+	//   "NETWORK_ERROR"
+	//   "PROVISIONING"
+	//   "WAITING_FOR_FULL_CONFIG"
+	Status string `json:"status,omitempty"`
+
+	// TargetVpnGateway: URL of the VPN gateway to which this VPN tunnel is
+	// associated. Provided by the client when the VPN tunnel is created.
+	TargetVpnGateway string `json:"targetVpnGateway,omitempty"`
+}
+
+type VpnTunnelAggregatedList struct {
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
+	Id string `json:"id,omitempty"`
+
+	// Items: [Output Only] A map of scoped vpn tunnel lists.
+	Items map[string]VpnTunnelsScopedList `json:"items,omitempty"`
+
+	// Kind: [Output Only] Type of resource. Always compute#vpnTunnel for
+	// VPN tunnels.
+	Kind string `json:"kind,omitempty"`
+
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
+	NextPageToken string `json:"nextPageToken,omitempty"`
+
+	// SelfLink: [Output Only] Server defined URL for this resource.
+	SelfLink string `json:"selfLink,omitempty"`
+}
+
+type VpnTunnelList struct {
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
+	Id string `json:"id,omitempty"`
+
+	// Items: [Output Only] A list of VpnTunnel resources.
+	Items []*VpnTunnel `json:"items,omitempty"`
+
+	// Kind: [Output Only] Type of resource. Always compute#vpnTunnel for
+	// VPN tunnels.
+	Kind string `json:"kind,omitempty"`
+
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
+	NextPageToken string `json:"nextPageToken,omitempty"`
+
+	// SelfLink: [Output Only] Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+}
+
+type VpnTunnelsScopedList struct {
+	// VpnTunnels: List of vpn tunnels contained in this scope.
+	VpnTunnels []*VpnTunnel `json:"vpnTunnels,omitempty"`
+
+	// Warning: Informational warning which replaces the list of addresses
+	// when the list is empty.
+	Warning *VpnTunnelsScopedListWarning `json:"warning,omitempty"`
+}
+
+type VpnTunnelsScopedListWarning struct {
+	// Code: [Output Only] The warning type identifier for this warning.
+	//
+	// Possible values:
+	//   "DEPRECATED_RESOURCE_USED"
+	//   "DISK_SIZE_LARGER_THAN_IMAGE_SIZE"
+	//   "INJECTED_KERNELS_DEPRECATED"
+	//   "NEXT_HOP_ADDRESS_NOT_ASSIGNED"
+	//   "NEXT_HOP_CANNOT_IP_FORWARD"
+	//   "NEXT_HOP_INSTANCE_NOT_FOUND"
+	//   "NEXT_HOP_INSTANCE_NOT_ON_NETWORK"
+	//   "NEXT_HOP_NOT_RUNNING"
+	//   "NOT_CRITICAL_ERROR"
+	//   "NO_RESULTS_ON_PAGE"
+	//   "REQUIRED_TOS_AGREEMENT"
+	//   "RESOURCE_NOT_DELETED"
+	//   "SINGLE_INSTANCE_PROPERTY_TEMPLATE"
+	//   "UNREACHABLE"
+	Code string `json:"code,omitempty"`
+
+	// Data: [Output Only] Metadata for this warning in key: value format.
+	Data []*VpnTunnelsScopedListWarningData `json:"data,omitempty"`
+
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
+	Message string `json:"message,omitempty"`
+}
+
+type VpnTunnelsScopedListWarningData struct {
+	// Key: [Output Only] A key for the warning data.
+	Key string `json:"key,omitempty"`
+
+	// Value: [Output Only] A warning data value corresponding to the key.
+	Value string `json:"value,omitempty"`
+}
+
 type Zone struct {
 	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
 	// format.
@@ -3175,6 +3780,10 @@ type Zone struct {
 	SelfLink string `json:"selfLink,omitempty"`
 
 	// Status: [Output Only] Status of the zone, either UP or DOWN.
+	//
+	// Possible values:
+	//   "DOWN"
+	//   "UP"
 	Status string `json:"status,omitempty"`
 }
 
@@ -3238,16 +3847,15 @@ func (c *AddressesAggregatedListCall) Filter(filter string) *AddressesAggregated
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *AddressesAggregatedListCall) MaxResults(maxResults int64) *AddressesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *AddressesAggregatedListCall) PageToken(pageToken string) *AddressesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -3306,13 +3914,13 @@ func (c *AddressesAggregatedListCall) Do() (*AddressAggregatedList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -3320,7 +3928,7 @@ func (c *AddressesAggregatedListCall) Do() (*AddressAggregatedList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -3677,16 +4285,15 @@ func (c *AddressesListCall) Filter(filter string) *AddressesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *AddressesListCall) MaxResults(maxResults int64) *AddressesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *AddressesListCall) PageToken(pageToken string) *AddressesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -3747,13 +4354,13 @@ func (c *AddressesListCall) Do() (*AddressList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -3761,7 +4368,7 @@ func (c *AddressesListCall) Do() (*AddressList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4192,16 +4799,15 @@ func (c *BackendServicesListCall) Filter(filter string) *BackendServicesListCall
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *BackendServicesListCall) MaxResults(maxResults int64) *BackendServicesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *BackendServicesListCall) PageToken(pageToken string) *BackendServicesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -4260,13 +4866,13 @@ func (c *BackendServicesListCall) Do() (*BackendServiceList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -4274,7 +4880,7 @@ func (c *BackendServicesListCall) Do() (*BackendServiceList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4527,16 +5133,15 @@ func (c *DiskTypesAggregatedListCall) Filter(filter string) *DiskTypesAggregated
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *DiskTypesAggregatedListCall) MaxResults(maxResults int64) *DiskTypesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *DiskTypesAggregatedListCall) PageToken(pageToken string) *DiskTypesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -4595,13 +5200,13 @@ func (c *DiskTypesAggregatedListCall) Do() (*DiskTypeAggregatedList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -4609,7 +5214,7 @@ func (c *DiskTypesAggregatedListCall) Do() (*DiskTypeAggregatedList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4763,16 +5368,15 @@ func (c *DiskTypesListCall) Filter(filter string) *DiskTypesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *DiskTypesListCall) MaxResults(maxResults int64) *DiskTypesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *DiskTypesListCall) PageToken(pageToken string) *DiskTypesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -4833,13 +5437,13 @@ func (c *DiskTypesListCall) Do() (*DiskTypeList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -4847,7 +5451,7 @@ func (c *DiskTypesListCall) Do() (*DiskTypeList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -4903,16 +5507,15 @@ func (c *DisksAggregatedListCall) Filter(filter string) *DisksAggregatedListCall
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *DisksAggregatedListCall) MaxResults(maxResults int64) *DisksAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *DisksAggregatedListCall) PageToken(pageToken string) *DisksAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -4971,13 +5574,13 @@ func (c *DisksAggregatedListCall) Do() (*DiskAggregatedList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -4985,7 +5588,7 @@ func (c *DisksAggregatedListCall) Do() (*DiskAggregatedList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -5469,16 +6072,15 @@ func (c *DisksListCall) Filter(filter string) *DisksListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *DisksListCall) MaxResults(maxResults int64) *DisksListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *DisksListCall) PageToken(pageToken string) *DisksListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -5539,13 +6141,13 @@ func (c *DisksListCall) Do() (*DiskList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -5553,7 +6155,7 @@ func (c *DisksListCall) Do() (*DiskList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -5882,16 +6484,15 @@ func (c *FirewallsListCall) Filter(filter string) *FirewallsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *FirewallsListCall) MaxResults(maxResults int64) *FirewallsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *FirewallsListCall) PageToken(pageToken string) *FirewallsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -5950,13 +6551,13 @@ func (c *FirewallsListCall) Do() (*FirewallList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -5964,7 +6565,7 @@ func (c *FirewallsListCall) Do() (*FirewallList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -6218,16 +6819,15 @@ func (c *ForwardingRulesAggregatedListCall) Filter(filter string) *ForwardingRul
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *ForwardingRulesAggregatedListCall) MaxResults(maxResults int64) *ForwardingRulesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *ForwardingRulesAggregatedListCall) PageToken(pageToken string) *ForwardingRulesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -6286,13 +6886,13 @@ func (c *ForwardingRulesAggregatedListCall) Do() (*ForwardingRuleAggregatedList,
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -6300,7 +6900,7 @@ func (c *ForwardingRulesAggregatedListCall) Do() (*ForwardingRuleAggregatedList,
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -6657,16 +7257,15 @@ func (c *ForwardingRulesListCall) Filter(filter string) *ForwardingRulesListCall
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *ForwardingRulesListCall) MaxResults(maxResults int64) *ForwardingRulesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *ForwardingRulesListCall) PageToken(pageToken string) *ForwardingRulesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -6727,13 +7326,13 @@ func (c *ForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -6741,7 +7340,7 @@ func (c *ForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -7181,16 +7780,15 @@ func (c *GlobalAddressesListCall) Filter(filter string) *GlobalAddressesListCall
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *GlobalAddressesListCall) MaxResults(maxResults int64) *GlobalAddressesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *GlobalAddressesListCall) PageToken(pageToken string) *GlobalAddressesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -7249,13 +7847,13 @@ func (c *GlobalAddressesListCall) Do() (*AddressList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -7263,7 +7861,7 @@ func (c *GlobalAddressesListCall) Do() (*AddressList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -7585,16 +8183,15 @@ func (c *GlobalForwardingRulesListCall) Filter(filter string) *GlobalForwardingR
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *GlobalForwardingRulesListCall) MaxResults(maxResults int64) *GlobalForwardingRulesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *GlobalForwardingRulesListCall) PageToken(pageToken string) *GlobalForwardingRulesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -7653,13 +8250,13 @@ func (c *GlobalForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -7667,7 +8264,7 @@ func (c *GlobalForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -7818,16 +8415,15 @@ func (c *GlobalOperationsAggregatedListCall) Filter(filter string) *GlobalOperat
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *GlobalOperationsAggregatedListCall) MaxResults(maxResults int64) *GlobalOperationsAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *GlobalOperationsAggregatedListCall) PageToken(pageToken string) *GlobalOperationsAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -7886,13 +8482,13 @@ func (c *GlobalOperationsAggregatedListCall) Do() (*OperationAggregatedList, err
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -7900,7 +8496,7 @@ func (c *GlobalOperationsAggregatedListCall) Do() (*OperationAggregatedList, err
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -8124,16 +8720,15 @@ func (c *GlobalOperationsListCall) Filter(filter string) *GlobalOperationsListCa
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *GlobalOperationsListCall) MaxResults(maxResults int64) *GlobalOperationsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *GlobalOperationsListCall) PageToken(pageToken string) *GlobalOperationsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -8192,13 +8787,13 @@ func (c *GlobalOperationsListCall) Do() (*OperationList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -8206,7 +8801,7 @@ func (c *GlobalOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -8528,16 +9123,15 @@ func (c *HttpHealthChecksListCall) Filter(filter string) *HttpHealthChecksListCa
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *HttpHealthChecksListCall) MaxResults(maxResults int64) *HttpHealthChecksListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *HttpHealthChecksListCall) PageToken(pageToken string) *HttpHealthChecksListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -8596,13 +9190,13 @@ func (c *HttpHealthChecksListCall) Do() (*HttpHealthCheckList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -8610,7 +9204,7 @@ func (c *HttpHealthChecksListCall) Do() (*HttpHealthCheckList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -8942,8 +9536,8 @@ type ImagesDeprecateCall struct {
 
 // Deprecate: Sets the deprecation status of an image.
 //
-// If an empty
-// request body is given, clears the deprecation status instead.
+// If an empty request body is given, clears the deprecation status
+// instead.
 // For details, see https://cloud.google.com/compute/docs/reference/latest/images/deprecate
 func (r *ImagesService) Deprecate(project string, image string, deprecationstatus *DeprecationStatus) *ImagesDeprecateCall {
 	c := &ImagesDeprecateCall{s: r.s, opt_: make(map[string]interface{})}
@@ -9244,16 +9838,15 @@ func (c *ImagesListCall) Filter(filter string) *ImagesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *ImagesListCall) MaxResults(maxResults int64) *ImagesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *ImagesListCall) PageToken(pageToken string) *ImagesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -9312,13 +9905,13 @@ func (c *ImagesListCall) Do() (*ImageList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -9326,7 +9919,7 @@ func (c *ImagesListCall) Do() (*ImageList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -9360,7 +9953,7 @@ type InstanceTemplatesDeleteCall struct {
 	opt_             map[string]interface{}
 }
 
-// Delete: Deletes the specified instance template resource.
+// Delete: Deletes the specified instance template.
 // For details, see https://cloud.google.com/compute/docs/reference/latest/instanceTemplates/delete
 func (r *InstanceTemplatesService) Delete(project string, instanceTemplate string) *InstanceTemplatesDeleteCall {
 	c := &InstanceTemplatesDeleteCall{s: r.s, opt_: make(map[string]interface{})}
@@ -9406,7 +9999,7 @@ func (c *InstanceTemplatesDeleteCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes the specified instance template resource.",
+	//   "description": "Deletes the specified instance template.",
 	//   "httpMethod": "DELETE",
 	//   "id": "compute.instanceTemplates.delete",
 	//   "parameterOrder": [
@@ -9415,14 +10008,14 @@ func (c *InstanceTemplatesDeleteCall) Do() (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "instanceTemplate": {
-	//       "description": "Name of the instance template resource to delete.",
+	//       "description": "The name of the instance template to delete.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "The project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -9505,14 +10098,14 @@ func (c *InstanceTemplatesGetCall) Do() (*InstanceTemplate, error) {
 	//   ],
 	//   "parameters": {
 	//     "instanceTemplate": {
-	//       "description": "Name of the instance template resource to return.",
+	//       "description": "The name of the instance template.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "The project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -9541,8 +10134,8 @@ type InstanceTemplatesInsertCall struct {
 	opt_             map[string]interface{}
 }
 
-// Insert: Creates an instance template resource in the specified
-// project using the data included in the request.
+// Insert: Creates an instance template in the specified project using
+// the data that is included in the request.
 // For details, see https://cloud.google.com/compute/docs/reference/latest/instanceTemplates/insert
 func (r *InstanceTemplatesService) Insert(project string, instancetemplate *InstanceTemplate) *InstanceTemplatesInsertCall {
 	c := &InstanceTemplatesInsertCall{s: r.s, opt_: make(map[string]interface{})}
@@ -9593,7 +10186,7 @@ func (c *InstanceTemplatesInsertCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates an instance template resource in the specified project using the data included in the request.",
+	//   "description": "Creates an instance template in the specified project using the data that is included in the request.",
 	//   "httpMethod": "POST",
 	//   "id": "compute.instanceTemplates.insert",
 	//   "parameterOrder": [
@@ -9601,7 +10194,7 @@ func (c *InstanceTemplatesInsertCall) Do() (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "The project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -9631,8 +10224,8 @@ type InstanceTemplatesListCall struct {
 	opt_    map[string]interface{}
 }
 
-// List: Retrieves the list of instance template resources contained
-// within the specified project.
+// List: Retrieves a list of instance templates that are contained
+// within the specified project and zone.
 // For details, see https://cloud.google.com/compute/docs/reference/latest/instanceTemplates/list
 func (r *InstanceTemplatesService) List(project string) *InstanceTemplatesListCall {
 	c := &InstanceTemplatesListCall{s: r.s, opt_: make(map[string]interface{})}
@@ -9648,16 +10241,15 @@ func (c *InstanceTemplatesListCall) Filter(filter string) *InstanceTemplatesList
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *InstanceTemplatesListCall) MaxResults(maxResults int64) *InstanceTemplatesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *InstanceTemplatesListCall) PageToken(pageToken string) *InstanceTemplatesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -9708,7 +10300,7 @@ func (c *InstanceTemplatesListCall) Do() (*InstanceTemplateList, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Retrieves the list of instance template resources contained within the specified project.",
+	//   "description": "Retrieves a list of instance templates that are contained within the specified project and zone.",
 	//   "httpMethod": "GET",
 	//   "id": "compute.instanceTemplates.list",
 	//   "parameterOrder": [
@@ -9716,13 +10308,13 @@ func (c *InstanceTemplatesListCall) Do() (*InstanceTemplateList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -9730,12 +10322,12 @@ func (c *InstanceTemplatesListCall) Do() (*InstanceTemplateList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "The project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -9902,16 +10494,15 @@ func (c *InstancesAggregatedListCall) Filter(filter string) *InstancesAggregated
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *InstancesAggregatedListCall) MaxResults(maxResults int64) *InstancesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *InstancesAggregatedListCall) PageToken(pageToken string) *InstancesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -9969,13 +10560,13 @@ func (c *InstancesAggregatedListCall) Do() (*InstanceAggregatedList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -9983,7 +10574,7 @@ func (c *InstancesAggregatedListCall) Do() (*InstanceAggregatedList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -10579,6 +11170,13 @@ func (r *InstancesService) GetSerialPortOutput(project string, zone string, inst
 	return c
 }
 
+// Port sets the optional parameter "port": Which COM port to retrieve
+// data from.
+func (c *InstancesGetSerialPortOutputCall) Port(port int64) *InstancesGetSerialPortOutputCall {
+	c.opt_["port"] = port
+	return c
+}
+
 // Fields allows partial responses to be retrieved.
 // See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
 // for more information.
@@ -10591,6 +11189,9 @@ func (c *InstancesGetSerialPortOutputCall) Do() (*SerialPortOutput, error) {
 	var body io.Reader = nil
 	params := make(url.Values)
 	params.Set("alt", "json")
+	if v, ok := c.opt_["port"]; ok {
+		params.Set("port", fmt.Sprintf("%v", v))
+	}
 	if v, ok := c.opt_["fields"]; ok {
 		params.Set("fields", fmt.Sprintf("%v", v))
 	}
@@ -10632,6 +11233,15 @@ func (c *InstancesGetSerialPortOutputCall) Do() (*SerialPortOutput, error) {
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
+	//     },
+	//     "port": {
+	//       "default": "1",
+	//       "description": "Which COM port to retrieve data from.",
+	//       "format": "int32",
+	//       "location": "query",
+	//       "maximum": "4",
+	//       "minimum": "1",
+	//       "type": "integer"
 	//     },
 	//     "project": {
 	//       "description": "Project ID for this request.",
@@ -10790,16 +11400,15 @@ func (c *InstancesListCall) Filter(filter string) *InstancesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *InstancesListCall) MaxResults(maxResults int64) *InstancesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *InstancesListCall) PageToken(pageToken string) *InstancesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -10860,13 +11469,13 @@ func (c *InstancesListCall) Do() (*InstanceList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -10874,7 +11483,7 @@ func (c *InstancesListCall) Do() (*InstanceList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -11794,16 +12403,15 @@ func (c *MachineTypesAggregatedListCall) Filter(filter string) *MachineTypesAggr
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *MachineTypesAggregatedListCall) MaxResults(maxResults int64) *MachineTypesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *MachineTypesAggregatedListCall) PageToken(pageToken string) *MachineTypesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -11862,13 +12470,13 @@ func (c *MachineTypesAggregatedListCall) Do() (*MachineTypeAggregatedList, error
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -11876,7 +12484,7 @@ func (c *MachineTypesAggregatedListCall) Do() (*MachineTypeAggregatedList, error
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -12030,16 +12638,15 @@ func (c *MachineTypesListCall) Filter(filter string) *MachineTypesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *MachineTypesListCall) MaxResults(maxResults int64) *MachineTypesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *MachineTypesListCall) PageToken(pageToken string) *MachineTypesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -12100,13 +12707,13 @@ func (c *MachineTypesListCall) Do() (*MachineTypeList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -12114,7 +12721,7 @@ func (c *MachineTypesListCall) Do() (*MachineTypeList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -12443,16 +13050,15 @@ func (c *NetworksListCall) Filter(filter string) *NetworksListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *NetworksListCall) MaxResults(maxResults int64) *NetworksListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *NetworksListCall) PageToken(pageToken string) *NetworksListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -12511,13 +13117,13 @@ func (c *NetworksListCall) Do() (*NetworkList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -12525,7 +13131,7 @@ func (c *NetworksListCall) Do() (*NetworkList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -13219,16 +13825,15 @@ func (c *RegionOperationsListCall) Filter(filter string) *RegionOperationsListCa
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *RegionOperationsListCall) MaxResults(maxResults int64) *RegionOperationsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *RegionOperationsListCall) PageToken(pageToken string) *RegionOperationsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -13289,13 +13894,13 @@ func (c *RegionOperationsListCall) Do() (*OperationList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -13303,7 +13908,7 @@ func (c *RegionOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -13451,16 +14056,15 @@ func (c *RegionsListCall) Filter(filter string) *RegionsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *RegionsListCall) MaxResults(maxResults int64) *RegionsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *RegionsListCall) PageToken(pageToken string) *RegionsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -13519,13 +14123,13 @@ func (c *RegionsListCall) Do() (*RegionList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -13533,7 +14137,7 @@ func (c *RegionsListCall) Do() (*RegionList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -13855,16 +14459,15 @@ func (c *RoutesListCall) Filter(filter string) *RoutesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *RoutesListCall) MaxResults(maxResults int64) *RoutesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *RoutesListCall) PageToken(pageToken string) *RoutesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -13923,13 +14526,13 @@ func (c *RoutesListCall) Do() (*RouteList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -13937,7 +14540,7 @@ func (c *RoutesListCall) Do() (*RouteList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -14168,16 +14771,15 @@ func (c *SnapshotsListCall) Filter(filter string) *SnapshotsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *SnapshotsListCall) MaxResults(maxResults int64) *SnapshotsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *SnapshotsListCall) PageToken(pageToken string) *SnapshotsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -14236,13 +14838,13 @@ func (c *SnapshotsListCall) Do() (*SnapshotList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -14250,7 +14852,7 @@ func (c *SnapshotsListCall) Do() (*SnapshotList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -14572,16 +15174,15 @@ func (c *TargetHttpProxiesListCall) Filter(filter string) *TargetHttpProxiesList
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *TargetHttpProxiesListCall) MaxResults(maxResults int64) *TargetHttpProxiesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *TargetHttpProxiesListCall) PageToken(pageToken string) *TargetHttpProxiesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -14640,13 +15241,13 @@ func (c *TargetHttpProxiesListCall) Do() (*TargetHttpProxyList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -14654,7 +15255,7 @@ func (c *TargetHttpProxiesListCall) Do() (*TargetHttpProxyList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -14805,16 +15406,15 @@ func (c *TargetInstancesAggregatedListCall) Filter(filter string) *TargetInstanc
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *TargetInstancesAggregatedListCall) MaxResults(maxResults int64) *TargetInstancesAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *TargetInstancesAggregatedListCall) PageToken(pageToken string) *TargetInstancesAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -14873,13 +15473,13 @@ func (c *TargetInstancesAggregatedListCall) Do() (*TargetInstanceAggregatedList,
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -14887,7 +15487,7 @@ func (c *TargetInstancesAggregatedListCall) Do() (*TargetInstanceAggregatedList,
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -15244,16 +15844,15 @@ func (c *TargetInstancesListCall) Filter(filter string) *TargetInstancesListCall
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *TargetInstancesListCall) MaxResults(maxResults int64) *TargetInstancesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *TargetInstancesListCall) PageToken(pageToken string) *TargetInstancesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -15314,13 +15913,13 @@ func (c *TargetInstancesListCall) Do() (*TargetInstanceList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -15328,7 +15927,7 @@ func (c *TargetInstancesListCall) Do() (*TargetInstanceList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -15606,16 +16205,15 @@ func (c *TargetPoolsAggregatedListCall) Filter(filter string) *TargetPoolsAggreg
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *TargetPoolsAggregatedListCall) MaxResults(maxResults int64) *TargetPoolsAggregatedListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *TargetPoolsAggregatedListCall) PageToken(pageToken string) *TargetPoolsAggregatedListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -15674,13 +16272,13 @@ func (c *TargetPoolsAggregatedListCall) Do() (*TargetPoolAggregatedList, error) 
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -15688,7 +16286,7 @@ func (c *TargetPoolsAggregatedListCall) Do() (*TargetPoolAggregatedList, error) 
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -16158,16 +16756,15 @@ func (c *TargetPoolsListCall) Filter(filter string) *TargetPoolsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *TargetPoolsListCall) MaxResults(maxResults int64) *TargetPoolsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *TargetPoolsListCall) PageToken(pageToken string) *TargetPoolsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -16228,13 +16825,13 @@ func (c *TargetPoolsListCall) Do() (*TargetPoolList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -16242,7 +16839,7 @@ func (c *TargetPoolsListCall) Do() (*TargetPoolList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -16624,6 +17221,579 @@ func (c *TargetPoolsSetBackupCall) Do() (*Operation, error) {
 
 }
 
+// method id "compute.targetVpnGateways.aggregatedList":
+
+type TargetVpnGatewaysAggregatedListCall struct {
+	s       *Service
+	project string
+	opt_    map[string]interface{}
+}
+
+// AggregatedList: Retrieves the list of target VPN gateways grouped by
+// scope.
+func (r *TargetVpnGatewaysService) AggregatedList(project string) *TargetVpnGatewaysAggregatedListCall {
+	c := &TargetVpnGatewaysAggregatedListCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	return c
+}
+
+// Filter sets the optional parameter "filter": Filter expression for
+// filtering listed resources.
+func (c *TargetVpnGatewaysAggregatedListCall) Filter(filter string) *TargetVpnGatewaysAggregatedListCall {
+	c.opt_["filter"] = filter
+	return c
+}
+
+// MaxResults sets the optional parameter "maxResults": Maximum count of
+// results to be returned.
+func (c *TargetVpnGatewaysAggregatedListCall) MaxResults(maxResults int64) *TargetVpnGatewaysAggregatedListCall {
+	c.opt_["maxResults"] = maxResults
+	return c
+}
+
+// PageToken sets the optional parameter "pageToken": Tag returned by a
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
+func (c *TargetVpnGatewaysAggregatedListCall) PageToken(pageToken string) *TargetVpnGatewaysAggregatedListCall {
+	c.opt_["pageToken"] = pageToken
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *TargetVpnGatewaysAggregatedListCall) Fields(s ...googleapi.Field) *TargetVpnGatewaysAggregatedListCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *TargetVpnGatewaysAggregatedListCall) Do() (*TargetVpnGatewayAggregatedList, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["filter"]; ok {
+		params.Set("filter", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["maxResults"]; ok {
+		params.Set("maxResults", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["pageToken"]; ok {
+		params.Set("pageToken", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/aggregated/targetVpnGateways")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *TargetVpnGatewayAggregatedList
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Retrieves the list of target VPN gateways grouped by scope.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.targetVpnGateways.aggregatedList",
+	//   "parameterOrder": [
+	//     "project"
+	//   ],
+	//   "parameters": {
+	//     "filter": {
+	//       "description": "Filter expression for filtering listed resources.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxResults": {
+	//       "default": "500",
+	//       "description": "Maximum count of results to be returned.",
+	//       "format": "uint32",
+	//       "location": "query",
+	//       "maximum": "500",
+	//       "minimum": "0",
+	//       "type": "integer"
+	//     },
+	//     "pageToken": {
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/aggregated/targetVpnGateways",
+	//   "response": {
+	//     "$ref": "TargetVpnGatewayAggregatedList"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
+// method id "compute.targetVpnGateways.delete":
+
+type TargetVpnGatewaysDeleteCall struct {
+	s                *Service
+	project          string
+	region           string
+	targetVpnGateway string
+	opt_             map[string]interface{}
+}
+
+// Delete: Deletes the specified TargetVpnGateway resource.
+func (r *TargetVpnGatewaysService) Delete(project string, region string, targetVpnGateway string) *TargetVpnGatewaysDeleteCall {
+	c := &TargetVpnGatewaysDeleteCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.targetVpnGateway = targetVpnGateway
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *TargetVpnGatewaysDeleteCall) Fields(s ...googleapi.Field) *TargetVpnGatewaysDeleteCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *TargetVpnGatewaysDeleteCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/targetVpnGateways/{targetVpnGateway}")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("DELETE", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":          c.project,
+		"region":           c.region,
+		"targetVpnGateway": c.targetVpnGateway,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Deletes the specified TargetVpnGateway resource.",
+	//   "httpMethod": "DELETE",
+	//   "id": "compute.targetVpnGateways.delete",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region",
+	//     "targetVpnGateway"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "targetVpnGateway": {
+	//       "description": "Name of the TargetVpnGateway resource to delete.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/targetVpnGateways/{targetVpnGateway}",
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.targetVpnGateways.get":
+
+type TargetVpnGatewaysGetCall struct {
+	s                *Service
+	project          string
+	region           string
+	targetVpnGateway string
+	opt_             map[string]interface{}
+}
+
+// Get: Returns the specified TargetVpnGateway resource.
+func (r *TargetVpnGatewaysService) Get(project string, region string, targetVpnGateway string) *TargetVpnGatewaysGetCall {
+	c := &TargetVpnGatewaysGetCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.targetVpnGateway = targetVpnGateway
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *TargetVpnGatewaysGetCall) Fields(s ...googleapi.Field) *TargetVpnGatewaysGetCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *TargetVpnGatewaysGetCall) Do() (*TargetVpnGateway, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/targetVpnGateways/{targetVpnGateway}")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":          c.project,
+		"region":           c.region,
+		"targetVpnGateway": c.targetVpnGateway,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *TargetVpnGateway
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Returns the specified TargetVpnGateway resource.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.targetVpnGateways.get",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region",
+	//     "targetVpnGateway"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "targetVpnGateway": {
+	//       "description": "Name of the TargetVpnGateway resource to return.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/targetVpnGateways/{targetVpnGateway}",
+	//   "response": {
+	//     "$ref": "TargetVpnGateway"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
+// method id "compute.targetVpnGateways.insert":
+
+type TargetVpnGatewaysInsertCall struct {
+	s                *Service
+	project          string
+	region           string
+	targetvpngateway *TargetVpnGateway
+	opt_             map[string]interface{}
+}
+
+// Insert: Creates a TargetVpnGateway resource in the specified project
+// and region using the data included in the request.
+func (r *TargetVpnGatewaysService) Insert(project string, region string, targetvpngateway *TargetVpnGateway) *TargetVpnGatewaysInsertCall {
+	c := &TargetVpnGatewaysInsertCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.targetvpngateway = targetvpngateway
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *TargetVpnGatewaysInsertCall) Fields(s ...googleapi.Field) *TargetVpnGatewaysInsertCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *TargetVpnGatewaysInsertCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.targetvpngateway)
+	if err != nil {
+		return nil, err
+	}
+	ctype := "application/json"
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/targetVpnGateways")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+		"region":  c.region,
+	})
+	req.Header.Set("Content-Type", ctype)
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Creates a TargetVpnGateway resource in the specified project and region using the data included in the request.",
+	//   "httpMethod": "POST",
+	//   "id": "compute.targetVpnGateways.insert",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/targetVpnGateways",
+	//   "request": {
+	//     "$ref": "TargetVpnGateway"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.targetVpnGateways.list":
+
+type TargetVpnGatewaysListCall struct {
+	s       *Service
+	project string
+	region  string
+	opt_    map[string]interface{}
+}
+
+// List: Retrieves the list of TargetVpnGateway resources available to
+// the specified project and region.
+func (r *TargetVpnGatewaysService) List(project string, region string) *TargetVpnGatewaysListCall {
+	c := &TargetVpnGatewaysListCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	return c
+}
+
+// Filter sets the optional parameter "filter": Filter expression for
+// filtering listed resources.
+func (c *TargetVpnGatewaysListCall) Filter(filter string) *TargetVpnGatewaysListCall {
+	c.opt_["filter"] = filter
+	return c
+}
+
+// MaxResults sets the optional parameter "maxResults": Maximum count of
+// results to be returned.
+func (c *TargetVpnGatewaysListCall) MaxResults(maxResults int64) *TargetVpnGatewaysListCall {
+	c.opt_["maxResults"] = maxResults
+	return c
+}
+
+// PageToken sets the optional parameter "pageToken": Tag returned by a
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
+func (c *TargetVpnGatewaysListCall) PageToken(pageToken string) *TargetVpnGatewaysListCall {
+	c.opt_["pageToken"] = pageToken
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *TargetVpnGatewaysListCall) Fields(s ...googleapi.Field) *TargetVpnGatewaysListCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *TargetVpnGatewaysListCall) Do() (*TargetVpnGatewayList, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["filter"]; ok {
+		params.Set("filter", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["maxResults"]; ok {
+		params.Set("maxResults", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["pageToken"]; ok {
+		params.Set("pageToken", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/targetVpnGateways")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+		"region":  c.region,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *TargetVpnGatewayList
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Retrieves the list of TargetVpnGateway resources available to the specified project and region.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.targetVpnGateways.list",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region"
+	//   ],
+	//   "parameters": {
+	//     "filter": {
+	//       "description": "Filter expression for filtering listed resources.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxResults": {
+	//       "default": "500",
+	//       "description": "Maximum count of results to be returned.",
+	//       "format": "uint32",
+	//       "location": "query",
+	//       "maximum": "500",
+	//       "minimum": "0",
+	//       "type": "integer"
+	//     },
+	//     "pageToken": {
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/targetVpnGateways",
+	//   "response": {
+	//     "$ref": "TargetVpnGatewayList"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
 // method id "compute.urlMaps.delete":
 
 type UrlMapsDeleteCall struct {
@@ -16921,16 +18091,15 @@ func (c *UrlMapsListCall) Filter(filter string) *UrlMapsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *UrlMapsListCall) MaxResults(maxResults int64) *UrlMapsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *UrlMapsListCall) PageToken(pageToken string) *UrlMapsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -16989,13 +18158,13 @@ func (c *UrlMapsListCall) Do() (*UrlMapList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -17003,7 +18172,7 @@ func (c *UrlMapsListCall) Do() (*UrlMapList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -17334,6 +18503,578 @@ func (c *UrlMapsValidateCall) Do() (*UrlMapsValidateResponse, error) {
 
 }
 
+// method id "compute.vpnTunnels.aggregatedList":
+
+type VpnTunnelsAggregatedListCall struct {
+	s       *Service
+	project string
+	opt_    map[string]interface{}
+}
+
+// AggregatedList: Retrieves the list of VPN tunnels grouped by scope.
+func (r *VpnTunnelsService) AggregatedList(project string) *VpnTunnelsAggregatedListCall {
+	c := &VpnTunnelsAggregatedListCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	return c
+}
+
+// Filter sets the optional parameter "filter": Filter expression for
+// filtering listed resources.
+func (c *VpnTunnelsAggregatedListCall) Filter(filter string) *VpnTunnelsAggregatedListCall {
+	c.opt_["filter"] = filter
+	return c
+}
+
+// MaxResults sets the optional parameter "maxResults": Maximum count of
+// results to be returned.
+func (c *VpnTunnelsAggregatedListCall) MaxResults(maxResults int64) *VpnTunnelsAggregatedListCall {
+	c.opt_["maxResults"] = maxResults
+	return c
+}
+
+// PageToken sets the optional parameter "pageToken": Tag returned by a
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
+func (c *VpnTunnelsAggregatedListCall) PageToken(pageToken string) *VpnTunnelsAggregatedListCall {
+	c.opt_["pageToken"] = pageToken
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *VpnTunnelsAggregatedListCall) Fields(s ...googleapi.Field) *VpnTunnelsAggregatedListCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *VpnTunnelsAggregatedListCall) Do() (*VpnTunnelAggregatedList, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["filter"]; ok {
+		params.Set("filter", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["maxResults"]; ok {
+		params.Set("maxResults", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["pageToken"]; ok {
+		params.Set("pageToken", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/aggregated/vpnTunnels")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *VpnTunnelAggregatedList
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Retrieves the list of VPN tunnels grouped by scope.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.vpnTunnels.aggregatedList",
+	//   "parameterOrder": [
+	//     "project"
+	//   ],
+	//   "parameters": {
+	//     "filter": {
+	//       "description": "Filter expression for filtering listed resources.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxResults": {
+	//       "default": "500",
+	//       "description": "Maximum count of results to be returned.",
+	//       "format": "uint32",
+	//       "location": "query",
+	//       "maximum": "500",
+	//       "minimum": "0",
+	//       "type": "integer"
+	//     },
+	//     "pageToken": {
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/aggregated/vpnTunnels",
+	//   "response": {
+	//     "$ref": "VpnTunnelAggregatedList"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
+// method id "compute.vpnTunnels.delete":
+
+type VpnTunnelsDeleteCall struct {
+	s         *Service
+	project   string
+	region    string
+	vpnTunnel string
+	opt_      map[string]interface{}
+}
+
+// Delete: Deletes the specified VpnTunnel resource.
+func (r *VpnTunnelsService) Delete(project string, region string, vpnTunnel string) *VpnTunnelsDeleteCall {
+	c := &VpnTunnelsDeleteCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.vpnTunnel = vpnTunnel
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *VpnTunnelsDeleteCall) Fields(s ...googleapi.Field) *VpnTunnelsDeleteCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *VpnTunnelsDeleteCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/vpnTunnels/{vpnTunnel}")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("DELETE", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":   c.project,
+		"region":    c.region,
+		"vpnTunnel": c.vpnTunnel,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Deletes the specified VpnTunnel resource.",
+	//   "httpMethod": "DELETE",
+	//   "id": "compute.vpnTunnels.delete",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region",
+	//     "vpnTunnel"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "vpnTunnel": {
+	//       "description": "Name of the VpnTunnel resource to delete.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/vpnTunnels/{vpnTunnel}",
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.vpnTunnels.get":
+
+type VpnTunnelsGetCall struct {
+	s         *Service
+	project   string
+	region    string
+	vpnTunnel string
+	opt_      map[string]interface{}
+}
+
+// Get: Returns the specified VpnTunnel resource.
+func (r *VpnTunnelsService) Get(project string, region string, vpnTunnel string) *VpnTunnelsGetCall {
+	c := &VpnTunnelsGetCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.vpnTunnel = vpnTunnel
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *VpnTunnelsGetCall) Fields(s ...googleapi.Field) *VpnTunnelsGetCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *VpnTunnelsGetCall) Do() (*VpnTunnel, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/vpnTunnels/{vpnTunnel}")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":   c.project,
+		"region":    c.region,
+		"vpnTunnel": c.vpnTunnel,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *VpnTunnel
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Returns the specified VpnTunnel resource.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.vpnTunnels.get",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region",
+	//     "vpnTunnel"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "vpnTunnel": {
+	//       "description": "Name of the VpnTunnel resource to return.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/vpnTunnels/{vpnTunnel}",
+	//   "response": {
+	//     "$ref": "VpnTunnel"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
+// method id "compute.vpnTunnels.insert":
+
+type VpnTunnelsInsertCall struct {
+	s         *Service
+	project   string
+	region    string
+	vpntunnel *VpnTunnel
+	opt_      map[string]interface{}
+}
+
+// Insert: Creates a VpnTunnel resource in the specified project and
+// region using the data included in the request.
+func (r *VpnTunnelsService) Insert(project string, region string, vpntunnel *VpnTunnel) *VpnTunnelsInsertCall {
+	c := &VpnTunnelsInsertCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	c.vpntunnel = vpntunnel
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *VpnTunnelsInsertCall) Fields(s ...googleapi.Field) *VpnTunnelsInsertCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *VpnTunnelsInsertCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	body, err := googleapi.WithoutDataWrapper.JSONReader(c.vpntunnel)
+	if err != nil {
+		return nil, err
+	}
+	ctype := "application/json"
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/vpnTunnels")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+		"region":  c.region,
+	})
+	req.Header.Set("Content-Type", ctype)
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Creates a VpnTunnel resource in the specified project and region using the data included in the request.",
+	//   "httpMethod": "POST",
+	//   "id": "compute.vpnTunnels.insert",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region"
+	//   ],
+	//   "parameters": {
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/vpnTunnels",
+	//   "request": {
+	//     "$ref": "VpnTunnel"
+	//   },
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.vpnTunnels.list":
+
+type VpnTunnelsListCall struct {
+	s       *Service
+	project string
+	region  string
+	opt_    map[string]interface{}
+}
+
+// List: Retrieves the list of VpnTunnel resources contained in the
+// specified project and region.
+func (r *VpnTunnelsService) List(project string, region string) *VpnTunnelsListCall {
+	c := &VpnTunnelsListCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.region = region
+	return c
+}
+
+// Filter sets the optional parameter "filter": Filter expression for
+// filtering listed resources.
+func (c *VpnTunnelsListCall) Filter(filter string) *VpnTunnelsListCall {
+	c.opt_["filter"] = filter
+	return c
+}
+
+// MaxResults sets the optional parameter "maxResults": Maximum count of
+// results to be returned.
+func (c *VpnTunnelsListCall) MaxResults(maxResults int64) *VpnTunnelsListCall {
+	c.opt_["maxResults"] = maxResults
+	return c
+}
+
+// PageToken sets the optional parameter "pageToken": Tag returned by a
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
+func (c *VpnTunnelsListCall) PageToken(pageToken string) *VpnTunnelsListCall {
+	c.opt_["pageToken"] = pageToken
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *VpnTunnelsListCall) Fields(s ...googleapi.Field) *VpnTunnelsListCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *VpnTunnelsListCall) Do() (*VpnTunnelList, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["filter"]; ok {
+		params.Set("filter", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["maxResults"]; ok {
+		params.Set("maxResults", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["pageToken"]; ok {
+		params.Set("pageToken", fmt.Sprintf("%v", v))
+	}
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/regions/{region}/vpnTunnels")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("GET", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project": c.project,
+		"region":  c.region,
+	})
+	req.Header.Set("User-Agent", c.s.userAgent())
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *VpnTunnelList
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "Retrieves the list of VpnTunnel resources contained in the specified project and region.",
+	//   "httpMethod": "GET",
+	//   "id": "compute.vpnTunnels.list",
+	//   "parameterOrder": [
+	//     "project",
+	//     "region"
+	//   ],
+	//   "parameters": {
+	//     "filter": {
+	//       "description": "Filter expression for filtering listed resources.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "maxResults": {
+	//       "default": "500",
+	//       "description": "Maximum count of results to be returned.",
+	//       "format": "uint32",
+	//       "location": "query",
+	//       "maximum": "500",
+	//       "minimum": "0",
+	//       "type": "integer"
+	//     },
+	//     "pageToken": {
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
+	//       "location": "query",
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "region": {
+	//       "description": "The name of the region for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/regions/{region}/vpnTunnels",
+	//   "response": {
+	//     "$ref": "VpnTunnelList"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute",
+	//     "https://www.googleapis.com/auth/compute.readonly"
+	//   ]
+	// }
+
+}
+
 // method id "compute.zoneOperations.delete":
 
 type ZoneOperationsDeleteCall struct {
@@ -17557,16 +19298,15 @@ func (c *ZoneOperationsListCall) Filter(filter string) *ZoneOperationsListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *ZoneOperationsListCall) MaxResults(maxResults int64) *ZoneOperationsListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *ZoneOperationsListCall) PageToken(pageToken string) *ZoneOperationsListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -17627,13 +19367,13 @@ func (c *ZoneOperationsListCall) Do() (*OperationList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -17641,7 +19381,7 @@ func (c *ZoneOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
@@ -17789,16 +19529,15 @@ func (c *ZonesListCall) Filter(filter string) *ZonesListCall {
 }
 
 // MaxResults sets the optional parameter "maxResults": Maximum count of
-// results to be returned. Maximum value is 500 and default value is
-// 500.
+// results to be returned.
 func (c *ZonesListCall) MaxResults(maxResults int64) *ZonesListCall {
 	c.opt_["maxResults"] = maxResults
 	return c
 }
 
 // PageToken sets the optional parameter "pageToken": Tag returned by a
-// previous list request truncated by maxResults. Used to continue a
-// previous list request.
+// previous list request when that list was truncated to maxResults.
+// Used to continue a previous list request.
 func (c *ZonesListCall) PageToken(pageToken string) *ZonesListCall {
 	c.opt_["pageToken"] = pageToken
 	return c
@@ -17857,13 +19596,13 @@ func (c *ZonesListCall) Do() (*ZoneList, error) {
 	//   ],
 	//   "parameters": {
 	//     "filter": {
-	//       "description": "Optional. Filter expression for filtering listed resources.",
+	//       "description": "Filter expression for filtering listed resources.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
 	//     "maxResults": {
 	//       "default": "500",
-	//       "description": "Optional. Maximum count of results to be returned. Maximum value is 500 and default value is 500.",
+	//       "description": "Maximum count of results to be returned.",
 	//       "format": "uint32",
 	//       "location": "query",
 	//       "maximum": "500",
@@ -17871,7 +19610,7 @@ func (c *ZonesListCall) Do() (*ZoneList, error) {
 	//       "type": "integer"
 	//     },
 	//     "pageToken": {
-	//       "description": "Optional. Tag returned by a previous list request truncated by maxResults. Used to continue a previous list request.",
+	//       "description": "Tag returned by a previous list request when that list was truncated to maxResults. Used to continue a previous list request.",
 	//       "location": "query",
 	//       "type": "string"
 	//     },
