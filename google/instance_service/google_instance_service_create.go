@@ -52,6 +52,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %#v", vm)
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %#v", err)
 		return "", api.NewVMCreationFailedError(true)
 	}
 
