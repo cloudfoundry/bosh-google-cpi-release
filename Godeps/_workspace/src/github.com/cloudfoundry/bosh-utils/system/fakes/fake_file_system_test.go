@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/bosh-agent/system/fakes"
+	. "github.com/cloudfoundry/bosh-utils/system/fakes"
 )
 
 var _ = Describe("FakeFileSystem", func() {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	osuser "os/user"
 	"path/filepath"
 	"strings"
 
@@ -12,8 +13,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/assert"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
-	. "github.com/cloudfoundry/bosh-agent/system"
+	. "github.com/cloudfoundry/bosh-utils/system"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
 func createOsFs() (fs FileSystem, runner CmdRunner) {
@@ -40,7 +41,28 @@ func init() {
 
 			homeDir, err := osFs.HomeDir("root")
 			Expect(err).ToNot(HaveOccurred())
-			assert.Contains(GinkgoT(), homeDir, "/root")
+			Expect(homeDir).To(ContainSubstring("/root"))
+		})
+
+		It("expand path", func() {
+			osFs, _ := createOsFs()
+
+			expandedPath, err := osFs.ExpandPath("~/fake-dir/fake-file.txt")
+			Expect(err).ToNot(HaveOccurred())
+
+			currentUser, err := osuser.Current()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(expandedPath).To(Equal(currentUser.HomeDir + "/fake-dir/fake-file.txt"))
+
+			expandedPath, err = osFs.ExpandPath("/fake-dir//fake-file.txt")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(expandedPath).To(Equal("/fake-dir/fake-file.txt"))
+
+			expandedPath, err = osFs.ExpandPath("./fake-file.txt")
+			Expect(err).ToNot(HaveOccurred())
+			currentDir, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(expandedPath).To(Equal(currentDir + "/fake-file.txt"))
 		})
 
 		It("mkdir all", func() {
@@ -394,7 +416,7 @@ func init() {
 		Describe("CopyFile", func() {
 			It("copies file", func() {
 				osFs, _ := createOsFs()
-				srcPath := "../Fixtures/test_copy_dir_entries/foo.txt"
+				srcPath := "test_assets/test_copy_dir_entries/foo.txt"
 				dstFile, err := osFs.TempFile("CopyFileTestFile")
 				Expect(err).ToNot(HaveOccurred())
 				defer os.Remove(dstFile.Name())
@@ -451,7 +473,7 @@ func init() {
 
 			It("recursively copies directory contents", func() {
 				osFs, _ := createOsFs()
-				srcPath := "../Fixtures/test_copy_dir_entries"
+				srcPath := "test_assets/test_copy_dir_entries"
 				dstPath, err := osFs.TempDir("CopyDirTestDir")
 				Expect(err).ToNot(HaveOccurred())
 				defer osFs.RemoveAll(dstPath)
@@ -472,7 +494,7 @@ func init() {
 
 			It("does not leak file descriptors", func() {
 				osFs, _ := createOsFs()
-				srcPath := "../Fixtures/test_copy_dir_entries"
+				srcPath := "test_assets/test_copy_dir_entries"
 				dstPath, err := osFs.TempDir("CopyDirTestDir")
 				Expect(err).ToNot(HaveOccurred())
 				defer osFs.RemoveAll(dstPath)

@@ -3,7 +3,7 @@ package registry
 import (
 	"fmt"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 // ClientOptions are the options used to create a BOSH Registry client.

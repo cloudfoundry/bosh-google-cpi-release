@@ -5,7 +5,7 @@ import (
 
 	"github.com/frodenas/bosh-registry/client"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
 func Example() {

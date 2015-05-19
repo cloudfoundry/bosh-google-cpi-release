@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/bosh-agent/logger"
+	. "github.com/cloudfoundry/bosh-utils/logger"
 )
 
 func expectedLogFormat(tag, msg string) string {

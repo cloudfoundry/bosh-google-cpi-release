@@ -12,9 +12,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
-	. "github.com/cloudfoundry/bosh-agent/system"
-	fakesys "github.com/cloudfoundry/bosh-agent/system/fakes"
+	. "github.com/cloudfoundry/bosh-utils/system"
+	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
 
 func init() {
@@ -32,11 +32,11 @@ func init() {
 				cmd := Command{
 					Name:       "ls",
 					Args:       []string{"-l"},
-					WorkingDir: "..",
+					WorkingDir: ".",
 				}
 				stdout, stderr, status, err := runner.RunComplexCommand(cmd)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(stdout).To(ContainSubstring("README.md"))
+				Expect(stdout).To(ContainSubstring("exec_cmd_runner_fixtures"))
 				Expect(stdout).To(ContainSubstring("total"))
 				Expect(stderr).To(BeEmpty())
 				Expect(status).To(Equal(0))

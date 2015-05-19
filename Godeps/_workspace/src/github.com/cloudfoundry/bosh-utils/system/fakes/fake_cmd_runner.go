@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	boshsys "github.com/cloudfoundry/bosh-agent/system"
+	boshsys "github.com/cloudfoundry/bosh-utils/system"
 )
 
 type FakeCmdRunner struct {

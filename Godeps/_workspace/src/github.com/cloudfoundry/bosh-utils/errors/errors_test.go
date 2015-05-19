@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/cloudfoundry/bosh-agent/errors"
+	. "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 type testShortError struct {
