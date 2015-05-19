@@ -153,6 +153,10 @@ func (i GoogleInstanceService) createSchedulingParams(
 	onHostMaintenance string,
 	preemptible bool,
 ) *compute.Scheduling {
+	if preemptible {
+		return &compute.Scheduling{Preemptible: preemptible}
+	}
+
 	scheduling := &compute.Scheduling{
 		AutomaticRestart:  automaticRestart,
 		OnHostMaintenance: onHostMaintenance,
