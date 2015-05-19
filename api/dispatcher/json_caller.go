@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
 )

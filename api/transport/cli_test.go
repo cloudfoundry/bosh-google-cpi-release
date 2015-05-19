@@ -9,7 +9,7 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/api/transport"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	fakedisp "github.com/frodenas/bosh-google-cpi/api/dispatcher/fakes"
 )

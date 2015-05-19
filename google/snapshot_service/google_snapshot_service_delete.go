@@ -1,7 +1,7 @@
 package snapshot
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 func (s GoogleSnapshotService) Delete(id string) error {

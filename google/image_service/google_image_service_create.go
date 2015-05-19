@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"

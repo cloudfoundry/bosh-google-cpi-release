@@ -1,8 +1,8 @@
 package image
 
 import (
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
-	boshuuid "github.com/cloudfoundry/bosh-agent/uuid"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
 	"google.golang.org/api/compute/v1"

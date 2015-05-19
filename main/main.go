@@ -4,9 +4,9 @@ import (
 	"flag"
 	"os"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
-	boshsys "github.com/cloudfoundry/bosh-agent/system"
-	boshuuid "github.com/cloudfoundry/bosh-agent/uuid"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	boshsys "github.com/cloudfoundry/bosh-utils/system"
+	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
 	bgcdisp "github.com/frodenas/bosh-google-cpi/api/dispatcher"

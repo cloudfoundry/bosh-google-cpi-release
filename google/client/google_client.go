@@ -1,7 +1,7 @@
 package client
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"golang.org/x/oauth2"
 	oauthgoogle "golang.org/x/oauth2/google"

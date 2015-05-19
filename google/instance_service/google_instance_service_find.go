@@ -3,7 +3,7 @@ package instance
 import (
 	"fmt"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"github.com/frodenas/bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"

@@ -1,7 +1,7 @@
 package targetpool
 
 import (
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
 	"google.golang.org/api/compute/v1"

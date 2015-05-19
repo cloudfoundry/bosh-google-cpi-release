@@ -3,7 +3,7 @@ package address
 import (
 	"fmt"
 
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 func (a GoogleAddressService) FindByIP(ipAddress string) (Address, bool, error) {

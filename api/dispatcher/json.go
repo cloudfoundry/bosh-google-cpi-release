@@ -3,7 +3,7 @@ package dispatcher
 import (
 	"encoding/json"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
 	bgcapi "github.com/frodenas/bosh-google-cpi/api"

@@ -8,7 +8,7 @@ import (
 
 	. "github.com/frodenas/bosh-google-cpi/api/dispatcher"
 
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	fakeaction "github.com/frodenas/bosh-google-cpi/action/fakes"
 	fakedisp "github.com/frodenas/bosh-google-cpi/api/dispatcher/fakes"

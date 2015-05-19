@@ -1,7 +1,7 @@
 package image
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-agent/errors"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"google.golang.org/api/googleapi"
 )

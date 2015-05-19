@@ -1,8 +1,8 @@
 package instance
 
 import (
-	boshlog "github.com/cloudfoundry/bosh-agent/logger"
-	boshuuid "github.com/cloudfoundry/bosh-agent/uuid"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
