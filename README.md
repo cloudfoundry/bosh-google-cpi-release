@@ -55,8 +55,8 @@ releases:
     url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=164
     sha1: 619385f93dc67f2b67f332a90bdf5d5b36842d7f
   - name: bosh-google-cpi
-    url: http://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-2.tgz
-    sha1: 6064545fe4f29500e28b94c747bb9cfc8bfd785a
+    url: http://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-3.tgz
+    sha1: eab558108a1ed9a3508fba3d10b9f71551d64709
 
 resource_pools:
   - name: vms
