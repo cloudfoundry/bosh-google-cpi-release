@@ -27,7 +27,7 @@ case $1 in
 
     exec chpst -u ${RUNAS}:${RUNAS} \
       ${PACKAGE_DIR}/bin/bosh-registry \
-      -configPath=${JOB_DIR}/config/registry.json \
+      -configFile=${JOB_DIR}/config/registry.json \
       >>${LOG_DIR}/registry.stdout.log \
       2>>${LOG_DIR}/registry.stderr.log
     ;;
