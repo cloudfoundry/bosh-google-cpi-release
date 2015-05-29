@@ -52,6 +52,12 @@ var _ = Describe("NewConfigFromPath", func() {
 		fs = fakesys.NewFakeFileSystem()
 	})
 
+	It("returns error if config is empty", func() {
+		_, err := NewConfigFromPath("", fs)
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring("Must provide a config file"))
+	})
+
 	It("returns error if config is not valid", func() {
 		err := fs.WriteFileString("/config.json", "{}")
 		Expect(err).ToNot(HaveOccurred())

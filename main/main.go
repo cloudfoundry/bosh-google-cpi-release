@@ -18,7 +18,7 @@ import (
 const mainLogTag = "main"
 
 var (
-	configPathOpt = flag.String("configPath", "", "Path to configuration file")
+	configFileOpt = flag.String("configFile", "", "Path to configuration file")
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 
 	flag.Parse()
 
-	config, err := NewConfigFromPath(*configPathOpt, fs)
+	config, err := NewConfigFromPath(*configFileOpt, fs)
 	if err != nil {
 		logger.Error(mainLogTag, "Loading config - %s", err.Error())
 		os.Exit(1)

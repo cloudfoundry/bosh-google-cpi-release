@@ -83,7 +83,7 @@ Create a configuration file:
 Run the cpi using the previously created configuration file:
 
 ```
-$ echo "{\"method\": \"method_name\", \"arguments\": []}" | cpi -configPath="/path/to/configuration_file.json"
+$ echo "{\"method\": \"method_name\", \"arguments\": []}" | cpi -configFile="/path/to/configuration_file.json"
 ```
 
 ## Features
