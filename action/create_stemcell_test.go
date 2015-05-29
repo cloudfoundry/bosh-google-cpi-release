@@ -17,13 +17,13 @@ var _ = Describe("CreateStemcell", func() {
 		stemcellCID StemcellCID
 		cloudProps  StemcellCloudProperties
 
-		stemcellService *imagefakes.FakeImageService
-		createStemcell  CreateStemcell
+		imageService   *imagefakes.FakeImageService
+		createStemcell CreateStemcell
 	)
 
 	BeforeEach(func() {
-		stemcellService = &imagefakes.FakeImageService{}
-		createStemcell = NewCreateStemcell(stemcellService)
+		imageService = &imagefakes.FakeImageService{}
+		createStemcell = NewCreateStemcell(imageService)
 	})
 
 	Describe("Run", func() {
@@ -44,61 +44,61 @@ var _ = Describe("CreateStemcell", func() {
 				_, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("Invalid 'fake-insfrastructure' infrastructure"))
-				Expect(stemcellService.CreateFromTarballCalled).To(BeFalse())
-				Expect(stemcellService.CreateFromURLCalled).To(BeFalse())
+				Expect(imageService.CreateFromTarballCalled).To(BeFalse())
+				Expect(imageService.CreateFromURLCalled).To(BeFalse())
 			})
 		})
 
 		Context("from a source url", func() {
 			BeforeEach(func() {
 				cloudProps.SourceURL = "fake-source-url"
-				stemcellService.CreateFromURLID = "fake-stemcell-id"
+				imageService.CreateFromURLID = "fake-stemcell-id"
 			})
 
 			It("creates the stemcell", func() {
 				stemcellCID, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(stemcellService.CreateFromURLCalled).To(BeTrue())
-				Expect(stemcellService.CreateFromTarballCalled).To(BeFalse())
+				Expect(imageService.CreateFromURLCalled).To(BeTrue())
+				Expect(imageService.CreateFromTarballCalled).To(BeFalse())
 				Expect(stemcellCID).To(Equal(StemcellCID("fake-stemcell-id")))
-				Expect(stemcellService.CreateFromURLSourceURL).To(Equal("fake-source-url"))
-				Expect(stemcellService.CreateFromURLDescription).To(Equal("fake-stemcell-name/fake-stemcell-version"))
+				Expect(imageService.CreateFromURLSourceURL).To(Equal("fake-source-url"))
+				Expect(imageService.CreateFromURLDescription).To(Equal("fake-stemcell-name/fake-stemcell-version"))
 			})
 
-			It("returns an error if stemcellService create from tarball call returns an error", func() {
-				stemcellService.CreateFromURLErr = errors.New("fake-stemcell-service-error")
+			It("returns an error if imageService create from tarball call returns an error", func() {
+				imageService.CreateFromURLErr = errors.New("fake-image-service-error")
 
 				_, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("fake-stemcell-service-error"))
-				Expect(stemcellService.CreateFromURLCalled).To(BeTrue())
-				Expect(stemcellService.CreateFromTarballCalled).To(BeFalse())
+				Expect(err.Error()).To(ContainSubstring("fake-image-service-error"))
+				Expect(imageService.CreateFromURLCalled).To(BeTrue())
+				Expect(imageService.CreateFromTarballCalled).To(BeFalse())
 			})
 		})
 
 		Context("from a stemcell tarball", func() {
 			BeforeEach(func() {
-				stemcellService.CreateFromTarballID = "fake-stemcell-id"
+				imageService.CreateFromTarballID = "fake-stemcell-id"
 			})
 
 			It("creates the stemcell", func() {
 				stemcellCID, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(stemcellService.CreateFromTarballCalled).To(BeTrue())
-				Expect(stemcellService.CreateFromURLCalled).To(BeFalse())
+				Expect(imageService.CreateFromTarballCalled).To(BeTrue())
+				Expect(imageService.CreateFromURLCalled).To(BeFalse())
 				Expect(stemcellCID).To(Equal(StemcellCID("fake-stemcell-id")))
-				Expect(stemcellService.CreateFromTarballImagePath).To(Equal("fake-stemcell-tarball"))
-				Expect(stemcellService.CreateFromTarballDescription).To(Equal("fake-stemcell-name/fake-stemcell-version"))
+				Expect(imageService.CreateFromTarballImagePath).To(Equal("fake-stemcell-tarball"))
+				Expect(imageService.CreateFromTarballDescription).To(Equal("fake-stemcell-name/fake-stemcell-version"))
 			})
 
-			It("returns an error if stemcellService create from tarball call returns an error", func() {
-				stemcellService.CreateFromTarballErr = errors.New("fake-stemcell-service-error")
+			It("returns an error if imageService create from tarball call returns an error", func() {
+				imageService.CreateFromTarballErr = errors.New("fake-stemcell-service-error")
 
 				_, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("fake-stemcell-service-error"))
-				Expect(stemcellService.CreateFromTarballCalled).To(BeTrue())
-				Expect(stemcellService.CreateFromURLCalled).To(BeFalse())
+				Expect(imageService.CreateFromTarballCalled).To(BeTrue())
+				Expect(imageService.CreateFromURLCalled).To(BeFalse())
 			})
 		})
 	})

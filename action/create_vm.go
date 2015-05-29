@@ -18,8 +18,8 @@ type CreateVM struct {
 	vmService          instance.Service
 	diskService        disk.Service
 	diskTypeService    disktype.Service
+	imageService       image.Service
 	machineTypeService machinetype.Service
-	stemcellService    image.Service
 	registryClient     registry.Client
 	registryOptions    registry.ClientOptions
 	agentOptions       registry.AgentOptions
@@ -30,8 +30,8 @@ func NewCreateVM(
 	vmService instance.Service,
 	diskService disk.Service,
 	diskTypeService disktype.Service,
+	imageService image.Service,
 	machineTypeService machinetype.Service,
-	stemcellService image.Service,
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
@@ -41,8 +41,8 @@ func NewCreateVM(
 		vmService:          vmService,
 		diskService:        diskService,
 		diskTypeService:    diskTypeService,
+		imageService:       imageService,
 		machineTypeService: machineTypeService,
-		stemcellService:    stemcellService,
 		registryClient:     registryClient,
 		registryOptions:    registryOptions,
 		agentOptions:       agentOptions,
@@ -78,7 +78,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Find stemcell
-	stemcell, found, err := cv.stemcellService.Find(string(stemcellCID))
+	stemcell, found, err := cv.imageService.Find(string(stemcellCID))
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating vm")
 	}

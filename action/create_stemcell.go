@@ -11,14 +11,14 @@ import (
 const googleInfrastructure = "google"
 
 type CreateStemcell struct {
-	stemcellService image.Service
+	imageService image.Service
 }
 
 func NewCreateStemcell(
-	stemcellService image.Service,
+	imageService image.Service,
 ) CreateStemcell {
 	return CreateStemcell{
-		stemcellService: stemcellService,
+		imageService: imageService,
 	}
 }
 
@@ -35,9 +35,9 @@ func (cs CreateStemcell) Run(stemcellPath string, cloudProps StemcellCloudProper
 	}
 
 	if cloudProps.SourceURL != "" {
-		stemcell, err = cs.stemcellService.CreateFromURL(cloudProps.SourceURL, description)
+		stemcell, err = cs.imageService.CreateFromURL(cloudProps.SourceURL, description)
 	} else {
-		stemcell, err = cs.stemcellService.CreateFromTarball(stemcellPath, description)
+		stemcell, err = cs.imageService.CreateFromTarball(stemcellPath, description)
 	}
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating stemcell")

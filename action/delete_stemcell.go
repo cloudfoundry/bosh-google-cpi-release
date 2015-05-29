@@ -7,19 +7,19 @@ import (
 )
 
 type DeleteStemcell struct {
-	stemcellService image.Service
+	imageService image.Service
 }
 
 func NewDeleteStemcell(
-	stemcellService image.Service,
+	imageService image.Service,
 ) DeleteStemcell {
 	return DeleteStemcell{
-		stemcellService: stemcellService,
+		imageService: imageService,
 	}
 }
 
 func (ds DeleteStemcell) Run(stemcellCID StemcellCID) (interface{}, error) {
-	if err := ds.stemcellService.Delete(string(stemcellCID)); err != nil {
+	if err := ds.imageService.Delete(string(stemcellCID)); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Deleting stemcell '%s'", stemcellCID)
 	}
 

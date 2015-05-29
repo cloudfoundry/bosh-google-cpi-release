@@ -15,30 +15,30 @@ var _ = Describe("DeleteStemcell", func() {
 	var (
 		err error
 
-		stemcellService *imagefakes.FakeImageService
+		imageService *imagefakes.FakeImageService
 
 		deleteStemcell DeleteStemcell
 	)
 
 	BeforeEach(func() {
-		stemcellService = &imagefakes.FakeImageService{}
-		deleteStemcell = NewDeleteStemcell(stemcellService)
+		imageService = &imagefakes.FakeImageService{}
+		deleteStemcell = NewDeleteStemcell(imageService)
 	})
 
 	Describe("Run", func() {
 		It("deletes the stemcell", func() {
 			_, err = deleteStemcell.Run("fake-stemcell-id")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(stemcellService.DeleteCalled).To(BeTrue())
+			Expect(imageService.DeleteCalled).To(BeTrue())
 		})
 
-		It("returns an error if stemcellService delete call returns an error", func() {
-			stemcellService.DeleteErr = errors.New("fake-stemcell-service-error")
+		It("returns an error if imageService delete call returns an error", func() {
+			imageService.DeleteErr = errors.New("fake-image-service-error")
 
 			_, err = deleteStemcell.Run("fake-stemcell-id")
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("fake-stemcell-service-error"))
-			Expect(stemcellService.DeleteCalled).To(BeTrue())
+			Expect(err.Error()).To(ContainSubstring("fake-image-service-error"))
+			Expect(imageService.DeleteCalled).To(BeTrue())
 		})
 	})
 })

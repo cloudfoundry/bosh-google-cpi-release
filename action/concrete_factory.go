@@ -56,6 +56,15 @@ func NewConcreteFactory(
 		logger,
 	)
 
+	imageService := image.NewGoogleImageService(
+		googleClient.Project(),
+		googleClient.ComputeService(),
+		googleClient.StorageService(),
+		operationService,
+		uuidGen,
+		logger,
+	)
+
 	machineTypeService := machinetype.NewGoogleMachineTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
@@ -76,15 +85,6 @@ func NewConcreteFactory(
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
-		operationService,
-		uuidGen,
-		logger,
-	)
-
-	stemcellService := image.NewGoogleImageService(
-		googleClient.Project(),
-		googleClient.ComputeService(),
-		googleClient.StorageService(),
 		operationService,
 		uuidGen,
 		logger,
@@ -126,16 +126,16 @@ func NewConcreteFactory(
 			"delete_snapshot": NewDeleteSnapshot(snapshotService),
 
 			// Stemcell management
-			"create_stemcell": NewCreateStemcell(stemcellService),
-			"delete_stemcell": NewDeleteStemcell(stemcellService),
+			"create_stemcell": NewCreateStemcell(imageService),
+			"delete_stemcell": NewDeleteStemcell(imageService),
 
 			// VM management
 			"create_vm": NewCreateVM(
 				vmService,
 				diskService,
 				diskTypeService,
+				imageService,
 				machineTypeService,
-				stemcellService,
 				registryClient,
 				options.Registry,
 				options.Agent,

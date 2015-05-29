@@ -49,11 +49,11 @@ var _ = Describe("ConcreteFactory", func() {
 		addressService     address.Service
 		diskService        disk.Service
 		diskTypeService    disktype.Service
+		imageService       image.Service
 		machineTypeService machinetype.Service
 		networkService     network.Service
 		snapshotService    snapshot.Service
 		registryClient     registry.Client
-		stemcellService    image.Service
 		targetPoolService  targetpool.Service
 		vmService          instance.Service
 	)
@@ -98,6 +98,15 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
+		imageService = image.NewGoogleImageService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			googleClient.StorageService(),
+			operationService,
+			uuidGen,
+			logger,
+		)
+
 		machineTypeService = machinetype.NewGoogleMachineTypeService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
@@ -118,15 +127,6 @@ var _ = Describe("ConcreteFactory", func() {
 		snapshotService = snapshot.NewGoogleSnapshotService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
-			operationService,
-			uuidGen,
-			logger,
-		)
-
-		stemcellService = image.NewGoogleImageService(
-			googleClient.Project(),
-			googleClient.ComputeService(),
-			googleClient.StorageService(),
 			operationService,
 			uuidGen,
 			logger,
@@ -201,13 +201,13 @@ var _ = Describe("ConcreteFactory", func() {
 	It("create_stemcell", func() {
 		action, err := factory.Create("create_stemcell")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateStemcell(stemcellService)))
+		Expect(action).To(Equal(NewCreateStemcell(imageService)))
 	})
 
 	It("delete_stemcell", func() {
 		action, err := factory.Create("delete_stemcell")
 		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteStemcell(stemcellService)))
+		Expect(action).To(Equal(NewDeleteStemcell(imageService)))
 	})
 
 	It("create_vm", func() {
@@ -217,8 +217,8 @@ var _ = Describe("ConcreteFactory", func() {
 			vmService,
 			diskService,
 			diskTypeService,
+			imageService,
 			machineTypeService,
-			stemcellService,
 			registryClient,
 			options.Registry,
 			options.Agent,
