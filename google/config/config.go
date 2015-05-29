@@ -1,0 +1,27 @@
+package config
+
+import (
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+)
+
+type Config struct {
+	Project     string `json:"project"`
+	JSONKey     string `json:"json_key"`
+	DefaultZone string `json:"default_zone"`
+}
+
+func (c Config) Validate() error {
+	if c.Project == "" {
+		return bosherr.Error("Must provide a non-empty Project")
+	}
+
+	if c.JSONKey == "" {
+		return bosherr.Error("Must provide a non-empty JSONKey")
+	}
+
+	if c.DefaultZone == "" {
+		return bosherr.Error("Must provide a non-empty DefaultZone")
+	}
+
+	return nil
+}

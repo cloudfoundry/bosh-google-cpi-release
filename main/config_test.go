@@ -11,11 +11,12 @@ import (
 	. "github.com/frodenas/bosh-google-cpi/main"
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
+	bgcconfig "github.com/frodenas/bosh-google-cpi/google/config"
 
 	"github.com/frodenas/bosh-registry/client"
 )
 
-var validGoogleConfig = GoogleConfig{
+var validGoogleConfig = bgcconfig.Config{
 	Project:     "fake-project",
 	JSONKey:     "{}",
 	DefaultZone: "fake-default-zone",
@@ -104,7 +105,7 @@ var _ = Describe("Config", func() {
 		})
 
 		It("returns error if goole section is not valid", func() {
-			config.Google.Project = ""
+			config.Google = bgcconfig.Config{}
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
@@ -118,47 +119,6 @@ var _ = Describe("Config", func() {
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Validating Actions configuration"))
-		})
-	})
-})
-
-var _ = Describe("GoogleConfig", func() {
-	var (
-		config GoogleConfig
-	)
-
-	Describe("Validate", func() {
-		BeforeEach(func() {
-			config = validGoogleConfig
-		})
-
-		It("does not return error if all fields are valid", func() {
-			err := config.Validate()
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		It("returns error if Project is empty", func() {
-			config.Project = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty Project"))
-		})
-
-		It("returns error if JSONKey is empty", func() {
-			config.JSONKey = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty JSONKey"))
-		})
-
-		It("returns error if DefaultZone is empty", func() {
-			config.DefaultZone = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty DefaultZone"))
 		})
 	})
 })

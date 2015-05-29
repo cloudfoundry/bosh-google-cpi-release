@@ -7,18 +7,13 @@ import (
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 
 	bgcaction "github.com/frodenas/bosh-google-cpi/action"
+	bogcconfig "github.com/frodenas/bosh-google-cpi/google/config"
 )
 
 type Config struct {
-	Google GoogleConfig
+	Google bogcconfig.Config
 
 	Actions bgcaction.ConcreteFactoryOptions
-}
-
-type GoogleConfig struct {
-	Project     string `json:"project"`
-	JSONKey     string `json:"json_key"`
-	DefaultZone string `json:"default_zone"`
 }
 
 func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error) {
@@ -51,22 +46,6 @@ func (c Config) Validate() error {
 
 	if err := c.Actions.Validate(); err != nil {
 		return bosherr.WrapError(err, "Validating Actions configuration")
-	}
-
-	return nil
-}
-
-func (c GoogleConfig) Validate() error {
-	if c.Project == "" {
-		return bosherr.Error("Must provide a non-empty Project")
-	}
-
-	if c.JSONKey == "" {
-		return bosherr.Error("Must provide a non-empty JSONKey")
-	}
-
-	if c.DefaultZone == "" {
-		return bosherr.Error("Must provide a non-empty DefaultZone")
 	}
 
 	return nil
