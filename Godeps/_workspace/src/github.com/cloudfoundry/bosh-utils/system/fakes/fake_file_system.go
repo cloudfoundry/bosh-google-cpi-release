@@ -11,7 +11,7 @@ import (
 	"strings"
 	"sync"
 
-	gouuid "github.com/nu7hatch/gouuid"
+	gouuid "github.com/cloudfoundry/bosh-utils/internal/github.com/nu7hatch/gouuid"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"

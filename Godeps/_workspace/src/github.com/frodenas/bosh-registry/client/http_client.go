@@ -87,14 +87,12 @@ func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 	}
 
 	var settingsResponse agentSettingsResponse
-	err = json.Unmarshal(httpBody, &settingsResponse)
-	if err != nil {
+	if err = json.Unmarshal(httpBody, &settingsResponse); err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	}
 
 	var agentSettings AgentSettings
-	err = json.Unmarshal([]byte(settingsResponse.Settings), &agentSettings)
-	if err != nil {
+	if err = json.Unmarshal([]byte(settingsResponse.Settings), &agentSettings); err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	}
 

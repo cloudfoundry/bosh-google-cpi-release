@@ -30,8 +30,7 @@ func Example() {
 
 	// Set the agent settings for a VM
 	fmt.Printf("Updating settings for instance '%s' with '%#v'", instanceID, settings)
-	err = registryClient.Update(instanceID, settings)
-	if err != nil {
+	if err = registryClient.Update(instanceID, settings); err != nil {
 		fmt.Printf("Update call returned an error: %s", err)
 	}
 
@@ -43,8 +42,7 @@ func Example() {
 	fmt.Printf("Settings for instance '%s' are '%#v'", instanceID, settings)
 
 	// Delete the agent settings for a VM
-	err = registryClient.Delete(instanceID)
-	if err != nil {
+	if err = registryClient.Delete(instanceID); err != nil {
 		fmt.Printf("Delete call returned an error: %s", err)
 	}
 }

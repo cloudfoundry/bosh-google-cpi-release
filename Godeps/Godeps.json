@@ -7,65 +7,65 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-utils/errors",
-			"Rev": "860ec42f3966efe5cce25381aa4eb980b1da36b9"
+			"Rev": "d70e86451e700c2a63ca801472e0607b83b60c45"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/bosh-utils/internal/github.com/nu7hatch/gouuid",
+			"Rev": "d70e86451e700c2a63ca801472e0607b83b60c45"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-utils/logger",
-			"Rev": "860ec42f3966efe5cce25381aa4eb980b1da36b9"
+			"Rev": "d70e86451e700c2a63ca801472e0607b83b60c45"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-utils/system",
-			"Rev": "860ec42f3966efe5cce25381aa4eb980b1da36b9"
+			"Rev": "d70e86451e700c2a63ca801472e0607b83b60c45"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/bosh-utils/uuid",
-			"Rev": "860ec42f3966efe5cce25381aa4eb980b1da36b9"
+			"Rev": "d70e86451e700c2a63ca801472e0607b83b60c45"
 		},
 		{
 			"ImportPath": "github.com/frodenas/bosh-registry/client",
-			"Rev": "3c0c475b9ad5f9fe68844f2de069cfd7050fff1a"
-		},
-		{
-			"ImportPath": "github.com/nu7hatch/gouuid",
-			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+			"Rev": "a77a262442925da838fc820dcda4bfa93665f439"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.1.0-42-gdbb5c6c",
-			"Rev": "dbb5c6caf33238b57facc1d975b1aaca6b90288c"
+			"Comment": "v1.2.0-beta-17-gc5c7614",
+			"Rev": "c5c761488350e56a28c4a91da87e5db7020bedc8"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
-			"Comment": "v1.0-39-gc853a76",
-			"Rev": "c853a76367c700fe446c27bc7e6fc8209ee4e0a1"
+			"Comment": "v1.0-48-g766f404",
+			"Rev": "766f4042b942146e90594d145c5071fa92c0aa9a"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "bb64f4dc73d4ab97978d5e1cb34515dcc570361b"
+			"Rev": "589db58a47224e5786650dac2677b9c302bab6c2"
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2",
-			"Rev": "ce5ea7da934b76b1066c527632359e2b8f65db97"
+			"Rev": "b5adcc2dcdf009d0391547edc6ecbaff889f5bb9"
 		},
 		{
 			"ImportPath": "google.golang.org/api/compute/v1",
-			"Rev": "d4ab0b854f8606d689612515c3d18bd3b19d7e70"
+			"Rev": "d56f328dc27a4097cd0fc535e7c77807f48a2e84"
 		},
 		{
 			"ImportPath": "google.golang.org/api/googleapi",
-			"Rev": "d4ab0b854f8606d689612515c3d18bd3b19d7e70"
+			"Rev": "d56f328dc27a4097cd0fc535e7c77807f48a2e84"
 		},
 		{
 			"ImportPath": "google.golang.org/api/storage/v1",
-			"Rev": "d4ab0b854f8606d689612515c3d18bd3b19d7e70"
+			"Rev": "d56f328dc27a4097cd0fc535e7c77807f48a2e84"
 		},
 		{
 			"ImportPath": "google.golang.org/cloud/compute/metadata",
-			"Rev": "85af25d662fd52ccf57f08c97fb9a6b4bfb6e8d2"
+			"Rev": "0664cafa95f5a1ed8b54e79f0ecfdc53353fb28c"
 		},
 		{
 			"ImportPath": "google.golang.org/cloud/internal",
-			"Rev": "85af25d662fd52ccf57f08c97fb9a6b4bfb6e8d2"
+			"Rev": "0664cafa95f5a1ed8b54e79f0ecfdc53353fb28c"
 		}
 	]
 }
