@@ -30,8 +30,7 @@ type NetworkTags []string
 func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
 
 func (n Network) validateDynamic() error {
-	err := n.validateTags()
-	if err != nil {
+	if err := n.validateTags(); err != nil {
 		return err
 	}
 
@@ -70,8 +69,7 @@ func (n Networks) Validate() error {
 				return bosherr.Error("Only one dynamic network is allowed")
 			}
 
-			err := net.validateDynamic()
-			if err != nil {
+			if err := net.validateDynamic(); err != nil {
 				return err
 			}
 
@@ -83,8 +81,7 @@ func (n Networks) Validate() error {
 				return bosherr.Error("Only one VIP network is allowed")
 			}
 
-			err := net.validateVip()
-			if err != nil {
+			if err := net.validateVip(); err != nil {
 				return err
 			}
 

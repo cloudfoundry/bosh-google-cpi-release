@@ -26,8 +26,7 @@ func NewDetachDisk(
 
 func (dd DetachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	// Detach the disk
-	err := dd.vmService.DetachDisk(string(vmCID), string(diskCID))
-	if err != nil {
+	if err := dd.vmService.DetachDisk(string(vmCID), string(diskCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}
@@ -42,8 +41,7 @@ func (dd DetachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 
 	// Update VM agent settings
 	newAgentSettings := agentSettings.DetachPersistentDisk(string(diskCID))
-	err = dd.registryClient.Update(string(vmCID), newAgentSettings)
-	if err != nil {
+	if err = dd.registryClient.Update(string(vmCID), newAgentSettings); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Detaching disk '%s' from vm '%s", diskCID, vmCID)
 	}
 

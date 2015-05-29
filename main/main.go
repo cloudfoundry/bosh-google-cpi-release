@@ -42,8 +42,7 @@ func main() {
 
 	cli := bgctrans.NewCLI(os.Stdin, os.Stdout, dispatcher, logger)
 
-	err = cli.ServeOnce()
-	if err != nil {
+	if err = cli.ServeOnce(); err != nil {
 		logger.Error(mainLogTag, "Serving once %s", err)
 		os.Exit(1)
 	}

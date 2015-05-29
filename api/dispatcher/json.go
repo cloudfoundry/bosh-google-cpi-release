@@ -61,8 +61,7 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 
 	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", string(reqBytes))
 
-	err := json.Unmarshal(reqBytes, &req)
-	if err != nil {
+	if err := json.Unmarshal(reqBytes, &req); err != nil {
 		return c.buildCpiError("Must provide valid JSON payload")
 	}
 

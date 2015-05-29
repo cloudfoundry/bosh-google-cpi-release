@@ -148,8 +148,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}()
 
 	// Configure VM networks
-	err = cv.vmService.AddNetworkConfiguration(vm, vmNetworks)
-	if err != nil {
+	if err = cv.vmService.AddNetworkConfiguration(vm, vmNetworks); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return "", err
 		}
@@ -159,8 +158,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Create VM settings
 	agentNetworks := networks.AsRegistryNetworks()
 	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
-	err = cv.registryClient.Update(vm, agentSettings)
-	if err != nil {
+	if err = cv.registryClient.Update(vm, agentSettings); err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating VM")
 	}
 

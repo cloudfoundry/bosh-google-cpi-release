@@ -91,8 +91,7 @@ func (r JSONCaller) extractMethodArgs(runMethodType reflect.Type, args []interfa
 
 		argValuePtr := reflect.New(argType)
 
-		err = json.Unmarshal(rawArgBytes, argValuePtr.Interface())
-		if err != nil {
+		if err = json.Unmarshal(rawArgBytes, argValuePtr.Interface()); err != nil {
 			err = bosherr.WrapError(err, "Unmarshalling action argument")
 			return
 		}

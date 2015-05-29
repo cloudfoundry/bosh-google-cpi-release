@@ -42,8 +42,7 @@ func (t CLI) ServeOnce() error {
 
 	respBytes := t.dispatcher.Dispatch(reqBytes)
 
-	_, err = t.out.Write(respBytes)
-	if err != nil {
+	if _, err := t.out.Write(respBytes); err != nil {
 		t.logger.Error(cliLogTag, "Failed writing to OUT: %s", err)
 		return bosherr.WrapError(err, "Writing to OUT")
 	}

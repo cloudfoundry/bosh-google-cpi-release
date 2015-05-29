@@ -65,8 +65,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 }
 
 func (i GoogleInstanceService) CleanUp(id string) {
-	err := i.Delete(id)
-	if err != nil {
+	if err := i.Delete(id); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed cleaning up Google Instance '%s': %#v", id, err)
 	}
 }

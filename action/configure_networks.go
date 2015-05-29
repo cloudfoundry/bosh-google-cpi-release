@@ -32,8 +32,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	}
 
 	// Update networks
-	err := rv.vmService.UpdateNetworkConfiguration(string(vmCID), vmNetworks)
-	if err != nil {
+	if err := rv.vmService.UpdateNetworkConfiguration(string(vmCID), vmNetworks); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}
@@ -49,8 +48,7 @@ func (rv ConfigureNetworks) Run(vmCID VMCID, networks Networks) (interface{}, er
 	// Update VM agent settings
 	agentNetworks := networks.AsRegistryNetworks()
 	newAgentSettings := agentSettings.ConfigureNetworks(agentNetworks)
-	err = rv.registryClient.Update(string(vmCID), newAgentSettings)
-	if err != nil {
+	if err = rv.registryClient.Update(string(vmCID), newAgentSettings); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Configuring networks for vm '%s'", vmCID)
 	}
 

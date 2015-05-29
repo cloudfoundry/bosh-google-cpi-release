@@ -19,8 +19,7 @@ func NewDeleteSnapshot(
 }
 
 func (ds DeleteSnapshot) Run(snapshotCID SnapshotCID) (interface{}, error) {
-	err := ds.snapshotService.Delete(string(snapshotCID))
-	if err != nil {
+	if err := ds.snapshotService.Delete(string(snapshotCID)); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Deleting snapshot '%s'", snapshotCID)
 	}
 

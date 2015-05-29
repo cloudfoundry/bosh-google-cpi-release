@@ -40,8 +40,7 @@ func (d GoogleDiskService) Create(size int, diskType string, zone string) (strin
 }
 
 func (d GoogleDiskService) cleanUp(id string) {
-	err := d.Delete(id)
-	if err != nil {
+	if err := d.Delete(id); err != nil {
 		d.logger.Debug(googleDiskServiceLogTag, "Failed cleaning up Google Disk '%s': %#v", id, err)
 	}
 }

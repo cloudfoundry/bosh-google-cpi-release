@@ -20,8 +20,7 @@ func NewRebootVM(
 }
 
 func (rv RebootVM) Run(vmCID VMCID) (interface{}, error) {
-	err := rv.vmService.Reboot(string(vmCID))
-	if err != nil {
+	if err := rv.vmService.Reboot(string(vmCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}

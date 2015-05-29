@@ -40,8 +40,7 @@ func (s GoogleSnapshotService) Create(diskID string, description string, zone st
 }
 
 func (s GoogleSnapshotService) cleanUp(id string) {
-	err := s.Delete(id)
-	if err != nil {
+	if err := s.Delete(id); err != nil {
 		s.logger.Debug(googleSnapshotServiceLogTag, "Failed cleaning up Google Snapshot '%s': %#v", id, err)
 	}
 }

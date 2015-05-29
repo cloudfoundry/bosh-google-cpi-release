@@ -20,8 +20,7 @@ func NewDeleteDisk(
 }
 
 func (dd DeleteDisk) Run(diskCID DiskCID) (interface{}, error) {
-	err := dd.diskService.Delete(string(diskCID))
-	if err != nil {
+	if err := dd.diskService.Delete(string(diskCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}

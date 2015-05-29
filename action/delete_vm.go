@@ -26,8 +26,7 @@ func NewDeleteVM(
 
 func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	// Delete VM networks
-	err := dv.vmService.DeleteNetworkConfiguration(string(vmCID))
-	if err != nil {
+	if err := dv.vmService.DeleteNetworkConfiguration(string(vmCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}
@@ -35,8 +34,7 @@ func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	}
 
 	// Delete the VM
-	err = dv.vmService.Delete(string(vmCID))
-	if err != nil {
+	if err := dv.vmService.Delete(string(vmCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {
 			return nil, err
 		}
@@ -44,8 +42,7 @@ func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
 	}
 
 	// Delete the VM agent settings
-	err = dv.registryClient.Delete(string(vmCID))
-	if err != nil {
+	if err := dv.registryClient.Delete(string(vmCID)); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Deleting vm '%s'", vmCID)
 	}
 

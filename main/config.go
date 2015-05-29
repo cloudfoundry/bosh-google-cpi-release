@@ -33,13 +33,11 @@ func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error)
 		return config, bosherr.WrapErrorf(err, "Reading config file '%s'", configFile)
 	}
 
-	err = json.Unmarshal(bytes, &config)
-	if err != nil {
+	if err = json.Unmarshal(bytes, &config); err != nil {
 		return config, bosherr.WrapError(err, "Unmarshalling config contents")
 	}
 
-	err = config.Validate()
-	if err != nil {
+	if err = config.Validate(); err != nil {
 		return config, bosherr.WrapError(err, "Validating config")
 	}
 
@@ -47,13 +45,11 @@ func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error)
 }
 
 func (c Config) Validate() error {
-	err := c.Google.Validate()
-	if err != nil {
+	if err := c.Google.Validate(); err != nil {
 		return bosherr.WrapError(err, "Validating Google configuration")
 	}
 
-	err = c.Actions.Validate()
-	if err != nil {
+	if err := c.Actions.Validate(); err != nil {
 		return bosherr.WrapError(err, "Validating Actions configuration")
 	}
 
