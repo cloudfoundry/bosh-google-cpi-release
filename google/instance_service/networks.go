@@ -1,96 +1,39 @@
 package instance
 
 import (
-	"regexp"
-
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 const defaultNetworkName = "default"
-const maxTagLength = 63
 
 type Networks map[string]Network
 
-type Network struct {
-	Type                string
-	IP                  string
-	Gateway             string
-	Netmask             string
-	DNS                 []string
-	Default             []string
-	NetworkName         string
-	EphemeralExternalIP bool
-	IPForwarding        bool
-	Tags                NetworkTags
-	TargetPool          string
-}
-
-type NetworkTags []string
-
-func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
-
-func (n Network) validateDynamic() error {
-	if err := n.validateTags(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (n Network) validateTags() error {
-	if len(n.Tags) > 0 {
-		pattern, _ := regexp.Compile("^[A-Za-z]+[A-Za-z0-9-]*[A-Za-z0-9]+$")
-		for _, tag := range n.Tags {
-			if len(tag) > maxTagLength || !pattern.MatchString(tag) {
-				return bosherr.Errorf("Invalid tag '%s': does not comply with RFC1035", tag)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (n Network) IsVip() bool { return n.Type == "vip" }
-
-func (n Network) validateVip() error {
-	if n.IP == "" {
-		return bosherr.Error("VIP Network must have an IP address")
-	}
-
-	return nil
-}
-
 func (n Networks) Validate() error {
-	var dnet, vnet bool
+	var dynamicNetworks, vipNetworks int
 
-	for _, net := range n {
-		if net.IsDynamic() {
-			if dnet {
-				return bosherr.Error("Only one dynamic network is allowed")
-			}
-
-			if err := net.validateDynamic(); err != nil {
-				return err
-			}
-
-			dnet = true
+	for _, network := range n {
+		if err := network.Validate(); err != nil {
+			return err
 		}
 
-		if net.IsVip() {
-			if vnet {
-				return bosherr.Error("Only one VIP network is allowed")
-			}
-
-			if err := net.validateVip(); err != nil {
-				return err
-			}
-
-			vnet = true
+		switch {
+		case network.IsDynamic():
+			dynamicNetworks++
+		case network.IsVip():
+			vipNetworks++
 		}
 	}
 
-	if !dnet {
-		return bosherr.Error("At least one 'dynamic' network should be defined")
+	if dynamicNetworks == 0 {
+		return bosherr.Error("At least one Dynamic network should be defined")
+	}
+
+	if dynamicNetworks > 1 {
+		return bosherr.Error("Only one Dynamic network is allowed")
+	}
+
+	if vipNetworks > 1 {
+		return bosherr.Error("Only one VIP network is allowed")
 	}
 
 	return nil
