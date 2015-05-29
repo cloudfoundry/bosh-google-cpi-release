@@ -115,6 +115,9 @@ jobs:
 
     networks:
       - name: private
+        default:
+          - dns
+          - gateway
       - name: public
         static_ips:
           - __STATIC_IP__ # <--- Replace with the static IP
