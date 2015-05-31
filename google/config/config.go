@@ -5,9 +5,11 @@ import (
 )
 
 type Config struct {
-	Project     string `json:"project"`
-	JSONKey     string `json:"json_key"`
-	DefaultZone string `json:"default_zone"`
+	Project               string `json:"project"`
+	JSONKey               string `json:"json_key"`
+	DefaultRootDiskSizeGb int    `json:"default_root_disk_size_gb"`
+	DefaultRootDiskType   string `json:"default_root_disk_type"`
+	DefaultZone           string `json:"default_zone"`
 }
 
 func (c Config) Validate() error {

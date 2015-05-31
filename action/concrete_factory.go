@@ -139,6 +139,8 @@ func NewConcreteFactory(
 				registryClient,
 				options.Registry,
 				options.Agent,
+				googleClient.DefaultRootDiskSizeGb(),
+				googleClient.DefaultRootDiskType(),
 				googleClient.DefaultZone(),
 			),
 			"configure_networks": NewConfigureNetworks(vmService, registryClient),

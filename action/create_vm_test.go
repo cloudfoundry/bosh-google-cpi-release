@@ -34,6 +34,8 @@ var _ = Describe("CreateVM", func() {
 		cloudProps               VMCloudProperties
 		disks                    []DiskCID
 		env                      Environment
+		defaultRootDiskSizeGb    int
+		defaultRootDiskType      string
 		registryOptions          registry.ClientOptions
 		agentOptions             registry.AgentOptions
 		expectedVMProps          *instance.Properties
@@ -70,6 +72,8 @@ var _ = Describe("CreateVM", func() {
 				Type: "fake-blobstore-type",
 			},
 		}
+		defaultRootDiskSizeGb = 0
+		defaultRootDiskType = ""
 		createVM = NewCreateVM(
 			vmService,
 			diskService,
@@ -79,6 +83,8 @@ var _ = Describe("CreateVM", func() {
 			registryClient,
 			registryOptions,
 			agentOptions,
+			defaultRootDiskSizeGb,
+			defaultRootDiskType,
 			"fake-default-zone",
 		)
 	})
@@ -97,7 +103,7 @@ var _ = Describe("CreateVM", func() {
 			cloudProps = VMCloudProperties{
 				Zone:              "",
 				MachineType:       "fake-machine-type",
-				RootDiskSizeGb:    10,
+				RootDiskSizeGb:    0,
 				RootDiskType:      "",
 				AutomaticRestart:  true,
 				OnHostMaintenance: "TERMINATE",
@@ -127,7 +133,7 @@ var _ = Describe("CreateVM", func() {
 				Zone:              "fake-default-zone",
 				Stemcell:          "fake-image-self-link",
 				MachineType:       "fake-machine-type-self-link",
-				RootDiskSizeGb:    10,
+				RootDiskSizeGb:    0,
 				RootDiskType:      "",
 				AutomaticRestart:  true,
 				OnHostMaintenance: "TERMINATE",
@@ -309,7 +315,110 @@ var _ = Describe("CreateVM", func() {
 			Expect(registryClient.UpdateCalled).To(BeTrue())
 		})
 
-		Context("when root disk type is set", func() {
+		Context("when default root disk size is set", func() {
+			BeforeEach(func() {
+				defaultRootDiskSizeGb = 20
+				expectedVMProps.RootDiskSizeGb = 20
+				createVM = NewCreateVM(
+					vmService,
+					diskService,
+					diskTypeService,
+					imageService,
+					machineTypeService,
+					registryClient,
+					registryOptions,
+					agentOptions,
+					defaultRootDiskSizeGb,
+					defaultRootDiskType,
+					"fake-default-zone",
+				)
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeTrue())
+				Expect(registryClient.UpdateCalled).To(BeTrue())
+				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+			})
+		})
+
+		Context("when cloud properties root disk size is set", func() {
+			BeforeEach(func() {
+				cloudProps.RootDiskSizeGb = 20
+				expectedVMProps.RootDiskSizeGb = 20
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeTrue())
+				Expect(registryClient.UpdateCalled).To(BeTrue())
+				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+			})
+		})
+
+		Context("when default root disk type is set", func() {
+			BeforeEach(func() {
+				diskTypeService.FindFound = true
+				defaultRootDiskType = "fake-default-root-disk-type"
+				diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-default-root-disk-type-self-link"}
+				expectedVMProps.RootDiskType = "fake-default-root-disk-type-self-link"
+				createVM = NewCreateVM(
+					vmService,
+					diskService,
+					diskTypeService,
+					imageService,
+					machineTypeService,
+					registryClient,
+					registryOptions,
+					agentOptions,
+					defaultRootDiskSizeGb,
+					defaultRootDiskType,
+					"fake-default-zone",
+				)
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeTrue())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeTrue())
+				Expect(registryClient.UpdateCalled).To(BeTrue())
+				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+			})
+		})
+
+		Context("when cloud properties root disk type is set", func() {
 			BeforeEach(func() {
 				diskTypeService.FindFound = true
 				cloudProps.RootDiskType = "fake-root-disk-type"

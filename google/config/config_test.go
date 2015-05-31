@@ -8,9 +8,11 @@ import (
 )
 
 var validConfig = Config{
-	Project:     "fake-project",
-	JSONKey:     "{}",
-	DefaultZone: "fake-default-zone",
+	Project:               "fake-project",
+	JSONKey:               "{}",
+	DefaultRootDiskSizeGb: 20,
+	DefaultRootDiskType:   "fake-default-root-disk-type",
+	DefaultZone:           "fake-default-zone",
 }
 
 var _ = Describe("Config", func() {

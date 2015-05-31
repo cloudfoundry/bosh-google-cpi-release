@@ -15,15 +15,17 @@ import (
 )
 
 type CreateVM struct {
-	vmService          instance.Service
-	diskService        disk.Service
-	diskTypeService    disktype.Service
-	imageService       image.Service
-	machineTypeService machinetype.Service
-	registryClient     registry.Client
-	registryOptions    registry.ClientOptions
-	agentOptions       registry.AgentOptions
-	defaultZone        string
+	vmService             instance.Service
+	diskService           disk.Service
+	diskTypeService       disktype.Service
+	imageService          image.Service
+	machineTypeService    machinetype.Service
+	registryClient        registry.Client
+	registryOptions       registry.ClientOptions
+	agentOptions          registry.AgentOptions
+	defaultRootDiskSizeGb int
+	defaultRootDiskType   string
+	defaultZone           string
 }
 
 func NewCreateVM(
@@ -35,81 +37,48 @@ func NewCreateVM(
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
+	defaultRootDiskSizeGb int,
+	defaultRootDiskType string,
 	defaultZone string,
 ) CreateVM {
 	return CreateVM{
-		vmService:          vmService,
-		diskService:        diskService,
-		diskTypeService:    diskTypeService,
-		imageService:       imageService,
-		machineTypeService: machineTypeService,
-		registryClient:     registryClient,
-		registryOptions:    registryOptions,
-		agentOptions:       agentOptions,
-		defaultZone:        defaultZone,
+		vmService:             vmService,
+		diskService:           diskService,
+		diskTypeService:       diskTypeService,
+		imageService:          imageService,
+		machineTypeService:    machineTypeService,
+		registryClient:        registryClient,
+		registryOptions:       registryOptions,
+		agentOptions:          agentOptions,
+		defaultRootDiskSizeGb: defaultRootDiskSizeGb,
+		defaultRootDiskType:   defaultRootDiskType,
+		defaultZone:           defaultZone,
 	}
 }
 
 func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMCloudProperties, networks Networks, disks []DiskCID, env Environment) (VMCID, error) {
-	// Find all affinity zones
-	zones := make(map[string]struct{})
-	if cloudProps.Zone != "" {
-		zones[cloudProps.Zone] = struct{}{}
-	}
-	for _, diskCID := range disks {
-		disk, found, err := cv.diskService.Find(string(diskCID), "")
-		if err != nil {
-			return "", bosherr.WrapError(err, "Creating vm")
-		}
-		if !found {
-			return "", api.NewDiskNotFoundError(string(diskCID), false)
-		}
-		zones[util.ResourceSplitter(disk.Zone)] = struct{}{}
-	}
-	if len(zones) > 1 {
-		return "", bosherr.Errorf("Creating vm: can't use multiple zones: '%v'", zones)
-	}
-
-	// Determine zone
-	zone := cv.defaultZone
-	for k := range zones {
-		zone = k
-		break
+	// Find zone
+	zone, err := cv.findZone(cloudProps.Zone, disks)
+	if err != nil {
+		return "", err
 	}
 
 	// Find stemcell
-	stemcell, found, err := cv.imageService.Find(string(stemcellCID))
+	stemcellLink, err := cv.findStemcellLink(string(stemcellCID))
 	if err != nil {
-		return "", bosherr.WrapError(err, "Creating vm")
-	}
-	if !found {
-		return "", bosherr.WrapErrorf(err, "Creating vm: Stemcell '%s' does not exists", stemcellCID)
+		return "", err
 	}
 
 	// Find machine type
-	if cloudProps.MachineType == "" {
-		return "", bosherr.WrapError(err, "Creating vm: 'machine_type' must be provided")
-	}
-	machineType, found, err := cv.machineTypeService.Find(string(cloudProps.MachineType), zone)
+	machineTypeLink, err := cv.findMachineTypeLink(string(cloudProps.MachineType), zone)
 	if err != nil {
-		return "", bosherr.WrapError(err, "Creating vm")
-	}
-	if !found {
-		return "", bosherr.WrapErrorf(err, "Creating vm: Machine Type '%s' does not exists", cloudProps.MachineType)
+		return "", err
 	}
 
-	// Find the Disk Type (if provided)
-	var diskType string
-	if cloudProps.RootDiskType != "" {
-		dt, found, err := cv.diskTypeService.Find(cloudProps.RootDiskType, zone)
-		if err != nil {
-			return "", bosherr.WrapError(err, "Creating vm")
-		}
-		if !found {
-			return "", bosherr.WrapErrorf(err, "Creating vm: Root Disk Type '%s' does not exists", cloudProps.RootDiskType)
-		}
-
-		diskType = dt.SelfLink
+	// Find the root Disk Type
+	rootDiskTypeLink, err := cv.findRootDiskTypeLink(cloudProps.RootDiskType, zone)
+	if err != nil {
+		return "", err
 	}
 
 	// Parse networks
@@ -121,10 +90,10 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
-		Stemcell:          stemcell.SelfLink,
-		MachineType:       machineType.SelfLink,
-		RootDiskSizeGb:    cloudProps.RootDiskSizeGb,
-		RootDiskType:      diskType,
+		Stemcell:          stemcellLink,
+		MachineType:       machineTypeLink,
+		RootDiskSizeGb:    cv.findRootDiskSizeGb(cloudProps.RootDiskSizeGb),
+		RootDiskType:      rootDiskTypeLink,
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
 		Preemptible:       cloudProps.Preemptible,
@@ -163,4 +132,90 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	return VMCID(vm), nil
+}
+
+func (cv CreateVM) findZone(zoneName string, disks []DiskCID) (string, error) {
+	zones := make(map[string]struct{})
+	if zoneName != "" {
+		zones[zoneName] = struct{}{}
+	}
+
+	for _, diskCID := range disks {
+		disk, found, err := cv.diskService.Find(string(diskCID), "")
+		if err != nil {
+			return "", bosherr.WrapError(err, "Creating vm")
+		}
+		if !found {
+			return "", api.NewDiskNotFoundError(string(diskCID), false)
+		}
+		zones[util.ResourceSplitter(disk.Zone)] = struct{}{}
+	}
+
+	if len(zones) > 1 {
+		return "", bosherr.Errorf("Creating vm: can't use multiple zones: '%v'", zones)
+	}
+
+	for zone := range zones {
+		return zone, nil
+	}
+
+	return cv.defaultZone, nil
+}
+
+func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {
+	stemcell, found, err := cv.imageService.Find(stemcellID)
+	if err != nil {
+		return "", bosherr.WrapError(err, "Creating vm")
+	}
+	if !found {
+		return "", bosherr.WrapErrorf(err, "Creating vm: Stemcell '%s' does not exists", stemcellID)
+	}
+
+	return stemcell.SelfLink, nil
+}
+
+func (cv CreateVM) findMachineTypeLink(machineTypeName string, zone string) (string, error) {
+	if machineTypeName == "" {
+		return "", bosherr.Error("Creating vm: 'machine_type' must be provided")
+	}
+
+	machineType, found, err := cv.machineTypeService.Find(machineTypeName, zone)
+	if err != nil {
+		return "", bosherr.WrapError(err, "Creating vm")
+	}
+	if !found {
+		return "", bosherr.WrapErrorf(err, "Creating vm: Machine Type '%s' does not exists", machineTypeName)
+	}
+
+	return machineType.SelfLink, nil
+}
+
+func (cv CreateVM) findRootDiskSizeGb(rootDiskSizeGb int) int {
+	diskSizeGb := cv.defaultRootDiskSizeGb
+	if rootDiskSizeGb > 0 {
+		diskSizeGb = rootDiskSizeGb
+	}
+
+	return diskSizeGb
+}
+
+func (cv CreateVM) findRootDiskTypeLink(diskTypeName string, zone string) (string, error) {
+	diskType := cv.defaultRootDiskType
+	if diskTypeName != "" {
+		diskType = diskTypeName
+	}
+
+	if diskType != "" {
+		dt, found, err := cv.diskTypeService.Find(diskType, zone)
+		if err != nil {
+			return "", bosherr.WrapError(err, "Creating vm")
+		}
+		if !found {
+			return "", bosherr.WrapErrorf(err, "Creating vm: Root Disk Type '%s' does not exists", diskTypeName)
+		}
+
+		return dt.SelfLink, nil
+	}
+
+	return "", nil
 }

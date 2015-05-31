@@ -28,6 +28,8 @@ Create a configuration file:
   "google": {
     "project": "my-gce-project",
     "json_key": "{\"private_key_id\": \"...\"}",
+    "default_root_disk_size_gb": 20,
+    "default_root_disk_type": "",
     "default_zone": "us-central1-a"
   },
   "actions": {
@@ -63,6 +65,8 @@ Create a configuration file:
 |:------------------------------------------|:----------:|:------------- |:-----------
 | google.project                            | Y          | String        | Google Compute Engine [Project](https://cloud.google.com/compute/docs/projects)
 | google.json_key                           | Y          | String        | Google Compute Engine [JSON key](https://developers.google.com/console/help/new/#serviceaccounts)
+| google.default_root_disk_size_gb          | N          | Integer       | The default size (in Gb) of the instance root disk (default is `10Gb`)
+| google.default_root_disk_type             | N          | String        | The name of the default [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
 | google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
 | actions.agent.mbus.endpoint               | Y          | String        | [BOSH Message Bus](http://bosh.io/docs/bosh-components.html#nats) URL used by deployed BOSH agents
 | actions.agent.ntp                         | Y          | Array&lt;String&gt; | List of NTP servers used by deployed BOSH agents

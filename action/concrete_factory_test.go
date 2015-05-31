@@ -222,6 +222,8 @@ var _ = Describe("ConcreteFactory", func() {
 			registryClient,
 			options.Registry,
 			options.Agent,
+			googleClient.DefaultRootDiskSizeGb(),
+			googleClient.DefaultRootDiskType(),
 			googleClient.DefaultZone(),
 		)))
 	})
