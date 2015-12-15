@@ -27,7 +27,7 @@ $ gcloud compute addresses create bosh --region us-central1
 $ gcloud compute firewall-rules create bosh --description "BOSH" --target-tags bosh --allow tcp:22 tcp:4222 tcp:6868 tcp:25250 tcp:25555 tcp:25777 udp:53
 ```
 
-* Create ypur [SSH keys](https://cloud.google.com/compute/docs/instances#sshing) if you haven't already.
+* Create your [SSH keys](https://cloud.google.com/compute/docs/instances#sshing) if you haven't already.
 
 ### Install the bosh-init CLI
 
@@ -52,8 +52,8 @@ name: bosh
 
 releases:
   - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=168
-    sha1: 57320a93a7a15e51af4c57d9d9c22706c45c9953
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=236
+    sha1: 88dd60313dbd7dd832faa44c90493ffa6cd85448
   - name: bosh-google-cpi
     url: http://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-5.tgz
     sha1: c5de3053f233e6ef42c2a4228fa94179d955cc84
@@ -62,8 +62,8 @@ resource_pools:
   - name: vms
     network: private
     stemcell:
-      url: http://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-2968-google-kvm-ubuntu-trusty-go_agent.tgz
-      sha1: ce5a64c3ecef4fd3e6bd633260dfaa7de76540eb
+      url: https://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-3153-google-kvm-ubuntu-trusty-go_agent.tgz
+      sha1: 7f0e4da9507edb122a25fcc1c17bf1d46651842c
     cloud_properties:
       machine_type: n1-standard-2
       root_disk_size_gb: 40
