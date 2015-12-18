@@ -186,7 +186,7 @@ jobs:
         default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
       agent:
-        mbus: nats://nats:nats@__STATIC_IP__:4222 # <--- Replace with the static IP
+        mbus: nats://nats:nats-password@__STATIC_IP__:4222 # <--- Replace with the static IP
         ntp: *ntp
         blobstore:
            options:
