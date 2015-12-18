@@ -126,19 +126,20 @@ jobs:
       nats:
         address: 127.0.0.1
         user: nats
-        password: nats
+        password: nats-password
 
       redis:
         listen_address: 127.0.0.1
         address: 127.0.0.1
-        password: redis
+        password: redis-password
 
       postgres: &db
-        adapter: postgres
+        listen_address: 127.0.0.1
         host: 127.0.0.1
         user: postgres
-        password: postgres
+        password: postgres-password
         database: bosh
+        adapter: postgres
 
       dns:
         address: __STATIC_IP__ # <--- Replace with the static IP
@@ -148,27 +149,32 @@ jobs:
 
       blobstore:
         address: __STATIC_IP__ # <--- Replace with the static IP
+        port: 25250
         provider: dav
         director:
           user: director
-          password: director
+          password: director-password
         agent:
           user: agent
-          password: agent
+          password: agent-password
 
       director:
         address: 127.0.0.1
         name: micro-google
         db: *db
         cpi_job: cpi
-
+        user_management:
+          provider: local
+          local:
+            users:
+              - name: admin
+                password: admin
+              - name: hm
+                password: hm-password
       hm:
-        http:
-          user: hm
-          password: hm
         director_account:
-          user: admin
-          password: admin
+          user: hm
+          password: hm-password
         resurrector_enabled: true
 
       ntp: &ntp
@@ -176,7 +182,7 @@ jobs:
 
       google: &google_properties
         project: __GCE_PROJECT__ # <--- Replace with your GCE project
-        json_key: __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key
+        json_key: __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key content
         default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
       agent:
@@ -186,12 +192,12 @@ jobs:
            options:
              endpoint: http://__STATIC_IP__:25250 # <--- Replace with the static IP
              user: agent
-             password: agent
+             password: agent-password
 
       registry:
         host: __STATIC_IP__ # <--- Replace with the static IP
         username: registry
-        password: registry
+        password: registry-password
 
 cloud_provider:
   template:
