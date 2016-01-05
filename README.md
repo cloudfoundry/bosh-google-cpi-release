@@ -56,7 +56,7 @@ releases:
     sha1: 88dd60313dbd7dd832faa44c90493ffa6cd85448
   - name: bosh-google-cpi
     url: http://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-6.tgz
-    sha1: 00a0a40a2cf90c971fc9ee271b5eb7b9
+    sha1: 57cbffe4ccd1935edf0302da334be900b479c98b
 
 resource_pools:
   - name: vms
