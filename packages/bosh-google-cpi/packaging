@@ -5,7 +5,7 @@ set -u # report the usage of uninitialized variables
 PACKAGES_DIR=${BOSH_PACKAGES_DIR:-/var/vcap/packages}
 
 # Set Golang dependency
-export GOROOT=$(readlink -n ${PACKAGES_DIR}/golang1.4)
+export GOROOT=$(readlink -n ${PACKAGES_DIR}/golang1.5)
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build BOSH Google CPI package
