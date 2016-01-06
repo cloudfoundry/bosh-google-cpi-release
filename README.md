@@ -182,7 +182,8 @@ jobs:
 
       google: &google_properties
         project: __GCE_PROJECT__ # <--- Replace with your GCE project
-        json_key: __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key content
+        json_key: >
+          __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key content
         default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
       agent:
