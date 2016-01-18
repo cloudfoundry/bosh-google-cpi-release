@@ -57,6 +57,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	}
 
 	if _, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %#v", err)
 		i.CleanUp(vm.Name)
 		return "", api.NewVMCreationFailedError(true)
 	}

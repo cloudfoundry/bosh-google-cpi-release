@@ -32,6 +32,7 @@ func (o GoogleOperationService) Waiter(operation *compute.Operation, zone string
 		}
 
 		if err != nil {
+			o.logger.Debug(googleOperationServiceLogTag, "Google Operation '%s' finished with an error: %#v", operation.Name, err)
 			if operation.Error != nil {
 				return nil, bosherr.WrapErrorf(GoogleOperationError(*operation.Error), "Google Operation '%s' finished with an error", operation.Name)
 			}
@@ -41,6 +42,7 @@ func (o GoogleOperationService) Waiter(operation *compute.Operation, zone string
 
 		if operation.Status == googleOperationReadyStatus {
 			if operation.Error != nil {
+				o.logger.Debug(googleOperationServiceLogTag, "Google Operation '%s' finished with an error: %s", operation.Name, GoogleOperationError(*operation.Error))
 				return nil, bosherr.WrapErrorf(GoogleOperationError(*operation.Error), "Google Operation '%s' finished with an error", operation.Name)
 			}
 
