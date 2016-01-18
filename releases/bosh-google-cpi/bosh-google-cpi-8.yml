@@ -1,0 +1,36 @@
+---
+packages:
+- name: bosh-google-cpi
+  version: f6186fcf239ed6089dda51f50013f6f018072ef9
+  fingerprint: f6186fcf239ed6089dda51f50013f6f018072ef9
+  sha1: b963ee988cf3f3e4c8aebf29b453bf3b4fe32be7
+  dependencies:
+  - golang1.5
+- name: bosh-registry
+  version: 691b470a2a9a4b76d77a3b492fb32d28e331a98e
+  fingerprint: 691b470a2a9a4b76d77a3b492fb32d28e331a98e
+  sha1: f2503673cfd06c3cd0b507881fe2ad271dee085a
+  dependencies:
+  - golang1.5
+- name: golang1.5
+  version: dae8648d7a5fe706c75a17e9b3329c5a6073021e
+  fingerprint: dae8648d7a5fe706c75a17e9b3329c5a6073021e
+  sha1: 495b3e6f53850500f2161a4c8b63c9e51f52e695
+  dependencies: []
+jobs:
+- name: cpi
+  version: 09e6dd5194ca92a3d8c39fc8358a212b87ae8036
+  fingerprint: 09e6dd5194ca92a3d8c39fc8358a212b87ae8036
+  sha1: b2a57927ea179d53bc0cbcfb60c646e80e9850a8
+- name: registry
+  version: ce9b80e3bbd96cdd70ea14e61d168dfec6928bab
+  fingerprint: ce9b80e3bbd96cdd70ea14e61d168dfec6928bab
+  sha1: 4cc0771ff5e6f393ff98591fab713b6fe7a2ac89
+license:
+  version: 177c113663fe9b8f50aa800f1858f3c1a59f635a
+  fingerprint: 177c113663fe9b8f50aa800f1858f3c1a59f635a
+  sha1: f34f431648106971e865a700759df85fb397a814
+commit_hash: 33d9503b
+uncommitted_changes: true
+name: bosh-google-cpi
+version: '8'
