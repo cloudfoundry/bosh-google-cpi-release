@@ -70,7 +70,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	// Find machine type
-	machineTypeLink, err := cv.findMachineTypeLink(string(cloudProps.MachineType), zone)
+	machineTypeLink, err := cv.findMachineTypeLink(cloudProps, zone)
 	if err != nil {
 		return "", err
 	}
@@ -174,20 +174,30 @@ func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {
 	return stemcell.SelfLink, nil
 }
 
-func (cv CreateVM) findMachineTypeLink(machineTypeName string, zone string) (string, error) {
-	if machineTypeName == "" {
-		return "", bosherr.Error("Creating vm: 'machine_type' must be provided")
+func (cv CreateVM) findMachineTypeLink(cloudProps VMCloudProperties, zone string) (string, error) {
+	machineTypeLink := ""
+	if cloudProps.MachineType != "" {
+		if cloudProps.CPU != 0 || cloudProps.RAM != 0 {
+			return "", bosherr.Error("Creating vm: 'machine_type' and 'cpu' or 'ram' cannot be provided together")
+		}
+
+		machineType, found, err := cv.machineTypeService.Find(cloudProps.MachineType, zone)
+		if err != nil {
+			return "", bosherr.WrapError(err, "Creating vm")
+		}
+		if !found {
+			return "", bosherr.WrapErrorf(err, "Creating vm: Machine Type '%s' does not exists", cloudProps.MachineType)
+		}
+		machineTypeLink = machineType.SelfLink
+	} else {
+		if cloudProps.CPU == 0 || cloudProps.RAM == 0 {
+			return "", bosherr.Error("Creating vm: 'machine_type' or 'cpu' and 'ram' must be provided")
+		}
+
+		machineTypeLink = cv.machineTypeService.CustomLink(cloudProps.CPU, cloudProps.RAM, zone)
 	}
 
-	machineType, found, err := cv.machineTypeService.Find(machineTypeName, zone)
-	if err != nil {
-		return "", bosherr.WrapError(err, "Creating vm")
-	}
-	if !found {
-		return "", bosherr.WrapErrorf(err, "Creating vm: Machine Type '%s' does not exists", machineTypeName)
-	}
-
-	return machineType.SelfLink, nil
+	return machineTypeLink, nil
 }
 
 func (cv CreateVM) findRootDiskSizeGb(rootDiskSizeGb int) int {

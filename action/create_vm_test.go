@@ -175,6 +175,7 @@ var _ = Describe("CreateVM", func() {
 			Expect(diskService.FindCalled).To(BeFalse())
 			Expect(imageService.FindCalled).To(BeTrue())
 			Expect(machineTypeService.FindCalled).To(BeTrue())
+			Expect(machineTypeService.CustomLinkCalled).To(BeFalse())
 			Expect(diskTypeService.FindCalled).To(BeFalse())
 			Expect(vmService.CreateCalled).To(BeTrue())
 			Expect(vmService.CleanUpCalled).To(BeFalse())
@@ -219,12 +220,28 @@ var _ = Describe("CreateVM", func() {
 			Expect(registryClient.UpdateCalled).To(BeFalse())
 		})
 
-		It("returns an error if machine type is not set", func() {
-			cloudProps.MachineType = ""
+		It("returns an error if machine type and cpu are set", func() {
+			cloudProps.CPU = 2
 
 			_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("'machine_type' must be provided"))
+			Expect(err.Error()).To(ContainSubstring("'machine_type' and 'cpu' or 'ram' cannot be provided together"))
+			Expect(diskService.FindCalled).To(BeFalse())
+			Expect(imageService.FindCalled).To(BeTrue())
+			Expect(machineTypeService.FindCalled).To(BeFalse())
+			Expect(diskTypeService.FindCalled).To(BeFalse())
+			Expect(vmService.CreateCalled).To(BeFalse())
+			Expect(vmService.CleanUpCalled).To(BeFalse())
+			Expect(vmService.AddNetworkConfigurationCalled).To(BeFalse())
+			Expect(registryClient.UpdateCalled).To(BeFalse())
+		})
+
+		It("returns an error if machine type and ram are set", func() {
+			cloudProps.RAM = 5120
+
+			_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("'machine_type' and 'cpu' or 'ram' cannot be provided together"))
 			Expect(diskService.FindCalled).To(BeFalse())
 			Expect(imageService.FindCalled).To(BeTrue())
 			Expect(machineTypeService.FindCalled).To(BeFalse())
@@ -265,6 +282,68 @@ var _ = Describe("CreateVM", func() {
 			Expect(vmService.CleanUpCalled).To(BeFalse())
 			Expect(vmService.AddNetworkConfigurationCalled).To(BeFalse())
 			Expect(registryClient.UpdateCalled).To(BeFalse())
+		})
+
+		Context("when custom machine type is set", func() {
+			BeforeEach(func() {
+				cloudProps.MachineType = ""
+				cloudProps.CPU = 2
+				cloudProps.RAM = 5120
+
+				machineTypeService.CustomLinkLink = "custom-machine-type-link"
+				expectedVMProps.MachineType = "custom-machine-type-link"
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeFalse())
+				Expect(machineTypeService.CustomLinkCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeTrue())
+				Expect(registryClient.UpdateCalled).To(BeTrue())
+				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+			})
+
+			It("returns an error if cpu is not set", func() {
+				cloudProps.CPU = 0
+
+				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("'machine_type' or 'cpu' and 'ram' must be provided"))
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeFalse())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeFalse())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeFalse())
+				Expect(registryClient.UpdateCalled).To(BeFalse())
+			})
+
+			It("returns an error if ram is not set", func() {
+				cloudProps.RAM = 0
+
+				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("'machine_type' or 'cpu' and 'ram' must be provided"))
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeFalse())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeFalse())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(vmService.AddNetworkConfigurationCalled).To(BeFalse())
+				Expect(registryClient.UpdateCalled).To(BeFalse())
+			})
 		})
 
 		It("returns an error if vmService create call returns an error", func() {
