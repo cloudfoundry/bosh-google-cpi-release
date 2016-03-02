@@ -119,8 +119,8 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | Option              | Required | Type          | Description
 |:--------------------|:--------:|:------------- |:-----------
 | machine_type        | Y        | String        | The name of the [Google Compute Engine Machine Type](https://cloud.google.com/compute/docs/machine-types) the CPI will use when creating the instance (required if not using `cpu` and `ram`)
-| cpu                 | Y        | Integer       | Number of vCPUs [Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/) the CPI will use when creating the instance (required if not using `machine_type`)
-| ram                 | Y        | Integer       | Amount of memory [Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/) the CPI will use when creating the instance (required if not using `machine_type`)
+| cpu                 | Y        | Integer       | Number of vCPUs ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
+| ram                 | Y        | Integer       | Amount of memory ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
 | zone                | N        | String        | The name of the [Google Compute Engine Zone](https://cloud.google.com/compute/docs/zones) where the instance must be created
 | root_disk_size_gb   | N        | Integer       | The size (in Gb) of the instance root disk (default is `10Gb`)
 | root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
