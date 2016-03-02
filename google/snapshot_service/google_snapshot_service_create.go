@@ -22,7 +22,6 @@ func (s GoogleSnapshotService) Create(diskID string, description string, zone st
 	snapshot := &compute.Snapshot{
 		Name:        fmt.Sprintf("%s-%s", googleSnapshotNamePrefix, uuidStr),
 		Description: description,
-		SourceDisk:  diskID,
 	}
 
 	s.logger.Debug(googleSnapshotServiceLogTag, "Creating Google Snapshot with params: %#v", snapshot)
