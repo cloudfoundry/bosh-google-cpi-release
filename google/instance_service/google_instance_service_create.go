@@ -12,6 +12,7 @@ import (
 )
 
 const defaultRootDiskSizeGb = 10
+const userDataKey = "user_data"
 
 func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
@@ -108,7 +109,8 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 	}
 
 	var metadataItems []*compute.MetadataItems
-	metadataItem := &compute.MetadataItems{Key: "user_data", Value: string(ud)}
+	userDataValue := string(ud)
+	metadataItem := &compute.MetadataItems{Key: userDataKey, Value: &userDataValue}
 	metadataItems = append(metadataItems, metadataItem)
 	metadata := &compute.Metadata{Items: metadataItems}
 
