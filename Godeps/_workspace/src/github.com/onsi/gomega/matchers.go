@@ -26,6 +26,15 @@ func BeEquivalentTo(expected interface{}) types.GomegaMatcher {
 	}
 }
 
+//BeIdenticalTo uses the == operator to compare actual with expected.
+//BeIdenticalTo is strict about types when performing comparisons.
+//It is an error for both actual and expected to be nil.  Use BeNil() instead.
+func BeIdenticalTo(expected interface{}) types.GomegaMatcher {
+	return &matchers.BeIdenticalToMatcher{
+		Expected: expected,
+	}
+}
+
 //BeNil succeeds if actual is nil
 func BeNil() types.GomegaMatcher {
 	return &matchers.BeNilMatcher{}
@@ -217,6 +226,13 @@ func HaveLen(count int) types.GomegaMatcher {
 	}
 }
 
+//HaveCap succeeds if actual has the passed-in capacity.  Actual must be of type array, chan, or slice.
+func HaveCap(count int) types.GomegaMatcher {
+	return &matchers.HaveCapMatcher{
+		Count: count,
+	}
+}
+
 //BeZero succeeds if actual is the zero value for its type or if actual is nil.
 func BeZero() types.GomegaMatcher {
 	return &matchers.BeZeroMatcher{}
@@ -342,4 +358,52 @@ func BeARegularFile() types.GomegaMatcher {
 //Actual must be a string representing the abs path to the file being checked.
 func BeADirectory() types.GomegaMatcher {
 	return &matchers.BeADirectoryMatcher{}
+}
+
+//And succeeds only if all of the given matchers succeed.
+//The matchers are tried in order, and will fail-fast if one doesn't succeed.
+//  Expect("hi").To(And(HaveLen(2), Equal("hi"))
+//
+//And(), Or(), Not() and WithTransform() allow matchers to be composed into complex expressions.
+func And(ms ...types.GomegaMatcher) types.GomegaMatcher {
+	return &matchers.AndMatcher{Matchers: ms}
+}
+
+//SatisfyAll is an alias for And().
+//  Ω("hi").Should(SatisfyAll(HaveLen(2), Equal("hi")))
+func SatisfyAll(matchers ...types.GomegaMatcher) types.GomegaMatcher {
+	return And(matchers...)
+}
+
+//Or succeeds if any of the given matchers succeed.
+//The matchers are tried in order and will return immediately upon the first successful match.
+//  Expect("hi").To(Or(HaveLen(3), HaveLen(2))
+//
+//And(), Or(), Not() and WithTransform() allow matchers to be composed into complex expressions.
+func Or(ms ...types.GomegaMatcher) types.GomegaMatcher {
+	return &matchers.OrMatcher{Matchers: ms}
+}
+
+//SatisfyAny is an alias for Or().
+//  Expect("hi").SatisfyAny(Or(HaveLen(3), HaveLen(2))
+func SatisfyAny(matchers ...types.GomegaMatcher) types.GomegaMatcher {
+	return Or(matchers...)
+}
+
+//Not negates the given matcher; it succeeds if the given matcher fails.
+//  Expect(1).To(Not(Equal(2))
+//
+//And(), Or(), Not() and WithTransform() allow matchers to be composed into complex expressions.
+func Not(matcher types.GomegaMatcher) types.GomegaMatcher {
+	return &matchers.NotMatcher{Matcher: matcher}
+}
+
+//WithTransform applies the `transform` to the actual value and matches it against `matcher`.
+//The given transform must be a function of one parameter that returns one value.
+//  var plus1 = func(i int) int { return i + 1 }
+//  Expect(1).To(WithTransform(plus1, Equal(2))
+//
+//And(), Or(), Not() and WithTransform() allow matchers to be composed into complex expressions.
+func WithTransform(transform interface{}, matcher types.GomegaMatcher) types.GomegaMatcher {
+	return matchers.NewWithTransformMatcher(transform, matcher)
 }

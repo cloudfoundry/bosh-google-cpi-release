@@ -222,6 +222,17 @@ func buildDefaultReporter() Reporter {
 	}
 }
 
+//Skip notifies Ginkgo that the current spec should be skipped.
+func Skip(message string, callerSkip ...int) {
+	skip := 0
+	if len(callerSkip) > 0 {
+		skip = callerSkip[0]
+	}
+
+	globalFailer.Skip(message, codelocation.New(skip+1))
+	panic(GINKGO_PANIC)
+}
+
 //Fail notifies Ginkgo that the current spec has failed. (Gomega will call Fail for you automatically when an assertion fails.)
 func Fail(message string, callerSkip ...int) {
 	skip := 0
@@ -334,6 +345,28 @@ func PIt(text string, _ ...interface{}) bool {
 func XIt(text string, _ ...interface{}) bool {
 	globalSuite.PushItNode(text, func() {}, types.FlagTypePending, codelocation.New(1), 0)
 	return true
+}
+
+//Specify blocks are aliases for It blocks and allow for more natural wording in situations
+//which "It" does not fit into a natural sentence flow. All the same protocols apply for Specify blocks
+//which apply to It blocks.
+func Specify(text string, body interface{}, timeout ...float64) bool {
+	return It(text, body, timeout...)
+}
+
+//You can focus individual Specifys using FSpecify
+func FSpecify(text string, body interface{}, timeout ...float64) bool {
+	return FIt(text, body, timeout...)
+}
+
+//You can mark Specifys as pending using PSpecify
+func PSpecify(text string, is ...interface{}) bool {
+	return PIt(text, is...)
+}
+
+//You can mark Specifys as pending using XSpecify
+func XSpecify(text string, is ...interface{}) bool {
+	return XIt(text, is...)
 }
 
 //By allows you to better document large Its.

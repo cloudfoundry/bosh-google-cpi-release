@@ -2,7 +2,7 @@ package uuid_test
 
 import (
 	"fmt"
-	"github.com/cloudfoundry/bosh-utils/internal/github.com/nu7hatch/gouuid"
+	"github.com/nu7hatch/gouuid"
 )
 
 func ExampleNewV4() {
