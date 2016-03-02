@@ -64,9 +64,9 @@ Create a configuration file:
 | Option                                    | Required   | Type          | Description
 |:------------------------------------------|:----------:|:------------- |:-----------
 | google.project                            | Y          | String        | Google Compute Engine [Project](https://cloud.google.com/compute/docs/projects)
-| google.json_key                           | Y          | String        | Google Compute Engine [JSON key](https://developers.google.com/console/help/new/#serviceaccounts)
+| google.json_key                           | Y          | String        | Google Compute Engine [JSON key](https://developers.google.com/identity/protocols/OAuth2ServiceAccount)
 | google.default_root_disk_size_gb          | N          | Integer       | The default size (in Gb) of the instance root disk (default is `10Gb`)
-| google.default_root_disk_type             | N          | String        | The name of the default [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
+| google.default_root_disk_type             | N          | String        | The name of the default [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
 | google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
 | actions.agent.mbus.endpoint               | Y          | String        | [BOSH Message Bus](http://bosh.io/docs/bosh-components.html#nats) URL used by deployed BOSH agents
 | actions.agent.ntp                         | Y          | Array&lt;String&gt; | List of NTP servers used by deployed BOSH agents
@@ -110,7 +110,7 @@ These options are specified under `cloud_properties` at the [networks](http://bo
 | ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default)
 | ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default)
 | target_pool           | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
-| tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags
+| tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags
 
 ### BOSH Resource pool options
 
@@ -123,10 +123,10 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | ram                 | Y        | Integer       | Amount of memory ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
 | zone                | N        | String        | The name of the [Google Compute Engine Zone](https://cloud.google.com/compute/docs/zones) where the instance must be created
 | root_disk_size_gb   | N        | Integer       | The size (in Gb) of the instance root disk (default is `10Gb`)
-| root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types) the CPI will use when creating the instance root disk
-| automatic_restart   | N        | Boolean       | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
-| on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
-| preemptible         | N        | Boolean       | If the instances should be [preemptible](https://cloud.google.com/compute/docs/instances/preemptible) (`false` by default)
+| root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
+| automatic_restart   | N        | Boolean       | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
+| on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
+| preemptible         | N        | Boolean       | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default)
 | service_scopes      | N        | Array&lt;String&gt; | [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for your default service account that determine the level of access your instance has to other Google services (no scope is assigned to the instance by default)
 
 ### BOSH Persistent Disks options
@@ -135,7 +135,7 @@ These options are specified under `cloud_properties` at the [disk_pools](http://
 
 | Option | Required | Type   | Description
 |:-------|:--------:|:------ |:-----------
-| type   | N        | String | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview_of_disk_types)
+| type   | N        | String | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview)
 
 ## Deployment Manifest Example
 
@@ -228,4 +228,4 @@ including your gem version, Ruby version, and operating system. Ideally, a bug r
 
 ## Copyright
 
-Copyright (c) 2015 Ferran Rodenas. See [LICENSE](https://github.com/frodenas/bosh-google-cpi/blob/master/LICENSE) for details.
+Copyright (c) 2015-2016 Ferran Rodenas. See [LICENSE](https://github.com/frodenas/bosh-google-cpi/blob/master/LICENSE) for details.
