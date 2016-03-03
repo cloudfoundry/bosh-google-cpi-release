@@ -14,16 +14,17 @@ templates:
 properties:
   google.project:
     description: "Google Compute Engine project"
+  google.default_zone:
+    description: "Google Compute Engine Default Zone"
   google.json_key:
     description: "Google Compute Engine JSON key"
+    default: ""
   google.default_root_disk_size_gb:
     description: "The default size (in Gb) of the instances root disk "
     default: 0
   google.default_root_disk_type:
     description: "The name of the default Google Compute Engine Disk Type the CPI will use when creating the instances root disk"
     default: ""
-  google.default_zone:
-    description: "Google Compute Engine Default Zone"
 
   agent.mbus:
     description: "Mbus URL used by deployed BOSH agents"
