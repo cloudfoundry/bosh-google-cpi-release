@@ -185,7 +185,7 @@ var _ = Describe("CreateVM", func() {
 			Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 			Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 			Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-			Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+			Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 		})
 
 		It("returns an error if imageService find call returns an error", func() {
@@ -310,7 +310,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 
 			It("returns an error if cpu is not set", func() {
@@ -428,7 +428,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 		})
 
@@ -453,7 +453,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 		})
 
@@ -493,7 +493,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 		})
 
@@ -519,7 +519,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 
 			It("returns an error if diskTypeService find call returns an error", func() {
@@ -576,7 +576,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 		})
 
@@ -602,7 +602,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
-				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-host:25777"))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
 			})
 
 			It("returns an error if diskService find call returns an error", func() {
