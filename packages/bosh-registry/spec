@@ -1,6 +1,6 @@
 ---
 name: bosh-registry
 dependencies:
-  - golang1.5
+  - golang
 files:
   - github.com/frodenas/bosh-registry/**/*

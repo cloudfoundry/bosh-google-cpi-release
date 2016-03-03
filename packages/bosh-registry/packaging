@@ -5,17 +5,15 @@ set -u # report the usage of uninitialized variables
 PACKAGES_DIR=${BOSH_PACKAGES_DIR:-/var/vcap/packages}
 
 # Set Golang dependency
-export GOROOT=$(cd "${PACKAGES_DIR}/golang1.5" && pwd -P)
+export GOROOT=$(cd "${PACKAGES_DIR}/golang" && pwd -P)
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build BOSH Registry package
-echo "Building BOSH Registry..."
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas
 mv ${BOSH_COMPILE_TARGET}/github.com/frodenas/bosh-registry ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-registry
 bin/build
 
 # Copy BOSH Registry package
-echo "Copying BOSH Registry..."
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
 cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-registry/out/bosh-registry ${BOSH_INSTALL_TARGET}/bin/
