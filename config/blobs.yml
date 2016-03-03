@@ -1,9 +1,9 @@
 ---
-golang1.5/go1.5.2.linux-amd64.tar.gz:
-  object_id: 5f5d29f1-7f59-4d0f-8cba-92966fc3411a
-  sha: cae87ed095e8d94a81871281d35da7829bd1234e
-  size: 76350075
-golang1.5/go1.5.2.darwin-amd64.tar.gz:
-  object_id: bc242f64-b0f5-4ca2-a30e-a157bd23e668
-  sha: 4f30332a56e9c8a36daeeff667bab3608e4dffd2
-  size: 76218682
+golang/go1.6.darwin-amd64.tar.gz:
+  object_id: aa28d8f5-335e-4e83-b20e-0d5166516114
+  sha: 8b81c3a0c4247cd5d5c3a593ad2466bdfcef2ca1
+  size: 84708502
+golang/go1.6.linux-amd64.tar.gz:
+  object_id: 251eab2d-2f9a-432b-83ed-5e9fa5138a0a
+  sha: 01a6a28dbe31a53103b600979bbbbd63a8104456
+  size: 84799480
