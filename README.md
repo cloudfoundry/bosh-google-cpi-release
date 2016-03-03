@@ -50,7 +50,7 @@ $ cd google-bosh-deployment
 
 ### Create a deployment manifest
 
-Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following content:
+Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following content and update it with your properties:
 
 ```
 ---
@@ -239,6 +239,8 @@ cloud_provider:
 ```
 
 ### Deploy
+
+Initialize the [gcloud](https://cloud.google.com/sdk/gcloud/reference/init) environment if you haven't done so previously. Alternativelly, you can set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON file that defines your credentials.
 
 Using the previously created deployment manifest, now we can deploy it:
 
