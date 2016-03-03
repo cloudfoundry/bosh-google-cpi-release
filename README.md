@@ -157,6 +157,7 @@ networks:
       - 8.8.4.4
     cloud_properties:
       network_name: default
+      subnetwork_name: my-subnetwork
       ephemeral_external_ip: false
       ip_forwarding: false
       target_pool: my-load-balancer
