@@ -35,7 +35,8 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	// Set the new metadata items
 	var metadataItems []*compute.MetadataItems
 	for key, value := range metadataMap {
-		metadataItems = append(metadataItems, &compute.MetadataItems{Key: key, Value: &value})
+		mValue := value
+		metadataItems = append(metadataItems, &compute.MetadataItems{Key: key, Value: &mValue})
 	}
 	metadata.Items = metadataItems
 
