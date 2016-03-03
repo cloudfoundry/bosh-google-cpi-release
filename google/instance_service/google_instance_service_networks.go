@@ -79,6 +79,10 @@ func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, networks Ne
 		return err
 	}
 
+	if err = i.updateSubnetwork(instance, networks); err != nil {
+		return err
+	}
+
 	if err = i.updateIPForwarding(instance, networks); err != nil {
 		return err
 	}
@@ -102,6 +106,20 @@ func (i GoogleInstanceService) updateNetwork(instance *compute.Instance, network
 	// If the network has changed we need to recreate the VM
 	if util.ResourceSplitter(instance.NetworkInterfaces[0].Network) != networks.NetworkName() {
 		i.logger.Debug(googleInstanceServiceLogTag, "Changing network for Google Instance '%s' not supported", instance.Name)
+		return api.NotSupportedError{}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateSubnetwork(instance *compute.Instance, networks Networks) error {
+	if networks.SubnetworkName() == "" {
+		return nil
+	}
+
+	// If the subnetwork has changed we need to recreate the VM
+	if util.ResourceSplitter(instance.NetworkInterfaces[0].Subnetwork) != networks.SubnetworkName() {
+		i.logger.Debug(googleInstanceServiceLogTag, "Changing subnetwork for Google Instance '%s' not supported", instance.Name)
 		return api.NotSupportedError{}
 	}
 
