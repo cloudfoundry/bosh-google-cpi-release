@@ -1,6 +1,0 @@
----
-name: golang1.5
-dependencies: {}
-files:
-  - golang1.5/go1.5.2.darwin-amd64.tar.gz
-  - golang1.5/go1.5.2.linux-amd64.tar.gz

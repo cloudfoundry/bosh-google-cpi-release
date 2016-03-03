@@ -1,0 +1,13 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# Grab the latest versions that are in the directory
+PLATFORM=`uname | tr '[:upper:]' '[:lower:]'`
+GOLANG_VERSION=`ls -r golang/go*.${PLATFORM}-* | sed "s/golang\/go\(.*\)\.${PLATFORM}-amd64.tar.gz/\1/" | head -1`
+
+# Extract Go Programming Language package
+tar xzvf ${BOSH_COMPILE_TARGET}/golang/go${GOLANG_VERSION}.${PLATFORM}-amd64.tar.gz
+
+# Copy Go Programming Language package
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp -a ${BOSH_COMPILE_TARGET}/go/* ${BOSH_INSTALL_TARGET}
