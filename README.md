@@ -64,10 +64,10 @@ Create a configuration file:
 | Option                                    | Required   | Type          | Description
 |:------------------------------------------|:----------:|:------------- |:-----------
 | google.project                            | Y          | String        | Google Compute Engine [Project](https://cloud.google.com/compute/docs/projects)
-| google.json_key                           | Y          | String        | Google Compute Engine [JSON key](https://developers.google.com/identity/protocols/OAuth2ServiceAccount)
+| google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
+| google.json_key                           | N         | String        | Contents of the Google Compute Engine [JSON file](https://developers.google.com/identity/protocols/application-default-credentials). Only required if you are not running the CPI inside a Google Compute Engine VM and the `GOOGLE_APPLICATION_CREDENTIALS` environment variable is not set
 | google.default_root_disk_size_gb          | N          | Integer       | The default size (in Gb) of the instance root disk (default is `10Gb`)
 | google.default_root_disk_type             | N          | String        | The name of the default [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
-| google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
 | actions.agent.mbus.endpoint               | Y          | String        | [BOSH Message Bus](http://bosh.io/docs/bosh-components.html#nats) URL used by deployed BOSH agents
 | actions.agent.ntp                         | Y          | Array&lt;String&gt; | List of NTP servers used by deployed BOSH agents
 | actions.agent.blobstore.type              | Y          | String        | Provider type for the [BOSH Blobstore](http://bosh.io/docs/bosh-components.html#blobstore) used by deployed BOSH agents (e.g. dav, s3)

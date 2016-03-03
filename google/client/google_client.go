@@ -1,6 +1,8 @@
 package client
 
 import (
+	"net/http"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"github.com/frodenas/bosh-google-cpi/google/config"
@@ -23,23 +25,38 @@ type GoogleClient struct {
 func NewGoogleClient(
 	config config.Config,
 ) (GoogleClient, error) {
-	computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)
-	if err != nil {
-		return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
+	var err error
+	var computeClient, storageClient *http.Client
+
+	if config.JSONKey != "" {
+		computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)
+		if err != nil {
+			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
+		}
+		computeClient = computeJwtConf.Client(oauth2.NoContext)
+
+		storageJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), storageScope)
+		if err != nil {
+			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
+		}
+		storageClient = storageJwtConf.Client(oauth2.NoContext)
+	} else {
+		computeClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope)
+		if err != nil {
+			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
+		}
+
+		storageClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, storageScope)
+		if err != nil {
+			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
+		}
 	}
 
-	computeClient := computeJwtConf.Client(oauth2.NoContext)
 	computeService, err := compute.New(computeClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 
-	storageJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), storageScope)
-	if err != nil {
-		return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
-	}
-
-	storageClient := storageJwtConf.Client(oauth2.NoContext)
 	storageService, err := storage.New(storageClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Storage Service client")

@@ -18,7 +18,6 @@ import (
 
 var validGoogleConfig = bgcconfig.Config{
 	Project:     "fake-project",
-	JSONKey:     "{}",
 	DefaultZone: "fake-default-zone",
 }
 

@@ -8,11 +8,8 @@ import (
 )
 
 var validConfig = Config{
-	Project:               "fake-project",
-	JSONKey:               "{}",
-	DefaultRootDiskSizeGb: 20,
-	DefaultRootDiskType:   "fake-default-root-disk-type",
-	DefaultZone:           "fake-default-zone",
+	Project:     "fake-project",
+	DefaultZone: "fake-default-zone",
 }
 
 var _ = Describe("Config", func() {
@@ -36,14 +33,6 @@ var _ = Describe("Config", func() {
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty Project"))
-		})
-
-		It("returns error if JSONKey is empty", func() {
-			config.JSONKey = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty JSONKey"))
 		})
 
 		It("returns error if DefaultZone is empty", func() {
