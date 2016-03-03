@@ -13,21 +13,27 @@ I am assuming you are familiar with [BOSH](http://bosh.io/) and its terminology.
 ### Setup the [Google Cloud Platform](https://cloud.google.com/) environment
 
 * [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine, if you haven't already.
-* Create a [service account](https://developers.google.com/console/help/new/#serviceaccounts) and secure store the downloaded **JSON Key**.
-* [Download and Install](https://cloud.google.com/compute/docs/gcloud-compute/#install) the gcloud command line tool.
+* Create a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) and secure store the downloaded **JSON Key**.
+* [Download and Install](https://cloud.google.com/sdk/) the Google Cloud SDK command line tool.
 * Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
 
 ```
 $ gcloud compute addresses create bosh --region us-central1
 ```
 
+* Create a new [network with auto-created subnetwork ranges](https://cloud.google.com/compute/docs/networking#creating_a_new_network_with_auto-created_subnetwork_ranges):
+
+```
+$ gcloud compute networks create cloudfoundry --mode auto
+```
+
 * Create a new firewall and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
 ```
-$ gcloud compute firewall-rules create bosh --description "BOSH" --target-tags bosh --allow tcp:22 tcp:4222 tcp:6868 tcp:25250 tcp:25555 tcp:25777 udp:53
+$ gcloud compute firewall-rules create bosh --description "BOSH" --network cloudfoundry --target-tags bosh --allow tcp:22,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
 ```
 
-* Create your [SSH keys](https://cloud.google.com/compute/docs/instances#sshing) if you haven't already.
+* Create your [SSH keys](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys) if you haven't already.
 
 ### Install the bosh-init CLI
 
@@ -44,7 +50,7 @@ $ cd google-bosh-deployment
 
 ### Create a deployment manifest
 
-Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following properties:
+Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following content:
 
 ```
 ---
@@ -52,11 +58,11 @@ name: bosh
 
 releases:
   - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=236
-    sha1: 88dd60313dbd7dd832faa44c90493ffa6cd85448
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=255.3
+    sha1: 1a3d61f968b9719d9afbd160a02930c464958bf4
   - name: bosh-google-cpi
-    url: https://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-8.tgz
-    sha1: 85288bc1784bf55faead8fb87d12e7f78cf42951
+    url: https://storage.googleapis.com/bosh-stemcells/bosh-google-cpi-9.tgz
+    sha1: 9f01d315035eeff6cf1a948ee32a80b3471c0037
 
 resource_pools:
   - name: vms
@@ -68,6 +74,9 @@ resource_pools:
       machine_type: n1-standard-2
       root_disk_size_gb: 40
       root_disk_type: pd-standard
+      service_scopes:
+        - compute
+        - devstorage.full_control
 
 disk_pools:
   - name: disks
@@ -79,10 +88,9 @@ networks:
   - name: private
     type: dynamic
     cloud_properties:
-      network_name: default
+      network_name: cloudfoundry
       tags:
         - bosh
-
   - name: public
     type: vip
 
@@ -105,9 +113,9 @@ jobs:
         release: bosh
       - name: health_monitor
         release: bosh
-      - name: cpi
-        release: bosh-google-cpi
       - name: registry
+        release: bosh
+      - name: google_cpi
         release: bosh-google-cpi
 
     resource_pool: vms
@@ -147,6 +155,18 @@ jobs:
         db: *db
         recursor: 8.8.8.8
 
+      registry:
+        address: __STATIC_IP__ # <--- Replace with the static IP
+        host: __STATIC_IP__ # <--- Replace with the static IP
+        db: *db
+        http:
+          user: registry
+          password: registry-password
+          port: 25777
+        username: registry
+        password: registry-password
+        port: 25777
+
       blobstore:
         address: __STATIC_IP__ # <--- Replace with the static IP
         port: 25250
@@ -162,7 +182,7 @@ jobs:
         address: 127.0.0.1
         name: micro-google
         db: *db
-        cpi_job: cpi
+        cpi_job: google_cpi
         user_management:
           provider: local
           local:
@@ -177,13 +197,8 @@ jobs:
           password: hm-password
         resurrector_enabled: true
 
-      ntp: &ntp
-        - 169.254.169.254
-
       google: &google_properties
         project: __GCE_PROJECT__ # <--- Replace with your GCE project
-        json_key: >
-          __GCE_JSON_KEY__ # <--- Replace with your GCE JSON key content
         default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
       agent:
@@ -195,14 +210,12 @@ jobs:
              user: agent
              password: agent-password
 
-      registry:
-        host: __STATIC_IP__ # <--- Replace with the static IP
-        username: registry
-        password: registry-password
+      ntp: &ntp
+        - 169.254.169.254
 
 cloud_provider:
   template:
-    name: cpi
+    name: google_cpi
     release: bosh-google-cpi
 
   ssh_tunnel:
@@ -211,17 +224,17 @@ cloud_provider:
     user: __SSH_USER__ # <--- Replace with the user corresponding to your private SSH key
     private_key: __PRIVATE_KEY_PATH__ # <--- Replace with the location of your google_compute_engine SSH private key
 
-  mbus: https://mbus:mbus@__STATIC_IP__:6868 # <--- Replace with the static IP
+  mbus: https://mbus:mbus-password@__STATIC_IP__:6868 # <--- Replace with the static IP
 
   properties:
     google: *google_properties
     agent:
-      mbus: https://mbus:mbus@0.0.0.0:6868
-      ntp: *ntp
+      mbus: https://mbus:mbus-password@0.0.0.0:6868
       blobstore:
         provider: local
         options:
           blobstore_path: /var/vcap/micro_bosh/data/cache
+      ntp: *ntp
 
 ```
 
@@ -298,4 +311,4 @@ git push origin master --tags
 ## Copyright
 
 See [LICENSE](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/LICENSE) for details.
-Copyright (c) 2015 Ferran Rodenas.
+Copyright (c) 2015-2016 Ferran Rodenas.
