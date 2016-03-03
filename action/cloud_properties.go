@@ -8,6 +8,7 @@ type Environment map[string]interface{}
 
 type NetworkCloudProperties struct {
 	NetworkName         string      `json:"network_name,omitempty"`
+	SubnetworkName      string      `json:"subnetwork_name,omitempty"`
 	Tags                NetworkTags `json:"tags,omitempty"`
 	EphemeralExternalIP bool        `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        bool        `json:"ip_forwarding,omitempty"`

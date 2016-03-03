@@ -24,6 +24,7 @@ var _ = Describe("Networks", func() {
 			DNS:                 []string{"fake-dynamic-network-dns"},
 			Default:             []string{"fake-dynamic-network-default"},
 			NetworkName:         "fake-dynamic-network-network-name",
+			SubnetworkName:      "fake-dynamic-network-subnetwork-name",
 			EphemeralExternalIP: true,
 			IPForwarding:        false,
 			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
@@ -38,6 +39,7 @@ var _ = Describe("Networks", func() {
 			DNS:                 []string{"fake-vip-network-dns"},
 			Default:             []string{"fake-vip-network-default"},
 			NetworkName:         "fake-vip-network-network-name",
+			SubnetworkName:      "fake-vip-network-subnetwork-name",
 			EphemeralExternalIP: false,
 			IPForwarding:        true,
 			Tags:                NetworkTags{"fake-vip-network-network-tag"},
@@ -167,6 +169,26 @@ var _ = Describe("Networks", func() {
 
 			It("returns the default network name", func() {
 				Expect(networks.NetworkName()).To(Equal("default"))
+			})
+		})
+	})
+
+	Describe("SubnetworkName", func() {
+		It("returns only the dynamic network subnetwork name", func() {
+			Expect(networks.SubnetworkName()).To(Equal("fake-dynamic-network-subnetwork-name"))
+		})
+
+		Context("when Subnetwork Name is empty", func() {
+			BeforeEach(func() {
+				dynamicNetwork.SubnetworkName = ""
+				networks = Networks{
+					"fake-dynamic-network": dynamicNetwork,
+					"fake-vip-network":     vipNetwork,
+				}
+			})
+
+			It("returns an empty subnetwork name", func() {
+				Expect(networks.SubnetworkName()).To(BeEmpty())
 			})
 		})
 	})

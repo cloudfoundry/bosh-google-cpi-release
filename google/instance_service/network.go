@@ -16,6 +16,7 @@ type Network struct {
 	DNS                 []string
 	Default             []string
 	NetworkName         string
+	SubnetworkName      string
 	EphemeralExternalIP bool
 	IPForwarding        bool
 	Tags                NetworkTags

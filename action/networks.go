@@ -30,6 +30,7 @@ func (ns Networks) AsInstanceServiceNetworks() instance.Networks {
 			DNS:                 network.DNS,
 			Default:             network.Default,
 			NetworkName:         network.CloudProperties.NetworkName,
+			SubnetworkName:      network.CloudProperties.SubnetworkName,
 			Tags:                instance.NetworkTags(network.CloudProperties.Tags),
 			EphemeralExternalIP: network.CloudProperties.EphemeralExternalIP,
 			IPForwarding:        network.CloudProperties.IPForwarding,

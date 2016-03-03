@@ -126,6 +126,18 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) 
 		return nil, bosherr.WrapErrorf(err, "Network '%s' does not exists", networks.NetworkName())
 	}
 
+	subnetworkLink := ""
+	if networks.SubnetworkName() != "" {
+		subnetwork, found, err := i.subnetworkService.Find(networks.SubnetworkName(), "")
+		if err != nil {
+			return nil, err
+		}
+		if !found {
+			return nil, bosherr.WrapErrorf(err, "Subnetwork '%s' does not exists", networks.SubnetworkName())
+		}
+		subnetworkLink = subnetwork.SelfLink
+	}
+
 	var networkInterfaces []*compute.NetworkInterface
 	var accessConfigs []*compute.AccessConfig
 
@@ -143,6 +155,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) 
 
 	networkInterface := &compute.NetworkInterface{
 		Network:       network.SelfLink,
+		Subnetwork:    subnetworkLink,
 		AccessConfigs: accessConfigs,
 	}
 	networkInterfaces = append(networkInterfaces, networkInterface)

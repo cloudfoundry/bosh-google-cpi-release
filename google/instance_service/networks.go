@@ -77,6 +77,12 @@ func (n Networks) NetworkName() string {
 	return defaultNetworkName
 }
 
+func (n Networks) SubnetworkName() string {
+	dynamicNetwork := n.DynamicNetwork()
+
+	return dynamicNetwork.SubnetworkName
+}
+
 func (n Networks) EphemeralExternalIP() bool {
 	dynamicNetwork := n.DynamicNetwork()
 

@@ -20,6 +20,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
+	"github.com/frodenas/bosh-google-cpi/google/subnetwork_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 
 	"github.com/frodenas/bosh-registry/client"
@@ -53,6 +54,7 @@ var _ = Describe("ConcreteFactory", func() {
 		machineTypeService machinetype.Service
 		networkService     network.Service
 		snapshotService    snapshot.Service
+		subnetworkService  subnetwork.Service
 		registryClient     registry.Client
 		targetPoolService  targetpool.Service
 		vmService          instance.Service
@@ -132,6 +134,12 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
+		subnetworkService = subnetwork.NewGoogleSubnetworkService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
 		targetPoolService = targetpool.NewGoogleTargetPoolService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
@@ -145,6 +153,7 @@ var _ = Describe("ConcreteFactory", func() {
 			addressService,
 			networkService,
 			operationService,
+			subnetworkService,
 			targetPoolService,
 			uuidGen,
 			logger,

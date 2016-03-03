@@ -107,6 +107,7 @@ These options are specified under `cloud_properties` at the [networks](http://bo
 | Option                | Required | Type          | Description
 |:----------------------|:--------:|:------------- |:-----------
 | network_name          | N        | String        | The name of the [Google Compute Engine Network](https://cloud.google.com/compute/docs/networking#networks) the CPI will use when creating the instance (if not set, by default it will use the `default` network)
+| subnetwork_name       | N        | String        | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance (if the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field should be specified)
 | ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default)
 | ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default)
 | target_pool           | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to

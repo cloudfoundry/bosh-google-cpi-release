@@ -7,6 +7,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/address_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
+	"github.com/frodenas/bosh-google-cpi/google/subnetwork_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 	"google.golang.org/api/compute/v1"
 )
@@ -21,6 +22,7 @@ type GoogleInstanceService struct {
 	addressService    address.Service
 	networkService    network.Service
 	operationService  operation.Service
+	subnetworkService subnetwork.Service
 	targetPoolService targetpool.Service
 	uuidGen           boshuuid.Generator
 	logger            boshlog.Logger
@@ -32,6 +34,7 @@ func NewGoogleInstanceService(
 	addressService address.Service,
 	networkService network.Service,
 	operationService operation.Service,
+	subnetworkService subnetwork.Service,
 	targetPoolService targetpool.Service,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
@@ -42,6 +45,7 @@ func NewGoogleInstanceService(
 		addressService:    addressService,
 		networkService:    networkService,
 		operationService:  operationService,
+		subnetworkService: subnetworkService,
 		targetPoolService: targetPoolService,
 		uuidGen:           uuidGen,
 		logger:            logger,

@@ -15,6 +15,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
 	"github.com/frodenas/bosh-google-cpi/google/operation_service"
 	"github.com/frodenas/bosh-google-cpi/google/snapshot_service"
+	"github.com/frodenas/bosh-google-cpi/google/subnetwork_service"
 	"github.com/frodenas/bosh-google-cpi/google/target_pool_service"
 
 	"github.com/frodenas/bosh-registry/client"
@@ -90,6 +91,12 @@ func NewConcreteFactory(
 		logger,
 	)
 
+	subnetworkService := subnetwork.NewGoogleSubnetworkService(
+		googleClient.Project(),
+		googleClient.ComputeService(),
+		logger,
+	)
+
 	targetPoolService := targetpool.NewGoogleTargetPoolService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
@@ -103,6 +110,7 @@ func NewConcreteFactory(
 		addressService,
 		networkService,
 		operationService,
+		subnetworkService,
 		targetPoolService,
 		uuidGen,
 		logger,
