@@ -1,6 +1,6 @@
 ---
 name: bosh-google-cpi
 dependencies:
-  - golang1.5
+  - golang
 files:
   - github.com/frodenas/bosh-google-cpi/**/*
