@@ -1,5 +1,5 @@
 ---
-name: cpi
+name: google_cpi
 
 packages:
   - bosh-google-cpi
