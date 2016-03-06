@@ -21,6 +21,7 @@ type Network struct {
 	IPForwarding        bool
 	Tags                NetworkTags
 	TargetPool          string
+	InstanceGroup       string
 }
 
 type NetworkTags []string

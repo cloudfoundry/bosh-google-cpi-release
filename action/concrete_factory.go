@@ -10,6 +10,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/image_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_group_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
@@ -66,6 +67,13 @@ func NewConcreteFactory(
 		logger,
 	)
 
+	instanceGroupService := instancegroup.NewGoogleInstanceGroupService(
+		googleClient.Project(),
+		googleClient.ComputeService(),
+		operationService,
+		logger,
+	)
+
 	machineTypeService := machinetype.NewGoogleMachineTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
@@ -108,6 +116,7 @@ func NewConcreteFactory(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		addressService,
+		instanceGroupService,
 		networkService,
 		operationService,
 		subnetworkService,

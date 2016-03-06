@@ -106,3 +106,9 @@ func (n Networks) TargetPool() string {
 
 	return dynamicNetwork.TargetPool
 }
+
+func (n Networks) InstanceGroup() string {
+	dynamicNetwork := n.DynamicNetwork()
+
+	return dynamicNetwork.InstanceGroup
+}

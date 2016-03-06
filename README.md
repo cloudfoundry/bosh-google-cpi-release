@@ -111,6 +111,7 @@ These options are specified under `cloud_properties` at the [networks](http://bo
 | ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default)
 | ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default)
 | target_pool           | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
+| instance_group        | N        | String        | The name of the [Google Compute Engine Instance Group](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups) the instances should be added to
 | tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags
 
 ### BOSH Resource pool options

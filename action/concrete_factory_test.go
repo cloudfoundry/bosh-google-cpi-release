@@ -15,6 +15,7 @@ import (
 	"github.com/frodenas/bosh-google-cpi/google/disk_service"
 	"github.com/frodenas/bosh-google-cpi/google/disk_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/image_service"
+	"github.com/frodenas/bosh-google-cpi/google/instance_group_service"
 	"github.com/frodenas/bosh-google-cpi/google/instance_service"
 	"github.com/frodenas/bosh-google-cpi/google/machine_type_service"
 	"github.com/frodenas/bosh-google-cpi/google/network_service"
@@ -46,18 +47,19 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	var (
-		operationService   operation.GoogleOperationService
-		addressService     address.Service
-		diskService        disk.Service
-		diskTypeService    disktype.Service
-		imageService       image.Service
-		machineTypeService machinetype.Service
-		networkService     network.Service
-		snapshotService    snapshot.Service
-		subnetworkService  subnetwork.Service
-		registryClient     registry.Client
-		targetPoolService  targetpool.Service
-		vmService          instance.Service
+		operationService     operation.GoogleOperationService
+		addressService       address.Service
+		diskService          disk.Service
+		diskTypeService      disktype.Service
+		imageService         image.Service
+		instanceGroupService instancegroup.Service
+		machineTypeService   machinetype.Service
+		networkService       network.Service
+		snapshotService      snapshot.Service
+		subnetworkService    subnetwork.Service
+		registryClient       registry.Client
+		targetPoolService    targetpool.Service
+		vmService            instance.Service
 	)
 
 	BeforeEach(func() {
@@ -109,6 +111,13 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
+		instanceGroupService = instancegroup.NewGoogleInstanceGroupService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			operationService,
+			logger,
+		)
+
 		machineTypeService = machinetype.NewGoogleMachineTypeService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
@@ -151,6 +160,7 @@ var _ = Describe("ConcreteFactory", func() {
 			googleClient.Project(),
 			googleClient.ComputeService(),
 			addressService,
+			instanceGroupService,
 			networkService,
 			operationService,
 			subnetworkService,

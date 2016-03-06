@@ -13,6 +13,7 @@ type NetworkCloudProperties struct {
 	EphemeralExternalIP bool        `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        bool        `json:"ip_forwarding,omitempty"`
 	TargetPool          string      `json:"target_pool,omitempty"`
+	InstanceGroup       string      `json:"instance_group,omitempty"`
 }
 
 type NetworkTags []string

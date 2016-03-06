@@ -32,6 +32,7 @@ var _ = Describe("Networks", func() {
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 					TargetPool:          "fake-network-1-cloud-target-pool",
+					InstanceGroup:       "fake-network-1-cloud-instance-group",
 				},
 			},
 			"fake-network-2-name": Network{
@@ -57,6 +58,7 @@ var _ = Describe("Networks", func() {
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 					TargetPool:          "fake-network-1-cloud-target-pool",
+					InstanceGroup:       "fake-network-1-cloud-instance-group",
 				},
 				"fake-network-2-name": instance.Network{
 					Type: "fake-network-2-type",

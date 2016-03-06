@@ -29,6 +29,7 @@ var _ = Describe("Networks", func() {
 			IPForwarding:        false,
 			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
 			TargetPool:          "fake-dynamic-network-target-pool",
+			InstanceGroup:       "fake-dynamic-network-instance-group",
 		}
 
 		vipNetwork = Network{
@@ -44,6 +45,7 @@ var _ = Describe("Networks", func() {
 			IPForwarding:        true,
 			Tags:                NetworkTags{"fake-vip-network-network-tag"},
 			TargetPool:          "fake-vip-network-target-pool",
+			InstanceGroup:       "fake-vip-network-instance-group",
 		}
 
 		networks = Networks{
@@ -214,6 +216,12 @@ var _ = Describe("Networks", func() {
 	Describe("TargetPool", func() {
 		It("returns only the dynamic network TargetPool", func() {
 			Expect(networks.TargetPool()).To(Equal("fake-dynamic-network-target-pool"))
+		})
+	})
+
+	Describe("InstanceGroup", func() {
+		It("returns only the dynamic network InstanceGroup", func() {
+			Expect(networks.InstanceGroup()).To(Equal("fake-dynamic-network-instance-group"))
 		})
 	})
 })
