@@ -71,7 +71,7 @@ resource_pools:
       url: https://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-3202-google-kvm-ubuntu-trusty-go_agent.tgz
       sha1: 2b99bb9e5238b0acdbc01e034c094338a89fb0da
     cloud_properties:
-      machine_type: n1-standard-2
+      machine_type: n1-standard-4
       root_disk_size_gb: 40
       root_disk_type: pd-standard
       service_scopes:
