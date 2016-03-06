@@ -18,19 +18,23 @@ I am assuming you are familiar with [BOSH](http://bosh.io/) and its terminology.
 * Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
 
 ```
-$ gcloud compute addresses create bosh --region us-central1
+$ gcloud compute addresses create bosh
 ```
 
 * Create a new [network with auto-created subnetwork ranges](https://cloud.google.com/compute/docs/networking#creating_a_new_network_with_auto-created_subnetwork_ranges):
 
 ```
-$ gcloud compute networks create cloudfoundry --mode auto
+$ gcloud compute networks create cf --mode auto
 ```
 
-* Create a new firewall and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
+* Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
 ```
-$ gcloud compute firewall-rules create bosh --description "BOSH" --network cloudfoundry --target-tags bosh --allow tcp:22,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
+$ gcloud compute firewall-rules create cf-intenal --description "Cloud Foundry Internal traffic" --network cf --source-tags cf-internal --target-tags cf-internal --allow tcp,udp,icmp
+```
+
+```
+$ gcloud compute firewall-rules create cf-bosh --description "Cloud Foundry BOSH External traffic" --network cf --target-tags cf-bosh --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
 ```
 
 * Create your [SSH keys](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys) if you haven't already.
@@ -88,9 +92,10 @@ networks:
   - name: private
     type: dynamic
     cloud_properties:
-      network_name: cloudfoundry
+      network_name: cf
       tags:
-        - bosh
+        - cf-intenal
+        - cf-bosh
   - name: public
     type: vip
 
@@ -247,6 +252,22 @@ Using the previously created deployment manifest, now we can deploy it:
 ```
 $ bosh-init deploy google-bosh-manifest.yml
 ```
+
+### Install the BOSH CLI
+
+Install the [BOSH CLI](http://bosh.io/docs/bosh-cli.html) tool in your workstation.
+
+Then target your BOSH environment:
+
+```
+$ bosh target <YOUR BOSH IP ADDRESS>
+```
+
+Your username is `admin` and password is `admin`.
+
+### Deploy Cloud Foundry
+
+Refer to the [Deploying Cloud Foundry on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploycf.md) guide.
 
 ## Contributing
 
