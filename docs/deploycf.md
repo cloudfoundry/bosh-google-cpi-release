@@ -8,8 +8,8 @@ In order to deploy [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Com
 
 * Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
     - 100 Cores
-    - 22 IP addresses
-    - 1.5 Tb persistent disk
+    - 25 IP addresses
+    - 1 Tb persistent disk
 
 ### Prepare the Google Compute Engine environment
 
@@ -22,8 +22,8 @@ $ gcloud compute addresses create cf
 * Create the following load balancing [health checks](https://cloud.google.com/compute/docs/load-balancing/health-checks):
 
 ```
-$ gcloud compute http-health-checks create cf-web \
-  --description "Cloud Foundry Web Health Check" \
+$ gcloud compute http-health-checks create cf-public \
+  --description "Cloud Foundry Public Health Check" \
   --timeout "5s" \
   --check-interval "30s" \
   --healthy-threshold "10" \
@@ -33,29 +33,12 @@ $ gcloud compute http-health-checks create cf-web \
   --host "api.<YOUR CF IP ADDRESS>.io"
 ```
 
-```
-$ gcloud compute http-health-checks create cf-ssh \
-  --description "Cloud Foundry SSH Health Check" \
-  --timeout "5s" \
-  --check-interval "30s" \
-  --healthy-threshold "10" \
-  --unhealthy-threshold "2" \
-  --port 2222 \
-  --host "api.<YOUR CF IP ADDRESS>.xip.io"
-```
-
 * Create the following load balancing [target pools](https://cloud.google.com/compute/docs/load-balancing/network/target-pools):
 
 ```
-$ gcloud compute target-pools create cf-web \
-  --description "Cloud Foundry Web Target Pool" \
-  --health-check cf-web
-```
-
-```
-$ gcloud compute target-pools create cf-ssh \
-  --description "Cloud Foundry SSH Target Pool" \
-  --health-check cf-ssh
+$ gcloud compute target-pools create cf-public \
+  --description "Cloud Foundry Public Target Pool" \
+  --health-check cf-public
 ```
 
 * Create the following load balancing [forwarding rules](https://cloud.google.com/compute/docs/load-balancing/network/forwarding-rules):
@@ -65,7 +48,7 @@ $ gcloud compute forwarding-rules create cf-http \
   --description "Cloud Foundry HTTP Traffic" \
   --ip-protocol TCP \
   --port-range 80 \
-  --target-pool cf-web \
+  --target-pool cf-public \
   --address <YOUR CF IP ADDRESS>
 ```
 
@@ -74,16 +57,7 @@ $ gcloud compute forwarding-rules create cf-https \
   --description "Cloud Foundry HTTPS Traffic" \
   --ip-protocol TCP \
   --port-range 443 \
-  --target-pool cf-web \
-  --address <YOUR CF IP ADDRESS>
-```
-
-```
-$ gcloud compute forwarding-rules create cf-wss \
-  --description "Cloud Foundry WSS Traffic" \
-  --ip-protocol TCP \
-  --port-range 4443 \
-  --target-pool cf-web \
+  --target-pool cf-public \
   --address <YOUR CF IP ADDRESS>
 ```
 
@@ -92,26 +66,27 @@ $ gcloud compute forwarding-rules create cf-ssh \
   --description "Cloud Foundry SSH Traffic" \
   --ip-protocol TCP \
   --port-range 2222 \
-  --target-pool cf-ssh \
+  --target-pool cf-public \
+  --address <YOUR CF IP ADDRESS>
+```
+
+```
+$ gcloud compute forwarding-rules create cf-wss \
+  --description "Cloud Foundry WSS Traffic" \
+  --ip-protocol TCP \
+  --port-range 4443 \
+  --target-pool cf-public \
   --address <YOUR CF IP ADDRESS>
 ```
 
 * Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
 ```
-$ gcloud compute firewall-rules create cf-web \
-  --description "Cloud Foundry Web Traffic" \
-  --network cloudfoundry \
-  --target-tags cf-web \
-  --allow tcp:80,tcp:443,tcp:4443
-```
-
-```
-$ gcloud compute firewall-rules create cf-ssh \
-  --description "Cloud Foundry SSH Traffic" \
-  --network cloudfoundry \
-  --target-tags cf-ssh \
-  --allow tcp:2222
+$ gcloud compute firewall-rules create cf-public \
+  --description "Cloud Foundry Public Traffic" \
+  --network cf \
+  --target-tags cf-public \
+  --allow tcp:80,tcp:443,tcp:2222,tcp:4443
 ```
 
 ### Deploying Cloud Foundry
