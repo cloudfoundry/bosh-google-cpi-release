@@ -268,6 +268,7 @@ Your username is `admin` and password is `admin`.
 ### Deploy other software
 
 * [Deploying Cloud Foundry on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_cf.md)
+* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_mysql.md)
 * [Deploying Concourse on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_concourse.md)
 
 ## Contributing
