@@ -1,0 +1,171 @@
+---
+<%
+director_uuid = "CHANGE-ME"
+vip_ip = "CHANGE-ME"
+common_password = "c1oudc0w"
+deployment_name = "concourse"
+%>
+name: <%= deployment_name %>
+director_uuid: <%= director_uuid %>
+
+releases:
+  - name: concourse
+    version: "0.74.0"
+  - name: garden-linux
+    version: "0.333.0"
+
+compilation:
+  workers: 3
+  network: private
+  reuse_compilation_vms: true
+  cloud_properties:
+    machine_type: n1-standard-8
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+    preemptible: true
+
+update:
+  canaries: 0
+  canary_watch_time: 1000-60000
+  update_watch_time: 1000-60000
+  max_in_flight: 32
+  serial: false
+
+networks:
+  - name: public
+    type: dynamic
+    cloud_properties:
+      network_name: cf
+      ephemeral_external_ip: true
+      tags:
+        - cf-internal
+        - concourse
+
+  - name: private
+    type: dynamic
+    cloud_properties:
+      network_name: cf
+      ephemeral_external_ip: true
+      tags:
+        - cf-internal
+
+  - name: vip
+    type: vip
+
+resource_pools:
+  - name: common
+    network: private
+    stemcell:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      version: latest
+    cloud_properties:
+      machine_type: n1-standard-4
+      root_disk_size_gb: 20
+      root_disk_type: pd-standard
+
+  - name: workers
+    network: private
+    stemcell:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      version: latest
+    cloud_properties:
+      machine_type: n1-highmem-8
+      root_disk_size_gb: 100
+      root_disk_type: pd-standard
+
+disk_pools:
+  - name: db
+    disk_size: 10240
+
+jobs:
+  - name: db
+    templates:
+      - name: postgresql
+        release: concourse
+      - name: consul-agent
+        release: concourse
+    instances: 1
+    resource_pool: common
+    persistent_disk_pool: db
+    networks:
+      - name: private
+        default: [dns, gateway]
+    properties:
+      consul:
+        agent:
+          mode: server
+          services:
+            postgresql: {}
+
+  - name: web
+    templates:
+      - name: atc
+        release: concourse
+      - name: tsa
+        release: concourse
+      - name: consul-agent
+        release: concourse
+    instances: 1
+    resource_pool: common
+    networks:
+      - name: public
+        default: [dns, gateway]
+      - name: vip
+        static_ips:
+          - <%= vip_ip %>
+    properties:
+      consul:
+        agent:
+          services:
+            atc: {}
+            tsa: {}
+
+  - name: worker
+    templates:
+      - name: groundcrew
+        release: concourse
+      - name: baggageclaim
+        release: concourse
+      - name: garden
+        release: garden-linux
+      - name: consul-agent
+        release: concourse
+    instances: 1
+    resource_pool: workers
+    networks:
+      - name: private
+        default: [dns, gateway]
+    properties:
+      consul:
+        agent:
+          services:
+            garden: {}
+
+properties:
+  postgresql:
+    databases:
+      - name: &atc_db_name atc
+    roles:
+      - name: &atc_db_username atc
+        password: &atc_db_password "<%= common_password %>"
+
+  consul:
+    agent:
+      servers:
+        lan:
+          - 0.db.private.<%= deployment_name %>.microbosh
+
+  atc:
+    external_url: http://<%= vip_ip %>
+    publicly_viewable: true
+    development_mode: true
+    postgresql:
+      address: 0.db.private.<%= deployment_name %>.microbosh
+      database: *atc_db_name
+      role:
+        name: *atc_db_username
+        password: *atc_db_password
+
+  garden:
+    listen_network: tcp
+    listen_address: 0.0.0.0:7777
