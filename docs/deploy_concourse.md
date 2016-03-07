@@ -7,9 +7,9 @@ In order to deploy [Concourse](http://concourse.ci/) on [Google Compute Engine](
 * An existing BOSH environment
 
 * Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
-    - 16 Cores
-    - 1 IP addresses
-    - 140 Gb persistent disk
+    - 24 Cores
+    - 3 IP addresses
+    - 160 Gb persistent disk
 
 ### Prepare the Google Compute Engine environment
 

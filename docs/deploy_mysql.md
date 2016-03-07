@@ -52,7 +52,7 @@ $ bosh deploy
 $ bosh run errand broker-registrar
 ```
 
-* Now your applications will be able to use MySQL
+* Now your applications will be able to use MySQL:
 
 ```
 $ cf marketplace
