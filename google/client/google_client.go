@@ -27,6 +27,7 @@ func NewGoogleClient(
 ) (GoogleClient, error) {
 	var err error
 	var computeClient, storageClient *http.Client
+    userAgent := "bosh-google-cpi/0.0.1"
 
 	if config.JSONKey != "" {
 		computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)
@@ -56,11 +57,13 @@ func NewGoogleClient(
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
+    computeService.UserAgent = userAgent
 
 	storageService, err := storage.New(storageClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Storage Service client")
 	}
+    storageService.UserAgent = userAgent
 
 	return GoogleClient{
 		config:         config,
