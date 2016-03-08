@@ -4,4 +4,4 @@ image: docker:///frodenas/bosh-google-cpi-boshrelease
 inputs:
   - name: bosh-google-cpi-boshrelease
 run:
-  path: bosh-google-cpi-boshrelease/ci/tasks/unit.sh
+  path: bosh-google-cpi-boshrelease/ci/tasks/unit-tests.sh

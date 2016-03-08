@@ -11,8 +11,8 @@ jobs:
       - get: bosh-google-cpi-boshrelease
         trigger: true
 
-      - task: unit
-        file: bosh-google-cpi-boshrelease/ci/tasks/unit.yml
+      - task: unit-tests
+        file: bosh-google-cpi-boshrelease/ci/tasks/unit-tests.yml
 
 resources:
   - name: bosh-google-cpi-boshrelease
