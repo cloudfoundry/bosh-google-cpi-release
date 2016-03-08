@@ -1,15 +1,7 @@
 ---
 platform: linux
-
 image: docker:///frodenas/bosh-google-cpi-boshrelease
-
 inputs:
   - name: bosh-google-cpi-boshrelease
-
-params:
-  GOARCH: amd64
-  GOARM:  5
-  GOOS:   linux
-
 run:
-  path: bosh-google-cpi-boshrelease/ci/scripts/bosh-google-cpi
+  path: bosh-google-cpi-boshrelease/ci/tasks/unit.sh

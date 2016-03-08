@@ -1,0 +1,25 @@
+---
+groups:
+  - name: bosh-google-cpi-boshrelease
+    jobs:
+      - integration
+
+jobs:
+  - name: integration
+    serial: true
+    plan:
+      - get: bosh-google-cpi-boshrelease
+        trigger: true
+
+      - task: unit
+        file: bosh-google-cpi-boshrelease/ci/tasks/unit.yml
+
+resources:
+  - name: bosh-google-cpi-boshrelease
+    type: git
+    source:
+      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      branch: master
+      ignore_paths:
+        - .final_builds/**/*.yml
+        - releases/**/*.yml
