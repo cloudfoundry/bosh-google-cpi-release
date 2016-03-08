@@ -1,0 +1,156 @@
+---
+<%
+director_uuid = "CHANGE-ME"
+vip_ip = "CHANGE-ME"
+root_domain = "#{vip_ip}.xip.io"
+common_password = "c1oudc0w"
+deployment_name = "redis"
+cf_deployment_name = "cf"
+%>
+name: <%= deployment_name %>
+director_uuid: <%= director_uuid %>
+
+releases:
+  - name: cf-redis
+    version: "424"
+
+compilation:
+  workers: 3
+  network: private
+  reuse_compilation_vms: true
+  cloud_properties:
+    machine_type: n1-standard-8
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+    preemptible: true
+
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 32
+  serial: false
+
+networks:
+  - name: private
+    type: dynamic
+    cloud_properties:
+      network_name: cf
+      ephemeral_external_ip: true
+      tags:
+        - cf-internal
+
+  - name: vip
+    type: vip
+
+resource_pools:
+  - name: common
+    network: private
+    stemcell:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      version: latest
+    cloud_properties:
+      machine_type: n1-standard-2
+      root_disk_size_gb: 20
+      root_disk_type: pd-standard
+
+disk_pools:
+  - name: redis
+    disk_size: 20480
+
+jobs:
+  - name: dedicated-node
+    templates:
+      - name: dedicated-node
+        release: cf-redis
+    instances: 1
+    resource_pool: common
+    persistent_disk_pool: redis
+    networks:
+      - name: private
+        default: [dns, gateway]
+
+  - name: cf-redis-broker
+    templates:
+      - name: cf-redis-broker
+        release: cf-redis
+    instances: 1
+    resource_pool: common
+    networks:
+      - name: private
+        default: [dns, gateway]
+
+  - name: broker-registrar
+    templates:
+      - name: broker-registrar
+        release: cf-redis
+    lifecycle: errand
+    instances: 1
+    resource_pool: common
+    networks:
+      - name: private
+        default: [dns, gateway]
+
+  - name: broker-deregistrar
+    templates:
+      - name: broker-deregistrar
+        release: cf-redis
+    lifecycle: errand
+    instances: 1
+    resource_pool: common
+    networks:
+      - name: private
+        default: [dns, gateway]
+
+  - name: smoke_tests
+    templates:
+      - name: smoke-tests
+        release: cf-redis
+    lifecycle: errand
+    instances: 1
+    resource_pool: common
+    networks:
+      - name: private
+        default: [dns, gateway]
+
+properties:
+  broker:
+    name: redis
+    username: admin
+    password: "<%= common_password %>"
+    host: "redis-broker.<%= root_domain %>"
+
+  cf:
+    admin_username: admin
+    admin_password: "<%= common_password %>"
+    api_url: "https://api.<%= root_domain %>"
+    apps_domain: "<%= root_domain %>"
+    skip_ssl_validation: true
+    nats:
+      host: 0.nats.private.<%= cf_deployment_name %>.microbosh
+      port: 4222
+      username: nats
+      password: "<%= common_password %>"
+
+  syslog_aggregator: {}
+
+  redis:
+    broker:
+      auth:
+        username: admin
+        password: "<%= common_password %>"
+      enable_service_access: true
+      service_name: redis
+      route_name:
+      network: private
+      backend_host: "redis-broker.<%= root_domain %>"
+      backend_port: 12345
+      name: redis
+      service_instance_limit: 5
+    maxmemory: 62144000
+    host: "redis-broker.<%= root_domain %>"
+    config_command: "config_<%= common_password %>"
+    save_command: "save_<%= common_password %>"
+    bg_save_command: "bg_save_<%= common_password %>"
+    agent:
+      backend_port: 54321
