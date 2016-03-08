@@ -30,7 +30,7 @@ $ gcloud compute http-health-checks create cf-public \
   --unhealthy-threshold "2" \
   --port 80 \
   --request-path "/info" \
-  --host "api.<YOUR CF IP ADDRESS>.io"
+  --host "api.<YOUR CF IP ADDRESS>.xip.io"
 ```
 
 * Create the following load balancing [target pools](https://cloud.google.com/compute/docs/load-balancing/network/target-pools):
