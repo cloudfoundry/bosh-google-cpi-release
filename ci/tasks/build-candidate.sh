@@ -16,4 +16,4 @@ pushd bosh-google-cpi-boshrelease
   bosh create release --name $cpi_release_name --version $semver --with-tarball
 popd
 
-mv bosh-google-cpi-boshrelease/dev_releases/$cpi_release_name/$cpi_release_name-$semver.tgz ../candidate/
+mv bosh-google-cpi-boshrelease/dev_releases/$cpi_release_name/$cpi_release_name-$semver.tgz candidate/
