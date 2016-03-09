@@ -1,0 +1,14 @@
+---
+platform: linux
+image: docker:///frodenas/bosh-google-cpi-boshrelease
+inputs:
+  - name: bosh-google-cpi-dev-artifacts
+  - name: bosh-google-cpi-boshrelease
+  - name: release-version-semver
+outputs:
+  - name: promoted
+run:
+  path: bosh-google-cpi-boshrelease/ci/tasks/promote-candidate.sh
+params:
+  aws_access_key_id:     replace-me
+  aws_secret_access_key: replace-me
