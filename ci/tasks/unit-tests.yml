@@ -2,6 +2,6 @@
 platform: linux
 image: docker:///frodenas/bosh-google-cpi-boshrelease
 inputs:
-  - name: bosh-google-cpi-boshrelease
+  - name: bosh-cpi-src
 run:
-  path: bosh-google-cpi-boshrelease/ci/tasks/unit-tests.sh
+  path: bosh-cpi-src/ci/tasks/unit-tests.sh

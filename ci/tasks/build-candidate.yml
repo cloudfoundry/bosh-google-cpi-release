@@ -2,9 +2,9 @@
 platform: linux
 image: docker:///frodenas/bosh-google-cpi-boshrelease
 inputs:
-  - name: bosh-google-cpi-boshrelease
+  - name: bosh-cpi-release
   - name: version-semver
 outputs:
   - name: candidate
 run:
-  path: bosh-google-cpi-boshrelease/ci/tasks/build-candidate.sh
+  path: bosh-cpi-release/ci/tasks/build-candidate.sh
