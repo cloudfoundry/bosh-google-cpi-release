@@ -1,0 +1,23 @@
+---
+platform: linux
+image: docker:///frodenas/bosh-google-cpi-boshrelease
+inputs:
+  - name: bosh-cpi-src
+  - name: bosh-cpi-release
+  - name: bosh-release
+  - name: stemcell
+  - name: bosh-init
+outputs:
+  - name: deployment
+run:
+  path: bosh-cpi-src/ci/tasks/setup-director.sh
+params:
+  BOSH_INIT_LOG_LEVEL: warn
+  google_project:      replace-me
+  google_default_zone: replace-me
+  google_json_key:     replace-me
+  google_static_ip:    replace-me
+  private_key_user:    replace-me
+  private_key_data:    replace-me
+  director_username:   replace-me
+  director_password:   replace-me

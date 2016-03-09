@@ -1,0 +1,11 @@
+---
+platform: linux
+image: docker:///frodenas/bosh-google-cpi-boshrelease
+inputs:
+  - name: bosh-cpi-src
+  - name: bosh-init
+  - name: deployment
+run:
+  path: bosh-cpi-src/ci/tasks/teardown-director.sh
+params:
+  BOSH_INIT_LOG_LEVEL: warn
