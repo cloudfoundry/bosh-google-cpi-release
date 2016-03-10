@@ -17,6 +17,7 @@ params:
   google_default_zone: replace-me
   google_json_key:     replace-me
   google_static_ip:    replace-me
+  google_network:      replace-me
   private_key_user:    replace-me
   private_key_data:    replace-me
   director_username:   replace-me

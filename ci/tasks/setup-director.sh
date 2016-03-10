@@ -9,6 +9,7 @@ check_param google_project
 check_param google_default_zone
 check_param google_json_key
 check_param google_static_ip
+check_param google_network
 check_param private_key_user
 check_param private_key_data
 check_param director_password
@@ -63,10 +64,9 @@ networks:
   - name: private
     type: dynamic
     cloud_properties:
-      network_name: cf
+      network_name: ${google_network}
       tags:
-        - cf-intenal
-        - cf-bosh
+        - bosh
   - name: public
     type: vip
 
