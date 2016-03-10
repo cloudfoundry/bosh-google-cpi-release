@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	"github.com/frodenas/bosh-google-cpi/google/config"
 
@@ -20,10 +21,12 @@ type GoogleClient struct {
 	config         config.Config
 	computeService *compute.Service
 	storageService *storage.Service
+	logger         boshlog.Logger
 }
 
 func NewGoogleClient(
 	config config.Config,
+	logger boshlog.Logger,
 ) (GoogleClient, error) {
 	var err error
 	var computeClient, storageClient *http.Client
@@ -69,6 +72,7 @@ func NewGoogleClient(
 		config:         config,
 		computeService: computeService,
 		storageService: storageService,
+		logger:         logger,
 	}, nil
 }
 
