@@ -117,7 +117,7 @@ jobs:
         <% end %>
     <% end %>
     <% if properties.use_vip %>
-      - name: static
+      - name: vip
         static_ips:
           - <%= properties.vip %>
     <% end %>
