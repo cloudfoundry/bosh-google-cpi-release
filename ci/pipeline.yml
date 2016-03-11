@@ -12,9 +12,8 @@ jobs:
   - name: integration
     serial: true
     plan:
-      - get: bosh-cpi-src
-        resource: bosh-google-cpi-boshrelease
-        trigger: true
+      - aggregate:
+        - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
 
       - task: unit-tests
         file: bosh-cpi-src/ci/tasks/unit-tests.yml
@@ -23,126 +22,108 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - get: bosh-cpi-src
-          resource: bosh-google-cpi-boshrelease
-          trigger: false
-          passed:
-            - integration
-        - get: version-semver
-          trigger: false
-          params:
-            bump: patch
+        - {trigger: false, passed: [integration], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
+        - {trigger: false,                        get: version-semver, params: {bump: patch}}
 
       - put: version-semver
-        params:
-          file: version-semver/number
+        params: {file: version-semver/number}
 
       - task: build-release
         file: bosh-cpi-src/ci/tasks/build-candidate.yml
 
       - put: bosh-cpi-dev-artifacts
-        resource: bosh-google-cpi-dev-artifacts
-        params:
-          from: candidate/.*\.tgz
+        params: {from: candidate/.*\.tgz}
 
   - name: bats-ubuntu
-    serial_groups:
-      - bats-ubuntu
+    serial_groups: [bats]
     plan:
       - aggregate:
-        - get: bosh-cpi-src
-          resource: bosh-google-cpi-boshrelease
-          trigger: false
-          passed:
-            - build-candidate
-        - get: bosh-cpi-release
-          resource: bosh-google-cpi-dev-artifacts
-          trigger: true
-          passed:
-            - build-candidate
-        - get: bosh-release
-          trigger: false
-        - get: stemcell
-          trigger: false
-          resource: google-ubuntu-stemcell
-        - get: bosh-init
-          trigger: false
+        - {trigger: false, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true,  passed: [build-candidate], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: false,                            get: bosh-release}
+        - {trigger: false,                            get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: false,                            get: bosh-init}
+        - {trigger: false,                            get: bats}
 
       - task: setup-director
         file: bosh-cpi-src/ci/tasks/setup-director.yml
         config:
           params:
-            google_project:      {{google_project}}
-            google_default_zone: {{google_default_zone}}
-            google_json_key:     {{google_json_key}}
-            google_static_ip:    {{google_static_ip}}
-            private_key_user:    {{private_key_user}}
-            private_key_data:    {{private_key_data}}
-            director_username:   {{director_username}}
-            director_password:   {{director_password}}
+            google_project:       {{google_project}}
+            google_default_zone:  {{google_default_zone}}
+            google_json_key_data: {{google_json_key_data}}
+            google_static_ip:     {{google_static_ip}}
+            google_network:       {{google_network}}
+            private_key_user:     {{private_key_user}}
+            private_key_data:     {{private_key_data}}
+            director_username:    {{director_username}}
+            director_password:    {{director_password}}
+        on_failure:
+          task: teardown-director
+          file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
-      - task: teardown-director
-        file: bosh-cpi-src/ci/tasks/teardown-director.yml
+      - task: run-bats
+        file: bosh-cpi-src/ci/tasks/run-bats.yml
+        config:
+          params:
+            base_os:              Ubuntu
+            stemcell_name:        bosh-google-kvm-ubuntu-trusty-go_agent
+            google_static_ip:     {{google_static_ip}}
+            google_network:       {{google_network}}
+            bat_vcap_password:    {{bat_vcap_password}}
+            bat_google_static_ip: {{bat_google_static_ip}}
+        ensure:
+          task: teardown-director
+          file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
   - name: bats-centos
-    serial_groups:
-      - bats-centos
+    serial_groups: [bats]
     plan:
       - aggregate:
-        - get: bosh-cpi-src
-          resource: bosh-google-cpi-boshrelease
-          trigger: false
-          passed:
-            - build-candidate
-        - get: bosh-cpi-release
-          resource: bosh-google-cpi-dev-artifacts
-          trigger: true
-          passed:
-            - build-candidate
-        - get: bosh-release
-          trigger: false
-        - get: stemcell
-          trigger: false
-          resource: google-centos-stemcell
-        - get: bosh-init
-          trigger: false
+        - {trigger: false, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [build-candidate], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: false,                            get: bosh-release}
+        - {trigger: false,                            get: stemcell, resource: google-centos-stemcell}
+        - {trigger: false,                            get: bosh-init}
+        - {trigger: false,                            get: bats}
 
       - task: setup-director
         file: bosh-cpi-src/ci/tasks/setup-director.yml
         config:
           params:
-            google_project:      {{google_project}}
-            google_default_zone: {{google_default_zone}}
-            google_json_key:     {{google_json_key}}
-            google_static_ip:    {{google_static_ip}}
-            private_key_user:    {{private_key_user}}
-            private_key_data:    {{private_key_data}}
-            director_username:   {{director_username}}
-            director_password:   {{director_password}}
+            google_project:       {{google_project}}
+            google_default_zone:  {{google_default_zone}}
+            google_json_key_data: {{google_json_key_data}}
+            google_static_ip:     {{google_static_ip}}
+            google_network:       {{google_network}}
+            private_key_user:     {{private_key_user}}
+            private_key_data:     {{private_key_data}}
+            director_username:    {{director_username}}
+            director_password:    {{director_password}}
+        on_failure:
+          task: teardown-director
+          file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
-      - task: teardown-director
-        file: bosh-cpi-src/ci/tasks/teardown-director.yml
+      - task: run-bats
+        file: bosh-cpi-src/ci/tasks/run-bats.yml
+        config:
+          params:
+            base_os:              Centos
+            stemcell_name:        bosh-google-kvm-centos-7-go_agent
+            google_static_ip:     {{google_static_ip}}
+            google_network:       {{google_network}}
+            bat_vcap_password:    {{bat_vcap_password}}
+            bat_google_static_ip: {{bat_google_static_ip}}
+        ensure:
+          task: teardown-director
+          file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
   - name: promote-candidate
     plan:
       - aggregate:
-        - get: bosh-cpi-src
-          resource: bosh-google-cpi-boshrelease
-          trigger: false
-          passed:
-            - bats-ubuntu
-            - bats-centos
-        - get: bosh-cpi-release
-          resource: bosh-google-cpi-dev-artifacts
-          trigger: false
-        - get: release-version-semver
-          trigger: false
-          params:
-            bump: major
-
-      - put: release-version-semver
-        params:
-          file: release-version-semver/number
+        - {trigger: false,                                     get: bosh-cpi-src,           resource: bosh-cpi-src-out}
+        - {trigger: false, passed: [bats-ubuntu, bats-centos], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: false,                                     get: release-version-semver, params: {bump: major}}
 
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
@@ -151,8 +132,14 @@ jobs:
             aws_access_key_id: {{s3_google_cpi_pipeline_access_key}}
             aws_secret_access_key: {{s3_google_cpi_pipeline_secret_key}}
 
+      #- put: bosh-cpi-src-out
+      #  params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
+
+      - put: release-version-semver
+        params: {file: release-version-semver/number}
+
 resources:
-  - name: bosh-google-cpi-boshrelease
+  - name: bosh-cpi-src-in
     type: git
     source:
       uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
@@ -161,7 +148,19 @@ resources:
         - .final_builds/**/*.yml
         - releases/**/*.yml
 
-  - name: bosh-google-cpi-dev-artifacts
+  - name: bosh-cpi-src-out
+    type: git
+    source:
+      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      branch: master
+
+  - name: bats
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      branch: master
+
+  - name: bosh-cpi-dev-artifacts
     type: s3
     source:
       regexp:            bosh-google-cpi([0-9.]+)\.tgz
@@ -177,22 +176,13 @@ resources:
       access_key_id:     {{s3_google_cpi_pipeline_access_key}}
       secret_access_key: {{s3_google_cpi_pipeline_secret_key}}
 
-  - name: bosh-release
-    type: bosh-io-release
+  - name: release-version-semver
+    type: semver
     source:
-      repository: cloudfoundry/bosh
-
-  - name: google-ubuntu-stemcell
-    type: s3
-    source:
-      bucket: bosh-google-stemcells
-      regexp: light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
-
-  - name: google-centos-stemcell
-    type: s3
-    source:
-      bucket: bosh-google-stemcells
-      regexp: light-bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent.tgz
+      key:               release-current-version
+      bucket:            {{s3_google_cpi_pipeline_bucket_name}}
+      access_key_id:     {{s3_google_cpi_pipeline_access_key}}
+      secret_access_key: {{s3_google_cpi_pipeline_secret_key}}
 
   - name: bosh-init
     type: s3
@@ -201,10 +191,21 @@ resources:
       bucket: bosh-init-artifacts
       region_name: us-east-1
 
-  - name: release-version-semver
-    type: semver
+  - name: bosh-release
+    type: bosh-io-release
     source:
-      key:               release-current-version
-      bucket:            {{s3_google_cpi_pipeline_bucket_name}}
-      access_key_id:     {{s3_google_cpi_pipeline_access_key}}
-      secret_access_key: {{s3_google_cpi_pipeline_secret_key}}
+      repository: cloudfoundry/bosh
+
+  - name: google-ubuntu-stemcell
+    type: s3
+    source:
+      bucket: bosh-google-cpi-stemcells
+      regexp: light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      region_name: us-east-1
+
+  - name: google-centos-stemcell
+    type: s3
+    source:
+      bucket: bosh-google-cpi-stemcells
+      regexp: light-bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent.tgz
+      region_name: us-east-1
