@@ -214,7 +214,7 @@ cloud_provider:
     release: bosh-google-cpi
 
   ssh_tunnel:
-    host: ${director_ipp}
+    host: ${director_ip}
     port: 22
     user: ${private_key_user}
     private_key: ${private_key}
