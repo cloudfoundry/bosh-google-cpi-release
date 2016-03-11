@@ -24,5 +24,5 @@ echo "Setting up google infrastructure..."
 gcloud -q compute addresses create bosh-ci-director
 gcloud -q compute addresses create bosh-ci-bats
 gcloud -q compute networks create bosh-ci --mode auto
-gcloud -q compute firewall-rules create bosh-ci-intenal  --description "BOSH CI Internal traffic" --network ${google_network} --source-tags bosh-ci-intenal --target-tags bosh-ci-intenal --allow tcp,udp,icmp
-gcloud -q compute firewall-rules create bosh-ci-external --description "BOSH CI External traffic" --network ${google_network} --target-tags bosh-ci-external --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
+gcloud -q compute firewall-rules create bosh-ci-intenal  --description "BOSH CI Internal traffic" --network bosh-ci --source-tags bosh-ci-intenal --target-tags bosh-ci-intenal --allow tcp,udp,icmp
+gcloud -q compute firewall-rules create bosh-ci-external --description "BOSH CI External traffic" --network bosh-ci --target-tags bosh-ci-external --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
