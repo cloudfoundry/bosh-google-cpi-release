@@ -6,12 +6,13 @@ source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_project
+check_param google_region
 check_param google_zone
 check_param google_json_key_data
-check_param google_static_ip
 check_param google_network
 check_param google_firewall_internal
 check_param google_firewall_external
+check_param google_address_director
 check_param private_key_user
 check_param private_key_data
 check_param director_password
@@ -32,6 +33,15 @@ echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
 mkdir -p $HOME/.config/gcloud/
 cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
+
+echo "Configuring google account..."
+gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application_default_credentials.json
+gcloud config set project ${google_project}
+gcloud config set compute/region ${google_region}
+gcloud config set compute/zone ${google_zone}
+
+echo "Looking for director IP..."
+director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq '.address')
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
@@ -113,7 +123,7 @@ jobs:
           - gateway
       - name: public
         static_ips:
-          - ${google_static_ip}
+          - ${director_ip}
 
     properties:
       nats:
@@ -135,14 +145,14 @@ jobs:
         adapter: postgres
 
       dns:
-        address: ${google_static_ip}
+        address: ${director_ip}
         domain_name: microbosh
         db: *db
         recursor: 8.8.8.8
 
       registry:
-        address: ${google_static_ip}
-        host: ${google_static_ip}
+        address: ${director_ip}
+        host: ${director_ip}
         db: *db
         http:
           user: registry
@@ -153,7 +163,7 @@ jobs:
         port: 25777
 
       blobstore:
-        address: ${google_static_ip}
+        address: ${director_ip}
         port: 25250
         provider: dav
         director:
@@ -187,11 +197,11 @@ jobs:
         default_zone: ${google_zone}
 
       agent:
-        mbus: nats://nats:nats-password@${google_static_ip}:4222
+        mbus: nats://nats:nats-password@${director_ip}:4222
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://${google_static_ip}:25250
+             endpoint: http://${director_ip}:25250
              user: agent
              password: agent-password
 
@@ -204,12 +214,12 @@ cloud_provider:
     release: bosh-google-cpi
 
   ssh_tunnel:
-    host: ${google_static_ip}
+    host: ${director_ipp}
     port: 22
     user: ${private_key_user}
     private_key: ${private_key}
 
-  mbus: https://mbus:mbus-password@${google_static_ip}:6868
+  mbus: https://mbus:mbus-password@${director_ip}:6868
 
   properties:
     google: *google_properties

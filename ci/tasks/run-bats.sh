@@ -5,28 +5,50 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param base_os
-check_param stemcell_name
-check_param google_static_ip
+check_param google_project
+check_param google_region
+check_param google_zone
+check_param google_json_key_data
 check_param google_network
 check_param google_firewall_internal
 check_param google_firewall_external
+check_param google_address_director
+check_param google_address_bats
+check_param base_os
+check_param stemcell_name
 check_param bat_vcap_password
-check_param bat_google_static_ip
 
 deployment_dir="${PWD}/deployment"
 bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
 bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
 private_key=${deployment_dir}/private_key.pem
+google_json_key=${deployment_dir}/google_key.json
 
-export BAT_DIRECTOR=${google_static_ip}
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
 export BAT_VCAP_PASSWORD="${bat_vcap_password}"
-export BAT_DNS_HOST=${google_static_ip}
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
 export BAT_VCAP_PRIVATE_KEY=${private_key}
+
+echo "Creating google json key..."
+echo "${google_json_key_data}" > ${google_json_key}
+mkdir -p $HOME/.config/gcloud/
+cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
+
+echo "Configuring google account..."
+gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application_default_credentials.json
+gcloud config set project ${google_project}
+gcloud config set compute/region ${google_region}
+gcloud config set compute/zone ${google_zone}
+
+echo "Looking for director IP..."
+director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq '.address')
+export BAT_DIRECTOR=${director_ip}
+export BAT_DNS_HOST=${director_ip}
+
+echo "Looking for bats IP..."
+bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq '.address')
 
 echo "Creating private key..."
 eval $(ssh-agent)
@@ -147,7 +169,7 @@ properties:
     name: ${stemcell_name}
     version: latest
   instances: 1
-  vip: ${bat_google_static_ip}
+  vip: ${bats_ip}
   networks:
     - name: default
       type: dynamic
