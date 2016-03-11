@@ -6,7 +6,7 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_project
 check_param google_default_zone
-check_param google_json_key
+check_param google_json_key_data
 check_param google_static_ip
 check_param google_network
 check_param private_key_user
@@ -16,6 +16,7 @@ check_param director_username
 
 deployment_dir="${PWD}/deployment"
 cpi_release_name=bosh-google-cpi
+google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 manifest_filename="director-manifest.yml"
 
@@ -23,6 +24,10 @@ echo "Setting up artifacts..."
 cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
 cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+
+echo "Creating google json key..."
+echo "${google_json_key_data}" > ${google_json_key}
+export GOOGLE_APPLICATION_CREDENTIALS=${google_json_key}
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
@@ -175,7 +180,6 @@ jobs:
       google: &google_properties
         project: ${google_project}
         default_zone: ${google_default_zone}
-        json_key: "${google_json_key}"
 
       agent:
         mbus: nats://nats:nats-password@${google_static_ip}:4222
