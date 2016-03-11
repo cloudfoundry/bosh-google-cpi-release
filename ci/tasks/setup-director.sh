@@ -41,7 +41,7 @@ gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
 echo "Looking for director IP..."
-director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq '.address')
+director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq -r '.address')
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}

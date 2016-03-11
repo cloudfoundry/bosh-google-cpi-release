@@ -43,12 +43,12 @@ gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
 echo "Looking for director IP..."
-director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq '.address')
+director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq -r '.address')
 export BAT_DIRECTOR=${director_ip}
 export BAT_DNS_HOST=${director_ip}
 
 echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq '.address')
+bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
 
 echo "Creating private key..."
 eval $(ssh-agent)
