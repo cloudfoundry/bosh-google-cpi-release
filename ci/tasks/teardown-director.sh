@@ -6,7 +6,12 @@ source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 deployment_dir="${PWD}/deployment"
+google_json_key=${deployment_dir}/google_key.json
 manifest_filename="director-manifest.yml"
+
+echo "Creating google json key..."
+mkdir -p $HOME/.config/gcloud/
+cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
 
 pushd ${deployment_dir}
   cp -r ./.bosh_init $HOME/
