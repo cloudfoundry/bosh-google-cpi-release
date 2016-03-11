@@ -1,6 +1,9 @@
 ---
 platform: linux
-image: docker:///frodenas/bosh-google-cpi-boshrelease
+image_resource:
+  type: docker-image
+  source:
+    repository: frodenas/bosh-google-cpi-boshrelease
 inputs:
   - name: bosh-cpi-src
   - name: version-semver
