@@ -10,6 +10,6 @@ run:
   path: bosh-cpi-src/ci/tasks/setup-infrastructure.sh
 params:
   google_project:       replace-me
-  google_default_zone:  replace-me
+  google_region:        replace-me
+  google_zone:          replace-me
   google_json_key_data: replace-me
-  google_network:       replace-me
