@@ -15,13 +15,15 @@ outputs:
 run:
   path: bosh-cpi-src/ci/tasks/setup-director.sh
 params:
-  BOSH_INIT_LOG_LEVEL:  warn
-  google_project:       replace-me
-  google_zone:          replace-me
-  google_json_key_data: replace-me
-  google_static_ip:     replace-me
-  google_network:       replace-me
-  private_key_user:     replace-me
-  private_key_data:     replace-me
-  director_username:    replace-me
-  director_password:    replace-me
+  BOSH_INIT_LOG_LEVEL:      warn
+  google_project:           replace-me
+  google_zone:              replace-me
+  google_json_key_data:     replace-me
+  google_static_ip:         replace-me
+  google_network:           replace-me
+  google_firewall_internal: replace-me
+  google_firewall_external: replace-me
+  private_key_user:         replace-me
+  private_key_data:         replace-me
+  director_username:        replace-me
+  director_password:        replace-me

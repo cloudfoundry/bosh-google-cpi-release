@@ -10,6 +10,8 @@ check_param google_zone
 check_param google_json_key_data
 check_param google_static_ip
 check_param google_network
+check_param google_firewall_internal
+check_param google_firewall_external
 check_param private_key_user
 check_param private_key_data
 check_param director_password
@@ -72,7 +74,8 @@ networks:
     cloud_properties:
       network_name: ${google_network}
       tags:
-        - bosh-ci
+        - ${google_firewall_internal}
+        - ${google_firewall_external}
   - name: public
     type: vip
 

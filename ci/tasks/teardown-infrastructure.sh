@@ -9,6 +9,11 @@ check_param google_project
 check_param google_region
 check_param google_zone
 check_param google_json_key_data
+check_param google_network
+check_param google_firewall_internal
+check_param google_firewall_external
+check_param google_address_director
+check_param google_address_bats
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
@@ -22,9 +27,9 @@ gcloud config set compute/zone ${google_zone}
 
 echo "Tearing down google infrastructure..."
 set +e
-gcloud -q compute firewall-rules delete bosh-ci-intenal
-gcloud -q compute firewall-rules delete bosh-ci-external
-gcloud -q compute networks delete bosh-ci
-gcloud -q compute addresses delete bosh-ci-director
-gcloud -q compute addresses delete bosh-ci-bats
+gcloud -q compute firewall-rules delete ${google_firewall_external}
+gcloud -q compute firewall-rules delete ${google_firewall_internal}
+gcloud -q compute networks delete ${google_network}
+gcloud -q compute addresses delete ${google_address_bats}
+gcloud -q compute addresses delete ${google_address_director}
 set -e

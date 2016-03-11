@@ -9,6 +9,8 @@ check_param base_os
 check_param stemcell_name
 check_param google_static_ip
 check_param google_network
+check_param google_firewall_internal
+check_param google_firewall_external
 check_param bat_vcap_password
 check_param bat_google_static_ip
 
@@ -51,7 +53,7 @@ compilation:
   network: default
   reuse_compilation_vms: true
   cloud_properties:
-    machine_type: <%= properties.machine_type || "n1-standard-4" %>
+    machine_type: <%= properties.machine_type || "n1-standard-2" %>
     root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
     root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
     <% if properties.zone %>
@@ -76,7 +78,6 @@ networks:
       ephemeral_external_ip: <%= network.cloud_properties.ephemeral_external_ip || false %>
       tags: <%= network.cloud_properties.tags || [] %>
   <% end %>
-
   - name: static
     type: vip
 
@@ -87,7 +88,7 @@ resource_pools:
       name: <%= properties.stemcell.name %>
       version: "<%= properties.stemcell.version %>"
     cloud_properties:
-      machine_type: <%= properties.machine_type || "n1-standard-4" %>
+      machine_type: <%= properties.machine_type || "n1-standard-2" %>
       root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
       root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
       <% if properties.zone %>
@@ -154,7 +155,7 @@ properties:
         network_name: ${google_network}
         ephemeral_external_ip: true
         tags:
-          - bosh-ci
+          - ${google_firewall_internal}
 EOF
 
 pushd bats

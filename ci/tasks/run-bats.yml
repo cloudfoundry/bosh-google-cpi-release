@@ -12,9 +12,11 @@ inputs:
 run:
   path: bosh-cpi-src/ci/tasks/run-bats.sh
 params:
-  base_os:              replace-me
-  stemcell_name:        replace-me
-  google_static_ip:     replace-me
-  google_network:       replace-me
-  bat_vcap_password:    replace-me
-  bat_google_static_ip: replace-me
+  base_os:                  replace-me
+  stemcell_name:            replace-me
+  google_static_ip:         replace-me
+  google_network:           replace-me
+  google_firewall_internal: replace-me
+  google_firewall_external: replace-me
+  bat_vcap_password:        replace-me
+  bat_google_static_ip:     replace-me
