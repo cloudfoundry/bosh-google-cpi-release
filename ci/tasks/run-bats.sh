@@ -77,7 +77,7 @@ networks:
       tags: <%= network.cloud_properties.tags || [] %>
   <% end %>
 
-  - name: vip
+  - name: static
     type: vip
 
 resource_pools:
@@ -117,7 +117,7 @@ jobs:
         <% end %>
     <% end %>
     <% if properties.use_vip %>
-      - name: vip
+      - name: static
         static_ips:
           - <%= properties.vip %>
     <% end %>
