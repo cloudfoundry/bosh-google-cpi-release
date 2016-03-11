@@ -27,7 +27,8 @@ cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
-export GOOGLE_APPLICATION_CREDENTIALS=${google_json_key}
+mkdir -p $HOME/.config/gcloud/
+cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
