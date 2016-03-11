@@ -72,7 +72,7 @@ networks:
     cloud_properties:
       network_name: ${google_network}
       tags:
-        - bosh
+        - bosh-ci
   - name: public
     type: vip
 

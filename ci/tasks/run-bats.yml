@@ -1,0 +1,17 @@
+---
+platform: linux
+image: docker:///frodenas/bosh-google-cpi-boshrelease
+inputs:
+  - name: bosh-cpi-src
+  - name: stemcell
+  - name: bats
+  - name: deployment
+run:
+  path: bosh-cpi-src/ci/tasks/run-bats.sh
+params:
+  base_os:              replace-me
+  stemcell_name:        replace-me
+  google_static_ip:     replace-me
+  google_network:       replace-me
+  bat_vcap_password:    replace-me
+  bat_google_static_ip: replace-me
