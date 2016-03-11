@@ -6,7 +6,7 @@ source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_project
-check_param google_default_zone
+check_param google_zone
 check_param google_json_key_data
 check_param google_static_ip
 check_param google_network
@@ -181,7 +181,7 @@ jobs:
 
       google: &google_properties
         project: ${google_project}
-        default_zone: ${google_default_zone}
+        default_zone: ${google_zone}
 
       agent:
         mbus: nats://nats:nats-password@${google_static_ip}:4222
