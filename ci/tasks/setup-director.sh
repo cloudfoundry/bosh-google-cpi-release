@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 source bosh-cpi-src/ci/tasks/utils.sh
@@ -176,7 +175,7 @@ jobs:
       google: &google_properties
         project: ${google_project}
         default_zone: ${google_default_zone}
-        json_key: ${google_json_key}
+        json_key: "${google_json_key}"
 
       agent:
         mbus: nats://nats:nats-password@${google_static_ip}:4222
