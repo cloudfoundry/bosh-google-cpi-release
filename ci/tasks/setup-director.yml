@@ -4,6 +4,7 @@ image_resource:
   type: docker-image
   source:
     repository: frodenas/bosh-google-cpi-boshrelease
+    tag: v1
 inputs:
   - name: bosh-cpi-src
   - name: bosh-cpi-release
