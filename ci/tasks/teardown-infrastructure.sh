@@ -27,7 +27,8 @@ gcloud config set compute/zone ${google_zone}
 
 echo "Tearing down google infrastructure..."
 set +e
-for instance in $(gcloud compute instances list --format json | jq --arg network ${google_network} -r '.[] | select(.networkInterfaces[].network==$network) | .name'); do
+IFS=$'\n'
+for instance in $(gcloud compute instances list --format json | jq --arg network ${google_network} '.[] | select(.networkInterfaces[].network==$network) | "\(.name) --zone \(.zone)"'); do
   echo "Deleting orphan instance ${instance}..."
   gcloud -q compute instances delete ${instance} --delete-disks all
 done
