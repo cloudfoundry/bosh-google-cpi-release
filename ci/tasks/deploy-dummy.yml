@@ -11,13 +11,14 @@ inputs:
 run:
   path: bosh-cpi-src/ci/tasks/deploy-dummy.sh
 params:
-  google_project:          replace-me
-  google_region:           replace-me
-  google_zone:             replace-me
-  google_json_key_data:    replace-me
-  google_network:          replace-me
-  google_address_director: replace-me
-  base_os:                 replace-me
-  stemcell_name:           replace-me
-  director_username:       replace-me
-  director_password:       replace-me
+  google_project:           replace-me
+  google_region:            replace-me
+  google_zone:              replace-me
+  google_json_key_data:     replace-me
+  google_network:           replace-me
+  google_firewall_internal: replace-me
+  google_address_director:  replace-me
+  base_os:                  replace-me
+  stemcell_name:            replace-me
+  director_username:        replace-me
+  director_password:        replace-me
