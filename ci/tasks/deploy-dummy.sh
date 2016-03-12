@@ -83,6 +83,7 @@ networks:
     type: dynamic
     cloud_properties:
       network_name: ${google_network}
+      ephemeral_external_ip: true
       tags:
         - ${google_firewall_internal}
 
