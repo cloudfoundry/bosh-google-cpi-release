@@ -178,6 +178,7 @@ properties:
         ephemeral_external_ip: true
         tags:
           - ${google_firewall_internal}
+          - ${google_firewall_external}
 EOF
 
 pushd bats
