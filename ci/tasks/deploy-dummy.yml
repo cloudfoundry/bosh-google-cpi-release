@@ -1,0 +1,24 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: frodenas/bosh-google-cpi-boshrelease
+inputs:
+  - name: bosh-cpi-src
+  - name: stemcell
+  - name: dummy-boshrelease
+  - name: deployment
+run:
+  path: bosh-cpi-src/ci/tasks/deploy-dummy.sh
+params:
+  google_project:          replace-me
+  google_region:           replace-me
+  google_zone:             replace-me
+  google_json_key_data:    replace-me
+  google_network:          replace-me
+  google_address_director: replace-me
+  base_os:                 replace-me
+  stemcell_name:           replace-me
+  director_username:       replace-me
+  director_password:       replace-me
