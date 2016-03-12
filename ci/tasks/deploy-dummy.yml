@@ -6,7 +6,6 @@ image_resource:
     repository: frodenas/bosh-google-cpi-boshrelease
 inputs:
   - name: bosh-cpi-src
-  - name: stemcell
   - name: dummy-boshrelease
   - name: deployment
 run:

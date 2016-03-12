@@ -101,7 +101,7 @@ pushd dummy-boshrelease
 popd
 
 echo "Uploading Stemcell..."
-bosh -n upload stemcell stemcell/stemcell.tgz --skip-if-exists
+bosh -n upload stemcell ${deployment_dir}/stemcell.tgz --skip-if-exists
 
 echo "Deploying Dummy Release..."
 bosh -n deploy -d ${dummy_manifest_filename}
