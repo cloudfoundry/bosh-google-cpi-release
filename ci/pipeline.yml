@@ -347,7 +347,7 @@ resources:
     source:
       uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
       branch: master
-      private_key: {{github_deployment_key_bosh-google-cpi-release}}
+      private_key: {{github_deployment_key_bosh_google_cpi_release}}
 
   - name: bats
     type: git
