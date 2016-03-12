@@ -104,7 +104,7 @@ echo "Uploading Stemcell..."
 bosh -n upload stemcell ${deployment_dir}/stemcell.tgz --skip-if-exists
 
 echo "Deploying Dummy Release..."
-bosh -n deploy -d ${dummy_manifest_filename}
+bosh -d ${dummy_manifest_filename} -n deploy
 
 echo "Deleting Dummy Release..."
 bosh -n delete deployment dummy
