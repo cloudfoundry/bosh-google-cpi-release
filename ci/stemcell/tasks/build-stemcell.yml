@@ -7,6 +7,8 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: bosh-src
+outputs:
+  - name: stemcell
 run:
   path: bosh-cpi-src/ci/stemcell/tasks/build-stemcell.sh
 params:
