@@ -10,6 +10,17 @@ fly -t google login -c <YOUR CONCOURSE URL>
 
 * Update the [credentials.yml](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/ci/credentials.yml) file.
 
+Note that the above `credentials.yml` configuration file requires a SSH private key for the `vcap` user. In order to generate this SSH key run:
+
+```
+ssh-keygen -t rsa -f vcap_key -C "vcap@localhost"
+```
+
+And then:
+  * Add the contents of the generated public SSH key-pair (`vcap_key.pub` file) as a Google Compute Engine [project-level key](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#project-wides).
+  * Paste the contents of the generated private SSH key-pair (`vcap_key.pub`) into the `private_key_data` property at the `credentials.yml` file.
+
+
 * Set the BOSH Google CPI pipeline:
 
 ```
