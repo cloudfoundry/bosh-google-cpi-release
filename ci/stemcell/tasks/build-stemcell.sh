@@ -3,6 +3,8 @@
 set -e
 
 source bosh-cpi-src/ci/tasks/utils.sh
+source /etc/profile.d/chruby.sh
+chruby "ruby-2.1.7"
 
 check_param build_number
 check_param os_name
