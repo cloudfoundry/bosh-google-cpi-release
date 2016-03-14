@@ -182,7 +182,7 @@ properties:
 EOF
 
 pushd bats
-   echo "Installing gems..."
+  echo "Installing gems..."
   ./write_gemfile
   bundle install
 

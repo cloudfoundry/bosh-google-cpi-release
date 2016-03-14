@@ -2,6 +2,8 @@
 
 set -e
 
+source bosh-cpi-src/ci/tasks/utils.sh
+
 check_param build_number
 check_param os_name
 check_param os_version
