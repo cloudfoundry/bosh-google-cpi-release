@@ -9,7 +9,8 @@ chruby "ruby-2.1.7"
 check_param build_number
 check_param os_name
 check_param os_version
-check_param os_image
+check_param os_image_bucket
+check_param os_image_file
 
 TASK_DIR=$PWD
 
@@ -58,7 +59,7 @@ sudo --preserve-env --set-home --user ubuntu -- /bin/bash --login -i <<SUDO
     bundle install --local
 
     echo "Creating stemcell..."
-    CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build_with_local_os_image[google,kvm,${os_name},${os_version},go,${TASK_DIR}/os-image/*.tgz]
+    CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build[google,kvm,${os_name},${os_version},go,{os_image_bucket},${os_image_file}]
   popd
 SUDO
 

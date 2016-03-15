@@ -7,13 +7,13 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: bosh-src
-  - name: os-image
 outputs:
   - name: stemcell
 run:
   path: bosh-cpi-src/ci/stemcell/tasks/build-stemcell.sh
 params:
-  build_number: replace-me
-  os_name:      replace-me
-  os_version:   replace-me
-  os_image:     replace-me
+  build_number:    replace-me
+  os_name:         replace-me
+  os_version:      replace-me
+  os_image_bucket: replace-me
+  os_image_file:   replace-me
