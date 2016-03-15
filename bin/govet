@@ -1,7 +1,0 @@
-#!/bin/bash
-
-bin=$(dirname $0)
-
-go get -u golang.org/x/tools/cmd/vet
-
-go tool vet $($bin/godirs)
