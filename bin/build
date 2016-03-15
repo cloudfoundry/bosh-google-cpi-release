@@ -8,4 +8,4 @@ if [ `uname` = "Linux" ]; then
 	$bin/build-linux-amd64
 fi
 
-$bin/go build -o $bin/../out/cpi github.com/frodenas/bosh-google-cpi/main
+go build -o $bin/../out/cpi github.com/frodenas/bosh-google-cpi/main

@@ -4,4 +4,4 @@ bin=$(dirname $0)
 
 go get -u golang.org/x/tools/cmd/vet
 
-$bin/go vet ./...
+go tool vet $($bin/godirs)

@@ -2,4 +2,4 @@
 
 bin=$(dirname $0)
 
-$bin/go fmt ./...
+gofmt -l $($bin/godirs)
