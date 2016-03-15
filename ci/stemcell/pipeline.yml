@@ -1,0 +1,82 @@
+---
+groups:
+  - name: bosh-google-stemcell
+    jobs:
+      - ubuntu-trusty-stemcell
+      - centos-7-stemcell
+
+  - name: ubuntu
+    jobs:
+      - ubuntu-trusty-stemcell
+
+  - name: centos
+    jobs:
+      - centos-7-stemcell
+
+jobs:
+  - name: ubuntu-trusty-stemcell
+    plan:
+      - aggregate:
+        - {trigger: false, get: bosh-cpi-src}
+        - {trigger: false, get: bosh-src}
+
+      - task: build-stemcell
+        file: bosh-cpi-src/ci/stemcell/tasks/build-stemcell.yml
+        privileged: true
+        config:
+          params:
+            build_number:    3202
+            os_name:         ubuntu
+            os_version:      trusty
+            os_image_bucket: bosh-os-images
+            os_image_file:   bosh-ubuntu-trusty-os-image.tgz
+
+      - task: publish-stemcell
+        file: bosh-cpi-src/ci/stemcell/tasks/publish-stemcell.yml
+        config:
+          params:
+            google_project:       {{google_project}}
+            google_region:        {{google_region}}
+            google_zone:          {{google_zone}}
+            google_json_key_data: {{google_json_key_data}}
+            google_bucket_name:   {{google_bucket_name}}
+
+  - name: centos-7-stemcell
+    plan:
+      - aggregate:
+        - {trigger: false, get: bosh-cpi-src}
+        - {trigger: false, get: bosh-src}
+
+      - task: build-stemcell
+        file: bosh-cpi-src/ci/stemcell/tasks/build-stemcell.yml
+        privileged: true
+        config:
+          params:
+            build_number:    3202
+            os_name:         centos
+            os_version:      7
+            os_image_bucket: bosh-os-images
+            os_image_file:   bosh-centos-7-os-image.tgz
+
+      - task: publish-stemcell
+        file: bosh-cpi-src/ci/stemcell/tasks/publish-stemcell.yml
+        config:
+          params:
+            google_project:       {{google_project}}
+            google_region:        {{google_region}}
+            google_zone:          {{google_zone}}
+            google_json_key_data: {{google_json_key_data}}
+            google_bucket_name:   {{google_bucket_name}}
+
+resources:
+  - name: bosh-cpi-src
+    type: git
+    source:
+      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      branch: master
+
+  - name: bosh-src
+    type: git
+    source:
+      uri: https://github.com/frodenas/bosh.git
+      branch: google
