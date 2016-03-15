@@ -64,6 +64,5 @@ sudo --preserve-env --set-home --user ubuntu -- /bin/bash --login -i <<SUDO
 SUDO
 
 echo "Copying stemcell..."
-image_basename="bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent"
-mv bosh-src/tmp/*.tgz stemcell/${image_basename}.tgz
-echo -n $(sha1sum stemcell/${image_basename}.tgz | awk '{print $1}') > stemcell/${image_basename}.tgz.sha1
+mv /mnt/stemcells/google/kvm/${os_name}/work/work/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent.tgz stemcell/
+mv /mnt/stemcells/google/kvm/${os_name}/work/work/stemcell/image stemcell/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent-raw.tar.gz
