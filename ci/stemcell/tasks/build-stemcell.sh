@@ -59,7 +59,7 @@ sudo --preserve-env --set-home --user ubuntu -- /bin/bash --login -i <<SUDO
     bundle install --local
 
     echo "Creating stemcell..."
-    CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build[google,kvm,${os_name},${os_version},go,{os_image_bucket},${os_image_file}]
+    CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build[google,kvm,${os_name},${os_version},go,${os_image_bucket},${os_image_file}]
   popd
 SUDO
 
