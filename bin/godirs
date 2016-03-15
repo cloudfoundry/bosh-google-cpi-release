@@ -4,8 +4,8 @@ cd $(dirname $0)/..
 
 find * -maxdepth 0 -type d \
     | grep -v '^\.'                 \
-    | grep -v '^vendor'             \
     | grep -v '^Godeps'             \
+    | grep -v '^vendor'             \
     | grep -v '^bin'                \
     | grep -v '^gobin'              \
     | grep -v '^out'                \
