@@ -11,16 +11,58 @@ check_param os_name
 check_param os_version
 check_param os_image
 
-# Set the proper permissions
-sudo chown -R ubuntu:ubuntu bosh-src
+TASK_DIR=$PWD
 
-pushd bosh-src
-  echo "Installing gems..."
-  bundle install --local
+# This is copied from https://github.com/concourse/concourse/blob/3c070db8231294e4fd51b5e5c95700c7c8519a27/jobs/baggageclaim/templates/baggageclaim_ctl.erb#L23-L54
+# helps the /dev/mapper/control issue and lets us actually do scary things with the /dev mounts
+# This allows us to create device maps from partition tables in image_create/apply.sh
+function permit_device_control() {
+  local devices_mount_info=$(cat /proc/self/cgroup | grep devices)
 
-  echo "Creating stemcell..."
-  CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build[google,kvm,${os_name},${os_version},go,bosh-os-images,${os_image}]
-popd
+  local devices_subsytems=$(echo $devices_mount_info | cut -d: -f2)
+  local devices_subdir=$(echo $devices_mount_info | cut -d: -f3)
+
+  cgroup_dir=/mnt/tmp-todo-devices-cgroup
+
+  if [ ! -e ${cgroup_dir} ]; then
+    # mount our container's devices subsystem somewhere
+    mkdir ${cgroup_dir}
+  fi
+
+  if ! mountpoint -q ${cgroup_dir}; then
+    mount -t cgroup -o $devices_subsytems none ${cgroup_dir}
+  fi
+
+  # permit our cgroup to do everything with all devices
+  # ignore failure in case something has already done this; echo appears to
+  # return EINVAL, possibly because devices this affects are already in use
+  echo a > ${cgroup_dir}${devices_subdir}/devices.allow || true
+}
+
+# Also copied from baggageclaim_ctl.erb creates 64 loopback mappings. This fixes failures with losetup --show --find ${disk_image}
+function create_loopback_mappings() {
+  for i in $(seq 0 64); do
+    if ! mknod -m 0660 /dev/loop$i b 7 $i; then
+      break
+    fi
+  done
+}
+
+permit_device_control
+create_loopback_mappings
+
+chown -R ubuntu:ubuntu bosh-src
+sudo --preserve-env --set-home --user ubuntu -- /bin/bash --login -i <<SUDO
+  pushd bosh-src
+    echo "Installing gems..."
+    bundle install --local
+
+    echo "Creating stemcell..."
+    CANDIDATE_BUILD_NUMBER=${build_number} bundle exec rake stemcell:build_with_local_os_image[google,kvm,${os_name},${os_version},go,${TASK_DIR}/os-image/*.tgz]
+  popd
+SUDO
 
 echo "Copying stemcell..."
-mv /mnt/stemcells/google/kvm/${os_name}/work/work/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent.tgz stemcell/
+image_basename="bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent"
+mv bosh-src/tmp/*.tgz stemcell/${image_basename}.tgz
+echo -n $(sha1sum stemcell/${image_basename}.tgz | awk '{print $1}') > stemcell/${image_basename}.tgz.sha1
