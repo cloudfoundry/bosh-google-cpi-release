@@ -1,10 +1,10 @@
 language: go
 
 go:
-  - tip
+  - 1.6
 
-branches:
-  only:
-    - master
+go_import_path: github.com/frodenas/bosh-google-cpi
 
-script: bin/test
+install: make get-deps
+
+script: make test

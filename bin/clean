@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-bin=$(dirname $0)
-
-$bin/go clean -r ./...

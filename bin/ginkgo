@@ -1,7 +1,0 @@
-#!/bin/bash
-
-bin=$(dirname $0)
-
-$bin/env go install github.com/onsi/ginkgo/ginkgo
-
-$bin/env ginkgo -r -race $bin/..
