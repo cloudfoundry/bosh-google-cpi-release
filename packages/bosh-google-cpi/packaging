@@ -12,7 +12,8 @@ export PATH=${GOROOT}/bin:${PATH}
 mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas
 mv ${BOSH_COMPILE_TARGET}/github.com/frodenas/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
 cd ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi
-bin/build
+export GOPATH=${BOSH_COMPILE_TARGET}/go
+make build
 
 # Copy BOSH Google CPI package
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
