@@ -8,6 +8,7 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 check_param aws_access_key_id_release
 check_param aws_secret_access_key_release
 
+cpi_release_name="bosh-google-cpi"
 integer_version=`cut -d "." -f1 release-version-semver/number`
 echo $integer_version > promoted/integer_version
 echo "BOSH Google CPI BOSH Release v${integer_version}" > promoted/annotation_message
@@ -42,3 +43,5 @@ EOF
   git config --global user.name CI
   git commit -m "BOSH Google CPI BOSH Release v${integer_version}"
 popd
+
+mv promoted/repo/releases/${cpi_release_name}/${cpi_release_name}-${integer_version}.tgz promoted/
