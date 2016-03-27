@@ -331,11 +331,11 @@ jobs:
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
           params:
-            aws_access_key_id: {{aws_s3_access_key}}
-            aws_secret_access_key: {{aws_s3_secret_key}}
+            aws_access_key_id_release: {{aws_s3_access_key_release}}
+            aws_secret_access_key_release: {{aws_s3_secret_key_release}}
 
       - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
 
       - put: release-version-semver
         params: {file: release-version-semver/number}

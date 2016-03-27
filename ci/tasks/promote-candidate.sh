@@ -5,13 +5,12 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param aws_access_key_id
-check_param aws_secret_access_key
+check_param aws_access_key_id_release
+check_param aws_secret_access_key_release
 
-# Creates an integer version number from the semantic version format
-# May be changed when we decide to fully use semantic versions for releases
 integer_version=`cut -d "." -f1 release-version-semver/number`
 echo $integer_version > promoted/integer_version
+echo "BOSH Google CPI BOSH Release v${integer_version}" > promoted/annotation_message
 
 cp -r bosh-cpi-src promoted/repo
 
@@ -24,8 +23,8 @@ pushd promoted/repo
 ---
 blobstore:
   s3:
-    access_key_id: ${aws_access_key_id}
-    secret_access_key: ${aws_secret_access_key}
+    access_key_id: ${aws_access_key_id_release}
+    secret_access_key: ${aws_secret_access_key_release}
 EOF
 
   echo "Using BOSH CLI version..."
@@ -41,5 +40,5 @@ EOF
 
   git config --global user.email cf-bosh-eng@pivotal.io
   git config --global user.name CI
-  git commit -m "New Final CPI BOSH Release v${integer_version}"
+  git commit -m "BOSH Google CPI BOSH Release v${integer_version}"
 popd
