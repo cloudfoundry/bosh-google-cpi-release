@@ -5,7 +5,7 @@ set -e
 DOCKER_IMAGE=${DOCKER_IMAGE:-frodenas/bosh-google-cpi-boshrelease}
 DOCKER_IMAGE_VERSION=${DOCKER_IMAGE_VERSION:-v1}
 
-#docker login
+docker login
 
 echo "Building docker image..."
 docker build -t $DOCKER_IMAGE .
