@@ -30,6 +30,7 @@ jobs:
             os_version:      trusty
             os_image_bucket: bosh-os-images
             os_image_file:   bosh-ubuntu-trusty-os-image.tgz
+            bucket_name:     {{google_stemcells_bucket_name}}
 
       - put: bosh-stemcells
         params: {file: stemcell/bosh-stemcell-*-google-kvm-*-*-go_agent.tgz}
@@ -56,6 +57,7 @@ jobs:
             os_version:      7
             os_image_bucket: bosh-os-images
             os_image_file:   bosh-centos-7-os-image.tgz
+            bucket_name:     {{google_stemcells_bucket_name}}
 
       - put: bosh-stemcells
         params: {file: stemcell/bosh-stemcell-*-google-kvm-*-*-go_agent.tgz}
