@@ -337,6 +337,9 @@ jobs:
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
 
+      - put: bosh-cpi-dev-artifacts
+        params: {file: promoted/*.tgz}
+
       - put: release-version-semver
         params: {file: release-version-semver/number}
 
