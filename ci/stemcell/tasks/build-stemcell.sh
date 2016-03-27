@@ -11,6 +11,7 @@ check_param os_name
 check_param os_version
 check_param os_image_bucket
 check_param os_image_file
+check_param bucket_name
 
 TASK_DIR=$PWD
 
@@ -66,3 +67,11 @@ SUDO
 echo "Copying stemcell..."
 mv /mnt/stemcells/google/kvm/${os_name}/work/work/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent.tgz stemcell/
 mv /mnt/stemcells/google/kvm/${os_name}/work/work/stemcell/image stemcell/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent-raw.tar.gz
+
+echo "Creating light stemcell..."
+pushd /mnt/stemcells/google/kvm/${os_name}/work/work/stemcell
+  touch image
+  echo "  source_url: https://storage.googleapis.com/${bucket_name}/bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent-raw.tar.gz" >> stemcell.MF
+  tar czvf light-bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent.tgz  *
+popd
+mv /mnt/stemcells/google/kvm/${os_name}/work/work/stemcell/light-bosh-stemcell-${build_number}-google-kvm-${os_name}-${os_version}-go_agent.tgz stemcell/

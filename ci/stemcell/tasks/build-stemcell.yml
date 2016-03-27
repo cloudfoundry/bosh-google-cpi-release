@@ -14,3 +14,4 @@ params:
   os_version:      replace-me
   os_image_bucket: replace-me
   os_image_file:   replace-me
+  bucket_name:     replace-me
