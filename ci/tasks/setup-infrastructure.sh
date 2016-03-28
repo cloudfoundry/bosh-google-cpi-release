@@ -14,8 +14,6 @@ check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
 check_param google_address_director_centos
-check_param google_address_bats_ubuntu
-check_param google_address_bats_centos
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
@@ -30,8 +28,6 @@ gcloud config set compute/zone ${google_zone}
 echo "Setting up google infrastructure..."
 gcloud -q compute addresses create ${google_address_director_ubuntu}
 gcloud -q compute addresses create ${google_address_director_centos}
-gcloud -q compute addresses create ${google_address_bats_ubuntu}
-gcloud -q compute addresses create ${google_address_bats_centos}
 gcloud -q compute networks create ${google_network} --mode auto
 gcloud -q compute firewall-rules create ${google_firewall_internal} --description "BOSH CI Internal traffic" --network ${google_network} --source-tags ${google_firewall_internal} --target-tags ${google_firewall_internal} --allow tcp,udp,icmp
 gcloud -q compute firewall-rules create ${google_firewall_external} --description "BOSH CI External traffic" --network ${google_network} --target-tags ${google_firewall_external} --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53

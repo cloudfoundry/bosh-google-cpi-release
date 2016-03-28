@@ -36,8 +36,6 @@ done
 gcloud -q compute firewall-rules delete ${google_firewall_external}
 gcloud -q compute firewall-rules delete ${google_firewall_internal}
 gcloud -q compute networks delete ${google_network}
-gcloud -q compute addresses delete ${google_address_bats_centos}
-gcloud -q compute addresses delete ${google_address_bats_ubuntu}
 gcloud -q compute addresses delete ${google_address_director_centos}
 gcloud -q compute addresses delete ${google_address_director_ubuntu}
 set -e
