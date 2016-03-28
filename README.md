@@ -30,11 +30,20 @@ $ gcloud compute networks create cf --mode auto
 * Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
 ```
-$ gcloud compute firewall-rules create cf-intenal --description "Cloud Foundry Internal traffic" --network cf --source-tags cf-internal --target-tags cf-internal --allow tcp,udp,icmp
+$ gcloud compute firewall-rules create cf-intenal \
+  --description "Cloud Foundry Internal traffic" \
+  --network cf \
+  --source-tags cf-internal \
+  --target-tags cf-internal \
+  --allow tcp,udp,icmp
 ```
 
 ```
-$ gcloud compute firewall-rules create cf-bosh --description "Cloud Foundry BOSH External traffic" --network cf --target-tags cf-bosh --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
+$ gcloud compute firewall-rules create cf-bosh \
+  --description "Cloud Foundry BOSH External traffic" \
+  --network cf \
+  --target-tags cf-bosh \
+  --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
 ```
 
 * Create a **password-less** [SSH key](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys) if you haven't already.
