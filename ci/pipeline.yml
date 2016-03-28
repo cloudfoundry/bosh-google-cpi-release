@@ -341,7 +341,9 @@ jobs:
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
 
       - put: bosh-cpi-artifacts
-        params: {file: promoted/*.tgz}
+        params:
+          file: promoted/*.tgz
+          predefined_acl: "publicRead"
 
 resources:
   - name: bosh-cpi-src-in
@@ -365,14 +367,14 @@ resources:
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi([0-9]+\.[0-9]+\.[0-9]+)\.tgz
+      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
 
   - name: bosh-cpi-artifacts
     type: gcs-resource
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi([0-9]+)\.tgz
+      regexp:   bosh-google-cpi-([0-9]+)\.tgz
 
   - name: version-semver
     type: semver
