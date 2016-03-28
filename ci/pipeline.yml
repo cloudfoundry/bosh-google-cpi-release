@@ -327,21 +327,21 @@ jobs:
         - {trigger: false, passed: [bats-ubuntu, bats-centos], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                                     get: release-version-semver, params: {bump: major}}
 
+      - put: release-version-semver
+        params: {file: release-version-semver/number}
+
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
           params:
-            aws_access_key_id_release: {{aws_s3_access_key_release}}
+            aws_access_key_id_release:     {{aws_s3_access_key_release}}
             aws_secret_access_key_release: {{aws_s3_secret_key_release}}
 
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
 
-      - put: bosh-cpi-dev-artifacts
+      - put: bosh-cpi-artifacts
         params: {file: promoted/*.tgz}
-
-      - put: release-version-semver
-        params: {file: release-version-semver/number}
 
 resources:
   - name: bosh-cpi-src-in
@@ -365,7 +365,14 @@ resources:
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi([0-9.]+)\.tgz
+      regexp:   bosh-google-cpi([0-9]+\.[0-9]+\.[0-9]+)\.tgz
+
+  - name: bosh-cpi-artifacts
+    type: gcs-resource
+    source:
+      json_key: {{google_json_key_data}}
+      bucket:   {{google_releases_bucket_name}}
+      regexp:   bosh-google-cpi([0-9]+)\.tgz
 
   - name: version-semver
     type: semver
