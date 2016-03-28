@@ -2,6 +2,7 @@ package client
 
 import (
 	"net/http"
+	"os"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -14,8 +15,11 @@ import (
 	"google.golang.org/api/storage/v1"
 )
 
-const computeScope = compute.ComputeScope
-const storageScope = storage.DevstorageFullControlScope
+const (
+	computeScope = compute.ComputeScope
+	storageScope = storage.DevstorageFullControlScope
+	metadataHost = "metadata"
+)
 
 type GoogleClient struct {
 	config         config.Config
@@ -45,6 +49,9 @@ func NewGoogleClient(
 		}
 		storageClient = storageJwtConf.Client(oauth2.NoContext)
 	} else {
+		if v := os.Getenv("GCE_METADATA_HOST"); v == "" {
+			os.Setenv("GCE_METADATA_HOST", metadataHost)
+		}
 		computeClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
