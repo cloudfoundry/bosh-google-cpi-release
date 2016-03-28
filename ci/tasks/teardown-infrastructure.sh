@@ -14,8 +14,6 @@ check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
 check_param google_address_director_centos
-check_param google_address_bats_ubuntu
-check_param google_address_bats_centos
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
