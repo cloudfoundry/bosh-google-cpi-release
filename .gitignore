@@ -15,3 +15,5 @@ releases/**/*.tgz
 *~
 *#
 #*
+bin/
+pkg/
