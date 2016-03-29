@@ -220,8 +220,8 @@ jobs:
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
           params:
-            aws_access_key_id_release:     {{aws_s3_access_key_release}}
-            aws_secret_access_key_release: {{aws_s3_secret_key_release}}
+            release_blobs_access_key: {{release_blobs_access_key}}
+            release_blobs_secret_key: {{release_blobs_secret_key}}
 
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
@@ -266,19 +266,21 @@ resources:
     type: semver
     source:
       key:               current-version
-      bucket:            {{aws_s3_bucket_name}}
-      access_key_id:     {{aws_s3_access_key}}
-      secret_access_key: {{aws_s3_secret_key}}
-      region:            {{aws_s3_region}}
+      bucket:            {{version_semver_bucket_name}}
+      access_key_id:     {{version_semver_access_key}}
+      secret_access_key: {{version_semver_secret_key}}
+      region:            {{version_semver_region}}
+      endpoint:          storage.googleapis.com
 
   - name: release-version-semver
     type: semver
     source:
       key:               release-current-version
-      bucket:            {{aws_s3_bucket_name}}
-      access_key_id:     {{aws_s3_access_key}}
-      secret_access_key: {{aws_s3_secret_key}}
-      region:            {{aws_s3_region}}
+      bucket:            {{version_semver_bucket_name}}
+      access_key_id:     {{version_semver_access_key}}
+      secret_access_key: {{version_semver_secret_key}}
+      region:            {{version_semver_region}}
+      endpoint:          storage.googleapis.com
 
   - name: bosh-init
     type: s3

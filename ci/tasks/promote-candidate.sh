@@ -5,8 +5,8 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param aws_access_key_id_release
-check_param aws_secret_access_key_release
+check_param release_blobs_access_key
+check_param release_blobs_secret_key
 
 cpi_release_name="bosh-google-cpi"
 integer_version=`cut -d "." -f1 release-version-semver/number`
@@ -24,8 +24,8 @@ pushd promoted/repo
 ---
 blobstore:
   s3:
-    access_key_id: ${aws_access_key_id_release}
-    secret_access_key: ${aws_secret_access_key_release}
+    access_key_id: ${release_blobs_access_key}
+    secret_access_key: ${release_blobs_secret_key}
 EOF
 
   echo "Using BOSH CLI version..."
