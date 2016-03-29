@@ -235,7 +235,7 @@ resources:
   - name: bosh-cpi-src-in
     type: git
     source:
-      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease.git
       branch: master
       ignore_paths:
         - .final_builds/**/*.yml
@@ -244,7 +244,7 @@ resources:
   - name: bosh-cpi-src-out
     type: git
     source:
-      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease.git
       branch: master
       private_key: {{github_deployment_key_bosh_google_cpi_release}}
 
