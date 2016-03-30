@@ -20,5 +20,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision('docker')
-  config.vm.synced_folder '../../src/github.com/frodenas/bosh-google-cpi', '/vagrant/frodenas.bosh-google-cpi-boshrelease/bosh-google-cpi'
+  config.vm.synced_folder '../../src/bosh-google-cpi', '/vagrant/bosh-google-cpi-boshrelease/bosh-google-cpi'
 end

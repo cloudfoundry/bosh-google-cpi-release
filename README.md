@@ -1,10 +1,10 @@
 # BOSH Google CPI release
 
-This is a [BOSH](http://bosh.io/) release for the external [BOSH Google CPI](https://github.com/frodenas/bosh-google-cpi/).
+This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 
 ## Disclaimer
 
-This is NOT presently a production ready [BOSH Google CPI](https://github.com/frodenas/bosh-google-cpi/) BOSH release. This is a work in progress. It is suitable for experimentation and may not become supported in the future.
+This is NOT presently a production ready BOSH Google CPI release. This is a work in progress. It is suitable for experimentation and may not become supported in the future.
 
 ## Usage
 
@@ -276,10 +276,10 @@ Your username is `admin` and password is `admin`.
 
 ### Deploy other software
 
-* [Deploying Cloud Foundry on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_cf.md)
-* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_mysql.md)
-* [Deploying Cloud Foundry Redis Service on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_redis.md)
-* [Deploying Concourse on Google Compute Engine](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_concourse.md)
+* [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/docs/deploy_cf.md)
+* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/docs/deploy_mysql.md)
+* [Deploying Cloud Foundry Redis Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/docs/deploy_redis.md)
+* [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/docs/deploy_concourse.md)
 
 ## Contributing
 
@@ -294,11 +294,11 @@ Here are some ways *you* can contribute:
 * by writing specifications
 * by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
 * by refactoring code
-* by closing [issues](https://github.com/frodenas/bosh-google-cpi-boshrelease/issues)
+* by closing [issues](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/issues)
 * by reviewing patches
 
 ### Submitting an Issue
-We use the [GitHub issue tracker](https://github.com/frodenas/bosh-google-cpi-boshrelease/issues) to track bugs and features.
+We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/issues) to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
 support for an existing issue by voting it up. When submitting a bug report, please include a
 [Gist](http://gist.github.com/) that includes a stack trace and any details that may be necessary to reproduce the bug,
@@ -345,5 +345,5 @@ git push origin master --tags
 
 ## Copyright
 
-See [LICENSE](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/LICENSE) for details.
+See [LICENSE](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/LICENSE) for details.
 Copyright (c) 2015-2016 Ferran Rodenas.

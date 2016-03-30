@@ -84,7 +84,7 @@ resources:
   - name: bosh-cpi-src
     type: git
     source:
-      uri: https://github.com/frodenas/bosh-google-cpi-boshrelease.git
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease.git
       branch: master
 
   - name: bosh-src
