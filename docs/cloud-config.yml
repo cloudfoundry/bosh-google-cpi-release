@@ -1,0 +1,64 @@
+azs:
+- name: z1
+  cloud_properties: {zone: us-central1-f}
+- name: z2
+  cloud_properties: {zone: us-central1-a}
+
+vm_types:
+- name: common
+  cloud_properties:
+    machine_type: n1-standard-4
+    root_disk_size_gb: 20
+    root_disk_type: pd-ssd
+
+- name: worker
+  cloud_properties:
+    machine_type: n1-highmem-8
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+
+compilation:
+  workers: 3
+  network: private
+  reuse_compilation_vms: true
+  cloud_properties:
+    machine_type: n1-standard-8
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+    preemptible: true
+
+networks:
+  - name: public-concourse
+    type: dynamic
+    subnets:
+    - az: z1
+      cloud_properties:
+        network_name: cf
+        ephemeral_external_ip: true
+        instance_group: ig-us-central1-f
+        tags:
+          - cf-internal
+          - concourse
+    - az: z2
+      cloud_properties:
+        network_name: cf
+        ephemeral_external_ip: true
+        instance_group: ig-us-central1-a
+        tags:
+          - cf-internal
+          - concourse
+
+  - name: private
+    type: dynamic
+    cloud_properties:
+      network_name: cf
+      ephemeral_external_ip: true
+      tags:
+        - cf-internal
+
+  - name: vip
+    type: vip
+    
+disk_types:
+- name: database
+  disk_size: 10240
