@@ -10,8 +10,7 @@ build-all:
 
 # Prepration for tests
 get-deps:
-	# Go vet  and lint tools
-	go get golang.org/x/tools/cmd/vet
+	# Go lint tool
 	go get github.com/golang/lint/golint
 
 	# Simplify cross-compiling
