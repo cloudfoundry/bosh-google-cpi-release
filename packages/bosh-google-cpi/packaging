@@ -9,12 +9,12 @@ export GOROOT=$(cd "${PACKAGES_DIR}/golang" && pwd -P)
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build BOSH Google CPI package
-mkdir -p ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas
-mv ${BOSH_COMPILE_TARGET}/github.com/frodenas/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/
-cd ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi
+mkdir -p ${BOSH_COMPILE_TARGET}/go/src
+mv ${BOSH_COMPILE_TARGET}/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/
+cd ${BOSH_COMPILE_TARGET}/go/src/bosh-google-cpi
 export GOPATH=${BOSH_COMPILE_TARGET}/go
 make build
 
 # Copy BOSH Google CPI package
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/github.com/frodenas/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/go/src/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/

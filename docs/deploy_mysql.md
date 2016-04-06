@@ -6,7 +6,7 @@ In order to deploy the [Cloud Foundry MySQL Service](https://github.com/cloudfou
 
 * An existing BOSH environment
 
-* An existing [Cloud Foundry environment](https://github.com/frodenas/bosh-google-cpi-boshrelease/blob/master/docs/deploy_cf.md)
+* An existing [Cloud Foundry environment](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/blob/master/docs/deploy_cf.md)
 
 * Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
     - 24 Cores
@@ -35,7 +35,7 @@ $ bosh upload stemcell https://storage.googleapis.com/bosh-stemcells/light-bosh-
 $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=26
 ```
 
-* Download the [mysql.yml](https://raw.githubusercontent.com/frodenas/bosh-google-cpi-boshrelease/master/docs/mysql.yml) deployment manifest file and update it with your properties (at the top of the file):
+* Download the [mysql.yml](https://raw.githubusercontent.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease/master/docs/mysql.yml) deployment manifest file and update it with your properties (at the top of the file):
     - `director_uuid = 'CHANGE-ME'`: replace `CHANGE-ME` with your BOSH UUID (run `bosh status`)
     - `vip_ip = 'CHANGE-ME'`: replace `CHANGE-ME` with the static IP assigned to your Cloud Foundry environment (named `cf`)
 

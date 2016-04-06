@@ -3,4 +3,4 @@ name: bosh-google-cpi
 dependencies:
   - golang
 files:
-  - github.com/frodenas/bosh-google-cpi/**/*
+  - bosh-google-cpi/**/*
