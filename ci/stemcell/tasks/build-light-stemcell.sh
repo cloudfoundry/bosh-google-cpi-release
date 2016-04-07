@@ -21,7 +21,10 @@ light_stemcell_name="light-${original_stemcell_name}"
 mkdir working_dir
 pushd working_dir
   tar xvf "${original_stemcell}"
-  mv image "${raw_stemcell_dir}/${raw_stemcell_name}"
+
+  raw_stemcell_path="${raw_stemcell_dir}/${raw_stemcell_name}"
+  mv image "${raw_stemcell_path}"
+  echo -n $(sha1sum ${raw_stemcell_path} | awk '{print $1}') > ${raw_stemcell_path}.sha1
 
   > image
   echo "  source_url: https://storage.googleapis.com/${BUCKET_NAME}/${raw_stemcell_name}" >> stemcell.MF
