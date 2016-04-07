@@ -9,7 +9,7 @@ This is **NOT** presently a production ready CPI. This is a work in progress. It
 ## Usage
 
 ### Deployment
-This is the implemention of the CPI, and is part of the [BOSH Google CPI release](https://github.com/cloudfoundry-incubator/bosh-google-cpi-boshrelease) repository. See the README at the root of this repository for instructions on deploying the release with this CPI.
+This is the implemention of the CPI, and is part of the [BOSH Google CPI release](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release) repository. See the README at the root of this repository for instructions on deploying the release with this CPI.
 
 ### Installation
 

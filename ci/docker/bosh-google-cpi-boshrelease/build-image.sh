@@ -2,7 +2,7 @@
 
 set -e
 
-DOCKER_IMAGE=${DOCKER_IMAGE:-cloudfoundry-incubator/bosh-google-cpi-boshrelease}
+DOCKER_IMAGE=${DOCKER_IMAGE:-cloudfoundry-incubator/bosh-google-cpi-release}
 DOCKER_IMAGE_VERSION=${DOCKER_IMAGE_VERSION:-v1}
 
 docker login
