@@ -16,3 +16,4 @@ run:
 params:
   release_blobs_access_key: replace-me
   release_blobs_secret_key: replace-me
+  release_blobs_bucket_name: replace-me

@@ -209,8 +209,8 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {trigger: false, passed: [deploy-ubuntu, deploy-centos], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, passed: [deploy-ubuntu, deploy-centos], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: false, passed: [deploy-ubuntu], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [deploy-ubuntu], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                                         get: release-version-semver, params: {bump: major}}
 
       - put: release-version-semver
@@ -222,7 +222,7 @@ jobs:
           params:
             release_blobs_access_key: {{release_blobs_access_key}}
             release_blobs_secret_key: {{release_blobs_secret_key}}
-
+            release_blobs_bucket_name: {{release_blobs_bucket_name}}
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
 
@@ -235,8 +235,8 @@ resources:
   - name: bosh-cpi-src-in
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      uri: https://github.com/evandbrown/bosh-google-cpi-boshrelease.git
+      branch: ci-develop
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml
@@ -244,8 +244,8 @@ resources:
   - name: bosh-cpi-src-out
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      uri: git@github.com:evandbrown/bosh-google-cpi-release.git
+      branch: ci-develop
       private_key: {{github_deployment_key_bosh_google_cpi_release}}
 
   - name: bosh-cpi-dev-artifacts
