@@ -13,7 +13,7 @@ raw_stemcell_dir="$PWD/raw-stemcell"
 
 echo "Creating light stemcell..."
 
-original_stemcell="${stemcell_dir}/*.tgz"
+original_stemcell="$(echo ${stemcell_dir}/*.tgz)"
 original_stemcell_name="$(basename "${original_stemcell}")"
 raw_stemcell_name="$(basename "${original_stemcell}" .tgz)-raw.tar.gz"
 light_stemcell_name="light-${original_stemcell_name}"
