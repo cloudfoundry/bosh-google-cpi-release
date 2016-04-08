@@ -29,14 +29,6 @@ blobstore:
     bucket_name: ${release_blobs_bucket_name}
 EOF
 
-  cat > config/final.yml << EOF
----
-blobstore:
-  provider: s3
-  options:
-    bucket_name: ${release_blobs_bucket_name}
-EOF
-
   echo "Using BOSH CLI version..."
   bosh version
 
