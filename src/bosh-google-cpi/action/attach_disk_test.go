@@ -11,12 +11,12 @@ import (
 	diskfakes "bosh-google-cpi/google/disk_service/fakes"
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 
-	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
+	registryfakes "bosh-google-cpi/registry/fakes"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/google/disk_service"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("AttachDisk", func() {

@@ -8,7 +8,7 @@ import (
 
 	"bosh-google-cpi/google/instance_service"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("Networks", func() {

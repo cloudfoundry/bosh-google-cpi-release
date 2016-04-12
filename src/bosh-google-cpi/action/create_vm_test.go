@@ -14,7 +14,7 @@ import (
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 	machinetypefakes "bosh-google-cpi/google/machine_type_service/fakes"
 
-	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
+	registryfakes "bosh-google-cpi/registry/fakes"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/google/disk_service"
@@ -23,7 +23,7 @@ import (
 	"bosh-google-cpi/google/instance_service"
 	"bosh-google-cpi/google/machine_type_service"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("CreateVM", func() {

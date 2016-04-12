@@ -10,9 +10,9 @@ import (
 
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 
-	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
+	registryfakes "bosh-google-cpi/registry/fakes"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("ConfigureNetworks", func() {

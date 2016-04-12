@@ -11,7 +11,7 @@ import (
 	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/util"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 type CreateVM struct {

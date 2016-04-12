@@ -13,7 +13,7 @@ import (
 	bgcaction "bosh-google-cpi/action"
 	bgcconfig "bosh-google-cpi/google/config"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var validGoogleConfig = bgcconfig.Config{

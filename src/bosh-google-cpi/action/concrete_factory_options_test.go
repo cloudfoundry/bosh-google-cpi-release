@@ -6,7 +6,7 @@ import (
 
 	. "bosh-google-cpi/action"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("ConcreteFactoryOptions", func() {

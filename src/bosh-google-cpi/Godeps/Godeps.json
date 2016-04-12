@@ -30,14 +30,6 @@
 			"Rev": "67f99ed9a1c4eab0f7b7db3a7cdcb8e019710d61"
 		},
 		{
-			"ImportPath": "github.com/frodenas/bosh-registry/client",
-			"Rev": "e45363ad6cae5b20ef03c1bde9c424114df2e404"
-		},
-		{
-			"ImportPath": "github.com/frodenas/bosh-registry/client/fakes",
-			"Rev": "e45363ad6cae5b20ef03c1bde9c424114df2e404"
-		},
-		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "99511271042a09d1e01baea8781caa5210fec66e"
 		},
