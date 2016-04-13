@@ -92,7 +92,7 @@ func (c MetadataClient) Fetch(instanceID string) (AgentSettings, error) {
 func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) error {
 	settingsJSON, err := json.Marshal(agentSettings)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Marshalling agent settings, contents: %#s", agentSettings)
+		return bosherr.WrapErrorf(err, "Marshalling agent settings, contents: %#v", agentSettings)
 	}
 	c.logger.Debug(metadataClientLogTag, "Updating instance metadata for %q with agent settings %q", instanceID, settingsJSON)
 
@@ -132,7 +132,7 @@ func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 			for _, item := range list.Instances[0].Metadata.Items {
 				metadata.items[item.Key] = *item.Value
 			}
-			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#s", instanceID, metadata))
+			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#v", instanceID, metadata))
 			return metadata, nil
 		}
 	}
