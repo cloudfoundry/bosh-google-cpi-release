@@ -90,14 +90,14 @@ resources:
   - name: centos-stemcells
     type: s3
     source:
-      regexp: {{bosh_stemcell_centos_regexp}}
-      bucket: {{bosh_stemcell_bucket}}
+      regexp: bosh-stemcell-(.+)-google-kvm-centos-7-go_agent.tgz
+      bucket: bosh-google-stemcells-dev
 
   - name: ubuntu-stemcells
     type: s3
     source:
-      regexp: {{bosh_stemcell_ubuntu_regexp}}
-      bucket: {{bosh_stemcell_bucket}}
+      regexp: bosh-stemcell-(.+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      bucket: bosh-google-stemcells-dev
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
