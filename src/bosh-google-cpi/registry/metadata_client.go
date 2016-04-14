@@ -13,7 +13,7 @@ import (
 
 const (
 	GCEMetadataKey       = "bosh_settings"
-	metadataClientLogTag = "registryMetadatalient"
+	metadataClientLogTag = "registryMetadataClient"
 )
 
 // MetadataClient represents a GCE metadata client.
@@ -54,18 +54,11 @@ func (i *instanceMetadata) computeMetadata() *compute.Metadata {
 	return metadata
 }
 
-// Delete deletes the instance settings for a given instance ID.
+// Delete deletes the instance settings for a given instance ID. This
+// is a no-op as metadata is associated with the instance and is
+// deleted when the VM is terminated. There is no need to clean up
+// metadata after a VM is deleted.
 func (c MetadataClient) Delete(instanceID string) error {
-	currentMetadata, err := c.metadata(instanceID)
-	if err != nil {
-		return err
-	}
-	delete(currentMetadata.items, c.options.GCEMetadataKey)
-	_, err = c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, currentMetadata.computeMetadata()).Do()
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
-	}
-
 	return nil
 }
 
@@ -115,14 +108,14 @@ func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 	svc := c.googleClient.ComputeService().Instances
 	listCall := svc.AggregatedList(c.googleClient.Project())
 	listCall.Filter(fmt.Sprintf("name eq %v", instanceID))
-	instances, err := listCall.Do()
+	aggregatedList, err := listCall.Do()
 	c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Searching for instance %q", instanceID))
 	if err != nil {
 		return instanceMetadata{}, bosherr.WrapError(err, fmt.Sprintf("Listing instances to find instance %q", instanceID))
 	}
 
 	// Find single instance in list
-	for _, list := range instances.Items {
+	for _, list := range aggregatedList.Items {
 		if len(list.Instances) == 1 {
 			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Found instance %q in zone %q", instanceID, list.Instances[0].Zone))
 			var metadata instanceMetadata
