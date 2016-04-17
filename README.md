@@ -30,7 +30,7 @@ $ gcloud compute networks create cf --mode auto
 * Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
 ```
-$ gcloud compute firewall-rules create cf-intenal \
+$ gcloud compute firewall-rules create cf-internal \
   --description "Cloud Foundry Internal traffic" \
   --network cf \
   --source-tags cf-internal \
@@ -103,7 +103,7 @@ networks:
     cloud_properties:
       network_name: cf
       tags:
-        - cf-intenal
+        - cf-internal
         - cf-bosh
   - name: public
     type: vip
