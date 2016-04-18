@@ -17,17 +17,7 @@ JSON.dump(
       },
     },
     "registry" => {
-      "protocol" => p("registry.protocol"),
-      "host" => p("registry.host"),
-      "port" => p("registry.port"),
-      "username" => p("registry.username"),
-      "password" => p("registry.password"),
-      "tls" => {
-        "insecure_skip_verify" => p("registry.client.tls.insecure_skip_verify"),
-        "certfile" => "/var/vcap/jobs/google_cpi/config/registry.certfile",
-        "keyfile" => "/var/vcap/jobs/google_cpi/config/registry.keyfile",
-        "cacertfile" => "/var/vcap/jobs/google_cpi/config/registry.cacertfile",
-      }
+      "use_gce_metadata" => true,
     },
   }
 )
