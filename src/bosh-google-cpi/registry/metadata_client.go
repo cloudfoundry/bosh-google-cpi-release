@@ -3,8 +3,11 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"time"
 
 	"bosh-google-cpi/google/client"
+	opsvc "bosh-google-cpi/google/operation_service"
 	"bosh-google-cpi/util"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -14,6 +17,9 @@ import (
 const (
 	GCEMetadataKey       = "bosh_settings"
 	metadataClientLogTag = "registryMetadataClient"
+	opWaiterRetryMax     = 100
+	opMaxSleepExponent   = 3
+	opReadyStatus        = "DONE"
 )
 
 // MetadataClient represents a GCE metadata client.
@@ -96,11 +102,14 @@ func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) e
 	currentMetadata.items[c.options.GCEMetadataKey] = string(settingsJSON)
 
 	c.logger.Debug(metadataClientLogTag, "Updating instance metadata to: %#v", currentMetadata.computeMetadata())
-	_, err = c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, currentMetadata.computeMetadata()).Do()
+	op, err := c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, currentMetadata.computeMetadata()).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
 	}
-
+	_, err = c.wait(op)
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
+	}
 	return nil
 }
 
@@ -130,4 +139,40 @@ func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 		}
 	}
 	return instanceMetadata{}, bosherr.WrapError(err, fmt.Sprintf("Could not find find instance %q", instanceID))
+}
+
+func (c MetadataClient) wait(operation *compute.Operation) (*compute.Operation, error) {
+	var tries int
+	var err error
+
+	start := time.Now()
+	for tries = 1; tries < opWaiterRetryMax; tries++ {
+		factor := math.Pow(2, math.Min(float64(tries), float64(opMaxSleepExponent)))
+		wait := time.Duration(factor) * time.Second
+		c.logger.Debug(metadataClientLogTag, "Waiting for Google Operation '%s' to be ready, retrying in %v (%d/%d)", operation.Name, wait, tries, opWaiterRetryMax)
+		time.Sleep(wait)
+
+		operation, err = c.googleClient.ComputeService().ZoneOperations.Get(c.googleClient.Project(), util.ResourceSplitter(operation.Zone), operation.Name).Do()
+
+		if err != nil {
+			c.logger.Debug(metadataClientLogTag, "Google Operation '%s' finished with an error: %#v", operation.Name, err)
+			if operation.Error != nil {
+				return nil, bosherr.WrapErrorf(opsvc.GoogleOperationError(*operation.Error), "Google Operation '%s' finished with an error", operation.Name)
+			}
+
+			return nil, bosherr.WrapErrorf(err, "Google Operation '%s' finished with an error", operation.Name)
+		}
+
+		if operation.Status == opReadyStatus {
+			if operation.Error != nil {
+				c.logger.Debug(metadataClientLogTag, "Google Operation '%s' finished with an error: %s", operation.Name, opsvc.GoogleOperationError(*operation.Error))
+				return nil, bosherr.WrapErrorf(opsvc.GoogleOperationError(*operation.Error), "Google Operation '%s' finished with an error", operation.Name)
+			}
+
+			c.logger.Debug(metadataClientLogTag, "Google Operation '%s' is now ready after %v", operation.Name, time.Since(start))
+			return operation, nil
+		}
+	}
+
+	return nil, bosherr.Errorf("Timed out waiting for Google Operation '%s' to be ready", operation.Name)
 }
