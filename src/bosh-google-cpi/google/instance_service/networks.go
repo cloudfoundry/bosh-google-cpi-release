@@ -101,12 +101,6 @@ func (n Networks) Tags() NetworkTags {
 	return dynamicNetwork.Tags
 }
 
-func (n Networks) TargetPool() string {
-	dynamicNetwork := n.DynamicNetwork()
-
-	return dynamicNetwork.TargetPool
-}
-
 func (n Networks) InstanceGroup() string {
 	dynamicNetwork := n.DynamicNetwork()
 

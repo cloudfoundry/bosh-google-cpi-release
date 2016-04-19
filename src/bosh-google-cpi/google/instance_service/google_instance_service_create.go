@@ -57,10 +57,18 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		return "", api.NewVMCreationFailedError(true)
 	}
 
-	if _, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
+	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %#v", err)
 		i.CleanUp(vm.Name)
 		return "", api.NewVMCreationFailedError(true)
+	}
+
+	if vmProps.TargetPool != "" {
+		if err := i.addToTargetPool(operation.TargetLink, vmProps.TargetPool); err != nil {
+			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %#v", err)
+			i.CleanUp(vm.Name)
+			return "", api.NewVMCreationFailedError(true)
+		}
 	}
 
 	return vm.Name, nil
@@ -70,6 +78,7 @@ func (i GoogleInstanceService) CleanUp(id string) {
 	if err := i.Delete(id); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed cleaning up Google Instance '%s': %#v", id, err)
 	}
+
 }
 
 func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, diskType string) []*compute.AttachedDisk {
@@ -211,4 +220,52 @@ func (i GoogleInstanceService) createTagsParams(networks Networks) (*compute.Tag
 	}
 
 	return tags, nil
+}
+
+func (i GoogleInstanceService) addToTargetPool(instanceSelfLink string, targetPoolName string) error {
+	if err := i.targetPoolService.AddInstance(targetPoolName, instanceSelfLink); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) removeFromTargetPool(instanceSelfLink string) error {
+	targetPool, found, err := i.targetPoolService.FindByInstance(instanceSelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	if found {
+		if err := i.targetPoolService.RemoveInstance(targetPool, instanceSelfLink); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, targetPoolName string) error {
+	// Check if instance is associated to a target pool
+	currentTargetPool, _, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
+	if err != nil {
+		return err
+	}
+
+	// Check if target pool info has changed
+	if targetPoolName != currentTargetPool {
+		if currentTargetPool != "" {
+			if err := i.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink); err != nil {
+				return err
+			}
+		}
+
+		if targetPoolName != "" {
+			if err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
