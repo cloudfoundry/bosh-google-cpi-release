@@ -1,0 +1,18 @@
+---
+platform: linux
+
+image: docker:///bosh/os-image-stemcell-builder
+
+inputs:
+  - name: bosh-cpi-src
+  - name: stemcell
+
+outputs:
+  - name: light-stemcell
+  - name: raw-stemcell
+
+run:
+  path: bosh-cpi-src/ci/stemcell/tasks/build-light-stemcell.sh
+
+params:
+  BUCKET_NAME: ""
