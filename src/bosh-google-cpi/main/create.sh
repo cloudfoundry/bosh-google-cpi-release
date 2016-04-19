@@ -1,0 +1,1 @@
+echo "{\"method\": \"create_vm\",\"arguments\": [\"agent\", \"stemcell-02aec13b-2882-4d78-7e21-c36b60778969\", {\"machine_type\": \"n1-standard-1\", \"target_pool\": \"concourse-tp\"}, {\"default\":{\"type\":\"dynamic\",\"cloud_properties\":{\"network_name\":\"cf\"}}}, [], {}]}" | ./main -configFile=cpi.json

@@ -1,0 +1,17 @@
+{
+  "google": {
+    "project": "evandbrown17",
+    "default_zone": "us-central1-a"
+  },
+  "actions": {
+    "agent": {
+      "mbus": "http://127.0.0.1",
+      "blobstore": {
+        "type": "local"
+      }
+    },
+    "registry": {
+      "use_gce_metadata": true
+    }
+  }
+}
