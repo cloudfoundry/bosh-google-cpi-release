@@ -116,7 +116,7 @@ $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
 ```
 
 * Download the [cloudfoundry.yml](https://raw.githubusercontent.com/cloudfoundry-incubator/bosh-google-cpi-release/master/docs/cloudfoundry.yml) deployment manifest file and update it with your properties (at the top of the file):
-    - `director_uuid = 'CHANGE-ME'`: replace `CHANGE-ME` with your BOSH UUID (run `bosh status`)
+    - `director_uuid = 'CHANGE-ME'`: replace `CHANGE-ME` with your BOSH UUID (run `bosh status --uuid`)
     - `vip_ip = 'CHANGE-ME'`: replace `CHANGE-ME` with the static IP reserved previously (named `cf`)
 
 * Target the deployment file and deploy:
