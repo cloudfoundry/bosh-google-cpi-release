@@ -50,22 +50,22 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		ServiceAccounts:   serviceAccountsParams,
 		Tags:              tagsParams,
 	}
-	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %#v", vm)
+	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
-		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %#v", err)
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		return "", api.NewVMCreationFailedError(true)
 	}
 
 	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
-		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %#v", err)
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		i.CleanUp(vm.Name)
 		return "", api.NewVMCreationFailedError(true)
 	}
 
 	if vmProps.TargetPool != "" {
 		if err := i.addToTargetPool(operation.TargetLink, vmProps.TargetPool); err != nil {
-			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %#v", err)
+			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %v", err)
 			i.CleanUp(vm.Name)
 			return "", api.NewVMCreationFailedError(true)
 		}
@@ -76,7 +76,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 
 func (i GoogleInstanceService) CleanUp(id string) {
 	if err := i.Delete(id); err != nil {
-		i.logger.Debug(googleInstanceServiceLogTag, "Failed cleaning up Google Instance '%s': %#v", id, err)
+		i.logger.Debug(googleInstanceServiceLogTag, "Failed cleaning up Google Instance '%s': %v", id, err)
 	}
 
 }
