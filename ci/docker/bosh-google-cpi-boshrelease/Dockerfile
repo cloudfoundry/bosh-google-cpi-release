@@ -1,5 +1,5 @@
 FROM ubuntu:15.04
-MAINTAINER Ferran Rodenas <frodenas@gmail.com>
+MAINTAINER Evan Brown <evanbrown@google.com>
 
 # Update base image
 ENV LANG en_US.UTF-8

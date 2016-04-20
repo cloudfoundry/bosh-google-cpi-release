@@ -3,7 +3,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: frodenas/bosh-google-cpi-boshrelease
+    repository: boshcpi/gce-cpi-release
     tag: v1
 inputs:
   - name: bosh-cpi-src
