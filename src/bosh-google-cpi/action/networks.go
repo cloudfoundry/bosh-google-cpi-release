@@ -1,7 +1,7 @@
 package action
 
 import (
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 
 	"bosh-google-cpi/google/instance_service"
 )

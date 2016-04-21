@@ -24,7 +24,7 @@ import (
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 var _ = Describe("ConcreteFactory", func() {

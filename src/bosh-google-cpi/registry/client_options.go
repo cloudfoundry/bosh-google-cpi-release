@@ -8,6 +8,14 @@ import (
 
 // ClientOptions are the options used to create a BOSH Registry client.
 type ClientOptions struct {
+	// Use GCE metadata instead of BOSH registry
+	UseGCEMetadata bool `json:"use_gce_metadata,omitempty"`
+
+	// The optional key to use for storing settings in GCE metadata. This
+	// field will use a default value if empty and UseGCEMetadata
+	// is true.
+	GCEMetadataKey string `json:"gce_metadata_key,omitempty"`
+
 	// BOSH Registry protocol
 	Protocol string `json:"protocol,omitempty"`
 
@@ -54,6 +62,9 @@ func (o ClientOptions) EndpointWithCredentials() string {
 
 // Validate validates the Client options.
 func (o ClientOptions) Validate() error {
+	if o.UseGCEMetadata {
+		return nil
+	}
 	if o.Protocol == "" {
 		return bosherr.Error("Must provide a non-empty Protocol")
 	}

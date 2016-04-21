@@ -10,7 +10,7 @@ import (
 
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 
-	registryfakes "github.com/frodenas/bosh-registry/client/fakes"
+	registryfakes "bosh-google-cpi/registry/fakes"
 )
 
 var _ = Describe("DeleteVM", func() {

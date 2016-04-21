@@ -38,6 +38,9 @@ properties:
     description: "Options for the blobstore used by deployed BOSH agents"
     default: {}
 
+  registry.use_gce_metadata:
+    description: "Google Compute Engine metadata should be used instead of BOSH registry"
+    default: true
   registry.protocol:
     description: "Registry Protocol (http|https)"
     default: "http"

@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 // FakeClient represents a Fake BOSH Registry Client.

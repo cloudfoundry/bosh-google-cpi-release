@@ -19,7 +19,7 @@ import (
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
 
-	"github.com/frodenas/bosh-registry/client"
+	"bosh-google-cpi/registry"
 )
 
 type ConcreteFactory struct {
@@ -86,11 +86,22 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	registryClient := registry.NewHTTPClient(
-		options.Registry,
-		logger,
-	)
-
+	// Choose the correct registry.Client based on the
+	// value of ClientOptions.UseGCEMetadata
+	var registryClient registry.Client
+	switch options.Registry.UseGCEMetadata {
+	case true:
+		registryClient = registry.NewMetadataClient(
+			googleClient,
+			options.Registry,
+			logger,
+		)
+	default:
+		registryClient = registry.NewHTTPClient(
+			options.Registry,
+			logger,
+		)
+	}
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
