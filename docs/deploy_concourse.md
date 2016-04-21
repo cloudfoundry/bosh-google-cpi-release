@@ -63,4 +63,4 @@ $ bosh deployment concourse.yml
 $ bosh deploy
 ```
 
-* Follow the [Concourse Getting Started](http://concourse.ci/getting-started.html) guide.
+* Follow the [Concourse Getting Started](http://concourse.ci/using-concourse.html) guide.
