@@ -51,8 +51,8 @@ instance_groups:
       databases:
       - name: *atc_db
         # make up a role and password
-        role: foo
-        password: bar
+        role: REPLACE_ME
+        password: REPLACE_ME
 
 - name: worker
   instances: 1
