@@ -157,6 +157,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) 
 		Network:       network.SelfLink,
 		Subnetwork:    subnetworkLink,
 		AccessConfigs: accessConfigs,
+		NetworkIP:     networks.StaticPrivateIP(),
 	}
 	networkInterfaces = append(networkInterfaces, networkInterface)
 
