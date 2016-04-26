@@ -2,15 +2,17 @@ package main
 
 import (
 	"flag"
+	"io"
 	"os"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
-	bgcaction "bosh-google-cpi/action"
-	bgcdisp "bosh-google-cpi/api/dispatcher"
-	bgctrans "bosh-google-cpi/api/transport"
+	"bosh-google-cpi/action"
+	"bosh-google-cpi/api/dispatcher"
+	"bosh-google-cpi/api/transport"
+	"bosh-google-cpi/config"
 
 	"bosh-google-cpi/google/client"
 )
@@ -19,6 +21,8 @@ const mainLogTag = "main"
 
 var (
 	configFileOpt = flag.String("configFile", "", "Path to configuration file")
+	input         io.Reader
+	output        io.Writer
 )
 
 func main() {
@@ -28,7 +32,7 @@ func main() {
 
 	flag.Parse()
 
-	config, err := NewConfigFromPath(*configFileOpt, fs)
+	config, err := config.NewConfigFromPath(*configFileOpt, fs)
 	if err != nil {
 		logger.Error(mainLogTag, "Loading config - %s", err.Error())
 		os.Exit(1)
@@ -40,7 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	cli := bgctrans.NewCLI(os.Stdin, os.Stdout, dispatcher, logger)
+	cli := transport.NewCLI(os.Stdin, os.Stdout, dispatcher, logger)
 
 	if err = cli.ServeOnce(); err != nil {
 		logger.Error(mainLogTag, "Serving once %s", err)
@@ -61,25 +65,25 @@ func basicDeps() (boshlog.Logger, boshsys.FileSystem, boshsys.CmdRunner, boshuui
 }
 
 func buildDispatcher(
-	config Config,
+	config config.Config,
 	logger boshlog.Logger,
 	fs boshsys.FileSystem,
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,
-) (bgcdisp.Dispatcher, error) {
+) (dispatcher.Dispatcher, error) {
 	googleClient, err := client.NewGoogleClient(config.Google, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	actionFactory := bgcaction.NewConcreteFactory(
+	actionFactory := action.NewConcreteFactory(
 		googleClient,
 		uuidGen,
 		config.Actions,
 		logger,
 	)
 
-	caller := bgcdisp.NewJSONCaller()
+	caller := dispatcher.NewJSONCaller()
 
-	return bgcdisp.NewJSON(actionFactory, caller, logger), nil
+	return dispatcher.NewJSON(actionFactory, caller, logger), nil
 }

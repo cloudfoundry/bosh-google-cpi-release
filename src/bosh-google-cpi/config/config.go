@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -29,6 +29,24 @@ func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error)
 	}
 
 	if err = json.Unmarshal(bytes, &config); err != nil {
+		return config, bosherr.WrapError(err, "Unmarshalling config contents")
+	}
+
+	if err = config.Validate(); err != nil {
+		return config, bosherr.WrapError(err, "Validating config")
+	}
+
+	return config, nil
+}
+
+func NewConfigFromString(configString string) (Config, error) {
+	var config Config
+	var err error
+	if configString == "" {
+		return config, bosherr.Errorf("Must provide a config")
+	}
+
+	if err = json.Unmarshal([]byte(configString), &config); err != nil {
 		return config, bosherr.WrapError(err, "Unmarshalling config contents")
 	}
 
