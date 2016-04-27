@@ -40,3 +40,7 @@ vet:
 # Runs the unit tests with coverage
 test: get-deps clean fmt lint vet build
 	ginkgo -r -race .
+	
+# Runs the integration tests with coverage
+testint: 
+	GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(EXTERNAL_STATIC_IP) go test -v -timeout=60m ./integration/... -ginkgo.slowSpecThreshold=500 -ginkgo.progress -ginkgo.v $(GINKGO_ARGS)

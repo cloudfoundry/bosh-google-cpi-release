@@ -16,12 +16,17 @@ import (
 	"github.com/cloudfoundry/bosh-utils/uuid"
 )
 
+const (
+	reusableVMName = "google-cpi-int-tests"
+)
+
 var (
-	stemcellCID, vmCID, diskCID string
+	stemcellCID, vmCID, diskCID, snapshotCID string
 
 	// Provided by user
 	googleProject    = os.Getenv("GOOGLE_PROJECT")
 	externalStaticIP = os.Getenv("EXTERNAL_STATIC_IP")
+	keepResuableVM   = os.Getenv("KEEP_REUSABLE_VM")
 
 	// Configurable defaults
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")

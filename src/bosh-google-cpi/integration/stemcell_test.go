@@ -9,11 +9,6 @@ import (
 
 var _ = Describe("Stemcell", func() {
 
-	BeforeEach(func() {
-		Expect(googleProject).ToNot(Equal(""), "GOOGLE_PROJECT must be set")
-		Expect(externalStaticIP).ToNot(Equal(""), "EXTERNAL_STATIC_IP must be set")
-	})
-
 	It("can create a stemcell from a valid JSON request", func() {
 
 		request := fmt.Sprintf(`{
