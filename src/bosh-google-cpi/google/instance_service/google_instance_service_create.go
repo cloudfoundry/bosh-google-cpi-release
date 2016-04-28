@@ -20,7 +20,10 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
 	}
 
-	instanceName := fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
+	instanceName := vmProps.Name
+	if instanceName == "" {
+		instanceName = fmt.Sprintf("%s-%s", googleInstanceNamePrefix, uuidStr)
+	}
 	canIPForward := networks.CanIPForward()
 	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskType)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, networks)

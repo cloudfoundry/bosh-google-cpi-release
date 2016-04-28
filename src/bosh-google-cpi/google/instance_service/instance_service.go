@@ -28,6 +28,7 @@ type Metadata map[string]interface{}
 
 type Properties struct {
 	Zone              string
+	Name              string
 	Stemcell          string
 	MachineType       string
 	RootDiskSizeGb    int

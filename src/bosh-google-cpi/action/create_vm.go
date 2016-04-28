@@ -90,6 +90,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
+		Name:              cloudProps.Name,
 		Stemcell:          stemcellLink,
 		MachineType:       machineTypeLink,
 		RootDiskSizeGb:    cv.findRootDiskSizeGb(cloudProps.RootDiskSizeGb),
