@@ -20,7 +20,6 @@ type Network struct {
 	EphemeralExternalIP bool
 	IPForwarding        bool
 	Tags                NetworkTags
-	TargetPool          string
 	InstanceGroup       string
 }
 

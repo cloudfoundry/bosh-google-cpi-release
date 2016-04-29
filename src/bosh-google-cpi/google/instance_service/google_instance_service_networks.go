@@ -18,22 +18,8 @@ func (i GoogleInstanceService) AddNetworkConfiguration(id string, networks Netwo
 		return api.NewVMNotFoundError(id)
 	}
 
-	if err := i.addToTargetPool(instance, networks); err != nil {
-		return err
-	}
-
 	if err := i.addToInstanceGroup(instance, networks); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) addToTargetPool(instance *compute.Instance, networks Networks) error {
-	if targetPoolName := networks.TargetPool(); targetPoolName != "" {
-		if err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -58,27 +44,8 @@ func (i GoogleInstanceService) DeleteNetworkConfiguration(id string) error {
 		return api.NewVMNotFoundError(id)
 	}
 
-	if err := i.removeFromTargetPool(instance); err != nil {
-		return err
-	}
-
 	if err := i.removeFromInstanceGroup(instance); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) removeFromTargetPool(instance *compute.Instance) error {
-	targetPool, found, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
-	if err != nil {
-		return err
-	}
-
-	if found {
-		if err := i.targetPoolService.RemoveInstance(targetPool, instance.SelfLink); err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -125,10 +92,6 @@ func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, networks Ne
 	}
 
 	if err = i.updateTags(instance, networks); err != nil {
-		return err
-	}
-
-	if err := i.updateTargetPool(instance, networks); err != nil {
 		return err
 	}
 
@@ -309,32 +272,6 @@ func (i GoogleInstanceService) updateTags(instance *compute.Instance, networks N
 	// Update the instance tags
 	if err := i.SetTags(instance.Name, instance.Zone, instanceTags); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, networks Networks) error {
-	// Check if instance is associated to a target pool
-	currentTargetPool, _, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
-	if err != nil {
-		return err
-	}
-
-	// Check if target pool info has changed
-	targetPoolName := networks.TargetPool()
-	if targetPoolName != currentTargetPool {
-		if currentTargetPool != "" {
-			if err := i.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink); err != nil {
-				return err
-			}
-		}
-
-		if targetPoolName != "" {
-			if err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink); err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

@@ -48,7 +48,6 @@ var _ = Describe("ConfigureNetworks", func() {
 						Tags:                NetworkTags{"fake-network-cloud-network-tag"},
 						EphemeralExternalIP: true,
 						IPForwarding:        false,
-						TargetPool:          "fake-network-cloud-target-pool",
 					},
 				},
 			}

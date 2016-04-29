@@ -12,7 +12,6 @@ type NetworkCloudProperties struct {
 	Tags                NetworkTags `json:"tags,omitempty"`
 	EphemeralExternalIP bool        `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        bool        `json:"ip_forwarding,omitempty"`
-	TargetPool          string      `json:"target_pool,omitempty"`
 	InstanceGroup       string      `json:"instance_group,omitempty"`
 }
 
@@ -43,6 +42,7 @@ type VMCloudProperties struct {
 	OnHostMaintenance string          `json:"on_host_maintenance,omitempty"`
 	Preemptible       bool            `json:"preemptible,omitempty"`
 	ServiceScopes     VMServiceScopes `json:"service_scopes,omitempty"`
+	TargetPool        string          `json:"target_pool,omitempty"`
 }
 
 type VMServiceScopes []string
