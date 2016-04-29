@@ -37,6 +37,7 @@ type Properties struct {
 	OnHostMaintenance string
 	Preemptible       bool
 	ServiceScopes     ServiceScopes
+	TargetPool        string
 }
 
 type ServiceScopes []string

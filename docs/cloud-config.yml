@@ -17,6 +17,11 @@ vm_types:
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
 
+vm_extensions:
+  - name: concourse-target-pool
+    cloud_properties:
+      target_pool: concourse_tp
+
 compilation:
   workers: 3
   network: private
