@@ -42,7 +42,7 @@ test: get-deps clean fmt lint vet build
 	ginkgo -r -race .
 	
 # Runs the integration tests with coverage
-testint: check-proj check-destroy
+testint: check-proj check-destroy get-deps clean fmt lint vet build
 	$(eval INTEGRATION_ADDRESS = $(shell gcloud compute addresses describe cfintegration --region=us-central1 | head  -n1 | cut -f2 -d' '))
 	GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) go test -v -timeout=60m ./integration/... -ginkgo.slowSpecThreshold=500 -ginkgo.progress -ginkgo.v $(GINKGO_ARGS)
 
