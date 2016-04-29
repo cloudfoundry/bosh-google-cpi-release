@@ -34,11 +34,15 @@ var (
 	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
 	stemcellURL          = envOrDefault("STEMCELL_URL", "https://storage.googleapis.com/evandbrown17/bosh-stemcell-3215-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz")
 	existingStemcell     = envOrDefault("EXISTING_STEMCELL", "stemcell-decdea81-a0a3-47b6-5d76-093d505a6de9")
+	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
+	instanceGroup        = envOrDefault("INSTANCE_GROUP", "cfintegration-us-central1-a")
+	zone                 = envOrDefault("ZONE", "us-central1-a")
+	region               = envOrDefault("REGION", "us-central1")
 
 	cfgContent = fmt.Sprintf(`{
 	  "google": {
 		"project": "%v",
-		"default_zone": "us-central1-a"
+		"default_zone": "%v"
 	  },
 	  "actions": {
 		"agent": {
@@ -51,21 +55,26 @@ var (
 		  "use_gce_metadata": true
 		}
 	  }
-	}`, googleProject)
+	}`, googleProject, zone)
 )
 
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
 	var config boshcfg.Config
-	var in, out, errOut bytes.Buffer
+	var in, out bytes.Buffer
 	var boshResponse boshdisp.Response
 	var googleClient client.GoogleClient
+
+	// \Write errout to stdout
+	defer func() {
+
+	}()
 
 	if config, err = boshcfg.NewConfigFromString(cfgContent); err != nil {
 		return boshResponse, err
 	}
 
-	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, &errOut, &errOut)
+	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, os.Stderr, os.Stderr)
 	uuidGen := uuid.NewGenerator()
 	if googleClient, err = client.NewGoogleClient(config.Google, logger); err != nil {
 		return boshResponse, err

@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"google.golang.org/api/compute/v1"
 )
 
 func assertSucceeds(request string) {
@@ -14,10 +15,7 @@ func assertSucceeds(request string) {
 }
 
 func assertSucceedsWithResult(request string) interface{} {
-	GinkgoWriter.Write([]byte(fmt.Sprintf("CPI request: %v\n", request)))
 	response, err := execCPI(request)
-	GinkgoWriter.Write([]byte(fmt.Sprintf("CPI response: %v\n", response)))
-	GinkgoWriter.Write([]byte(fmt.Sprintf("CPI error: %v\n", err)))
 	Expect(err).ToNot(HaveOccurred())
 	Expect(response.Error).To(BeNil())
 	Expect(response.Result).ToNot(BeNil())
@@ -30,4 +28,18 @@ func toStringArray(raw []interface{}) []string {
 		strings[i] = raw[i].(string)
 	}
 	return strings
+}
+
+func assertValidVM(id string, valFunc func(*compute.Instance)) {
+	listCall := computeService.Instances.AggregatedList(googleProject)
+	listCall.Filter(fmt.Sprintf("name eq %v", id))
+	aggregatedList, err := listCall.Do()
+	Expect(err).To(BeNil())
+	for _, list := range aggregatedList.Items {
+		if len(list.Instances) == 1 {
+			valFunc(list.Instances[0])
+			return
+		}
+	}
+	Fail(fmt.Sprintf("Instance %q not found\n", id))
 }
