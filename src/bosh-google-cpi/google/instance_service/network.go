@@ -29,9 +29,15 @@ func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
 
 func (n Network) IsVip() bool { return n.Type == "vip" }
 
+func (n Network) IsManual() bool { return n.Type == "manual" }
+
 func (n Network) Validate() error {
 	switch {
 	case n.IsDynamic():
+		if err := n.validateTags(); err != nil {
+			return err
+		}
+	case n.IsManual():
 		if err := n.validateTags(); err != nil {
 			return err
 		}
@@ -39,6 +45,7 @@ func (n Network) Validate() error {
 		if n.IP == "" {
 			return bosherr.Error("VIP Networks must provide an IP Address")
 		}
+
 	default:
 		return bosherr.Errorf("Network type '%s' not supported", n.Type)
 	}
