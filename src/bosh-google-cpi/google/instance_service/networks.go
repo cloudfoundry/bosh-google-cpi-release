@@ -105,12 +105,6 @@ func (n Networks) Tags() NetworkTags {
 	return network.Tags
 }
 
-func (n Networks) TargetPool() string {
-	network := n.Network()
-
-	return network.TargetPool
-}
-
 func (n Networks) InstanceGroup() string {
 	network := n.Network()
 

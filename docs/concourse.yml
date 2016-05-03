@@ -18,6 +18,7 @@ instance_groups:
   instances: 1
   vm_type: common
   azs: [z1]
+  vm_extensions: [concourse-target-pool]
   stemcell: trusty
   networks: 
   - name: public-concourse

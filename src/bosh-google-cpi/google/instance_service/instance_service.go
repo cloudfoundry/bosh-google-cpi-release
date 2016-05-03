@@ -28,6 +28,7 @@ type Metadata map[string]interface{}
 
 type Properties struct {
 	Zone              string
+	Name              string
 	Stemcell          string
 	MachineType       string
 	RootDiskSizeGb    int
@@ -36,6 +37,7 @@ type Properties struct {
 	OnHostMaintenance string
 	Preemptible       bool
 	ServiceScopes     ServiceScopes
+	TargetPool        string
 }
 
 type ServiceScopes []string
