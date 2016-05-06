@@ -39,7 +39,7 @@ vet:
 
 # Runs the unit tests with coverage
 test: get-deps clean fmt lint vet build
-	ginkgo -r -race .
+	ginkgo -r -race -skipPackage=integration .
 	
 # Runs the integration tests with coverage
 testint: check-proj check-destroy get-deps clean fmt
