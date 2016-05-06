@@ -42,9 +42,10 @@ test: get-deps clean fmt lint vet build
 	ginkgo -r -race .
 	
 # Runs the integration tests with coverage
-testint: check-proj check-destroy get-deps clean fmt lint vet build
+testint: check-proj check-destroy get-deps clean fmt
 	$(eval INTEGRATION_ADDRESS = $(shell gcloud compute addresses describe cfintegration --region=us-central1 | head  -n1 | cut -f2 -d' '))
-	GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) go test -v -timeout=60m ./integration/... -ginkgo.slowSpecThreshold=500 -ginkgo.progress -ginkgo.v $(GINKGO_ARGS)
+	#GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) go test -v -timeout=60m ./integration/... -ginkgo.slowSpecThreshold=500 -ginkgo.progress -ginkgo.v -ginkgo.p -ginkgo.randomizeAllSpecs --ginkgo.randomizeSuites $(GINKGO_ARGS)
+	GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS)
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
 configint: check-proj

@@ -9,8 +9,10 @@ import (
 
 var _ = Describe("Stemcell", func() {
 
-	It("can create a stemcell from a valid JSON request", func() {
+	It("executes the stemcell lifecycle", func() {
+		var stemcellCID string
 
+		By("uploading a stemcell")
 		request := fmt.Sprintf(`{
 			  "method": "create_stemcell",
 			  "arguments": ["", {
@@ -20,13 +22,10 @@ var _ = Describe("Stemcell", func() {
 				  "source_url": "%s"
 				}]
 			}`, stemcellURL)
-
 		stemcellCID = assertSucceedsWithResult(request).(string)
-	})
 
-	It("can delete a stemcell from a valid JSON request", func() {
-
-		request := fmt.Sprintf(`{
+		By("deleting the stemcell")
+		request = fmt.Sprintf(`{
 			  "method": "delete_stemcell",
 			  "arguments": ["%v"]
 			}`, stemcellCID)
@@ -35,5 +34,6 @@ var _ = Describe("Stemcell", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(response.Error).To(BeNil())
 		Expect(response.Result).To(BeNil())
+
 	})
 })

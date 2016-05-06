@@ -8,9 +8,10 @@ import (
 )
 
 var _ = Describe("VM", func() {
-	Context("Lifecycle", func() {
-		It("can create a simple VM", func() {
-			request := fmt.Sprintf(`{
+	It("executes the VM lifecycle", func() {
+		var vmCID string
+		By("creating a VM")
+		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
 				"agent",
@@ -31,48 +32,43 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, networkName)
-			vmCID = assertSucceedsWithResult(request).(string)
-		})
+		vmCID = assertSucceedsWithResult(request).(string)
 
-		It("can confirm existence of an existing VM", func() {
-			request := fmt.Sprintf(`{
+		By("locating the VM")
+		request = fmt.Sprintf(`{
 			  "method": "has_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			exists := assertSucceedsWithResult(request).(bool)
-			Expect(exists).To(Equal(true))
-		})
+		exists := assertSucceedsWithResult(request).(bool)
+		Expect(exists).To(Equal(true))
 
-		It("can reboot an existing VM", func() {
-			request := fmt.Sprintf(`{
+		By("rebooting the VM")
+		request = fmt.Sprintf(`{
 			  "method": "reboot_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
+		assertSucceeds(request)
 
-		It("can delete a VM", func() {
-			request := fmt.Sprintf(`{
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
+		assertSucceeds(request)
 	})
 
-	Context("can create a VM with existing disk attachment hints", func() {
-		var request, diskCID2 string
-		It("creates the disks", func() {
-			request = fmt.Sprintf(`{
+	It("executes the VM lifecycle with disk attachment hints", func() {
+		By("creating two disks")
+		var request, diskCID, diskCID2, vmCID string
+		request = fmt.Sprintf(`{
 			  "method": "create_disk",
 			  "arguments": [32768, {}, ""]
 			}`)
-			diskCID = assertSucceedsWithResult(request).(string)
-			diskCID2 = assertSucceedsWithResult(request).(string)
-		})
+		diskCID = assertSucceedsWithResult(request).(string)
+		diskCID2 = assertSucceedsWithResult(request).(string)
 
-		It("creates a VM with the disks", func() {
-			request = fmt.Sprintf(`{
+		By("creating a VM with the disk attachment hints")
+		request = fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
 				"agent",
@@ -93,32 +89,32 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, networkName, diskCID, diskCID2)
-			vmCID = assertSucceedsWithResult(request).(string)
-		})
+		vmCID = assertSucceedsWithResult(request).(string)
 
-		It("deletes the disks", func() {
-			request = fmt.Sprintf(`{
+		By("deleting the disks")
+		request = fmt.Sprintf(`{
 			  "method": "delete_disk",
 			  "arguments": ["%v"]
 			}`, diskCID)
-			assertSucceeds(request)
+		assertSucceeds(request)
 
-			request = fmt.Sprintf(`{
+		request = fmt.Sprintf(`{
 			  "method": "delete_disk",
 			  "arguments": ["%v"]
 			}`, diskCID2)
-			assertSucceeds(request)
-		})
-		It("deletes the VM", func() {
-			request = fmt.Sprintf(`{
+		assertSucceeds(request)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
+		assertSucceeds(request)
 	})
 
-	It("can create a VM with custom machine type", func() {
+	It("executes the VM lifecycle with custom machine type", func() {
+		By("creating a VM")
+		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -142,6 +138,8 @@ var _ = Describe("VM", func() {
 			  ]
 			}`, existingStemcell, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
 		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
@@ -149,7 +147,10 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("can create a VM in a particular zone", func() {
+	It("executes the VM lifecycle in a specific zone", func() {
+		By("creating a VM")
+		var vmCID string
+
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -173,15 +174,19 @@ var _ = Describe("VM", func() {
 			  ]
 			}`, existingStemcell, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
 		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
 		assertSucceeds(request)
 	})
-	Context("scheduling params", func() {
-		It("can create a VM with automatic restart disabled", func() {
-			request := fmt.Sprintf(`{
+
+	It("executes the VM lifecycle with automatic restart disabled", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
 				"agent",
@@ -203,15 +208,21 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, networkName)
-			vmCID = assertSucceedsWithResult(request).(string)
-			request = fmt.Sprintf(`{
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
-		It("can create a VM with OnHostMaintenance modified", func() {
-			request := fmt.Sprintf(`{
+		assertSucceeds(request)
+	})
+
+	It("execute the VM lifecycle with OnHostMaintenance modified", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
 				"agent",
@@ -233,15 +244,21 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, networkName)
-			vmCID = assertSucceedsWithResult(request).(string)
-			request = fmt.Sprintf(`{
+
+		By("deleting the VM")
+		vmCID = assertSucceedsWithResult(request).(string)
+		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
-		It("can create a preemtible VM", func() {
-			request := fmt.Sprintf(`{
+		assertSucceeds(request)
+	})
+
+	It("can execute the VM lifecycle with a preemptible VM", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
 				"agent",
@@ -263,15 +280,19 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, networkName)
-			vmCID = assertSucceedsWithResult(request).(string)
-			request = fmt.Sprintf(`{
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-			assertSucceeds(request)
-		})
+		assertSucceeds(request)
 	})
-	It("can create a VM with scopes", func() {
+
+	It("executes the VM lifecycle with scopes", func() {
+		By("creating a VM")
+		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -295,6 +316,8 @@ var _ = Describe("VM", func() {
 			  ]
 			}`, existingStemcell, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
 		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]

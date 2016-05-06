@@ -21,8 +21,6 @@ const (
 )
 
 var (
-	stemcellCID, vmCID, diskCID, snapshotCID string
-
 	// Provided by user
 	googleProject    = os.Getenv("GOOGLE_PROJECT")
 	externalStaticIP = os.Getenv("EXTERNAL_STATIC_IP")
@@ -61,20 +59,15 @@ var (
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
 	var config boshcfg.Config
-	var in, out bytes.Buffer
+	var in, out, errOut bytes.Buffer
 	var boshResponse boshdisp.Response
 	var googleClient client.GoogleClient
-
-	// \Write errout to stdout
-	defer func() {
-
-	}()
 
 	if config, err = boshcfg.NewConfigFromString(cfgContent); err != nil {
 		return boshResponse, err
 	}
 
-	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, os.Stderr, os.Stderr)
+	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, &errOut, os.Stderr)
 	uuidGen := uuid.NewGenerator()
 	if googleClient, err = client.NewGoogleClient(config.Google, logger); err != nil {
 		return boshResponse, err
