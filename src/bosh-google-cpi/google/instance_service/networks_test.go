@@ -11,6 +11,7 @@ var _ = Describe("Networks", func() {
 	var (
 		err            error
 		dynamicNetwork Network
+		manualNetwork  Network
 		vipNetwork     Network
 		networks       Networks
 	)
@@ -30,7 +31,20 @@ var _ = Describe("Networks", func() {
 			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
 			InstanceGroup:       "fake-dynamic-network-instance-group",
 		}
-
+		manualNetwork = Network{
+			Type:                "manual",
+			IP:                  "fake-manual-network-ip",
+			Gateway:             "fake-manual-network-gateway",
+			Netmask:             "fake-manual-network-netmask",
+			DNS:                 []string{"fake-manual-network-dns"},
+			Default:             []string{"fake-manual-network-default"},
+			NetworkName:         "fake-manual-network-network-name",
+			SubnetworkName:      "fake-manual-network-subnetwork-name",
+			EphemeralExternalIP: true,
+			IPForwarding:        false,
+			Tags:                NetworkTags{"fake-manual-network-network-tag"},
+			InstanceGroup:       "fake-manual-network-instance-group",
+		}
 		vipNetwork = Network{
 			Type:                "vip",
 			IP:                  "fake-vip-network-ip",
@@ -48,14 +62,20 @@ var _ = Describe("Networks", func() {
 
 		networks = Networks{
 			"fake-dynamic-network": dynamicNetwork,
+			"fake-manual-network":  manualNetwork,
 			"fake-vip-network":     vipNetwork,
 		}
 	})
 
 	Describe("Validate", func() {
-		It("does not return an error if networks are valid", func() {
-			err = networks.Validate()
-			Expect(err).NotTo(HaveOccurred())
+		Context("when networks are valid", func() {
+			BeforeEach(func() {
+				delete(networks, "fake-dynamic-network")
+			})
+			It("does not return an error", func() {
+				err = networks.Validate()
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 
 		Context("when networks are not valid", func() {
@@ -69,7 +89,7 @@ var _ = Describe("Networks", func() {
 			})
 		})
 
-		Context("when there are not any dynamic networks", func() {
+		Context("when there are not any dynamic or manual networks", func() {
 			BeforeEach(func() {
 				networks = Networks{
 					"fake-vip-network": vipNetwork,
@@ -79,7 +99,7 @@ var _ = Describe("Networks", func() {
 			It("returns an error", func() {
 				err = networks.Validate()
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("At least one Dynamic network should be defined"))
+				Expect(err.Error()).To(ContainSubstring("Exactly one Dynamic or Manual network must be defined"))
 			})
 		})
 
@@ -94,7 +114,37 @@ var _ = Describe("Networks", func() {
 			It("returns an error", func() {
 				err = networks.Validate()
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("Only one Dynamic network is allowed"))
+				Expect(err.Error()).To(ContainSubstring("Exactly one Dynamic or Manual network must be defined"))
+			})
+		})
+
+		Context("when there are more than 1 manual networks", func() {
+			BeforeEach(func() {
+				networks = Networks{
+					"fake-manual-network-1": manualNetwork,
+					"fake-manual-network-2": manualNetwork,
+				}
+			})
+
+			It("returns an error", func() {
+				err = networks.Validate()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Exactly one Dynamic or Manual network must be defined"))
+			})
+		})
+
+		Context("when there are more than 1 manual and dynamic networks", func() {
+			BeforeEach(func() {
+				networks = Networks{
+					"fake-manual-network-1":  manualNetwork,
+					"fake-dynamic-network-2": dynamicNetwork,
+				}
+			})
+
+			It("returns an error", func() {
+				err = networks.Validate()
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Exactly one Dynamic or Manual network must be defined"))
 			})
 		})
 
@@ -116,8 +166,14 @@ var _ = Describe("Networks", func() {
 	})
 
 	Describe("DynamicNetwork", func() {
-		It("returns the dynamic network", func() {
-			Expect(networks.DynamicNetwork()).To(Equal(dynamicNetwork))
+		Context("when there is a dynamic network", func() {
+			BeforeEach(func() {
+				delete(networks, "fake-manual-network")
+			})
+
+			It("returns the dynamic network", func() {
+				Expect(networks.Network()).To(Equal(dynamicNetwork))
+			})
 		})
 
 		Context("when there is NOT a dynamic network", func() {
@@ -126,7 +182,28 @@ var _ = Describe("Networks", func() {
 			})
 
 			It("returns an emtpy network", func() {
-				Expect(networks.DynamicNetwork()).To(Equal(Network{}))
+				Expect(networks.Network()).To(Equal(Network{}))
+			})
+		})
+	})
+
+	Describe("ManualNetwork", func() {
+		Context("when there is a manual network", func() {
+			BeforeEach(func() {
+				delete(networks, "fake-dynamic-network")
+			})
+			It("returns the manual network", func() {
+				Expect(networks.Network()).To(Equal(manualNetwork))
+			})
+		})
+
+		Context("when there is NOT a manual network", func() {
+			BeforeEach(func() {
+				networks = Networks{"fake-vip-network": vipNetwork}
+			})
+
+			It("returns an emtpy network", func() {
+				Expect(networks.Network()).To(Equal(Network{}))
 			})
 		})
 	})
