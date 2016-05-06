@@ -96,8 +96,6 @@ jobs:
     templates:
       - name: nats
         release: bosh
-      - name: redis
-        release: bosh
       - name: postgres
         release: bosh
       - name: powerdns
@@ -130,11 +128,6 @@ jobs:
         address: 127.0.0.1
         user: nats
         password: nats-password
-
-      redis:
-        listen_address: 127.0.0.1
-        address: 127.0.0.1
-        password: redis-password
 
       postgres: &db
         listen_address: 127.0.0.1
