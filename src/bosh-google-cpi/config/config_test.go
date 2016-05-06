@@ -8,8 +8,6 @@ import (
 
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 
-	. "bosh-google-cpi/main"
-
 	bgcaction "bosh-google-cpi/action"
 	bgcconfig "bosh-google-cpi/google/config"
 
