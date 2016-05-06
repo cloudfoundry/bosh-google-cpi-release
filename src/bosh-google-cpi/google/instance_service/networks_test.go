@@ -22,7 +22,7 @@ var _ = Describe("Networks", func() {
 			IP:                  "fake-dynamic-network-ip",
 			Gateway:             "fake-dynamic-network-gateway",
 			Netmask:             "fake-dynamic-network-netmask",
-			DNS:                 []string{"fake-dynamic-network-dns"},
+			DNS:                 []string{"fake-dynamic-or-manual-network-dns"},
 			Default:             []string{"fake-dynamic-network-default"},
 			NetworkName:         "fake-dynamic-network-network-name",
 			SubnetworkName:      "fake-dynamic-network-subnetwork-name",
@@ -36,7 +36,7 @@ var _ = Describe("Networks", func() {
 			IP:                  "fake-manual-network-ip",
 			Gateway:             "fake-manual-network-gateway",
 			Netmask:             "fake-manual-network-netmask",
-			DNS:                 []string{"fake-manual-network-dns"},
+			DNS:                 []string{"fake-dynamic-or-manual-network-dns"},
 			Default:             []string{"fake-manual-network-default"},
 			NetworkName:         "fake-manual-network-network-name",
 			SubnetworkName:      "fake-manual-network-subnetwork-name",
@@ -62,16 +62,12 @@ var _ = Describe("Networks", func() {
 
 		networks = Networks{
 			"fake-dynamic-network": dynamicNetwork,
-			"fake-manual-network":  manualNetwork,
 			"fake-vip-network":     vipNetwork,
 		}
 	})
 
 	Describe("Validate", func() {
 		Context("when networks are valid", func() {
-			BeforeEach(func() {
-				delete(networks, "fake-dynamic-network")
-			})
 			It("does not return an error", func() {
 				err = networks.Validate()
 				Expect(err).NotTo(HaveOccurred())
@@ -191,6 +187,7 @@ var _ = Describe("Networks", func() {
 		Context("when there is a manual network", func() {
 			BeforeEach(func() {
 				delete(networks, "fake-dynamic-network")
+				networks["fake-manual-network"] = manualNetwork
 			})
 			It("returns the manual network", func() {
 				Expect(networks.Network()).To(Equal(manualNetwork))
@@ -226,7 +223,7 @@ var _ = Describe("Networks", func() {
 
 	Describe("DNS", func() {
 		It("returns only the dynamic network DNS servers", func() {
-			Expect(networks.DNS()).To(Equal([]string{"fake-dynamic-network-dns"}))
+			Expect(networks.DNS()).To(Equal([]string{"fake-dynamic-or-manual-network-dns"}))
 		})
 	})
 
