@@ -6,7 +6,6 @@ groups:
       - build-candidate
       - setup-infrastructure
       - deploy-ubuntu
-      - deploy-centos
       - teardown-infrastructure
       - promote-candidate
 
@@ -14,12 +13,6 @@ groups:
     jobs:
       - build-candidate
       - deploy-ubuntu
-      - promote-candidate
-
-  - name: centos
-    jobs:
-      - build-candidate
-      - deploy-centos
       - promote-candidate
 
 jobs:
@@ -49,7 +42,7 @@ jobs:
 
   - name: setup-infrastructure
     serial: true
-    serial_groups: [director-ubuntu, director-centos]
+    serial_groups: [director-ubuntu]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -67,6 +60,7 @@ jobs:
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_director_centos: {{google_address_director_centos}}
+            google_address_bats:            {{google_address_bats}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -81,6 +75,44 @@ jobs:
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_director_centos: {{google_address_director_centos}}
+            google_address_bats:            {{google_address_bats}}
+
+  - name: teardown-infrastructure
+    serial: true
+    serial_groups: [director-ubuntu]
+    plan:
+      - aggregate:
+        - {trigger: true, passed: [deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+
+      - task: teardown-infrastructure
+        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+        config:
+          params:
+            google_project:                 {{google_project}}
+            google_region:                  {{google_region}}
+            google_zone:                    {{google_zone}}
+            google_json_key_data:           {{google_json_key_data}}
+            google_network:                 {{google_network}}
+            google_firewall_internal:       {{google_firewall_internal}}
+            google_firewall_external:       {{google_firewall_external}}
+            google_address_director_ubuntu: {{google_address_director_ubuntu}}
+            google_address_director_centos: {{google_address_director_centos}}
+            google_address_bats:            {{google_address_bats}}
+
+      - task: setup-infrastructure
+        file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
+        config:
+          params:
+            google_project:                 {{google_project}}
+            google_region:                  {{google_region}}
+            google_zone:                    {{google_zone}}
+            google_json_key_data:           {{google_json_key_data}}
+            google_network:                 {{google_network}}
+            google_firewall_internal:       {{google_firewall_internal}}
+            google_firewall_external:       {{google_firewall_external}}
+            google_address_director_ubuntu: {{google_address_director_ubuntu}}
+            google_address_director_centos: {{google_address_director_centos}}
+            google_address_bats:            {{google_address_bats}}
 
   - name: deploy-ubuntu
     serial: true
@@ -93,6 +125,7 @@ jobs:
         - {trigger: false,                                                  get: bosh-init}
         - {trigger: false,                                                  get: bosh-release}
         - {trigger: false,                                                  get: dummy-boshrelease}
+        - {trigger: false,                                                  get: bats}
 
       - task: setup-director
         file: bosh-cpi-src/ci/tasks/setup-director.yml
@@ -129,24 +162,12 @@ jobs:
             stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
             director_username:        {{director_username}}
             director_password:        {{director_password}}
-        ensure:
+        on_failure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
-  - name: deploy-centos
-    serial: true
-    serial_groups: [director-centos]
-    plan:
-      - aggregate:
-        - {trigger: false, passed: [build-candidate, setup-infrastructure], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true,  passed: [build-candidate],                       get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                                                  get: stemcell, resource: google-centos-stemcell}
-        - {trigger: false,                                                  get: bosh-init}
-        - {trigger: false,                                                  get: bosh-release}
-        - {trigger: false,                                                  get: dummy-boshrelease}
-
-      - task: setup-director
-        file: bosh-cpi-src/ci/tasks/setup-director.yml
+      - task: run-bats
+        file: bosh-cpi-src/ci/tasks/run-bats.yml
         config:
           params:
             google_project:           {{google_project}}
@@ -156,61 +177,21 @@ jobs:
             google_network:           {{google_network}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
-            google_address_director:  {{google_address_director_centos}}
-            private_key_user:         {{private_key_user}}
-            private_key_data:         {{private_key_data}}
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
-        on_failure:
-          task: teardown-director
-          file: bosh-cpi-src/ci/tasks/teardown-director.yml
-
-      - task: deploy-dummy
-        file: bosh-cpi-src/ci/tasks/deploy-dummy.yml
-        config:
-          params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            google_network:           {{google_network}}
-            google_firewall_internal: {{google_firewall_internal}}
-            google_address_director:  {{google_address_director_centos}}
-            base_os:                  Centos
-            stemcell_name:            bosh-google-kvm-centos-7-go_agent
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
+            google_address_director:  {{google_address_director_ubuntu}}
+            google_address_bats:      {{google_address_bats}}
+            base_os:                  Ubuntu
+            stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
+            bat_vcap_password:        {{bat_vcap_password}}
         ensure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
-
-  - name: teardown-infrastructure
-    serial: true
-    serial_groups: [director-ubuntu, director-centos]
-    plan:
-      - aggregate:
-        - {trigger: true, passed: [deploy-ubuntu, deploy-centos], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-
-      - task: teardown-infrastructure
-        file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
-        config:
-          params:
-            google_project:                 {{google_project}}
-            google_region:                  {{google_region}}
-            google_zone:                    {{google_zone}}
-            google_json_key_data:           {{google_json_key_data}}
-            google_network:                 {{google_network}}
-            google_firewall_internal:       {{google_firewall_internal}}
-            google_firewall_external:       {{google_firewall_external}}
-            google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_director_centos: {{google_address_director_centos}}
 
   - name: promote-candidate
     serial: true
     plan:
       - aggregate:
-        - {trigger: false, passed: [deploy-ubuntu, deploy-centos], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, passed: [deploy-ubuntu, deploy-centos], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: false, passed: [deploy-ubuntu], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [deploy-ubuntu], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                                         get: release-version-semver, params: {bump: major}}
 
       - put: release-version-semver
@@ -313,15 +294,8 @@ resources:
       bucket:   {{google_stemcells_bucket_name}}
       regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 
-  - name: google-centos-stemcell
-    type: gcs-resource
-    source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent.tgz
-
 resource_types:
   - name: gcs-resource
     type: docker-image
     source:
-      repository: frodenas/gcs-resource
+    repository: frodenas/gcs-resource
