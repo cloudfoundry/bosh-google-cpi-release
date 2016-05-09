@@ -13,7 +13,7 @@ check_param google_network
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
-check_param google_address_bats
+check_param google_address_bats_ubuntu
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
@@ -48,7 +48,7 @@ export BAT_DIRECTOR=${director_ip}
 export BAT_DNS_HOST=${director_ip}
 
 echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
+bats_ip=$(gcloud compute addresses describe ${google_address_bats_ubuntu} --format json | jq -r '.address')
 
 echo "Creating private key..."
 eval $(ssh-agent)
