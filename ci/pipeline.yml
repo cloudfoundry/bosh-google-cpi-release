@@ -59,8 +59,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_director_centos: {{google_address_director_centos}}
-            google_address_bats:            {{google_address_bats}}
+            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -74,8 +73,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_director_centos: {{google_address_director_centos}}
-            google_address_bats:            {{google_address_bats}}
+            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
 
   - name: teardown-infrastructure
     serial: true
@@ -96,8 +94,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_director_centos: {{google_address_director_centos}}
-            google_address_bats:            {{google_address_bats}}
+            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -111,8 +108,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_director_centos: {{google_address_director_centos}}
-            google_address_bats:            {{google_address_bats}}
+            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
 
   - name: deploy-ubuntu
     serial: true
@@ -178,7 +174,7 @@ jobs:
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}
-            google_address_bats:      {{google_address_bats}}
+            google_address_bats_ubuntu:      {{google_address_bats_ubuntu}}
             base_os:                  Ubuntu
             stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
             bat_vcap_password:        {{bat_vcap_password}}

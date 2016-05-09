@@ -13,7 +13,7 @@ check_param google_network
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
-check_param google_address_director_centos
+check_param google_address_bats_ubuntu
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
@@ -34,7 +34,6 @@ done
 gcloud -q compute firewall-rules delete ${google_firewall_external}
 gcloud -q compute firewall-rules delete ${google_firewall_internal}
 gcloud -q compute networks delete ${google_network}
-gcloud -q compute addresses delete ${google_address_director_centos}
 gcloud -q compute addresses delete ${google_address_director_ubuntu}
-gcloud -q compute addresses delete ${google_address_bats}
+gcloud -q compute addresses delete ${google_address_bats_ubuntu}
 set -e
