@@ -56,6 +56,7 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
@@ -70,6 +71,7 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
@@ -91,6 +93,7 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
@@ -105,6 +108,7 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
@@ -132,6 +136,7 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}
@@ -152,6 +157,7 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal: {{google_firewall_internal}}
             google_address_director:  {{google_address_director_ubuntu}}
             base_os:                  Ubuntu
@@ -171,6 +177,7 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}

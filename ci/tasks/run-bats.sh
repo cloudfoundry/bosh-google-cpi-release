@@ -92,11 +92,18 @@ networks:
   <% properties.networks.each do |network| %>
   - name: <%= network.name %>
     type: <%= network.type %>
+    <% if network.ip %>
+    ip: <%= network.ip %>
+    <% end %>
     dns: <%= p('dns').inspect %>
     cloud_properties:
       <% if network.cloud_properties.network_name %>
       network_name: <%= network.cloud_properties.network_name %>
       <% end %>
+      <% if network.cloud_properties.subnetwork_name %>
+      subnetwork_name: <%= network.cloud_properties.subnetwork_name %>
+      <% end %>
+
       ephemeral_external_ip: <%= network.cloud_properties.ephemeral_external_ip || false %>
       tags: <%= network.cloud_properties.tags || [] %>
   <% end %>
@@ -172,9 +179,10 @@ properties:
   vip: ${bats_ip}
   networks:
     - name: default
-      type: dynamic
+      type: manual
       cloud_properties:
         network_name: ${google_network}
+        subnetwork_name: ${google_subnetwork}
         ephemeral_external_ip: true
         tags:
           - ${google_firewall_internal}
