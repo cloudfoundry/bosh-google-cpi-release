@@ -11,6 +11,8 @@ check_param google_zone
 check_param google_json_key_data
 check_param google_network
 check_param google_subnetwork
+check_param google_subnetwork_range
+check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
@@ -80,14 +82,19 @@ disk_pools:
       type: pd-standard
 
 networks:
+
   - name: private
     type: manual
-    cloud_properties:
-      network_name: ${google_network}
-      subnetwork_name: ${google_subnetwork}
-      tags:
-        - ${google_firewall_internal}
-        - ${google_firewall_external}
+    subnets:
+    - range: ${google_subnetwork_range}
+      gateway: ${google_subnetwork_gw}
+      cloud_properties:
+        network_name: ${google_network}
+        subnetwork_name: ${google_subnetwork}
+        tags:
+          - ${google_firewall_internal}
+          - ${google_firewall_external}
+
   - name: public
     type: vip
 

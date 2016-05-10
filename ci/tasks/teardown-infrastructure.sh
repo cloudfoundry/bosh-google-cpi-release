@@ -34,7 +34,7 @@ gcloud compute instances list --format json | jq -r --arg network ${google_netwo
 done
 gcloud -q compute firewall-rules delete ${google_firewall_external}
 gcloud -q compute firewall-rules delete ${google_firewall_internal}
-gcloud -q compute subnetworks delete ${google_subnetwork}
+gcloud -q compute networks subnets delete ${google_subnetwork}
 gcloud -q compute networks delete ${google_network}
 gcloud -q compute addresses delete ${google_address_director_ubuntu}
 gcloud -q compute addresses delete ${google_address_bats_ubuntu}
