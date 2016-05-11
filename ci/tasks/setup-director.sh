@@ -123,7 +123,7 @@ jobs:
 
     networks:
       - name: private
-        static_ips: [192.168.1.1]
+        static_ips: [192.168.0.6]
         default:
           - dns
           - gateway
@@ -146,14 +146,14 @@ jobs:
         adapter: postgres
 
       dns:
-        address: 192.168.1.1
+        address: 192.168.0.6
         domain_name: microbosh
         db: *db
         recursor: 169.254.169.254
 
       registry:
-        address: 192.168.1.1
-        host: 192.168.1.1
+        address: 192.168.0.6
+        host: 192.168.0.6
         db: *db
         http:
           user: registry
@@ -164,7 +164,7 @@ jobs:
         port: 25777
 
       blobstore:
-        address: 192.168.1.1
+        address: 192.168.0.6
         port: 25250
         provider: dav
         director:
@@ -198,11 +198,11 @@ jobs:
         default_zone: ${google_zone}
 
       agent:
-        mbus: nats://nats:nats-password@192.168.1.1:4222
+        mbus: nats://nats:nats-password@192.168.0.6:4222
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://192.168.1.1:25250
+             endpoint: http://192.168.0.6:25250
              user: agent
              password: agent-password
 
