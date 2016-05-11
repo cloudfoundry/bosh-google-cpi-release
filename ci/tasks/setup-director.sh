@@ -93,7 +93,6 @@ networks:
         tags:
           - ${google_firewall_internal}
           - ${google_firewall_external}
-
   - name: public
     type: vip
 
@@ -124,6 +123,7 @@ jobs:
 
     networks:
       - name: private
+        static_ips: [192.168.1.1]
         default:
           - dns
           - gateway
@@ -146,14 +146,14 @@ jobs:
         adapter: postgres
 
       dns:
-        address: ${director_ip}
+        address: 192.168.1.1
         domain_name: microbosh
         db: *db
         recursor: 8.8.8.8
 
       registry:
-        address: ${director_ip}
-        host: ${director_ip}
+        address: 192.168.1.1
+        host: 192.168.1.1
         db: *db
         http:
           user: registry
@@ -164,7 +164,7 @@ jobs:
         port: 25777
 
       blobstore:
-        address: ${director_ip}
+        address: 192.168.1.1
         port: 25250
         provider: dav
         director:
@@ -198,11 +198,11 @@ jobs:
         default_zone: ${google_zone}
 
       agent:
-        mbus: nats://nats:nats-password@${director_ip}:4222
+        mbus: nats://nats:nats-password@192.168.1.1:4222
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://${director_ip}:25250
+             endpoint: http://192.168.1.1:25250
              user: agent
              password: agent-password
 
