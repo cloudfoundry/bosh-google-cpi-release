@@ -1,9 +1,8 @@
 package instance
 
 import (
-	"regexp"
-
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"regexp"
 )
 
 const maxTagLength = 63
@@ -29,7 +28,7 @@ func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
 
 func (n Network) IsVip() bool { return n.Type == "vip" }
 
-func (n Network) IsManual() bool { return n.Type == "manual" }
+func (n Network) IsManual() bool { return n.Type == "" || n.Type == "manual" }
 
 func (n Network) Validate() error {
 	switch {
