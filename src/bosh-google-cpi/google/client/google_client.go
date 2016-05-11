@@ -18,7 +18,7 @@ import (
 const (
 	computeScope = compute.ComputeScope
 	storageScope = storage.DevstorageFullControlScope
-	metadataHost = "metadata"
+	metadataHost = "metadata.google.internal"
 )
 
 type GoogleClient struct {
