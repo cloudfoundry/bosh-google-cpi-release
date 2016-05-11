@@ -149,7 +149,7 @@ jobs:
         address: 192.168.1.1
         domain_name: microbosh
         db: *db
-        recursor: 8.8.8.8
+        recursor: 169.254.169.254
 
       registry:
         address: 192.168.1.1
