@@ -30,6 +30,6 @@ echo "Setting up google infrastructure..."
 gcloud -q compute addresses create ${google_address_director_ubuntu}
 gcloud -q compute addresses create ${google_address_bats_ubuntu}
 gcloud -q compute networks create ${google_network} --mode custom
-gcloud -q compute networks subnets create ${google_subnetwork} --network=${google_network} --range={google_subnetwork_range}
+gcloud -q compute networks subnets create ${google_subnetwork} --network=${google_network} --range=${google_subnetwork_range}
 gcloud -q compute firewall-rules create ${google_firewall_internal} --description "BOSH CI Internal traffic" --network ${google_network} --source-tags ${google_firewall_internal} --target-tags ${google_firewall_internal} --allow tcp,udp,icmp
 gcloud -q compute firewall-rules create ${google_firewall_external} --description "BOSH CI External traffic" --network ${google_network} --target-tags ${google_firewall_external} --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
