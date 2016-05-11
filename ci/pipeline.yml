@@ -56,11 +56,11 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:              {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -71,11 +71,12 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
   - name: teardown-infrastructure
     serial: true
@@ -108,11 +109,12 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
   - name: deploy-ubuntu
     serial: true
@@ -136,7 +138,9 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:        {{google_subnetwork}}
+            google_subnetwork_range:  {{google_subnetwork_range}}
+            google_subnetwork_gw:     {{google_subnetwork_gw}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}
@@ -157,7 +161,9 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:        {{google_subnetwork}}
+            google_subnetwork_range:  {{google_subnetwork_range}}
+            google_subnetwork_gw:     {{google_subnetwork_gw}}
             google_firewall_internal: {{google_firewall_internal}}
             google_address_director:  {{google_address_director_ubuntu}}
             base_os:                  Ubuntu
@@ -177,7 +183,8 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
-            google_subnetwork:                 {{google_subnetwork}}
+            google_subnetwork:        {{google_subnetwork}}
+            google_subnetwork_range:  {{google_subnetwork_range}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}
@@ -219,8 +226,8 @@ resources:
   - name: bosh-cpi-src-in
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      uri: https://github.com/evandbrown/bosh-google-cpi-release.git
+      branch: bats-manual-network
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml

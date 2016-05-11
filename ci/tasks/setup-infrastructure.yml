@@ -15,6 +15,8 @@ params:
   google_zone:                    replace-me
   google_json_key_data:           replace-me
   google_network:                 replace-me
+  google_subnetwork:              replace-me
+  google_subnetwork_range:        replace-me
   google_firewall_internal:       replace-me
   google_firewall_external:       replace-me
   google_address_director_ubuntu: replace-me

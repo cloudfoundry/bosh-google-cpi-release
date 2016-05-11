@@ -10,6 +10,7 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_subnetwork
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director

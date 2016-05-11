@@ -82,7 +82,6 @@ disk_pools:
       type: pd-standard
 
 networks:
-
   - name: private
     type: manual
     subnets:
