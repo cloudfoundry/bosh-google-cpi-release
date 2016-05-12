@@ -20,6 +20,7 @@ google_firewall_internal: <NAME OF THE GOOGLE FIREWALL (INTERNAL TRAFFIC) TO BE 
 google_firewall_external: <NAME OF THE GOOGLE FIREWALL (EXTERNAL TRAFFIC) TO BE CREATED>
 google_address_director_ubuntu: <NAME OF THE GOOGLE ADDRESS (DIRECTOR IP) TO BE CREATED FOR UBUNTU TESTS>
 google_address_bats_ubuntu: <NAME OF THE GOOGLE ADDRESS (BATS IP) TO BE CREATED FOR UBUNTU TESTS>
+google_address_static_bats_ubuntu: <NAME OF THE GOOGLE ADDRESS (BATS IP) TO BE CREATED FOR UBUNTU TESTS>
 google_stemcells_bucket_name: <NAME OF THE GCS BUCKET TO STORE STEMCELLS>
 google_releases_bucket_name: <NAME OF THE GCS BUCKET TO STORE RELEASES>
 private_key_user: vcap

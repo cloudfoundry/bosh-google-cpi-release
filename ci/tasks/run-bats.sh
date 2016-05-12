@@ -16,7 +16,8 @@ check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
-check_param google_address_bats_ubuntu
+check_param google_address_bats
+check_param google_address_static_bats
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
@@ -144,6 +145,8 @@ jobs:
       - name: <%= network.name %>
         <% if i == 0 %>
         default: [dns, gateway]
+        static_ips:
+          - <%= properties.static_ip %>
         <% end %>
     <% end %>
     <% if properties.use_vip %>
@@ -177,6 +180,7 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
+  static_ip: ${google_address_static_bats}
   networks:
     - name: default
       type: manual
