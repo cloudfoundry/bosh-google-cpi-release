@@ -98,9 +98,11 @@ networks:
       <% properties.network.subnets.each do |subnet| %>
       - range: <%= subnet.range %>
         gateway: <%= subnet.gateway %>
+        dns: <%= p('dns').inspect %>
         cloud_properties:
           network_name: <%= subnet.cloud_properties.network_name %>
           subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
+          ephemeral_external_ip: <%= network.cloud_properties.ephemeral_external_ip || false %>
           tags: <%= subnet.cloud_properties.tags || [] %>
       <% end %>
   - name: static
@@ -182,6 +184,7 @@ properties:
       cloud_properties:
         network_name: ${google_network}
         subnetwork_name: ${google_subnetwork}
+        ephemeral_external_ip: true
         tags:
           - ${google_firewall_internal}
           - ${google_firewall_external}
