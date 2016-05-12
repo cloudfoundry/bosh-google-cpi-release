@@ -57,20 +57,20 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
-		return "", api.NewVMCreationFailedError(true)
+		return "", api.NewVMCreationFailedError(err.Error(), true)
 	}
 
 	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		i.CleanUp(vm.Name)
-		return "", api.NewVMCreationFailedError(true)
+		return "", api.NewVMCreationFailedError(err.Error(), true)
 	}
 
 	if vmProps.TargetPool != "" {
 		if err := i.addToTargetPool(operation.TargetLink, vmProps.TargetPool); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %v", err)
 			i.CleanUp(vm.Name)
-			return "", api.NewVMCreationFailedError(true)
+			return "", api.NewVMCreationFailedError(err.Error(), true)
 		}
 	}
 
