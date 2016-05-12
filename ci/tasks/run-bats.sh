@@ -147,7 +147,7 @@ jobs:
         <% if i == 0 %>
         default: [dns, gateway]
         static_ips:
-        <% for i in 0..properties.instances do %>
+        <% properties.instances.times do |i| %>
           - <%= properties.static_ips[i] %>
         <% end %>
         <% end %>
