@@ -185,6 +185,7 @@ jobs:
             google_network:           {{google_network}}
             google_subnetwork:        {{google_subnetwork}}
             google_subnetwork_range:  {{google_subnetwork_range}}
+            google_subnetwork_gw:     {{google_subnetwork_gw}}
             google_firewall_internal: {{google_firewall_internal}}
             google_firewall_external: {{google_firewall_external}}
             google_address_director:  {{google_address_director_ubuntu}}

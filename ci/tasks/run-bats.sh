@@ -11,6 +11,8 @@ check_param google_zone
 check_param google_json_key_data
 check_param google_network
 check_param google_subnetwork
+check_param google_subnetwork_range
+check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
@@ -90,24 +92,17 @@ update:
   max_in_flight: <%= properties.max_in_flight || 1 %>
 
 networks:
-  <% properties.networks.each do |network| %>
   - name: <%= network.name %>
     type: <%= network.type %>
-    <% if network.ip %>
-    ip: <%= network.ip %>
-    <% end %>
-    dns: <%= p('dns').inspect %>
-    cloud_properties:
-      <% if network.cloud_properties.network_name %>
-      network_name: <%= network.cloud_properties.network_name %>
+    subnets:
+      <% properties.network.subnets.each do |subnet| %>
+      - range: <%= subnet.range %>
+        gateway: <%= subnet.gateway %>
+        cloud_properties:
+          network_name: <%= subnet.cloud_properties.network_name %>
+          subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
+          tags: <%= subnet.cloud_properties.tags || [] %>
       <% end %>
-      <% if network.cloud_properties.subnetwork_name %>
-      subnetwork_name: <%= network.cloud_properties.subnetwork_name %>
-      <% end %>
-
-      ephemeral_external_ip: <%= network.cloud_properties.ephemeral_external_ip || false %>
-      tags: <%= network.cloud_properties.tags || [] %>
-  <% end %>
   - name: static
     type: vip
 
@@ -178,13 +173,15 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
-  networks:
-    - name: default
-      type: manual
+  network:
+    name: default
+    type: manual
+    subnets:
+    - range: ${google_subnetwork_range}
+      gateway: ${google_subnetwork_gw}
       cloud_properties:
         network_name: ${google_network}
         subnetwork_name: ${google_subnetwork}
-        ephemeral_external_ip: true
         tags:
           - ${google_firewall_internal}
           - ${google_firewall_external}
