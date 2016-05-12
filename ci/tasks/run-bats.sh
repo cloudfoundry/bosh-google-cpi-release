@@ -136,17 +136,8 @@ jobs:
     persistent_disk: <%= properties.persistent_disk %>
     <% end %>
     networks:
-    <% properties.job_networks.each_with_index do |network, i| %>
-      - name: <%= network.name %>
-        <% if i == 0 %>
+      - name: default
         default: [dns, gateway]
-        <% end %>
-    <% end %>
-    <% if properties.use_vip %>
-      - name: static
-        static_ips:
-          - <%= properties.vip %>
-    <% end %>
 
 properties:
   batlight:
