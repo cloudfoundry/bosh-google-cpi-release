@@ -99,6 +99,7 @@ networks:
     subnets:
       <% network.subnets.each do |subnet| %>
       - range: <%= subnet.range %>
+        static: [192.168.0.10-192.168.0.100]
         gateway: <%= subnet.gateway %>
         dns: <%= p('dns').inspect %>
         cloud_properties:
