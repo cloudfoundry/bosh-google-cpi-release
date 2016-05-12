@@ -24,6 +24,7 @@ var _ = Describe("Networks", func() {
 				Gateway: "fake-network-1-gateway",
 				Netmask: "fake-network-1-netmask",
 				DNS:     []string{"fake-network-1-dns"},
+				DHCP:    true,
 				Default: []string{"fake-network-1-default"},
 				CloudProperties: NetworkCloudProperties{
 					NetworkName:         "fake-network-1-cloud-network-name",
@@ -37,6 +38,7 @@ var _ = Describe("Networks", func() {
 			"fake-network-2-name": Network{
 				Type: "fake-network-2-type",
 				IP:   "fake-network-2-ip",
+				DHCP: true,
 			},
 		}
 	})
@@ -77,11 +79,13 @@ var _ = Describe("Networks", func() {
 					Gateway: "fake-network-1-gateway",
 					Netmask: "fake-network-1-netmask",
 					DNS:     []string{"fake-network-1-dns"},
+					DHCP:    true,
 					Default: []string{"fake-network-1-default"},
 				},
 				"fake-network-2-name": registry.NetworkSettings{
 					Type: "fake-network-2-type",
 					IP:   "fake-network-2-ip",
+					DHCP: true,
 				},
 			}
 
