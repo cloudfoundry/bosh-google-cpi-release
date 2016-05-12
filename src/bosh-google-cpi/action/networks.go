@@ -14,7 +14,7 @@ type Network struct {
 	Gateway         string                 `json:"gateway,omitempty"`
 	Netmask         string                 `json:"netmask,omitempty"`
 	DNS             []string               `json:"dns,omitempty"`
-	DHCP            bool                   `json:"dhcp,omitempty"`
+	DHCP            bool                   `json:"use_dhcp,omitempty"`
 	Default         []string               `json:"default,omitempty"`
 	CloudProperties NetworkCloudProperties `json:"cloud_properties,omitempty"`
 }
