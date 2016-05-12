@@ -92,10 +92,11 @@ update:
   max_in_flight: <%= properties.max_in_flight || 1 %>
 
 networks:
+  <% properties.networks.each do |network| %>
   - name: <%= network.name %>
     type: <%= network.type %>
     subnets:
-      <% properties.network.subnets.each do |subnet| %>
+      <% network.subnets.each do |subnet| %>
       - range: <%= subnet.range %>
         gateway: <%= subnet.gateway %>
         cloud_properties:
@@ -103,6 +104,7 @@ networks:
           subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
           tags: <%= subnet.cloud_properties.tags || [] %>
       <% end %>
+  <% end %>
   - name: static
     type: vip
 
@@ -164,18 +166,18 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
-  network:
-    name: default
-    type: manual
-    subnets:
-    - range: ${google_subnetwork_range}
-      gateway: ${google_subnetwork_gw}
-      cloud_properties:
-        network_name: ${google_network}
-        subnetwork_name: ${google_subnetwork}
-        tags:
-          - ${google_firewall_internal}
-          - ${google_firewall_external}
+  networks:
+    - name: default
+      type: manual
+      subnets:
+      - range: ${google_subnetwork_range}
+        gateway: ${google_subnetwork_gw}
+        cloud_properties:
+          network_name: ${google_network}
+          subnetwork_name: ${google_subnetwork}
+          tags:
+            - ${google_firewall_internal}
+            - ${google_firewall_external}
 EOF
 
 pushd bats
