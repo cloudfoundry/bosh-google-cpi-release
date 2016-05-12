@@ -52,7 +52,7 @@ export BAT_DIRECTOR=${director_ip}
 export BAT_DNS_HOST=${director_ip}
 
 echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats_ubuntu} --format json | jq -r '.address')
+bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
 
 echo "Creating private key..."
 eval $(ssh-agent)
