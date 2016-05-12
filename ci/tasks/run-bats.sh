@@ -146,8 +146,7 @@ jobs:
       - name: <%= network.name %>
         <% if i == 0 %>
         default: [dns, gateway]
-        static_ips:
-          - <%= properties.static_ip %>
+        static_ips: <%= properties.static_ips %>
         <% end %>
     <% end %>
     <% if properties.use_vip %>
@@ -181,7 +180,7 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
-  static_ip: ${google_address_static_bats}
+  static_ips: [${google_address_static_bats}]
   networks:
     - name: default
       type: manual
