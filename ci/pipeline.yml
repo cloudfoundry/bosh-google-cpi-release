@@ -133,21 +133,22 @@ jobs:
         file: bosh-cpi-src/ci/tasks/setup-director.yml
         config:
           params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            google_network:           {{google_network}}
-            google_subnetwork:        {{google_subnetwork}}
-            google_subnetwork_range:  {{google_subnetwork_range}}
-            google_subnetwork_gw:     {{google_subnetwork_gw}}
-            google_firewall_internal: {{google_firewall_internal}}
-            google_firewall_external: {{google_firewall_external}}
-            google_address_director:  {{google_address_director_ubuntu}}
-            private_key_user:         {{private_key_user}}
-            private_key_data:         {{private_key_data}}
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
+            google_project:                 {{google_project}}
+            google_region:                  {{google_region}}
+            google_zone:                    {{google_zone}}
+            google_json_key_data:           {{google_json_key_data}}
+            google_network:                 {{google_network}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
+            google_subnetwork_gw:           {{google_subnetwork_gw}}
+            google_firewall_internal:       {{google_firewall_internal}}
+            google_firewall_external:       {{google_firewall_external}}
+            google_address_director:        {{google_address_director_ubuntu}}
+            google_address_static_director: {{google_address_static_director_ubuntu}}
+            private_key_user:               {{private_key_user}}
+            private_key_data:               {{private_key_data}}
+            director_username:              {{director_username}}
+            director_password:              {{director_password}}
         on_failure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml

@@ -16,6 +16,7 @@ check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
+check_param google_address_static_director
 check_param private_key_user
 check_param private_key_data
 check_param director_password
@@ -123,7 +124,7 @@ jobs:
 
     networks:
       - name: private
-        static_ips: [192.168.0.6]
+        static_ips: [${google_address_static_director}]
         default:
           - dns
           - gateway
@@ -146,14 +147,14 @@ jobs:
         adapter: postgres
 
       dns:
-        address: 192.168.0.6
+        address: ${google_address_static_director}
         domain_name: microbosh
         db: *db
         recursor: 169.254.169.254
 
       registry:
-        address: 192.168.0.6
-        host: 192.168.0.6
+        address: ${google_address_static_director}
+        host: ${google_address_static_director}
         db: *db
         http:
           user: registry
@@ -164,7 +165,7 @@ jobs:
         port: 25777
 
       blobstore:
-        address: 192.168.0.6
+        address: ${google_address_static_director}
         port: 25250
         provider: dav
         director:
@@ -198,11 +199,11 @@ jobs:
         default_zone: ${google_zone}
 
       agent:
-        mbus: nats://nats:nats-password@192.168.0.6:4222
+        mbus: nats://nats:nats-password@${google_address_static_director}:4222
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://192.168.0.6:25250
+             endpoint: http://${google_address_static_director}:25250
              user: agent
              password: agent-password
 
