@@ -3,8 +3,6 @@ package dispatcher
 import (
 	"encoding/json"
 
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-
 	bgcaction "bosh-google-cpi/action"
 	bgcapi "bosh-google-cpi/api"
 )
@@ -41,13 +39,13 @@ type ResponseError struct {
 type JSON struct {
 	actionFactory bgcaction.Factory
 	caller        Caller
-	logger        boshlog.Logger
+	logger        bgcapi.MultiLogger
 }
 
 func NewJSON(
 	actionFactory bgcaction.Factory,
 	caller Caller,
-	logger boshlog.Logger,
+	logger bgcapi.MultiLogger,
 ) JSON {
 	return JSON{
 		actionFactory: actionFactory,
@@ -105,6 +103,8 @@ func (c JSON) buildCloudError(err error) []byte {
 	respErr := Response{
 		Error: &ResponseError{},
 	}
+
+	respErr.Log = c.logger.LogBuff.String()
 
 	if typedErr, ok := err.(bgcapi.CloudError); ok {
 		respErr.Error.Type = typedErr.Type()

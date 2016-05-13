@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
 	"bosh-google-cpi/action"
+	boshapi "bosh-google-cpi/api"
 	boshdisp "bosh-google-cpi/api/dispatcher"
 	"bosh-google-cpi/api/transport"
 	boshcfg "bosh-google-cpi/config"
@@ -59,7 +61,7 @@ var (
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
 	var config boshcfg.Config
-	var in, out, errOut bytes.Buffer
+	var in, out, errOut, errOutLog bytes.Buffer
 	var boshResponse boshdisp.Response
 	var googleClient client.GoogleClient
 
@@ -67,9 +69,11 @@ func execCPI(request string) (boshdisp.Response, error) {
 		return boshResponse, err
 	}
 
-	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, &errOut, os.Stderr)
+	multiWriter := io.MultiWriter(&errOut, &errOutLog)
+	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, multiWriter, multiWriter)
+	multiLogger := boshapi.MultiLogger{logger, &errOutLog}
 	uuidGen := uuid.NewGenerator()
-	if googleClient, err = client.NewGoogleClient(config.Google, logger); err != nil {
+	if googleClient, err = client.NewGoogleClient(config.Google, multiLogger); err != nil {
 		return boshResponse, err
 	}
 
@@ -77,14 +81,14 @@ func execCPI(request string) (boshdisp.Response, error) {
 		googleClient,
 		uuidGen,
 		config.Actions,
-		logger,
+		multiLogger,
 	)
 
 	caller := boshdisp.NewJSONCaller()
-	dispatcher := boshdisp.NewJSON(actionFactory, caller, logger)
+	dispatcher := boshdisp.NewJSON(actionFactory, caller, multiLogger)
 
 	in.WriteString(request)
-	cli := transport.NewCLI(&in, &out, dispatcher, logger)
+	cli := transport.NewCLI(&in, &out, dispatcher, multiLogger)
 
 	var response []byte
 

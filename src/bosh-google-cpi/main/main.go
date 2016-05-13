@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"flag"
 	"io"
 	"os"
@@ -10,6 +12,7 @@ import (
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	"bosh-google-cpi/action"
+	"bosh-google-cpi/api"
 	"bosh-google-cpi/api/dispatcher"
 	"bosh-google-cpi/api/transport"
 	"bosh-google-cpi/config"
@@ -52,21 +55,23 @@ func main() {
 	}
 }
 
-func basicDeps() (boshlog.Logger, boshsys.FileSystem, boshsys.CmdRunner, boshuuid.Generator) {
-	logger := boshlog.NewWriterLogger(boshlog.LevelDebug, os.Stderr, os.Stderr)
+func basicDeps() (api.MultiLogger, boshsys.FileSystem, boshsys.CmdRunner, boshuuid.Generator) {
+	var logBuff bytes.Buffer
+	multiWriter := io.MultiWriter(os.Stderr, bufio.NewWriter(&logBuff))
+	logger := boshlog.NewWriterLogger(boshlog.LevelDebug, multiWriter, os.Stderr)
+	multiLogger := api.MultiLogger{logger, &logBuff}
+	fs := boshsys.NewOsFileSystem(multiLogger)
 
-	fs := boshsys.NewOsFileSystem(logger)
-
-	cmdRunner := boshsys.NewExecCmdRunner(logger)
+	cmdRunner := boshsys.NewExecCmdRunner(multiLogger)
 
 	uuidGen := boshuuid.NewGenerator()
 
-	return logger, fs, cmdRunner, uuidGen
+	return multiLogger, fs, cmdRunner, uuidGen
 }
 
 func buildDispatcher(
 	config config.Config,
-	logger boshlog.Logger,
+	logger api.MultiLogger,
 	fs boshsys.FileSystem,
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,

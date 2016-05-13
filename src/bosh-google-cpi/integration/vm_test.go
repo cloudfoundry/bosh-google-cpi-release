@@ -7,7 +7,35 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("VM", func() {
+var _ = FDescribe("VM", func() {
+	It("creates a VM with an invalid configuration and receives an error message with logs", func() {
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-error"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, networkName)
+		resp, err := execCPI(request)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resp.Error.Message).ToNot(BeEmpty())
+		Expect(resp.Log).To(BeEmpty())
+	})
+
 	It("executes the VM lifecycle", func() {
 		var vmCID string
 		By("creating a VM")
@@ -55,6 +83,7 @@ var _ = Describe("VM", func() {
 			  "arguments": ["%v"]
 			}`, vmCID)
 		assertSucceeds(request)
+
 	})
 
 	It("executes the VM lifecycle with disk attachment hints", func() {
