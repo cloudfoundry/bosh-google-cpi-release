@@ -56,10 +56,11 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:              {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -70,10 +71,12 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
   - name: teardown-infrastructure
     serial: true
@@ -91,6 +94,7 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:                 {{google_subnetwork}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
@@ -105,10 +109,12 @@ jobs:
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
             google_network:                 {{google_network}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:            {{google_address_bats_ubuntu}}
+            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
   - name: deploy-ubuntu
     serial: true
@@ -127,18 +133,22 @@ jobs:
         file: bosh-cpi-src/ci/tasks/setup-director.yml
         config:
           params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            google_network:           {{google_network}}
-            google_firewall_internal: {{google_firewall_internal}}
-            google_firewall_external: {{google_firewall_external}}
-            google_address_director:  {{google_address_director_ubuntu}}
-            private_key_user:         {{private_key_user}}
-            private_key_data:         {{private_key_data}}
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
+            google_project:                 {{google_project}}
+            google_region:                  {{google_region}}
+            google_zone:                    {{google_zone}}
+            google_json_key_data:           {{google_json_key_data}}
+            google_network:                 {{google_network}}
+            google_subnetwork:              {{google_subnetwork}}
+            google_subnetwork_range:        {{google_subnetwork_range}}
+            google_subnetwork_gw:           {{google_subnetwork_gw}}
+            google_firewall_internal:       {{google_firewall_internal}}
+            google_firewall_external:       {{google_firewall_external}}
+            google_address_director:        {{google_address_director_ubuntu}}
+            google_address_static_director: {{google_address_static_director_ubuntu}}
+            private_key_user:               {{private_key_user}}
+            private_key_data:               {{private_key_data}}
+            director_username:              {{director_username}}
+            director_password:              {{director_password}}
         on_failure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
@@ -152,6 +162,9 @@ jobs:
             google_zone:              {{google_zone}}
             google_json_key_data:     {{google_json_key_data}}
             google_network:           {{google_network}}
+            google_subnetwork:        {{google_subnetwork}}
+            google_subnetwork_range:  {{google_subnetwork_range}}
+            google_subnetwork_gw:     {{google_subnetwork_gw}}
             google_firewall_internal: {{google_firewall_internal}}
             google_address_director:  {{google_address_director_ubuntu}}
             base_os:                  Ubuntu
@@ -166,18 +179,22 @@ jobs:
         file: bosh-cpi-src/ci/tasks/run-bats.yml
         config:
           params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            google_network:           {{google_network}}
-            google_firewall_internal: {{google_firewall_internal}}
-            google_firewall_external: {{google_firewall_external}}
-            google_address_director:  {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:      {{google_address_bats_ubuntu}}
-            base_os:                  Ubuntu
-            stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
-            bat_vcap_password:        {{bat_vcap_password}}
+            google_project:                  {{google_project}}
+            google_region:                   {{google_region}}
+            google_zone:                     {{google_zone}}
+            google_json_key_data:            {{google_json_key_data}}
+            google_network:                  {{google_network}}
+            google_subnetwork:               {{google_subnetwork}}
+            google_subnetwork_range:         {{google_subnetwork_range}}
+            google_subnetwork_gw:            {{google_subnetwork_gw}}
+            google_firewall_internal:        {{google_firewall_internal}}
+            google_firewall_external:        {{google_firewall_external}}
+            google_address_director:         {{google_address_director_ubuntu}}
+            google_address_bats:             {{google_address_bats_ubuntu}}
+            google_address_static_bats:      {{google_address_static_bats_ubuntu}}
+            base_os:                         Ubuntu
+            stemcell_name:                   bosh-google-kvm-ubuntu-trusty-go_agent
+            bat_vcap_password:               {{bat_vcap_password}}
         ensure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
@@ -212,8 +229,8 @@ resources:
   - name: bosh-cpi-src-in
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      uri: https://github.com/evandbrown/bosh-google-cpi-release.git
+      branch: bats-manual-network
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml

@@ -118,6 +118,7 @@ var _ = Describe("CreateVM", func() {
 					Gateway: "fake-network-gateway",
 					Netmask: "fake-network-netmask",
 					DNS:     []string{"fake-network-dns"},
+					DHCP:    true,
 					Default: []string{"fake-network-default"},
 					CloudProperties: NetworkCloudProperties{
 						NetworkName:         "fake-network-cloud-network-name",
@@ -159,6 +160,7 @@ var _ = Describe("CreateVM", func() {
 						Gateway: "fake-network-gateway",
 						Netmask: "fake-network-netmask",
 						DNS:     []string{"fake-network-dns"},
+						DHCP:    true,
 						Default: []string{"fake-network-default"},
 					},
 				},

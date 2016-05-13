@@ -10,6 +10,8 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_subnetwork
+check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_address_director
 check_param base_os
@@ -80,12 +82,15 @@ resource_pools:
 
 networks:
   - name: private
-    type: dynamic
-    cloud_properties:
-      network_name: ${google_network}
-      ephemeral_external_ip: true
-      tags:
-        - ${google_firewall_internal}
+    type: manual
+    subnets:
+    - range: ${google_subnetwork_range}
+      gateway: ${google_subnetwork_gw}
+      cloud_properties:
+        network_name: ${google_network}
+        subnetwork_name: ${google_subnetwork}
+        tags:
+          - ${google_firewall_internal}
 
 jobs:
   - name: dummy

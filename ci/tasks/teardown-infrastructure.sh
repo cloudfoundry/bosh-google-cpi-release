@@ -10,6 +10,7 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_subnetwork
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
@@ -33,6 +34,7 @@ gcloud compute instances list --format json | jq -r --arg network ${google_netwo
 done
 gcloud -q compute firewall-rules delete ${google_firewall_external}
 gcloud -q compute firewall-rules delete ${google_firewall_internal}
+gcloud -q compute networks subnets delete ${google_subnetwork}
 gcloud -q compute networks delete ${google_network}
 gcloud -q compute addresses delete ${google_address_director_ubuntu}
 gcloud -q compute addresses delete ${google_address_bats_ubuntu}

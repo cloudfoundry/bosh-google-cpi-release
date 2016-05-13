@@ -14,6 +14,7 @@ type Network struct {
 	Gateway         string                 `json:"gateway,omitempty"`
 	Netmask         string                 `json:"netmask,omitempty"`
 	DNS             []string               `json:"dns,omitempty"`
+	DHCP            bool                   `json:"use_dhcp,omitempty"`
 	Default         []string               `json:"default,omitempty"`
 	CloudProperties NetworkCloudProperties `json:"cloud_properties,omitempty"`
 }
@@ -50,6 +51,7 @@ func (ns Networks) AsRegistryNetworks() registry.NetworksSettings {
 			IP:      network.IP,
 			Gateway: network.Gateway,
 			Netmask: network.Netmask,
+			DHCP:    true,
 			DNS:     network.DNS,
 			Default: network.Default,
 		}

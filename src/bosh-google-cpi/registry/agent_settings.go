@@ -93,6 +93,9 @@ type NetworkSettings struct {
 	// List of DNS servers
 	DNS []string `json:"dns"`
 
+	// Does network have DHCP
+	DHCP bool `json:"use_dhcp"`
+
 	// List of defaults
 	Default []string `json:"default"`
 

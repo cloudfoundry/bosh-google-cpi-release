@@ -10,10 +10,14 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_subnetwork
+check_param google_subnetwork_range
+check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
-check_param google_address_bats_ubuntu
+check_param google_address_bats
+check_param google_address_static_bats
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
@@ -48,7 +52,7 @@ export BAT_DIRECTOR=${director_ip}
 export BAT_DNS_HOST=${director_ip}
 
 echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats_ubuntu} --format json | jq -r '.address')
+bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
 
 echo "Creating private key..."
 eval $(ssh-agent)
@@ -92,13 +96,18 @@ networks:
   <% properties.networks.each do |network| %>
   - name: <%= network.name %>
     type: <%= network.type %>
-    dns: <%= p('dns').inspect %>
-    cloud_properties:
-      <% if network.cloud_properties.network_name %>
-      network_name: <%= network.cloud_properties.network_name %>
+    subnets:
+      <% network.subnets.each do |subnet| %>
+      - range: <%= subnet.range %>
+        static: [192.168.0.10-192.168.0.100]
+        gateway: <%= subnet.gateway %>
+        dns: <%= p('dns').inspect %>
+        cloud_properties:
+          network_name: <%= subnet.cloud_properties.network_name %>
+          subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
+          ephemeral_external_ip: <%= subnet.cloud_properties.ephemeral_external_ip || false %>
+          tags: <%= subnet.cloud_properties.tags || [] %>
       <% end %>
-      ephemeral_external_ip: <%= network.cloud_properties.ephemeral_external_ip || false %>
-      tags: <%= network.cloud_properties.tags || [] %>
   <% end %>
   - name: static
     type: vip
@@ -137,6 +146,10 @@ jobs:
       - name: <%= network.name %>
         <% if i == 0 %>
         default: [dns, gateway]
+        static_ips:
+        <% properties.instances.times do |i| %>
+          - <%= properties.static_ips[i] %>
+        <% end %>
         <% end %>
     <% end %>
     <% if properties.use_vip %>
@@ -170,15 +183,21 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
+  static_ips: [${google_address_static_bats}]
   networks:
     - name: default
-      type: dynamic
-      cloud_properties:
-        network_name: ${google_network}
-        ephemeral_external_ip: true
-        tags:
-          - ${google_firewall_internal}
-          - ${google_firewall_external}
+      static_ip: 192.168.0.20
+      type: manual
+      subnets:
+      - range: ${google_subnetwork_range}
+        gateway: ${google_subnetwork_gw}
+        cloud_properties:
+          network_name: ${google_network}
+          subnetwork_name: ${google_subnetwork}
+          ephemeral_external_ip: true
+          tags:
+            - ${google_firewall_internal}
+            - ${google_firewall_external}
 EOF
 
 pushd bats

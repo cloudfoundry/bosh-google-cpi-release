@@ -10,9 +10,13 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_subnetwork
+check_param google_subnetwork_range
+check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director
+check_param google_address_static_director
 check_param private_key_user
 check_param private_key_data
 check_param director_password
@@ -80,12 +84,16 @@ disk_pools:
 
 networks:
   - name: private
-    type: dynamic
-    cloud_properties:
-      network_name: ${google_network}
-      tags:
-        - ${google_firewall_internal}
-        - ${google_firewall_external}
+    type: manual
+    subnets:
+    - range: ${google_subnetwork_range}
+      gateway: ${google_subnetwork_gw}
+      cloud_properties:
+        network_name: ${google_network}
+        subnetwork_name: ${google_subnetwork}
+        tags:
+          - ${google_firewall_internal}
+          - ${google_firewall_external}
   - name: public
     type: vip
 
@@ -116,6 +124,7 @@ jobs:
 
     networks:
       - name: private
+        static_ips: [${google_address_static_director}]
         default:
           - dns
           - gateway
@@ -138,14 +147,14 @@ jobs:
         adapter: postgres
 
       dns:
-        address: ${director_ip}
+        address: ${google_address_static_director}
         domain_name: microbosh
         db: *db
-        recursor: 8.8.8.8
+        recursor: 169.254.169.254
 
       registry:
-        address: ${director_ip}
-        host: ${director_ip}
+        address: ${google_address_static_director}
+        host: ${google_address_static_director}
         db: *db
         http:
           user: registry
@@ -156,7 +165,7 @@ jobs:
         port: 25777
 
       blobstore:
-        address: ${director_ip}
+        address: ${google_address_static_director}
         port: 25250
         provider: dav
         director:
@@ -190,11 +199,11 @@ jobs:
         default_zone: ${google_zone}
 
       agent:
-        mbus: nats://nats:nats-password@${director_ip}:4222
+        mbus: nats://nats:nats-password@${google_address_static_director}:4222
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://${director_ip}:25250
+             endpoint: http://${google_address_static_director}:25250
              user: agent
              password: agent-password
 
