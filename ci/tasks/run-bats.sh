@@ -186,6 +186,7 @@ properties:
   static_ips: [${google_address_static_bats}]
   networks:
     - name: default
+      static_ip: 192.168.0.20
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
