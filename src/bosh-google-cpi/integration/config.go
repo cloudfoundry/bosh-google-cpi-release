@@ -71,7 +71,7 @@ func execCPI(request string) (boshdisp.Response, error) {
 
 	multiWriter := io.MultiWriter(&errOut, &errOutLog)
 	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, multiWriter, multiWriter)
-	multiLogger := boshapi.MultiLogger{logger, &errOutLog}
+	multiLogger := boshapi.MultiLogger{Logger: logger, LogBuff: &errOutLog}
 	uuidGen := uuid.NewGenerator()
 	if googleClient, err = client.NewGoogleClient(config.Google, multiLogger); err != nil {
 		return boshResponse, err

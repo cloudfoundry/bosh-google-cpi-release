@@ -1,6 +1,7 @@
 package dispatcher_test
 
 import (
+	"bytes"
 	"errors"
 
 	. "github.com/onsi/ginkgo"
@@ -11,6 +12,7 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
 	fakeaction "bosh-google-cpi/action/fakes"
+	bgcapi "bosh-google-cpi/api"
 	fakedisp "bosh-google-cpi/api/dispatcher/fakes"
 	fakeapi "bosh-google-cpi/api/fakes"
 )
@@ -27,7 +29,7 @@ var _ = Describe("JSON", func() {
 		actionFactory = fakeaction.NewFakeFactory()
 		caller = &fakedisp.FakeCaller{}
 		logger = boshlog.NewLogger(boshlog.LevelNone)
-		dispatcher = NewJSON(actionFactory, caller, logger)
+		dispatcher = NewJSON(actionFactory, caller, bgcapi.MultiLogger{Logger: logger, LogBuff: &bytes.Buffer{}})
 	})
 
 	Describe("Dispatch", func() {

@@ -59,7 +59,7 @@ func basicDeps() (api.MultiLogger, boshsys.FileSystem, boshsys.CmdRunner, boshuu
 	var logBuff bytes.Buffer
 	multiWriter := io.MultiWriter(os.Stderr, bufio.NewWriter(&logBuff))
 	logger := boshlog.NewWriterLogger(boshlog.LevelDebug, multiWriter, os.Stderr)
-	multiLogger := api.MultiLogger{logger, &logBuff}
+	multiLogger := api.MultiLogger{Logger: logger, LogBuff: &logBuff}
 	fs := boshsys.NewOsFileSystem(multiLogger)
 
 	cmdRunner := boshsys.NewExecCmdRunner(multiLogger)
