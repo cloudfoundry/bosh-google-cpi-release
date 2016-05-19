@@ -6,6 +6,7 @@ packages:
 
 templates:
   bin/cpi.erb: bin/cpi
+  bin/pre-start.erb: bin/pre-start
   config/cpi.json.erb: config/cpi.json
   config/registry.cacertfile.erb: config/registry.cacertfile
   config/registry.certfile.erb: config/registry.certfile
