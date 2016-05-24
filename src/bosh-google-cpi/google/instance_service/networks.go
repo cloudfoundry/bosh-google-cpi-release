@@ -104,9 +104,3 @@ func (n Networks) Tags() NetworkTags {
 
 	return network.Tags
 }
-
-func (n Networks) InstanceGroup() string {
-	network := n.Network()
-
-	return network.InstanceGroup
-}

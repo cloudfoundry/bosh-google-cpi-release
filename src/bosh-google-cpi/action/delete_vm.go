@@ -25,14 +25,6 @@ func NewDeleteVM(
 }
 
 func (dv DeleteVM) Run(vmCID VMCID) (interface{}, error) {
-	// Delete VM networks
-	if err := dv.vmService.DeleteNetworkConfiguration(string(vmCID)); err != nil {
-		if _, ok := err.(api.CloudError); ok {
-			return nil, err
-		}
-		return nil, bosherr.WrapErrorf(err, "Deleting vm '%s'", vmCID)
-	}
-
 	// Delete the VM
 	if err := dv.vmService.Delete(string(vmCID)); err != nil {
 		if _, ok := err.(api.CloudError); ok {

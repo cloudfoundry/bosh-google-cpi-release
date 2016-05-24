@@ -32,7 +32,6 @@ var _ = Describe("Networks", func() {
 					Tags:                NetworkTags{"fake-network-1-cloud-network-tag"},
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
-					InstanceGroup:       "fake-network-1-cloud-instance-group",
 				},
 			},
 			"fake-network-2-name": Network{
@@ -58,7 +57,6 @@ var _ = Describe("Networks", func() {
 					Tags:                instance.NetworkTags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
-					InstanceGroup:       "fake-network-1-cloud-instance-group",
 				},
 				"fake-network-2-name": instance.Network{
 					Type: "fake-network-2-type",

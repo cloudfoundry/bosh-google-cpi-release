@@ -19,7 +19,6 @@ type Network struct {
 	EphemeralExternalIP bool
 	IPForwarding        bool
 	Tags                NetworkTags
-	InstanceGroup       string
 }
 
 type NetworkTags []string

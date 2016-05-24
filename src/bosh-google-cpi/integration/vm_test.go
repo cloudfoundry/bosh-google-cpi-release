@@ -5,10 +5,11 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"google.golang.org/api/compute/v1"
 )
 
-var _ = FDescribe("VM", func() {
-	It("creates a VM with an invalid configuration and receives an error message with logs", func() {
+var _ = Describe("VM", func() {
+	FIt("creates a VM with an invalid configuration and receives an error message with logs", func() {
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -33,7 +34,7 @@ var _ = FDescribe("VM", func() {
 		resp, err := execCPI(request)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(resp.Error.Message).ToNot(BeEmpty())
-		Expect(resp.Log).To(BeEmpty())
+		Expect(resp.Log).ToNot(BeEmpty())
 	})
 
 	It("executes the VM lifecycle", func() {
@@ -353,4 +354,55 @@ var _ = FDescribe("VM", func() {
 			}`, vmCID)
 		assertSucceeds(request)
 	})
+
+	FIt("executes the VM lifecycle with a backend service", func() {
+		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
+			instances := make([]string, len(ig.Items))
+			for _, i := range ig.Items {
+				instances = append(instances, i.Instance)
+			}
+			return instances
+		}
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "backend_service": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, backendService, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		ig, err := computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(justInstances(ig)).To(ContainElement(ContainSubstring(vmCID)))
+
+		By("deleting the VM and confirming its removal from backend service instance group")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+		ig, err = computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
+
+	})
+
 })

@@ -6,14 +6,12 @@ import (
 
 type Service interface {
 	AddAccessConfig(id string, zone string, networkInterface string, accessConfig *compute.AccessConfig) error
-	AddNetworkConfiguration(id string, networks Networks) error
 	AttachDisk(id string, diskLink string) (string, string, error)
 	AttachedDisks(id string) (AttachedDisks, error)
 	CleanUp(id string)
 	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error)
 	Delete(id string) error
 	DeleteAccessConfig(id string, zone string, networkInterface string, accessConfig string) error
-	DeleteNetworkConfiguration(id string) error
 	DetachDisk(id string, diskID string) error
 	Find(id string, zone string) (*compute.Instance, bool, error)
 	Reboot(id string) error
@@ -38,6 +36,7 @@ type Properties struct {
 	Preemptible       bool
 	ServiceScopes     ServiceScopes
 	TargetPool        string
+	BackendService    string
 }
 
 type ServiceScopes []string

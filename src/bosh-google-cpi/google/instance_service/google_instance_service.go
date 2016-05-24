@@ -5,7 +5,7 @@ import (
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	"bosh-google-cpi/google/address_service"
-	"bosh-google-cpi/google/instance_group_service"
+	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/network_service"
 	"bosh-google-cpi/google/operation_service"
 	"bosh-google-cpi/google/subnetwork_service"
@@ -18,23 +18,23 @@ const googleInstanceNamePrefix = "vm"
 const googleInstanceDescription = "Instance managed by BOSH"
 
 type GoogleInstanceService struct {
-	project              string
-	computeService       *compute.Service
-	addressService       address.Service
-	instanceGroupService instancegroup.Service
-	networkService       network.Service
-	operationService     operation.Service
-	subnetworkService    subnetwork.Service
-	targetPoolService    targetpool.Service
-	uuidGen              boshuuid.Generator
-	logger               boshlog.Logger
+	project               string
+	computeService        *compute.Service
+	addressService        address.Service
+	backendServiceService backendservice.Service
+	networkService        network.Service
+	operationService      operation.Service
+	subnetworkService     subnetwork.Service
+	targetPoolService     targetpool.Service
+	uuidGen               boshuuid.Generator
+	logger                boshlog.Logger
 }
 
 func NewGoogleInstanceService(
 	project string,
 	computeService *compute.Service,
 	addressService address.Service,
-	instanceGroupService instancegroup.Service,
+	backendServiceService backendservice.Service,
 	networkService network.Service,
 	operationService operation.Service,
 	subnetworkService subnetwork.Service,
@@ -43,16 +43,16 @@ func NewGoogleInstanceService(
 	logger boshlog.Logger,
 ) GoogleInstanceService {
 	return GoogleInstanceService{
-		project:              project,
-		computeService:       computeService,
-		addressService:       addressService,
-		instanceGroupService: instanceGroupService,
-		networkService:       networkService,
-		operationService:     operationService,
-		subnetworkService:    subnetworkService,
-		targetPoolService:    targetPoolService,
-		uuidGen:              uuidGen,
-		logger:               logger,
+		project:               project,
+		computeService:        computeService,
+		addressService:        addressService,
+		backendServiceService: backendServiceService,
+		networkService:        networkService,
+		operationService:      operationService,
+		subnetworkService:     subnetworkService,
+		targetPoolService:     targetPoolService,
+		uuidGen:               uuidGen,
+		logger:                logger,
 	}
 }
 

@@ -29,7 +29,6 @@ var _ = Describe("Networks", func() {
 			EphemeralExternalIP: true,
 			IPForwarding:        false,
 			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
-			InstanceGroup:       "fake-dynamic-network-instance-group",
 		}
 		manualNetwork = Network{
 			Type:                "manual",
@@ -43,7 +42,6 @@ var _ = Describe("Networks", func() {
 			EphemeralExternalIP: true,
 			IPForwarding:        false,
 			Tags:                NetworkTags{"fake-manual-network-network-tag"},
-			InstanceGroup:       "fake-manual-network-instance-group",
 		}
 		vipNetwork = Network{
 			Type:                "vip",
@@ -57,7 +55,6 @@ var _ = Describe("Networks", func() {
 			EphemeralExternalIP: false,
 			IPForwarding:        true,
 			Tags:                NetworkTags{"fake-vip-network-network-tag"},
-			InstanceGroup:       "fake-vip-network-instance-group",
 		}
 
 		networks = Networks{
@@ -282,12 +279,6 @@ var _ = Describe("Networks", func() {
 	Describe("Tags", func() {
 		It("returns only the dynamic network Tags", func() {
 			Expect(networks.Tags()).To(Equal(NetworkTags{"fake-dynamic-network-network-tag"}))
-		})
-	})
-
-	Describe("InstanceGroup", func() {
-		It("returns only the dynamic network InstanceGroup", func() {
-			Expect(networks.InstanceGroup()).To(Equal("fake-dynamic-network-instance-group"))
 		})
 	})
 })
