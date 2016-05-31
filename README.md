@@ -71,18 +71,18 @@ name: bosh
 
 releases:
   - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=236
-    sha1: 88dd60313dbd7dd832faa44c90493ffa6cd85448
+    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
+    sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
   - name: bosh-google-cpi
-    url: https://storage.googleapis.com/bosh-releases/bosh-google-cpi-12.tgz
-    sha1: d022f5d3f95b5456ff2a9558721760c5a3f0c772
+    url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-0.0.82.tgz
+    sha1: 60cc5b4fba6efda5b7627679b47c6cb2aedfc8d3
 
 resource_pools:
   - name: vms
     network: private
     stemcell:
-      url: https://storage.googleapis.com/bosh-stemcells/light-bosh-stemcell-3202-google-kvm-ubuntu-trusty-go_agent.tgz
-      sha1: e34ae599cfb3cdce849152a8a9fe24d78df8eb14
+      url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3218-google-kvm-ubuntu-trusty-go_agent.tgz
+      sha1: 3626815e3fabe8afa7d91362eba1e4c0540795b2
     cloud_properties:
       machine_type: n1-standard-4
       root_disk_size_gb: 40
@@ -97,16 +97,23 @@ disk_pools:
     cloud_properties:
       type: pd-standard
 
+
 networks:
-  - name: private
-    type: dynamic
-    cloud_properties:
-      network_name: cf
-      tags:
-        - cf-internal
-        - cf-bosh
-  - name: public
+  - name: vip
     type: vip
+  - name: private
+    type: manual
+    subnets:
+    - range: 10.0.0.0/24
+      gateway: 10.0.0.1
+      static: [10.0.0.6-10.0.0.255]
+      cloud_properties:
+        network_name: concourse
+        subnetwork_name: concourse-subnet-1
+        tags:
+          - cf-internal
+          - cf-bosh
+
 
 jobs:
   - name: bosh
@@ -114,8 +121,6 @@ jobs:
 
     templates:
       - name: nats
-        release: bosh
-      - name: redis
         release: bosh
       - name: postgres
         release: bosh
@@ -127,33 +132,27 @@ jobs:
         release: bosh
       - name: health_monitor
         release: bosh
-      - name: registry
-        release: bosh
       - name: google_cpi
         release: bosh-google-cpi
 
     resource_pool: vms
     persistent_disk_pool: disks
 
+
     networks:
+      - name: vip
+        static_ips: [104.154.108.78]
       - name: private
+        static_ips: [10.0.0.6]
         default:
           - dns
           - gateway
-      - name: public
-        static_ips:
-          - __STATIC_IP__ # <--- Replace with the static IP
 
     properties:
       nats:
         address: 127.0.0.1
         user: nats
         password: nats-password
-
-      redis:
-        listen_address: 127.0.0.1
-        address: 127.0.0.1
-        password: redis-password
 
       postgres: &db
         listen_address: 127.0.0.1
@@ -164,25 +163,13 @@ jobs:
         adapter: postgres
 
       dns:
-        address: __STATIC_IP__ # <--- Replace with the static IP
+        address: __STATIC_IP__ # <--- Replace with private static IP
         domain_name: microbosh
         db: *db
         recursor: 8.8.8.8
 
-      registry:
-        address: __STATIC_IP__ # <--- Replace with the static IP
-        host: __STATIC_IP__ # <--- Replace with the static IP
-        db: *db
-        http:
-          user: registry
-          password: registry-password
-          port: 25777
-        username: registry
-        password: registry-password
-        port: 25777
-
       blobstore:
-        address: __STATIC_IP__ # <--- Replace with the static IP
+        address: __STATIC_IP__ # <--- Replace with private static IP
         port: 25250
         provider: dav
         director:
@@ -216,11 +203,11 @@ jobs:
         default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
 
       agent:
-        mbus: nats://nats:nats-password@__STATIC_IP__:4222 # <--- Replace with the static IP
+        mbus: nats://nats:nats-password@__STATIC_IP__:4222 # <--- Replace with the private static IP
         ntp: *ntp
         blobstore:
            options:
-             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the static IP
+             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the private static IP
              user: agent
              password: agent-password
 
@@ -233,12 +220,12 @@ cloud_provider:
     release: bosh-google-cpi
 
   ssh_tunnel:
-    host: __STATIC_IP__ # <--- Replace with the static IP
+    host: __STATIC_IP__ # <--- Replace with the private static IP
     port: 22
     user: __SSH_USER__ # <--- Replace with the user corresponding to your private SSH key
     private_key: __PRIVATE_KEY_PATH__ # <--- Replace with the location of your google_compute_engine SSH private key
 
-  mbus: https://mbus:mbus-password@__STATIC_IP__:6868 # <--- Replace with the static IP
+  mbus: https://mbus:mbus-password@__STATIC_IP__:6868 # <--- Replace with the private static IP
 
   properties:
     google: *google_properties
