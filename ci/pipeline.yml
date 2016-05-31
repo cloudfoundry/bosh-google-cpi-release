@@ -229,8 +229,8 @@ resources:
   - name: bosh-cpi-src-in
     type: git
     source:
-      uri: https://github.com/evandbrown/bosh-google-cpi-release.git
-      branch: bats-manual-network
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      branch: master
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml
