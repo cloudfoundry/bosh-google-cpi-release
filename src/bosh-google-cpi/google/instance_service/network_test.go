@@ -28,7 +28,6 @@ var _ = Describe("Network", func() {
 			EphemeralExternalIP: true,
 			IPForwarding:        false,
 			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
-			InstanceGroup:       "fake-dynamic-network-instance-group",
 		}
 
 		vipNetwork = Network{
@@ -43,7 +42,6 @@ var _ = Describe("Network", func() {
 			EphemeralExternalIP: false,
 			IPForwarding:        true,
 			Tags:                NetworkTags{"fake-vip-network-network-tag"},
-			InstanceGroup:       "fake-vip-network-instance-group",
 		}
 
 		unknownNetwork = Network{Type: "unknown"}

@@ -100,6 +100,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		Preemptible:       cloudProps.Preemptible,
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,
+		BackendService:    cloudProps.BackendService,
 	}
 
 	// Create VM
@@ -117,14 +118,6 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 			cv.vmService.CleanUp(vm)
 		}
 	}()
-
-	// Configure VM networks
-	if err = cv.vmService.AddNetworkConfiguration(vm, vmNetworks); err != nil {
-		if _, ok := err.(api.CloudError); ok {
-			return "", err
-		}
-		return "", bosherr.WrapError(err, "Creating VM")
-	}
 
 	// Create VM settings
 	agentNetworks := networks.AsRegistryNetworks()

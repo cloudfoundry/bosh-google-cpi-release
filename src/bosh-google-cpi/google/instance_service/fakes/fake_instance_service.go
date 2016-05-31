@@ -9,9 +9,6 @@ type FakeInstanceService struct {
 	AddAccessConfigCalled bool
 	AddAccessConfigErr    error
 
-	AddNetworkConfigurationCalled bool
-	AddNetworkConfigurationErr    error
-
 	AttachDiskCalled     bool
 	AttachDiskErr        error
 	AttachDiskDeviceName string
@@ -35,9 +32,6 @@ type FakeInstanceService struct {
 
 	DeleteAccessConfigCalled bool
 	DeleteAccessConfigErr    error
-
-	DeleteNetworkConfigurationCalled bool
-	DeleteNetworkConfigurationErr    error
 
 	DetachDiskCalled bool
 	DetachDiskErr    error
@@ -64,11 +58,6 @@ type FakeInstanceService struct {
 func (i *FakeInstanceService) AddAccessConfig(id string, zone string, networkInterface string, accessConfig *compute.AccessConfig) error {
 	i.AddAccessConfigCalled = true
 	return i.AddAccessConfigErr
-}
-
-func (i *FakeInstanceService) AddNetworkConfiguration(id string, networks instance.Networks) error {
-	i.AddNetworkConfigurationCalled = true
-	return i.AddNetworkConfigurationErr
 }
 
 func (i *FakeInstanceService) AttachDisk(id string, diskLink string) (string, string, error) {
@@ -102,11 +91,6 @@ func (i *FakeInstanceService) Delete(id string) error {
 func (i *FakeInstanceService) DeleteAccessConfig(id string, zone string, networkInterface string, accessConfig string) error {
 	i.DeleteCalled = true
 	return i.DeleteErr
-}
-
-func (i *FakeInstanceService) DeleteNetworkConfiguration(id string) error {
-	i.DeleteNetworkConfigurationCalled = true
-	return i.DeleteNetworkConfigurationErr
 }
 
 func (i *FakeInstanceService) DetachDisk(id string, diskID string) error {

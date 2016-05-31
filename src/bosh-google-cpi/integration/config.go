@@ -35,7 +35,8 @@ var (
 	stemcellURL          = envOrDefault("STEMCELL_URL", "https://storage.googleapis.com/evandbrown17/bosh-stemcell-3215-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz")
 	existingStemcell     = envOrDefault("EXISTING_STEMCELL", "stemcell-decdea81-a0a3-47b6-5d76-093d505a6de9")
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
-	instanceGroup        = envOrDefault("INSTANCE_GROUP", "cfintegration-us-central1-a")
+	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
 
