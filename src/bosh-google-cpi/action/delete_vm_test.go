@@ -33,20 +33,8 @@ var _ = Describe("DeleteVM", func() {
 		It("deletes the vm", func() {
 			_, err = deleteVM.Run("fake-vm-id")
 			Expect(err).NotTo(HaveOccurred())
-			Expect(vmService.DeleteNetworkConfigurationCalled).To(BeTrue())
 			Expect(vmService.DeleteCalled).To(BeTrue())
 			Expect(registryClient.DeleteCalled).To(BeTrue())
-		})
-
-		It("returns an error if vmService delete network configuration call returns an error", func() {
-			vmService.DeleteNetworkConfigurationErr = errors.New("fake-vm-service-error")
-
-			_, err = deleteVM.Run("fake-vm-id")
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("fake-vm-service-error"))
-			Expect(vmService.DeleteNetworkConfigurationCalled).To(BeTrue())
-			Expect(vmService.DeleteCalled).To(BeFalse())
-			Expect(registryClient.DeleteCalled).To(BeFalse())
 		})
 
 		It("returns an error if vmService delete call returns an error", func() {
@@ -55,7 +43,6 @@ var _ = Describe("DeleteVM", func() {
 			_, err = deleteVM.Run("fake-vm-id")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("fake-vm-service-error"))
-			Expect(vmService.DeleteNetworkConfigurationCalled).To(BeTrue())
 			Expect(vmService.DeleteCalled).To(BeTrue())
 			Expect(registryClient.DeleteCalled).To(BeFalse())
 		})
@@ -66,7 +53,6 @@ var _ = Describe("DeleteVM", func() {
 			_, err = deleteVM.Run("fake-vm-id")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("fake-registry-client-error"))
-			Expect(vmService.DeleteNetworkConfigurationCalled).To(BeTrue())
 			Expect(vmService.DeleteCalled).To(BeTrue())
 			Expect(registryClient.DeleteCalled).To(BeTrue())
 		})

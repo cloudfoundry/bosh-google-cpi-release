@@ -9,63 +9,6 @@ import (
 	"google.golang.org/api/compute/v1"
 )
 
-func (i GoogleInstanceService) AddNetworkConfiguration(id string, networks Networks) error {
-	instance, found, err := i.Find(id, "")
-	if err != nil {
-		return err
-	}
-	if !found {
-		return api.NewVMNotFoundError(id)
-	}
-
-	if err := i.addToInstanceGroup(instance, networks); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) addToInstanceGroup(instance *compute.Instance, networks Networks) error {
-	if instanceGroupName := networks.InstanceGroup(); instanceGroupName != "" {
-		if err := i.instanceGroupService.AddInstance(instanceGroupName, instance.SelfLink); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) DeleteNetworkConfiguration(id string) error {
-	instance, found, err := i.Find(id, "")
-	if err != nil {
-		return err
-	}
-	if !found {
-		return api.NewVMNotFoundError(id)
-	}
-
-	if err := i.removeFromInstanceGroup(instance); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) removeFromInstanceGroup(instance *compute.Instance) error {
-	instanceGroup, found, err := i.instanceGroupService.FindByInstance(instance.SelfLink, "")
-	if err != nil {
-		return err
-	}
-
-	if found {
-		if err := i.instanceGroupService.RemoveInstance(instanceGroup, instance.SelfLink); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, networks Networks) error {
 	instance, found, err := i.Find(id, "")
 	if err != nil {
@@ -92,10 +35,6 @@ func (i GoogleInstanceService) UpdateNetworkConfiguration(id string, networks Ne
 	}
 
 	if err = i.updateTags(instance, networks); err != nil {
-		return err
-	}
-
-	if err := i.updateInstanceGroup(instance, networks); err != nil {
 		return err
 	}
 
@@ -272,32 +211,6 @@ func (i GoogleInstanceService) updateTags(instance *compute.Instance, networks N
 	// Update the instance tags
 	if err := i.SetTags(instance.Name, instance.Zone, instanceTags); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func (i GoogleInstanceService) updateInstanceGroup(instance *compute.Instance, networks Networks) error {
-	// Check if instance is associated to an instance group
-	currentInstanceGroup, _, err := i.instanceGroupService.FindByInstance(instance.SelfLink, "")
-	if err != nil {
-		return err
-	}
-
-	// Check if instance group info has changed
-	instanceGroupName := networks.InstanceGroup()
-	if instanceGroupName != currentInstanceGroup {
-		if currentInstanceGroup != "" {
-			if err := i.instanceGroupService.RemoveInstance(currentInstanceGroup, instance.SelfLink); err != nil {
-				return err
-			}
-		}
-
-		if instanceGroupName != "" {
-			if err := i.instanceGroupService.AddInstance(instanceGroupName, instance.SelfLink); err != nil {
-				return err
-			}
-		}
 	}
 
 	return nil

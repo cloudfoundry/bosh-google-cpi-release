@@ -74,6 +74,14 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		}
 	}
 
+	if vmProps.BackendService != "" {
+		if err := i.addToBackendService(operation.TargetLink, vmProps.BackendService); err != nil {
+			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Backend Service: %v", err)
+			i.CleanUp(vm.Name)
+			return "", api.NewVMCreationFailedError(err.Error(), true)
+		}
+	}
+
 	return vm.Name, nil
 }
 
@@ -269,6 +277,22 @@ func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, targ
 				return err
 			}
 		}
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) addToBackendService(instanceSelfLink, backendServiceName string) error {
+	if err := i.backendServiceService.AddInstance(backendServiceName, instanceSelfLink); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i GoogleInstanceService) removeFromBackendService(instanceSelfLink string) error {
+	if err := i.backendServiceService.RemoveInstance(instanceSelfLink); err != nil {
+		return err
 	}
 
 	return nil

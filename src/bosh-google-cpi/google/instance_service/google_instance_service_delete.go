@@ -30,5 +30,8 @@ func (i GoogleInstanceService) Delete(id string) error {
 		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Target Pool", id)
 	}
 
+	if err = i.removeFromBackendService(instance.SelfLink); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Backend Services", id)
+	}
 	return nil
 }

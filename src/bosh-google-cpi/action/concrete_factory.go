@@ -6,11 +6,11 @@ import (
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
 	"bosh-google-cpi/google/address_service"
+	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/client"
 	"bosh-google-cpi/google/disk_service"
 	"bosh-google-cpi/google/disk_type_service"
 	"bosh-google-cpi/google/image_service"
-	"bosh-google-cpi/google/instance_group_service"
 	"bosh-google-cpi/google/instance_service"
 	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/google/network_service"
@@ -67,7 +67,7 @@ func NewConcreteFactory(
 		logger,
 	)
 
-	instanceGroupService := instancegroup.NewGoogleInstanceGroupService(
+	backendServiceService := backendservice.NewGoogleBackendServiceService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
@@ -127,7 +127,7 @@ func NewConcreteFactory(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		addressService,
-		instanceGroupService,
+		backendServiceService,
 		networkService,
 		operationService,
 		subnetworkService,

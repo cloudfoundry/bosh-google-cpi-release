@@ -11,6 +11,7 @@ import (
 	clientfakes "bosh-google-cpi/google/client/fakes"
 
 	"bosh-google-cpi/google/address_service"
+	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/client"
 	"bosh-google-cpi/google/disk_service"
 	"bosh-google-cpi/google/disk_type_service"
@@ -47,19 +48,20 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	var (
-		operationService     operation.GoogleOperationService
-		addressService       address.Service
-		diskService          disk.Service
-		diskTypeService      disktype.Service
-		imageService         image.Service
-		instanceGroupService instancegroup.Service
-		machineTypeService   machinetype.Service
-		networkService       network.Service
-		snapshotService      snapshot.Service
-		subnetworkService    subnetwork.Service
-		registryClient       registry.Client
-		targetPoolService    targetpool.Service
-		vmService            instance.Service
+		operationService      operation.GoogleOperationService
+		addressService        address.Service
+		diskService           disk.Service
+		diskTypeService       disktype.Service
+		imageService          image.Service
+		instanceGroupService  instancegroup.Service
+		backendServiceService backendservice.Service
+		machineTypeService    machinetype.Service
+		networkService        network.Service
+		snapshotService       snapshot.Service
+		subnetworkService     subnetwork.Service
+		registryClient        registry.Client
+		targetPoolService     targetpool.Service
+		vmService             instance.Service
 	)
 
 	BeforeEach(func() {
@@ -108,6 +110,13 @@ var _ = Describe("ConcreteFactory", func() {
 			googleClient.StorageService(),
 			operationService,
 			uuidGen,
+			logger,
+		)
+
+		backendServiceService = backendservice.NewGoogleBackendServiceService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			operationService,
 			logger,
 		)
 
@@ -160,7 +169,7 @@ var _ = Describe("ConcreteFactory", func() {
 			googleClient.Project(),
 			googleClient.ComputeService(),
 			addressService,
-			instanceGroupService,
+			backendServiceService,
 			networkService,
 			operationService,
 			subnetworkService,

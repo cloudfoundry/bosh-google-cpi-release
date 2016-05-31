@@ -27,10 +27,11 @@ func (i GoogleInstanceGroupService) Find(id string, zone string) (InstanceGroup,
 
 				// Return the first instance group (it can only be 1 instance group with the same name across all zones)
 				instanceGroup := InstanceGroup{
-					Name:      instanceGroupItem.Name,
-					Instances: instances,
-					SelfLink:  instanceGroupItem.SelfLink,
-					Zone:      instanceGroupItem.Zone,
+					Name:       instanceGroupItem.Name,
+					Instances:  instances,
+					SelfLink:   instanceGroupItem.SelfLink,
+					Zone:       instanceGroupItem.Zone,
+					Subnetwork: instanceGroupItem.Subnetwork,
 				}
 				return instanceGroup, true, nil
 			}
