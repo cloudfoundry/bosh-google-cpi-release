@@ -1,6 +1,8 @@
 ---
 <%
-director_uuid = "REPLACE_ME"
+director_uuid = "REPLACE"
+lb_ip = "REPLACE"
+lb_proto = "http://"
 common_password = "c1oudc0w"
 deployment_name = "concourse"
 %>
@@ -9,26 +11,26 @@ director_uuid: <%= director_uuid %>
 
 releases:
 - name: concourse
-  version: latest
+  version: 1.0.0
 - name: garden-linux
-  version: latest
+  version: 0.337.0
 
 instance_groups:
 - name: web
-  instances: 1
+  instances: 2
   vm_type: common
-  azs: [z1]
-  vm_extensions: [concourse-target-pool]
+  azs: [z1,z2]
+  vm_extensions: [concourse-lb]
   stemcell: trusty
   networks: 
-  - name: public-concourse
+  - name: public
     default: [dns, gateway]
 
   jobs:
   - name: atc
     release: concourse
     properties:
-      external_url: /
+      external_url: <%= lb_proto %><%= lb_ip %>
       basic_auth_username: concourse
       basic_auth_password: ofcourse
 
@@ -41,24 +43,25 @@ instance_groups:
 - name: db
   instances: 1
   vm_type: common
+  azs: [z1]
   stemcell: trusty
   persistent_disk_type: database
-  networks: [{name: private}]
+  networks: [{name: public}]
   jobs:
   - name: postgresql
     release: concourse
     properties:
       databases:
       - name: *atc_db
-        # make up a role and password
-        role: REPLACE_ME
-        password: REPLACE_ME
+        role: admin
+        password: <%= common_password %>
 
 - name: worker
   instances: 1
   vm_type: worker
+  azs: [z1]
   stemcell: trusty
-  networks: [{name: private}]
+  networks: [{name: public}]
   jobs:
   - name: groundcrew
     release: concourse
