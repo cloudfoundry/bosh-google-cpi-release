@@ -41,9 +41,10 @@ $ gcloud compute firewall-rules create concourse-internal \
 
 * Create a load balancer for Concourse
 
-1. Create an unmanaged instance group:
+1. Create an unmanaged instance group and named port:
   ```
   gcloud compute instance-groups unmanaged create concourse-us-central1-f --zone us-central1-f
+  gcloud compute instance-groups unmanaged set-named-ports concourse-us-central1-f --named-ports "http:8080"
   ```
 
 2. Create a health check:
