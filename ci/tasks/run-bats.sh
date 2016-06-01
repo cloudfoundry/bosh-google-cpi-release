@@ -18,6 +18,8 @@ check_param google_firewall_external
 check_param google_address_director
 check_param google_address_bats
 check_param google_address_static_bats
+check_param google_address_static_bats_range
+check_param google_address_static_bats_dir
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
@@ -99,7 +101,7 @@ networks:
     subnets:
       <% network.subnets.each do |subnet| %>
       - range: <%= subnet.range %>
-        static: [192.168.0.10-192.168.0.100]
+        static: [<%= subnet.static %>]
         gateway: <%= subnet.gateway %>
         dns: <%= p('dns').inspect %>
         cloud_properties:
@@ -186,11 +188,12 @@ properties:
   static_ips: [${google_address_static_bats}]
   networks:
     - name: default
-      static_ip: 192.168.0.20
+      static_ip: ${google_address_static_bats_dir}
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gw}
+        static: ${google_address_static_bats_range}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}
