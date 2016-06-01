@@ -41,40 +41,37 @@ $ gcloud compute firewall-rules create concourse-internal \
 * Create a load balancer for Concourse
 
 1. Create an unmanaged instance group:
+  ```
+  gcloud compute instance-groups unmanaged create concourse-us-central1-f --zone us-central1-f
+  ```
 
-```
-gcloud compute instance-groups unmanaged create concourse-us-central1-f --zone us-central1-f
-```
+2. Create a health check:
+  ```
+  gcloud compute http-health-checks create concourse --port 8080 --request-path="/login"
+  ```
+3. Create a backend service:
 
-1. Create a health check:
+  ```
+  gcloud compute backend-services create concourse --http-health-check "concourse" --port 8080 --timeout "30"
 
-```
-gcloud compute http-health-checks create concourse --port 8080 --request-path="/login"
-```
-
-1. Create a backend service:
-
-```
-gcloud compute backend-services create concourse --http-health-check "concourse" --port 8080 --timeout "30"
-
-gcloud compute backend-services add-backend "http" --instance-group "concourse-us-central1-f" --zone "us-central1-f" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
-```
+  gcloud compute backend-services add-backend "http" --instance-group "concourse-us-central1-f" --zone "us-central1-f" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
+  ```
 
 1. Create a URL Map:
 
-```
-gcloud compute url-maps create concourse-http --default-service concourse
-```
+  ```
+  gcloud compute url-maps create concourse-http --default-service concourse
+  ```
 
 1. Create a target proxy:
-
-gcloud compute target-http-proxies create concourse-http --url-map concourse-http
-
+  ```
+  gcloud compute target-http-proxies create concourse-http --url-map concourse-http
+  ```
 1. Create a global forwarding rule
 
-```
-gcloud compute forwarding-rules create concourse-http-fw --target-http-proxy concourse-http --global --address=REPLACE --port-range=80-80
-```
+  ```
+  gcloud compute forwarding-rules create concourse-http-fw --target-http-proxy concourse-http --global --address=REPLACE --port-range=80-80
+  ```
 
 ### Deploying Concourse
 
