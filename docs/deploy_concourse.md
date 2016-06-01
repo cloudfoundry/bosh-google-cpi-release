@@ -55,7 +55,7 @@ $ gcloud compute firewall-rules create concourse-internal \
   ```
   gcloud compute backend-services create concourse --http-health-check "concourse" --port 8080 --timeout "30"
 
-  gcloud compute backend-services add-backend "http" --instance-group "concourse-us-central1-f" --zone "us-central1-f" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
+  gcloud compute backend-services add-backend "concourse" --instance-group "concourse-us-central1-f" --zone "us-central1-f" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
   ```
 
 1. Create a URL Map:
