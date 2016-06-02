@@ -7,6 +7,7 @@ groups:
       - setup-infrastructure
       - deploy-ubuntu
       - run-bats
+      - run-int
       - teardown-infrastructure
       - promote-candidate
 
@@ -215,15 +216,10 @@ jobs:
             google_json_key_data:             {{google_json_key_data}}
             google_network:                   {{google_network}}
             google_subnetwork:                {{google_subnetwork}}
-            google_subnetwork_range:          {{google_subnetwork_range}}
-            google_subnetwork_gw:             {{google_subnetwork_gw}}
             google_firewall_internal:         {{google_firewall_internal}}
             google_firewall_external:         {{google_firewall_external}}
-            google_address_director:          {{google_address_director_ubuntu}}
             google_address_int:              {{google_address_int_ubuntu}}
             google_address_static_int:       {{google_address_static_int_ubuntu}}
-            google_address_static_int_range: {{google_address_static_int_range_ubuntu}}
-            google_address_static_int_dir:   {{google_address_static_int_dir_ubuntu}}
             base_os:                          Ubuntu
             stemcell_name:                    bosh-google-kvm-ubuntu-trusty-go_agent
             bat_vcap_password:                {{bat_vcap_password}}
