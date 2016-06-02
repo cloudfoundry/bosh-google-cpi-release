@@ -32,3 +32,8 @@ private_key_data: |
 director_username: <THE DIRECTOR USERNAME TO BE CREATED>
 director_password: <THE DIRECTOR PASSWORD TO BE CREATED>
 bat_vcap_password: <THE BAT VCAP PASSWORD TO BE CREATED>
+
+google_existingStemcell: ci
+google_targetPool: ci
+google_backendService: ci
+

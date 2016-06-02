@@ -5,7 +5,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("Network", func() {
@@ -146,7 +145,7 @@ var _ = Describe("Network", func() {
 				  "vip": {
 					"type": "vip",
 					"ip": "%v"
-				  }  
+				  }
 				},
 				[],
 				{}
@@ -208,7 +207,7 @@ var _ = Describe("Network", func() {
 	It("can create a VM with a static private IP", func() {
 		By("creating a VM")
 		var vmCID string
-		ip := "192.168.100.101"
+
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -249,7 +248,6 @@ var _ = Describe("Network", func() {
 	It("can create a VM with a static private IP and ephemeral public IP", func() {
 		By("creating a VM")
 		var vmCID string
-		ip := "192.168.100.102"
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -291,7 +289,6 @@ var _ = Describe("Network", func() {
 	It("can create a VM with a static private IP and static public IP", func() {
 		By("creating a VM")
 		var vmCID string
-		ip := "192.168.100.103"
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -310,7 +307,7 @@ var _ = Describe("Network", func() {
 					  "subnetwork_name": "%v",
 					  "ephemeral_external_ip": true
 					}
-				  }, 
+				  },
 				  "vip": {
 					"type": "vip",
 					"ip": "%v"

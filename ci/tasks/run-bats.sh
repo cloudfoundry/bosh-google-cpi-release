@@ -24,6 +24,7 @@ check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
 
+
 # Initialize deployment artifacts
 deployment_dir="${PWD}/deployment"
 cpi_release_name=bosh-google-cpi

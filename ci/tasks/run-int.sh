@@ -11,31 +11,42 @@ check_param google_zone
 check_param google_json_key_data
 check_param google_network
 check_param google_subnetwork
-check_param google_subnetwork_range
-check_param google_subnetwork_gw
-check_param google_firewall_internal
-check_param google_firewall_external
-check_param google_address_director
-check_param google_address_bats
-check_param google_address_static_bats
-check_param google_address_static_bats_range
-check_param google_address_static_bats_dir
-check_param base_os
+check_param google_target_pool
+check_param google_backend_service
+check_param google_address_int
+check_param google_address_static_int
 check_param stemcell_name
-check_param bat_vcap_password
 
+
+# Initialize deployment artifacts
 deployment_dir="${PWD}/deployment"
-bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
-bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
-private_key=${deployment_dir}/private_key.pem
 google_json_key=${deployment_dir}/google_key.json
 
-export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
-export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
-export BAT_VCAP_PASSWORD="${bat_vcap_password}"
-export BAT_INFRASTRUCTURE=google
-export BAT_NETWORKING=dynamic
-export BAT_VCAP_PRIVATE_KEY=${private_key}
+export INT_STEMCELL="${deployment_dir}/stemcell.tgz"
+export NETWORK_NAME=${google_network}
+export CUSTOM_NETWORK_NAME=$NETWORK_NAME
+export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
+export PRIVATE_IP=${google_address_static_int}
+export STEMCELL_URL=${stemcell_url}
+# Hardcoded until a standard release cycle is made, or to be stored programatically from
+# You can hardcode this for your ENV using `gcloud compute images list`
+# This step in concourse pipelines/Google-BOSH-CPI-Release/resources/google-ubuntu-stemcell
+export EXISTING_STEMCELL=stemcell-c9b5025e-ceb1-4a59-5553-5a1bca74866f
+export TARGET_POOL=${google_target_pool}
+export BACKEND_SERVICE=${google_backend_service}
+export ZONE=${google_zone}
+export REGION=${google_region}
+export GOOGLE_PROJECT=${google_project}
+
+echo "Setting up artifacts..."
+cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
+cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
+cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+
+# Find external IP
+echo "Looking for external IP..."
+external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
+export EXTERNAL_STATIC_IP=${external_ip}
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
@@ -48,166 +59,23 @@ gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
-echo "Looking for director IP..."
-director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq -r '.address')
-export BAT_DIRECTOR=${director_ip}
-export BAT_DNS_HOST=${director_ip}
+# Setup Go and run tests
+export GOPATH=${PWD}/bosh-cpi-src
+export PATH=${GOPATH}/bin:$PATH
 
-echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
+cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
+make testintci
 
-echo "Creating private key..."
-eval $(ssh-agent)
-ssh-add ${private_key}
 
-echo "Using BOSH CLI version..."
-bosh version
 
-echo "Targeting BOSH director..."
-bosh -n target ${BAT_DIRECTOR}
 
-echo "Creating ${bat_manifest_filename}..."
-cat > ${bat_manifest_filename} <<EOF
----
-name: <%= properties.name || "bat" %>
-director_uuid: <%= properties.uuid %>
 
-releases:
-  - name: bat
-    version: <%= properties.release || "latest" %>
 
-compilation:
-  workers: <%= properties.compilation_workers || 2 %>
-  network: default
-  reuse_compilation_vms: true
-  cloud_properties:
-    machine_type: <%= properties.machine_type || "n1-standard-2" %>
-    root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
-    root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-    <% if properties.zone %>
-    zone: <%= properties.zone %>
-    <% end %>
 
-update:
-  canaries: <%= properties.canaries || 1 %>
-  canary_watch_time: 3000-90000
-  update_watch_time: 3000-90000
-  max_in_flight: <%= properties.max_in_flight || 1 %>
 
-networks:
-  <% properties.networks.each do |network| %>
-  - name: <%= network.name %>
-    type: <%= network.type %>
-    subnets:
-      <% network.subnets.each do |subnet| %>
-      - range: <%= subnet.range %>
-        static: [<%= subnet.static %>]
-        gateway: <%= subnet.gateway %>
-        dns: <%= p('dns').inspect %>
-        cloud_properties:
-          network_name: <%= subnet.cloud_properties.network_name %>
-          subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
-          ephemeral_external_ip: <%= subnet.cloud_properties.ephemeral_external_ip || false %>
-          tags: <%= subnet.cloud_properties.tags || [] %>
-      <% end %>
-  <% end %>
-  - name: static
-    type: vip
 
-resource_pools:
-  - name: common
-    network: default
-    stemcell:
-      name: <%= properties.stemcell.name %>
-      version: "<%= properties.stemcell.version %>"
-    cloud_properties:
-      machine_type: <%= properties.machine_type || "n1-standard-2" %>
-      root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
-      root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-      <% if properties.zone %>
-      zone: <%= properties.zone %>
-      <% end %>
-    <% if properties.password %>
-    env:
-      bosh:
-        password: <%= properties.password %>
-    <% end %>
 
-jobs:
-  - name: <%= properties.job || "batlight" %>
-    templates: <% (properties.templates || ["batlight"]).each do |template| %>
-    - name: <%= template %>
-    <% end %>
-    instances: <%= properties.instances %>
-    resource_pool: common
-    <% if properties.persistent_disk %>
-    persistent_disk: <%= properties.persistent_disk %>
-    <% end %>
-    networks:
-    <% properties.job_networks.each_with_index do |network, i| %>
-      - name: <%= network.name %>
-        <% if i == 0 %>
-        default: [dns, gateway]
-        static_ips:
-        <% properties.instances.times do |i| %>
-          - <%= properties.static_ips[i] %>
-        <% end %>
-        <% end %>
-    <% end %>
-    <% if properties.use_vip %>
-      - name: static
-        static_ips:
-          - <%= properties.vip %>
-    <% end %>
 
-properties:
-  batlight:
-    <% if properties.batlight.fail %>
-    fail: <%= properties.batlight.fail %>
-    <% end %>
-    <% if properties.batlight.missing %>
-    missing: <%= properties.batlight.missing %>
-    <% end %>
-    <% if properties.batlight.drain_type %>
-    drain_type: <%= properties.batlight.drain_type %>
-    <% end %>
-EOF
 
-echo "Creating ${bat_config_filename}..."
-cat > ${bat_config_filename} <<EOF
----
-cpi: google
-manifest_template_path: ${bat_manifest_filename}
-properties:
-  uuid: $(bosh status --uuid)
-  stemcell:
-    name: ${stemcell_name}
-    version: latest
-  instances: 1
-  vip: ${bats_ip}
-  static_ips: [${google_address_static_bats}]
-  networks:
-    - name: default
-      static_ip: ${google_address_static_bats_dir}
-      type: manual
-      subnets:
-      - range: ${google_subnetwork_range}
-        gateway: ${google_subnetwork_gw}
-        static: ${google_address_static_bats_range}
-        cloud_properties:
-          network_name: ${google_network}
-          subnetwork_name: ${google_subnetwork}
-          ephemeral_external_ip: true
-          tags:
-            - ${google_firewall_internal}
-            - ${google_firewall_external}
-EOF
 
-pushd bats
-  echo "Installing gems..."
-  ./write_gemfile
-  bundle install
 
-  echo "Running BOSH Acceptance Tests..."
-  bundle exec rspec spec
-popd

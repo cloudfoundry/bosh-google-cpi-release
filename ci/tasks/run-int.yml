@@ -8,6 +8,7 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: stemcell
+  - name: int
 run:
   path: bosh-cpi-src/ci/tasks/run-int.sh
 params:
@@ -17,10 +18,10 @@ params:
   google_json_key_data:             replace-me
   google_network:                   replace-me
   google_subnetwork:                replace-me
-  google_subnetwork_range:          replace-me
-  google_subnetwork_gw:             replace-me
-  google_firewall_internal:         replace-me
-  google_firewall_external:         replace-me
-  google_address_director:          replace-me
+  google_target_pool:               replace-me
+  google_backend_service:           replace-me
+  google_address_int:               replace-me
   google_address_static_int:        replace-me
   stemcell_name:                    replace-me
+  existing_stemcell:                replace-me
+
