@@ -175,6 +175,16 @@ jobs:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
+  - name: run-bats
+    serial: true
+    serial_groups: [director-ubuntu]
+    plan:
+      - aggregate:
+        - {trigger: false, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: false,                                                  get: bats}
+        - {trigger: false,                                                  get: deployment}
+
       - task: run-bats
         file: bosh-cpi-src/ci/tasks/run-bats.yml
         config:
@@ -197,9 +207,6 @@ jobs:
             base_os:                          Ubuntu
             stemcell_name:                    bosh-google-kvm-ubuntu-trusty-go_agent
             bat_vcap_password:                {{bat_vcap_password}}
-        ensure:
-          task: teardown-director
-          file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
   - name: promote-candidate
     serial: true
