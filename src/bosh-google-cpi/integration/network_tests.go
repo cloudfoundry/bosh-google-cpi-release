@@ -3,6 +3,8 @@ package integration
 import (
 	"fmt"
 
+	"google.golang.org/api/compute/v1"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

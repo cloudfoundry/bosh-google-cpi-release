@@ -13,9 +13,8 @@ check_param google_network
 check_param google_subnetwork
 check_param google_target_pool
 check_param google_backend_service
-check_param google_address_int
 check_param google_address_static_int
-check_param stemcell_name
+check_param google_address_int
 
 
 # Initialize deployment artifacts
@@ -43,10 +42,6 @@ cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
 cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
 
-# Find external IP
-echo "Looking for external IP..."
-external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
-export EXTERNAL_STATIC_IP=${external_ip}
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
@@ -58,6 +53,11 @@ gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application
 gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
+
+# Find external IP
+echo "Looking for external IP..."
+external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
+export EXTERNAL_STATIC_IP=${external_ip}
 
 # Setup Go and run tests
 export GOPATH=${PWD}/bosh-cpi-src

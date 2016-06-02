@@ -42,7 +42,7 @@ test: get-deps clean fmt lint vet build
 	ginkgo -r -race -skipPackage=integration .
 
 # Runs the integration tests from Concourse
-testintci: get-deps clean
+testintci: get-deps
 	ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Runs the integration tests with coverage
