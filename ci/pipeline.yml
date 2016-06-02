@@ -183,7 +183,6 @@ jobs:
         - {trigger: false, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                                  get: bats}
-        - {trigger: false,                                                  get: deployment}
 
       - task: run-bats
         file: bosh-cpi-src/ci/tasks/run-bats.yml
