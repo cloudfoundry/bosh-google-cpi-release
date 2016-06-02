@@ -38,8 +38,6 @@ export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 
 echo "Setting up artifacts..."
-cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
-cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
 
 

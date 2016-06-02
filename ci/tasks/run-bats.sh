@@ -35,8 +35,8 @@ bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
 bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
 
 echo "Setting up artifacts..."
-cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
-cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
+# cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
+# cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
 
 
