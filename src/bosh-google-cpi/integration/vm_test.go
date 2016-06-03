@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("VM", func() {
-	FIt("creates a VM with an invalid configuration and receives an error message with logs", func() {
+	It("creates a VM with an invalid configuration and receives an error message with logs", func() {
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -355,7 +355,7 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	FIt("executes the VM lifecycle with a backend service", func() {
+	It("executes the VM lifecycle with a backend service", func() {
 		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
 			instances := make([]string, len(ig.Items))
 			for _, i := range ig.Items {

@@ -25,8 +25,8 @@ google_address_director_ubuntu: <NAME OF THE GOOGLE ADDRESS (DIRECTOR IP) TO BE 
 google_address_static_director_ubuntu: <NAME OF THE STATIC DIRECTOR IP TO BE CREATED FOR UBUNTU TESTS>
 google_address_bats_ubuntu: <NAME OF THE GOOGLE ADDRESS (BATS IP) TO BE CREATED FOR UBUNTU TESTS>
 google_address_static_bats_ubuntu: <NAME OF THE GOOGLE ADDRESS (BATS IP) TO BE CREATED FOR UBUNTU TESTS>
-google_address_static_bats_range_ubuntu: <HYPHEN-DELIMITED RANGE OF STATIC IPS BATS DIRECTOR CAN USE>
-google_address_static_bats_dir_ubuntu: <STATIC IP THAT WILL BE ASSIGNED TO BATS DIR>
+google_address_static_bats_available_range_ubuntu: <HYPHEN-DELIMITED RANGE OF STATIC IPS BATS DIRECTOR CAN USE>
+google_address_static_bats_ubuntu: <STATIC IP THAT WILL BE ASSIGNED TO BATS DIR>
 google_stemcells_bucket_name: <NAME OF THE GCS BUCKET TO STORE STEMCELLS>
 google_releases_bucket_name: <NAME OF THE GCS BUCKET TO STORE RELEASES>
 private_key_user: vcap
