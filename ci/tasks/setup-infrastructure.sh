@@ -9,12 +9,16 @@ check_param google_region
 check_param google_zone
 check_param google_json_key_data
 check_param google_network
+check_param google_auto_network
 check_param google_subnetwork
 check_param google_subnetwork_range
 check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
 check_param google_address_bats_ubuntu
+check_param google_target_pool
+check_param google_backend_service 
+check_param google_address_int_ubuntu
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
@@ -29,7 +33,21 @@ gcloud config set compute/zone ${google_zone}
 echo "Setting up google infrastructure..."
 gcloud -q compute addresses create ${google_address_director_ubuntu}
 gcloud -q compute addresses create ${google_address_bats_ubuntu}
+gcloud -q compute addresses create ${google_address_int_ubuntu}
+gcloud -q compute networks create ${google_auto_network}
 gcloud -q compute networks create ${google_network} --mode custom
 gcloud -q compute networks subnets create ${google_subnetwork} --network=${google_network} --range=${google_subnetwork_range}
 gcloud -q compute firewall-rules create ${google_firewall_internal} --description "BOSH CI Internal traffic" --network ${google_network} --source-tags ${google_firewall_internal} --target-tags ${google_firewall_internal} --allow tcp,udp,icmp
 gcloud -q compute firewall-rules create ${google_firewall_external} --description "BOSH CI External traffic" --network ${google_network} --target-tags ${google_firewall_external} --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
+
+# Target pool
+gcloud -q compute target-pools create ${google_target_pool} --region=${google_region}
+
+# Backend service
+gcloud -q compute instance-groups unmanaged create ${google_backend_service} --zone ${google_zone}
+gcloud -q compute http-health-checks create ${google_backend_service}
+gcloud -q compute backend-services create ${google_backend_service} --http-health-check ${google_backend_service} --port-name "http" --timeout "30"
+gcloud -q compute backend-services add-backend ${google_backend_service} --instance-group ${google_backend_service} --zone ${google_zone} --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
+
+
+
