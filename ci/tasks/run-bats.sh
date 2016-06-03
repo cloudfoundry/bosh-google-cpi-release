@@ -23,24 +23,23 @@ check_param google_address_static_bats_dir
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
+check_param private_key_data
 
 
 # Initialize deployment artifacts
-deployment_dir="${PWD}/deployment"
 cpi_release_name=bosh-google-cpi
-google_json_key=${deployment_dir}/google_key.json
-private_key=${deployment_dir}/private_key.pem
+google_json_key=google_key.json
+private_key=private_key.pem
 manifest_filename="director-manifest.yml"
-bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
-bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
+bat_manifest_filename="${base_os}-bats-manifest.yml"
+bat_config_filename="${base_os}-bats-config.yml"
 
 echo "Setting up artifacts..."
-# cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
-# cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
-cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+echo "${private_key_data}" > ${private_key}
+cp ./stemcell/*.tgz stemcell.tgz
 
 
-export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
+export BAT_STEMCELL="stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
 export BAT_VCAP_PASSWORD="${bat_vcap_password}"
 export BAT_INFRASTRUCTURE=google

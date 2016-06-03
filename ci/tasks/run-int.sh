@@ -15,22 +15,18 @@ check_param google_target_pool
 check_param google_backend_service
 check_param google_address_static_int
 check_param google_address_int
-
+check_param google_existing_stemcell
 
 # Initialize deployment artifacts
-deployment_dir="${PWD}/deployment"
-google_json_key=${deployment_dir}/google_key.json
+google_json_key=google_key.json
 
-export INT_STEMCELL="${deployment_dir}/stemcell.tgz"
-export NETWORK_NAME=${google_network}
-export CUSTOM_NETWORK_NAME=$NETWORK_NAME
+export INT_STEMCELL="stemcell.tgz"
+export NETWORK_NAME=${google_auto_network}
+export CUSTOM_NETWORK_NAME=${google_network}
 export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
 export PRIVATE_IP=${google_address_static_int}
 export STEMCELL_URL=${stemcell_url}
-# Hardcoded until a standard release cycle is made, or to be stored programatically from
-# You can hardcode this for your ENV using `gcloud compute images list`
-# This step in concourse pipelines/Google-BOSH-CPI-Release/resources/google-ubuntu-stemcell
-export EXISTING_STEMCELL=stemcell-c9b5025e-ceb1-4a59-5553-5a1bca74866f
+export EXISTING_STEMCELL=${google_existing_stemcell}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
 export ZONE=${google_zone}
@@ -38,7 +34,7 @@ export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 
 echo "Setting up artifacts..."
-cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+cp ./stemcell/*.tgz stemcell.tgz
 
 
 echo "Creating google json key..."
@@ -62,18 +58,5 @@ export GOPATH=${PWD}/bosh-cpi-src
 export PATH=${GOPATH}/bin:$PATH
 
 cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
+env
 make testintci
-
-
-
-
-
-
-
-
-
-
-
-
-
-
