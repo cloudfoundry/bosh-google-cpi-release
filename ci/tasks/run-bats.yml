@@ -30,3 +30,4 @@ params:
   base_os:                          replace-me
   stemcell_name:                    replace-me
   bat_vcap_password:                replace-me
+  private_key_data:                 replace-me
