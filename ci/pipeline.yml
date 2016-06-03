@@ -6,13 +6,9 @@ groups:
       - build-candidate
       - setup-infrastructure
       - deploy-ubuntu
+      - run-bats
+      - run-int
       - teardown-infrastructure
-      - promote-candidate
-
-  - name: ubuntu
-    jobs:
-      - build-candidate
-      - deploy-ubuntu
       - promote-candidate
 
 jobs:
@@ -79,11 +75,9 @@ jobs:
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
 
   - name: teardown-infrastructure
-    serial: true
-    serial_groups: [director-ubuntu]
     plan:
       - aggregate:
-        - {trigger: true, passed: [deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
 
       - task: teardown-infrastructure
         file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
@@ -176,14 +170,11 @@ jobs:
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
   - name: run-bats
-    serial: true
-    serial_groups: [director-ubuntu]
     plan:
       - aggregate:
-        - {trigger: false, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                                  get: bats}
-        - {trigger: false,                                                  get: deployment}
 
       - task: run-bats
         file: bosh-cpi-src/ci/tasks/run-bats.yml
@@ -207,6 +198,35 @@ jobs:
             base_os:                          Ubuntu
             stemcell_name:                    bosh-google-kvm-ubuntu-trusty-go_agent
             bat_vcap_password:                {{bat_vcap_password}}
+
+  - name: run-int
+    plan:
+      - aggregate:
+        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: false,                                                  get: bats}
+
+      - task: run-int
+        file: bosh-cpi-src/ci/tasks/run-int.yml
+        config:
+          params:
+            google_project:                   {{google_project}}
+            google_region:                    {{google_region}}
+            google_zone:                      {{google_zone}}
+            google_json_key_data:             {{google_json_key_data}}
+            google_network:                   {{google_network}}
+            google_subnetwork:                {{google_subnetwork}}
+            google_firewall_internal:         {{google_firewall_internal}}
+            google_firewall_external:         {{google_firewall_external}}
+            google_address_int:              {{google_address_int_ubuntu}}
+            google_address_static_int:       {{google_address_static_int_ubuntu}}
+            base_os:                          Ubuntu
+            stemcell_name:                    bosh-google-kvm-ubuntu-trusty-go_agent
+            bat_vcap_password:                {{bat_vcap_password}}
+            existing_stemcell:                replace-me
+            google_target_pool:               {{google_target_pool}}
+            google_backend_service:           {{google_backend_service}}
+
 
   - name: promote-candidate
     serial: true

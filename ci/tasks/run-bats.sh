@@ -24,11 +24,21 @@ check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
 
+
+# Initialize deployment artifacts
 deployment_dir="${PWD}/deployment"
+cpi_release_name=bosh-google-cpi
+google_json_key=${deployment_dir}/google_key.json
+private_key=${deployment_dir}/private_key.pem
+manifest_filename="director-manifest.yml"
 bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
 bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
-private_key=${deployment_dir}/private_key.pem
-google_json_key=${deployment_dir}/google_key.json
+
+echo "Setting up artifacts..."
+# cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
+# cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
+cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+
 
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
@@ -57,6 +67,8 @@ echo "Looking for bats IP..."
 bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
 
 echo "Creating private key..."
+echo "${private_key_data}" > ${private_key}
+chmod go-r ${private_key}
 eval $(ssh-agent)
 ssh-add ${private_key}
 
