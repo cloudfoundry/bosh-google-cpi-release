@@ -85,29 +85,10 @@ jobs:
   - name: teardown-infrastructure
     plan:
       - aggregate:
-        - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
 
       - task: teardown-infrastructure
         file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
-        config:
-          params:
-            google_project:                 {{google_project}}
-            google_region:                  {{google_region}}
-            google_zone:                    {{google_zone}}
-            google_json_key_data:           {{google_json_key_data}}
-            google_auto_network:            {{google_auto_network}}
-            google_network:                 {{google_network}}
-            google_subnetwork:              {{google_subnetwork}}
-            google_firewall_internal:       {{google_firewall_internal}}
-            google_firewall_external:       {{google_firewall_external}}
-            google_backend_service:         {{google_backend_service}}
-            google_target_pool:             {{google_target_pool}}
-            google_address_director_ubuntu: {{google_address_director_ubuntu}}
-            google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
-            google_address_int_ubuntu:      {{google_address_int_ubuntu}}
-
-      - task: setup-infrastructure
-        file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
         config:
           params:
             google_project:                 {{google_project}}
