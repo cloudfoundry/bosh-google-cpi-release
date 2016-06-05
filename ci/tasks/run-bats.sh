@@ -18,8 +18,8 @@ check_param google_firewall_external
 check_param google_address_director
 check_param google_address_bats
 check_param google_address_static_bats
-check_param google_address_static_bats_available_range
-check_param google_address_static_bats
+check_param google_address_static_pair_bats
+check_param google_address_static_available_range_bats
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
@@ -200,7 +200,7 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
-  static_ips: [${google_address_static_bats}]
+  static_ips: [${google_address_static_pair_bats}]
   networks:
     - name: default
       static_ip: ${google_address_static_bats}
@@ -208,7 +208,7 @@ properties:
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gw}
-        static: ${google_address_static_bats_available_range}
+        static: ${google_address_static_available_range_bats}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}
