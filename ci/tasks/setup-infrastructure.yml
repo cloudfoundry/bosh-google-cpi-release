@@ -14,6 +14,7 @@ params:
   google_region:                  replace-me
   google_zone:                    replace-me
   google_json_key_data:           replace-me
+  google_auto_network:            replace-me
   google_network:                 replace-me
   google_subnetwork:              replace-me
   google_subnetwork_range:        replace-me
@@ -21,3 +22,7 @@ params:
   google_firewall_external:       replace-me
   google_address_director_ubuntu: replace-me
   google_address_bats_ubuntu:     replace-me
+  google_existing_stemcell:       replace-me
+  google_target_pool:             replace-me 
+  google_backend_service:         replace-me 
+  google_address_int_ubuntu:      replace-me

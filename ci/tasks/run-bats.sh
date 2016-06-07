@@ -18,17 +18,30 @@ check_param google_firewall_external
 check_param google_address_director
 check_param google_address_bats
 check_param google_address_static_bats
-check_param google_address_static_bats_range
-check_param google_address_static_bats_dir
+check_param google_address_static_pair_bats
+check_param google_address_static_available_range_bats
 check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
+check_param private_key_data
 
-deployment_dir="${PWD}/deployment"
+
+# Initialize deployment artifacts
+deployment_dir="${PWD}"
+cpi_release_name=bosh-google-cpi
+google_json_key=${deployment_dir}/google_key.json
+private_key=${deployment_dir}/private_key.pem
+manifest_filename="director-manifest.yml"
 bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
 bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
-private_key=${deployment_dir}/private_key.pem
-google_json_key=${deployment_dir}/google_key.json
+
+echo "Setting up artifacts..."
+echo "${private_key_data}" > ${private_key}
+cp ./stemcell/*.tgz stemcell.tgz
+
+echo "Setting up artifacts..."
+cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+echo "${private_key_data}" > ${private_key}
 
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
@@ -57,6 +70,8 @@ echo "Looking for bats IP..."
 bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
 
 echo "Creating private key..."
+echo "${private_key_data}" > ${private_key}
+chmod go-r ${private_key}
 eval $(ssh-agent)
 ssh-add ${private_key}
 
@@ -185,15 +200,15 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
-  static_ips: [${google_address_static_bats}]
+  static_ips: [${google_address_static_pair_bats}]
   networks:
     - name: default
-      static_ip: ${google_address_static_bats_dir}
+      static_ip: ${google_address_static_bats}
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gw}
-        static: ${google_address_static_bats_range}
+        static: ${google_address_static_available_range_bats}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}
