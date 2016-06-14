@@ -224,5 +224,5 @@ pushd bats
   bundle install
 
   echo "Running BOSH Acceptance Tests..."
-  bundle exec rspec spec
+  bundle exec rspec --tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip spec
 popd
