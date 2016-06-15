@@ -3,5 +3,7 @@ final_name: bosh-google-cpi
 blobstore:
   provider: s3
   options:
+    bucket: bosh-cpi-artifacts
     bucket_name: bosh-cpi-artifacts
     host: storage.googleapis.com
+    endpoint: https://storage.googleapis.com
