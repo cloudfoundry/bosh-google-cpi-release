@@ -28,4 +28,6 @@ builds:
     version: '17'
   aaecafda-cb1b-454d-8372-8e622ba6153a:
     version: '20'
+  8f15d444-410e-4d38-973f-60bdba28faff:
+    version: '21'
 format-version: '2'
