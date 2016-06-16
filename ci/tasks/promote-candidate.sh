@@ -26,7 +26,6 @@ blobstore:
   s3:
     access_key_id: ${release_blobs_access_key}
     secret_access_key: ${release_blobs_secret_key}
-    host: storage.googleapis.com
 EOF
 
   echo "Using BOSH CLI version..."
