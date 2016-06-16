@@ -2,261 +2,314 @@
 
 This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 
-## Disclaimer
-
-This is NOT presently a production ready BOSH Google CPI release. This is a work in progress. It is suitable for experimentation and may not become supported in the future.
-
 ## Usage
 
-I am assuming you are familiar with [BOSH](http://bosh.io/) and its terminology. If not, please take a look at the [BOSH documentation](http://bosh.io/docs) before running this procedure.
+If you are not familiar with [BOSH](http://bosh.io/) and its terminology please take a look at the [BOSH documentation](http://bosh.io/docs).
 
-### Setup the [Google Cloud Platform](https://cloud.google.com/) environment
+## Deploy a BOSH Director on Google Cloud Platform
+These instructions walk  you through deploy a BOSH Director on Google Cloud Platform using manual networking.
 
-* [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine, if you haven't already.
-* Create a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) and secure store the downloaded **JSON Key**.
-* [Download and Install](https://cloud.google.com/sdk/) the Google Cloud SDK command line tool.
-* Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
+### Configure your [Google Cloud Platform](https://cloud.google.com/) environment
 
-```
-$ gcloud compute addresses create bosh
-```
+#### Signup and Setup
+1. [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine
+1. Create a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount), download the JSON Key, and securely store it
+1. [Download and install](https://cloud.google.com/sdk/) the Google Cloud SDK command line tool.
 
-* Create a new [network with auto-created subnetwork ranges](https://cloud.google.com/compute/docs/networking#creating_a_new_network_with_auto-created_subnetwork_ranges):
-
-```
-$ gcloud compute networks create cf --mode auto
-```
-
-* Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
+#### Configure gcloud
 
 ```
-$ gcloud compute firewall-rules create cf-internal \
-  --description "Cloud Foundry Internal traffic" \
-  --network cf \
-  --source-tags cf-internal \
-  --target-tags cf-internal \
-  --allow tcp,udp,icmp
+$ gcloud auth login
+$ gcloud config set project REPLACE_WITH_YOUR_PROJECT_ID
+$ gcloud config set compute/zone us-central1-f
 ```
 
-```
-$ gcloud compute firewall-rules create cf-bosh \
-  --description "Cloud Foundry BOSH External traffic" \
-  --network cf \
-  --target-tags cf-bosh \
-  --allow tcp:22,tcp:443,tcp:4222,tcp:6868,tcp:25250,tcp:25555,tcp:25777,udp:53
-```
+#### Provision infrastructure
+1. Create a new [network with custom subnetwork ranges](https://cloud.google.com/compute/docs/networking):
 
-* Create a **password-less** [SSH key](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys) if you haven't already.
+  ```
+  $ gcloud compute networks create cf --mode custom
+  ```
 
-### Install the bosh-init CLI
+1. Create a new subnetwork for BOSH:
 
-Install the [bosh-init](https://bosh.io/docs/install-bosh-init.html) tool in your workstation.
+  ```
+  $ gcloud compute networks subnets create bosh \
+      --network cf \
+      --range 10.0.0.0/24 \
+      --description "Subnet for BOSH Director and bastion" \
+      --region us-central1
+  ```
 
-### Create a deployment directory
+1. Create a new subnetwork for BOSH deployments:
 
-Create a deployment directory to store all `bosh-init` artifacts:
+  ```
+  $ gcloud compute networks subnets create deployments \
+      --network cf \
+      --range 10.100.0.0/16 \
+      --description "Subnet for BOSH deployments" \
+      --region us-central1
+  ```
 
-```
-$ mkdir google-bosh-deployment
-$ cd google-bosh-deployment
-```
+1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all internal traffic between VMs with the `cf-internal` tag:
 
-### Create a deployment manifest
+  ```
+  $ gcloud compute firewall-rules create cf-internal \
+    --description "Cloud Foundry Internal traffic" \
+    --network cf \
+    --source-tags cf-internal \
+    --target-tags cf-internal \
+    --allow tcp,udp,icmp
+  ```
 
-Create a `google-bosh-manifest.yml` deployment manifest file inside the previously created deployment directory with the following content and update it with your properties:
+1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all SSH access to the bastion host that you will deploy the BOSH Director from:
 
-```
----
-name: bosh
+  ```
+  $ gcloud compute firewall-rules create bosh-ssh \
+    --description "BOSH bastion" \
+    --network cf \
+    --target-tags bosh-ssh \
+    --allow tcp:22
+  ```
 
-releases:
-  - name: bosh
-    url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
-    sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
-  - name: bosh-google-cpi
-    url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-0.0.82.tgz
-    sha1: 60cc5b4fba6efda5b7627679b47c6cb2aedfc8d3
+1. Create a bastion VM that you will use to run `bosh-init` and deply the Director:
 
-resource_pools:
-  - name: vms
-    network: private
-    stemcell:
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3218-google-kvm-ubuntu-trusty-go_agent.tgz
-      sha1: 3626815e3fabe8afa7d91362eba1e4c0540795b2
-    cloud_properties:
-      machine_type: n1-standard-4
-      root_disk_size_gb: 40
-      root_disk_type: pd-standard
-      service_scopes:
-        - compute
-        - devstorage.full_control
+  ```
+  $ gcloud compute instances create bosh-bastion \
+      --image ubuntu-14-04 \
+      --subnet bosh \
+      --private-network-ip 10.0.0.200 \
+      --tags bosh-ssh,cf-internal \
+      --scopes cloud-platform \
+      --metadata "startup-script=apt-get update -y ; apt-get upgrade -y ; apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 ; gem install bosh_cli ; curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.94-linux-amd64; chmod +x /usr/bin/bosh-init"
+  ```
 
-disk_pools:
-  - name: disks
-    disk_size: 32_768
-    cloud_properties:
-      type: pd-standard
+#### Deploy BOSH Director
+
+1. SSH to the bastion VM you created in the previous step. All SSH commands after this should be run from the VM:
+
+  ```
+  $ gcloud compute ssh bosh-bastion
+  ```
+
+1. Create a **password-less** SSH key:
+
+  ```
+  $ ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+  ```
+
+1. Navigate to your [project's web console](https://console.cloud.google.com/compute/metadata/sshKeys) and add the new SSH public key by pasting the contents of ~/.ssh/bosh.pub:
+
+  ![](img/add-ssh.png)
+
+  > **Important:** The username field should auto-populate the value `bosh` after you paste the public key. If it does not, be sure there are no newlines or carriage returns being pasted; the value you paste should be a single line.
 
 
-networks:
-  - name: vip
-    type: vip
-  - name: private
-    type: manual
-    subnets:
-    - range: 10.0.0.0/24
-      gateway: 10.0.0.1
-      static: [10.0.0.6-10.0.0.255]
+1. Confirm that `bosh-init` is installed by querying its version:
+
+  ```
+  $ bosh-init -v
+  ```
+
+1. Create and `cd` to a directory:
+
+  ```
+  $ mkdir google-bosh-director
+  $ cd google-bosh-director
+  ```
+
+1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml`:
+
+  ```
+  ---
+  name: bosh
+
+  releases:
+    - name: bosh
+      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
+      sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
+    - name: bosh-google-cpi
+      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-20.tgz
+      sha1: 9b4ada4267f1523f5d278e0813eb055e91ea15ed 
+
+  resource_pools:
+    - name: vms
+      network: private
+      stemcell:
+        url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3218-google-kvm-ubuntu-trusty-go_agent.tgz
+        sha1: 3626815e3fabe8afa7d91362eba1e4c0540795b2 
       cloud_properties:
-        network_name: concourse
-        subnetwork_name: concourse-subnet-1
-        tags:
-          - cf-internal
-          - cf-bosh
+        machine_type: n1-standard-4
+        root_disk_size_gb: 40
+        root_disk_type: pd-standard
+        service_scopes:
+          - compute
+          - devstorage.full_control
 
+  disk_pools:
+    - name: disks
+      disk_size: 32_768
+      cloud_properties:
+        type: pd-standard
 
-jobs:
-  - name: bosh
-    instances: 1
+  networks:
+    - name: vip
+      type: vip
+    - name: private
+      type: manual
+      subnets:
+      - range: 10.0.0.0/29
+        gateway: 10.0.0.1
+        static: [10.0.0.2-10.0.0.7]
+        cloud_properties:
+          network_name: cf
+          subnetwork_name: bosh
+          ephemeral_external_ip: true
+          tags:
+            - cf-internal
 
-    templates:
-      - name: nats
-        release: bosh
-      - name: postgres
-        release: bosh
-      - name: powerdns
-        release: bosh
-      - name: blobstore
-        release: bosh
-      - name: director
-        release: bosh
-      - name: health_monitor
-        release: bosh
-      - name: google_cpi
-        release: bosh-google-cpi
+  jobs:
+    - name: bosh
+      instances: 1
 
-    resource_pool: vms
-    persistent_disk_pool: disks
+      templates:
+        - name: nats
+          release: bosh
+        - name: postgres
+          release: bosh
+        - name: powerdns
+          release: bosh
+        - name: blobstore
+          release: bosh
+        - name: director
+          release: bosh
+        - name: health_monitor
+          release: bosh
+        - name: google_cpi
+          release: bosh-google-cpi
 
+      resource_pool: vms
+      persistent_disk_pool: disks
 
-    networks:
-      - name: vip
-        static_ips: [104.154.108.78]
-      - name: private
-        static_ips: [10.0.0.6]
-        default:
-          - dns
-          - gateway
+      networks:
+        - name: private
+          static_ips: [10.0.0.6]
+          default:
+            - dns
+            - gateway
+
+      properties:
+        nats:
+          address: 127.0.0.1
+          user: nats
+          password: nats-password
+
+        postgres: &db
+          listen_address: 127.0.0.1
+          host: 127.0.0.1
+          user: postgres
+          password: postgres-password
+          database: bosh
+          adapter: postgres
+
+        dns:
+          address: 10.0.0.6
+          domain_name: microbosh
+          db: *db
+          recursor: 169.254.169.254
+
+        blobstore:
+          address: 10.0.0.6
+          port: 25250
+          provider: dav
+          director:
+            user: director
+            password: director-password
+          agent:
+            user: agent
+            password: agent-password
+
+        director:
+          address: 127.0.0.1
+          name: micro-google
+          db: *db
+          cpi_job: google_cpi
+          user_management:
+            provider: local
+            local:
+              users:
+                - name: admin
+                  password: admin
+                - name: hm
+                  password: hm-password
+        hm:
+          director_account:
+            user: hm
+            password: hm-password
+          resurrector_enabled: true
+
+        google: &google_properties
+          project: {{PROJECT_ID}}
+          default_zone: us-central1-f
+
+        agent:
+          mbus: nats://nats:nats-password@10.0.0.6:4222
+          ntp: *ntp
+          blobstore:
+             options:
+               endpoint: http://10.0.0.6:25250
+               user: agent
+               password: agent-password
+
+        ntp: &ntp
+          - 169.254.169.254
+
+  cloud_provider:
+    template:
+      name: google_cpi
+      release: bosh-google-cpi
+
+    ssh_tunnel:
+      host: 10.0.0.6
+      port: 22
+      user: bosh
+      private_key: {{SSH_KEY_PATH}}
+
+    mbus: https://mbus:mbus-password@10.0.0.6:6868
 
     properties:
-      nats:
-        address: 127.0.0.1
-        user: nats
-        password: nats-password
-
-      postgres: &db
-        listen_address: 127.0.0.1
-        host: 127.0.0.1
-        user: postgres
-        password: postgres-password
-        database: bosh
-        adapter: postgres
-
-      dns:
-        address: __STATIC_IP__ # <--- Replace with private static IP
-        domain_name: microbosh
-        db: *db
-        recursor: 8.8.8.8
-
-      blobstore:
-        address: __STATIC_IP__ # <--- Replace with private static IP
-        port: 25250
-        provider: dav
-        director:
-          user: director
-          password: director-password
-        agent:
-          user: agent
-          password: agent-password
-
-      director:
-        address: 127.0.0.1
-        name: micro-google
-        db: *db
-        cpi_job: google_cpi
-        user_management:
-          provider: local
-          local:
-            users:
-              - name: admin
-                password: admin
-              - name: hm
-                password: hm-password
-      hm:
-        director_account:
-          user: hm
-          password: hm-password
-        resurrector_enabled: true
-
-      google: &google_properties
-        project: __GCE_PROJECT__ # <--- Replace with your GCE project
-        default_zone: __GCE_DEFAULT_ZONE__ # <--- Replace with the GCE zone to use by default
-
+      google: *google_properties
       agent:
-        mbus: nats://nats:nats-password@__STATIC_IP__:4222 # <--- Replace with the private static IP
-        ntp: *ntp
+        mbus: https://mbus:mbus-password@0.0.0.0:6868
         blobstore:
-           options:
-             endpoint: http://__STATIC_IP__:25250 # <--- Replace with the private static IP
-             user: agent
-             password: agent-password
+          provider: local
+          options:
+            blobstore_path: /var/vcap/micro_bosh/data/cache
+        ntp: *ntp
+  ```
 
-      ntp: &ntp
-        - 169.254.169.254
+1. Run this `sed` command to insert your Google Cloud Platform project ID into the manifest:
 
-cloud_provider:
-  template:
-    name: google_cpi
-    release: bosh-google-cpi
+  ```
+  sed -i s#{{PROJECT_ID}}#`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`# manifest.yml
+  ```
 
-  ssh_tunnel:
-    host: __STATIC_IP__ # <--- Replace with the private static IP
-    port: 22
-    user: __SSH_USER__ # <--- Replace with the user corresponding to your private SSH key
-    private_key: __PRIVATE_KEY_PATH__ # <--- Replace with the location of your google_compute_engine SSH private key
+1. Run this `sed` command to insert the full path of the SSH private key you created earlier:
 
-  mbus: https://mbus:mbus-password@__STATIC_IP__:6868 # <--- Replace with the private static IP
+  ```
+  sed -i s#{{SSH_KEY_PATH}}#$HOME/.ssh/bosh# manifest.yml
+  ```
 
-  properties:
-    google: *google_properties
-    agent:
-      mbus: https://mbus:mbus-password@0.0.0.0:6868
-      blobstore:
-        provider: local
-        options:
-          blobstore_path: /var/vcap/micro_bosh/data/cache
-      ntp: *ntp
+1. Deploy the new manifest to create a BOSH Director:
 
 ```
+$ bosh-init deploy manifest.yml
+  ```
 
-### Deploy
-
-Initialize the [gcloud](https://cloud.google.com/sdk/gcloud/reference/init) environment if you haven't done so previously. Alternativelly, you can set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable pointing to the JSON file that defines your credentials.
-
-Using the previously created deployment manifest, now we can deploy it:
+1. Target your BOSH environment:
 
 ```
-$ bosh-init deploy google-bosh-manifest.yml
-```
-
-### Install the BOSH CLI
-
-Install the [BOSH CLI](http://bosh.io/docs/bosh-cli.html) tool in your workstation.
-
-Then target your BOSH environment:
-
-```
-$ bosh target <YOUR BOSH IP ADDRESS>
+$ bosh target 10.0.0.6
 ```
 
 Your username is `admin` and password is `admin`.
@@ -267,22 +320,6 @@ Your username is `admin` and password is `admin`.
 * [Deploying Cloud Foundry MySQL Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_mysql.md)
 * [Deploying Cloud Foundry Redis Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_redis.md)
 * [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_concourse.md)
-
-## Contributing
-
-In the spirit of [free software](http://www.fsf.org/licensing/essays/free-sw.html), **everyone** is encouraged to help improve this project.
-
-Here are some ways *you* can contribute:
-
-* by using alpha, beta, and prerelease versions
-* by reporting bugs
-* by suggesting new features
-* by writing or editing documentation
-* by writing specifications
-* by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
-* by refactoring code
-* by closing [issues](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues)
-* by reviewing patches
 
 ### Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
@@ -299,38 +336,3 @@ including your gem version, Ruby version, and operating system. Ideally, a bug r
 3. Implement your feature or bug fix.
 4. Commit and push your changes.
 5. Submit a pull request.
-
-### Create new release
-
-#### Creating a final release
-
-If you need to create a new final release, you will need to get read/write API credentials to the [@cloudfoundry-community](https://github.com/cloudfoundry-community) s3 account.
-
-Please email [Dr Nic Williams](mailto:&#x64;&#x72;&#x6E;&#x69;&#x63;&#x77;&#x69;&#x6C;&#x6C;&#x69;&#x61;&#x6D;&#x73;&#x40;&#x67;&#x6D;&#x61;&#x69;&#x6C;&#x2E;&#x63;&#x6F;&#x6D;) and he will create unique API credentials for you.
-
-Create a `config/private.yml` file with the following contents:
-
-``` yaml
----
-blobstore:
-  s3:
-    access_key_id:     ACCESS
-    secret_access_key: PRIVATE
-```
-
-You can now create final releases for everyone to enjoy!
-
-```
-bosh create release
-# test this dev release
-git commit -m "updated BOSH Google CPI release"
-bosh create release --final
-git commit -m "creating vXYZ release"
-git tag vXYZ
-git push origin master --tags
-```
-
-## Copyright
-
-See [LICENSE](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/LICENSE) for details.
-Copyright (c) 2015-2016 Ferran Rodenas.
