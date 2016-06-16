@@ -260,7 +260,7 @@ resources:
   - name: bosh-cpi-src-out
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      uri: git@github.com:cloudfoundry-incubator/bosh-google-cpi-release.git
       branch: master
       private_key: {{github_deployment_key_bosh_google_cpi_release}}
 
