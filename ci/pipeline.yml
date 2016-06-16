@@ -85,7 +85,7 @@ jobs:
   - name: teardown-infrastructure
     plan:
       - aggregate:
-        - {trigger: false, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
 
       - task: teardown-infrastructure
         file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
@@ -240,7 +240,7 @@ jobs:
             release_blobs_secret_key: {{release_blobs_secret_key}}
 
       - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version, annotate: promoted/annotation_message}
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
 
       - put: bosh-cpi-artifacts
         params:
