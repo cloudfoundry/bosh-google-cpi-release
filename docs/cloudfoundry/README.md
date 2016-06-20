@@ -57,7 +57,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a new subnetwork for public CloudFoundry components:
 
   ```
-  $ gcloud compute networks subnets create cf-public \
+  $ gcloud compute networks subnets create cf-public-us-east1 \
       --network cf \
       --range 10.200.0.0/16 \
       --description "Subnet for public CloudFoundry components" \
@@ -67,11 +67,30 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a new subnetwork for private CloudFoundry components:
 
   ```
-  $ gcloud compute networks subnets create cf-private \
+  $ gcloud compute networks subnets create cf-private-us-east1 \
       --network cf \
       --range 192.168.0.0/16 \
       --description "Subnet for private CloudFoundry components" \
       --region us-central1
+  ```
+
+1. Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
+
+  ```
+  $ gcloud compute firewall-rules create cf-public \
+    --description "Cloud Foundry public traffic" \
+    --network cf \
+    --target-tags cf-public \
+    --allow tcp:80,tcp:443,tcp:2222,tcp:4443
+  ```
+
+  ```
+  $ gcloud compute firewall-rules create cf-internal \
+    --description "Cloud Foundry public traffic" \
+    --network cf \
+    --target-tags cf-internal \
+    --source-tags cf-internal,bosh-internal \
+    --allow tcp,udp,icmp
   ```
 
 1. Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
@@ -146,18 +165,17 @@ You must have the `gcloud` CLI installed on your workstation. See
     --address ${address}
   ```
 
-1. Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
-
-  ```
-  $ gcloud compute firewall-rules create cf-public \
-    --description "Cloud Foundry public traffic" \
-    --network cf \
-    --target-tags cf-public \
-    --allow tcp:80,tcp:443,tcp:2222,tcp:4443
-  ```
+Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
 
 <a name="deploy-cloudfoundry"></a>
-### Deploy Cloud Foundry
+## Deploy Cloud Foundry
+Before working this section, you must have deployed the supporting infrastructure on Google Cloud Platform using either the [automatic](#deploy-automatic) or [manual](deploy-manual) steps provided earlier.
+
+1. SSH to your bastion instance:
+
+  ```
+  $ gcloud compute ssh bosh-bastion
+  ```
 
 1. Target and login into your BOSH environment:
 

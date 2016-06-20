@@ -43,7 +43,7 @@ resource "google_compute_firewall" "cf-internal" {
   }
 
   target_tags = ["cf-internal"]
-  source_tags = ["cf-internal"]
+  source_tags = ["cf-internal", "bosh-internal"]
 }
 
 // Static IP address for forwarding rule

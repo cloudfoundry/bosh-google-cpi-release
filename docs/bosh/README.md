@@ -19,28 +19,54 @@ The following diagram provides an overview of the deployment:
 
 ## Configure your [Google Cloud Platform](https://cloud.google.com/) environment
 
-### Signup and Setup
+### Signup
 1. [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine
 1. [Download and install](https://cloud.google.com/sdk/) the Google Cloud SDK command line tool.
 
-### Configure gcloud
+### Setup
 
-```
-$ gcloud auth login
-$ gcloud config set project REPLACE_WITH_YOUR_PROJECT_ID
-$ gcloud config set compute/zone us-east1-b
-$ gcloud config set compute/region us-east1
-```
+1. Set your project ID:
+
+  ```
+  $ export projectid=REPLACE_WITH_YOUR_PROJECT_ID
+  ```
+
+1. Configure `gcloud`:
+
+  ```
+  $ gcloud auth login
+  $ gcloud config set project ${projectid}
+  $ gcloud config set compute/zone us-east1-b
+  $ gcloud config set compute/region us-east1
+  ```
+  
+1. Create a service account and key:
+
+  ```
+  $ gcloud iam service-accounts create terraform-bosh
+  $ gcloud iam service-accounts keys create /tmp/terraform-bosh.key.json \
+      --iam-account terraform-bosh@${projectid}.iam.gserviceaccount.com
+  ```
+
+1. Grant the new service account editor access to your project:
+
+  ```
+  $ gcloud projects add-iam-policy-binding ${projectid} \
+      --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+      --role roles/editor
+  ```
+
+1. Make your service account's key available in an environment variable to be used by `terraform`:
+
+  ```
+  $ export GOOGLE_CREDENTIALS=$(cat /tmp/terraform-bosh.key.json)
+  ```
 
 <a name="deploy-automatic"></a>
 ## Deploy supporting infrastructure automatically
-The following instructions offer the fastest path to getting BOSH up and
-running on Google Cloud Platform. Using [Terraform](terraform.io), you
-will provision all of the infrastructure required to run BOSH in just a
-few commands.
+The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](terraform.io) you will provision all of the infrastructure required to run BOSH in just a few commands.
 
-If you would like a detailed understanding of what is being created, you may
-follow the instructions in [Deploy supporting infrastructure manually](#deploy-manual).
+If you would like a detailed understanding of what is being created, you may instead follow the instructions in [Deploy supporting infrastructure manually](#deploy-manual).
 
 ### Requirements
 You must have the `terraform` CLI installed on your workstation. See
@@ -121,7 +147,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   $ gcloud compute firewall-rules create bosh-bastion \
     --description "BOSH bastion" \
     --network cf \
-    --target-tags bosh-ssh \
+    --target-tags bosh-bastion \
     --allow tcp:22
   ```
 
@@ -130,7 +156,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
   $ gcloud compute instances create bosh-bastion \
       --image ubuntu-14-04 \
-      --subnet bosh \
+      --subnet bosh-us-east1 \
       --private-network-ip 10.0.0.200 \
       --tags bosh-bastion,bosh-internal \
       --scopes cloud-platform \
@@ -152,6 +178,13 @@ Before working this section, you must have deployed the supporting infrastructur
 
   ```
   $ gcloud compute ssh bosh-bastion
+  ```
+
+1. Configure `gcloud` to use the correct zone and region:
+
+  ```
+  $ gcloud config set compute/zone us-east1-b
+  $ gcloud config set compute/region us-east1
   ```
 
 1. Create a **password-less** SSH key:
