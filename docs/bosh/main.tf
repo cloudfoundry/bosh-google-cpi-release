@@ -1,3 +1,8 @@
+provider "google" {
+    project = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
+    region = "us-east1"
+}
+
 resource "google_compute_network" "cf" {
   name       = "cf"
 }

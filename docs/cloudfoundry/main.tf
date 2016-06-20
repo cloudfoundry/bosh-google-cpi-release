@@ -1,8 +1,3 @@
-provider "google" {
-    project = "evandbrown17"
-    region = "us-east1"
-}
-
 // Subnet for the public Cloud Foundry components
 resource "google_compute_subnetwork" "cf-public-us-east1" {
   name          = "cf-public-us-east1"
