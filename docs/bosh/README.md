@@ -28,7 +28,8 @@ The following diagram provides an overview of the deployment:
 ```
 $ gcloud auth login
 $ gcloud config set project REPLACE_WITH_YOUR_PROJECT_ID
-$ gcloud config set compute/zone us-central1-f
+$ gcloud config set compute/zone us-east1-b
+$ gcloud config set compute/region us-east1
 ```
 
 <a name="deploy-automatic"></a>
@@ -46,9 +47,36 @@ You must have the `terraform` CLI installed on your workstation. See
 [Download Terraform](https://www.terraform.io/downloads.html) for more details.
 
 ### Steps
+1. Download the BOSH terraform file - [main.tf](main.tf) - and save it on your workstation where `terraform` is installed.
+1. Edit `main.tf`, inserting your Google Cloud Project ID on the second line:
+
+  ```
+  provider "google" {
+    project = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
+    region = "us-east1"
+  }
+  ...
+  ```
+
+1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
+
+  ```
+  $ terraform plan
+  ```
+
+1. Create the resources:
+
+  ```
+  $ terraform apply
+  ```
+
+Now you have the infrastructure ready to deploy a BOSH director. Go ahead to the [Deploy BOSH](#deploy-bosh) section to do that. 
 
 <a name="deploy-manual"></a>
 ## Deploy supporting infrastructure manually
+
+> **Note:** Do not follow the steps if you've already completed the [Deploy supporting infrastructure automatically](#deploy-automatic) instructions. Instead, skip ahead to the [Deploy BOSH](#deploy-bosh) section.
+
 The following instructions offer the most detailed path to getting BOSH up and
 running on Google Cloud Platform using the `gcloud` CLI. Although it is
 recommended you use the [Deploy supporting infrastructure automatically](#deploy-automatic)
@@ -116,6 +144,7 @@ curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-ini
 chmod +x /usr/bin/bosh-init"
   ```
 
+<a name="deploy-bosh"></a>
 ## Deploy BOSH
 Before working this section, you must have deployed the supporting infrastructure on Google Cloud Platform using either the [automatic](#deploy-automatic) or [manual](deploy-manual) steps provided earlier.
 
@@ -349,10 +378,10 @@ Your username is `admin` and password is `admin`.
 
 ### Deploy other software
 
-* [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_cf.md)
-* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_mysql.md)
-* [Deploying Cloud Foundry Redis Service on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_redis.md)
-* [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/deploy_concourse.md)
+* [Deploying Cloud Foundry on Google Compute Engine](../cloudfoundry/README.md)
+* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](../deploy_mysql.md)
+* [Deploying Cloud Foundry Redis Service on Google Compute Engine](../deploy_redis.md)
+* [Deploying Concourse on Google Compute Engine](../deploy_concourse.md)
 
 ### Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.

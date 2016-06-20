@@ -1,17 +1,58 @@
 # Deploying Cloud Foundry on Google Compute Engine
 
-In order to deploy [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Compute Engine](https://cloud.google.com/) follow these steps:
+This guide describes how to deploy [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Compute Engine](https://cloud.google.com/) using BOSH. The BOSH director must have been created following the steps in the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide. You must use the same deployment steps here as you did in the BOSH instructions (that is, either __deploy automatically__ or __deploy manually__).
 
-### Prerequisites
 
-This guide assumes that you have deployed a BOSH Director following the instructions at [https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/README.md](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/README.md). In particular, the network provisioning and configuration in that guide is used by the Cloud Foundry deployment in this guide.
+## Prerequisites
+
+* You must have an existing BOSH director and bastion host created by following the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide.
 
 * Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
     - 100 Cores
     - 25 IP addresses
     - 1 Tb persistent disk
 
-### Prepare the Google Compute Engine environment
+<a name="deploy-automatic"></a>
+## Deploy supporting infrastructure automatically
+
+> **Note:** Use this section if you also used the automatic steps in the BOSH deployment instructions.
+
+The following instructions offer the fastest path to getting Cloud Foundry up and running on Google Cloud Platform. Using [Terraform](terraform.io), you will provision all of the infrastructure required to run CloudFoundry injust a few commands.
+
+If you would like a detailed understanding of what is being created, you may
+follow the instructions in [Deploy supporting infrastructure manually](#deploy-manual).
+
+### Requirements
+You must have followed the [Deploy supporting infrastructure automatically](../bosh/README.md#deploy-automatic) steps in the Deploy BOSH on Google Cloud Platform, which used `terraform` to deploy the BOSH director.
+
+### Steps
+1. Download the Cloud Foundry Terraform file - [cloudfoundry.tf](cloudfoundry.tf) - and save it to the same directory where you saved the BOSH director's `main.tf` file.
+1. Use Terraform's `plan` feature to confirm that the new resources will be created:
+
+  ```
+  $ tf plan
+  ```
+
+1. Create the resources
+
+  ```
+  $ tf apply
+  ```
+
+Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
+
+<a name="deploy-manually"></a>
+## Deploy supporting infrastructure manually
+
+> **Note:** Use this section if you also used the manual steps in the BOSH deployment instructions.
+
+> **Note:** Do not follow these steps if you've already completed the [Deploy supporting infrastructure automatically](#deploy-automatic) instructions. Instead, skip ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section.
+
+The following instructions offer the most detailed path to getting Cloud Foundry up and running on Google Cloud Platform using the `gcloud` CLI. Although it is recommended you use the [Deploy supporting infrastructure automatically](#deploy-automatic) instructions for a production environment, these steps can be helpful in understanding exactly what is being provisioned to support your Cloud Foundry environment.
+
+### Requirements
+You must have the `gcloud` CLI installed on your workstation. See
+[https://cloud.google.com/sdk/](https://cloud.google.com/sdk/) for more details.
 
 1. Create a new subnetwork for public CloudFoundry components:
 
@@ -115,7 +156,8 @@ This guide assumes that you have deployed a BOSH Director following the instruct
     --allow tcp:80,tcp:443,tcp:2222,tcp:4443
   ```
 
-### Deploying Cloud Foundry
+<a name="deploy-cloudfoundry"></a>
+### Deploy Cloud Foundry
 
 1. Target and login into your BOSH environment:
 
@@ -141,7 +183,7 @@ This guide assumes that you have deployed a BOSH Director following the instruct
   $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
   ```
 
-1. Download the [cloudfoundry.yml](https://raw.githubusercontent.com/cloudfoundry-incubator/bosh-google-cpi-release/master/docs/cloudfoundry.yml) deployment manifest file and update it with your properties (at the top of the file):
+1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and update it with your properties (at the top of the file):
     - `director_uuid = '{{DIRECTOR_UUID}}'`: replace `{{DIRECTOR_UUID}}` with your BOSH UUID (run `bosh status --uuid`)
     - `vip_ip = 'VIP_IP'`: replace `VIP_IP` with the static IP reserved previously (named `cf`)
 
