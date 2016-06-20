@@ -134,11 +134,11 @@ In order to deploy [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Com
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
 
   ```
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=26
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.338.0
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=55
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1474.0
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=237
+  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=23
+  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.333.0
+  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=36
+  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1454.0
+  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
   ```
 
 1. Download the [cloudfoundry.yml](https://raw.githubusercontent.com/cloudfoundry-incubator/bosh-google-cpi-release/master/docs/cloudfoundry.yml) deployment manifest file and update it with your properties (at the top of the file):
