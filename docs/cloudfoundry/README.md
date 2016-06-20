@@ -30,13 +30,13 @@ You must have followed the [Deploy supporting infrastructure automatically](../b
 1. Use Terraform's `plan` feature to confirm that the new resources will be created:
 
   ```
-  $ tf plan
+  $ terraform plan
   ```
 
 1. Create the resources
 
   ```
-  $ tf apply
+  $ terraform apply
   ```
 
 Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 

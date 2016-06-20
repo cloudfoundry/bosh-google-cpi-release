@@ -412,9 +412,6 @@ Your username is `admin` and password is `admin`.
 ### Deploy other software
 
 * [Deploying Cloud Foundry on Google Compute Engine](../cloudfoundry/README.md)
-* [Deploying Cloud Foundry MySQL Service on Google Compute Engine](../deploy_mysql.md)
-* [Deploying Cloud Foundry Redis Service on Google Compute Engine](../deploy_redis.md)
-* [Deploying Concourse on Google Compute Engine](../deploy_concourse.md)
 
 ### Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
