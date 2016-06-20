@@ -59,9 +59,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
   $ gcloud compute networks subnets create cf-public-us-east1 \
       --network cf \
-      --range 10.200.0.0/16 \
-      --description "Subnet for public CloudFoundry components" \
-      --region us-central1
+      --range 10.200.0.0/16
   ```
 
 1. Create a new subnetwork for private CloudFoundry components:
@@ -69,16 +67,13 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
   $ gcloud compute networks subnets create cf-private-us-east1 \
       --network cf \
-      --range 192.168.0.0/16 \
-      --description "Subnet for private CloudFoundry components" \
-      --region us-central1
+      --range 192.168.0.0/16
   ```
 
 1. Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
   ```
   $ gcloud compute firewall-rules create cf-public \
-    --description "Cloud Foundry public traffic" \
     --network cf \
     --target-tags cf-public \
     --allow tcp:80,tcp:443,tcp:2222,tcp:4443
@@ -86,7 +81,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute firewall-rules create cf-internal \
-    --description "Cloud Foundry public traffic" \
     --network cf \
     --target-tags cf-internal \
     --source-tags cf-internal,bosh-internal \
@@ -109,7 +103,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute http-health-checks create cf-public \
-    --description "Cloud Foundry Public Health Check" \
     --timeout "5s" \
     --check-interval "30s" \
     --healthy-threshold "10" \
@@ -123,7 +116,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute target-pools create cf-public \
-    --description "Cloud Foundry Public Target Pool" \
     --health-check cf-public
   ```
 
@@ -131,7 +123,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute forwarding-rules create cf-http \
-    --description "Cloud Foundry HTTP Traffic" \
     --ip-protocol TCP \
     --port-range 80 \
     --target-pool cf-public \
@@ -140,7 +131,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute forwarding-rules create cf-https \
-    --description "Cloud Foundry HTTPS Traffic" \
     --ip-protocol TCP \
     --port-range 443 \
     --target-pool cf-public \
@@ -149,7 +139,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute forwarding-rules create cf-ssh \
-    --description "Cloud Foundry SSH Traffic" \
     --ip-protocol TCP \
     --port-range 2222 \
     --target-pool cf-public \
@@ -158,7 +147,6 @@ You must have the `gcloud` CLI installed on your workstation. See
 
   ```
   $ gcloud compute forwarding-rules create cf-wss \
-    --description "Cloud Foundry WSS Traffic" \
     --ip-protocol TCP \
     --port-range 4443 \
     --target-pool cf-public \
