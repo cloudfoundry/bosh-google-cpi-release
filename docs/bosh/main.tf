@@ -1,6 +1,16 @@
+variable "region" {
+    type = "string"
+    default = "us-east1"
+}
+
+variable "zone" {
+    type = "string"
+    default = "us-east1-d"
+}
+
 provider "google" {
     project = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
-    region = "us-east1"
+    region = "${var.region}"
 }
 
 resource "google_compute_network" "cf" {
@@ -8,8 +18,8 @@ resource "google_compute_network" "cf" {
 }
 
 // Subnet for the BOSH director
-resource "google_compute_subnetwork" "bosh-us-east1" {
-  name          = "bosh-us-east1"
+resource "google_compute_subnetwork" "bosh-subnet-1" {
+  name          = "bosh-${var.region}"
   ip_cidr_range = "10.0.0.0/24"
   network       = "${google_compute_network.cf.self_link}"
 }
@@ -55,7 +65,7 @@ resource "google_compute_firewall" "bosh-internal" {
 resource "google_compute_instance" "bosh-bastion" {
   name         = "bosh-bastion"
   machine_type = "n1-standard-1"
-  zone         = "us-east1-b"
+  zone         = "${var.zone}"
 
   tags = ["bosh-bastion", "bosh-internal"]
 
@@ -64,7 +74,7 @@ resource "google_compute_instance" "bosh-bastion" {
   }
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.bosh-us-east1.name}"
+    subnetwork = "${google_compute_subnetwork.bosh-subnet-1.name}"
     access_config {
       // Ephemeral IP
     }

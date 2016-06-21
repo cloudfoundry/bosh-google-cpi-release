@@ -1,13 +1,13 @@
 // Subnet for the public Cloud Foundry components
-resource "google_compute_subnetwork" "cf-public-us-east1" {
-  name          = "cf-public-us-east1"
+resource "google_compute_subnetwork" "cf-public-subnet-1" {
+  name          = "cf-public-${var.region}"
   ip_cidr_range = "10.200.0.0/16"
   network       = "${google_compute_network.cf.self_link}"
 }
 
 // Subnet for the private Cloud Foundry components
-resource "google_compute_subnetwork" "cf-private-us-east1" {
-  name          = "cf-private-us-east1"
+resource "google_compute_subnetwork" "cf-private-subnet-1" {
+  name          = "cf-private-${var.region}"
   ip_cidr_range = "192.168.0.0/16"
   network       = "${google_compute_network.cf.self_link}"
 }
