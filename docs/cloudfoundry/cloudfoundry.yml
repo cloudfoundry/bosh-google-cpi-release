@@ -100,6 +100,7 @@ networks:
         tags:
           - cf-public
           - cf-internal
+          - bosh-internal
 
   - name: private
     type: manual
@@ -112,6 +113,7 @@ networks:
         ephemeral_external_ip: true
         tags:
           - cf-internal
+          - bosh-internal
 
   - name: vip
     type: vip
