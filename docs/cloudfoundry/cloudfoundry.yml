@@ -1,10 +1,17 @@
 ---
 <%
+# CF settings
 director_uuid = "{{DIRECTOR_UUID}}"
 vip_ip = "{{VIP_IP}}"
 root_domain = "#{vip_ip}.xip.io"
 common_password = "c1oudc0w"
 deployment_name = "cf"
+
+# Google network settings
+google_region = "us-east1"
+network = "cf"
+public_subnetwork = "cf-public-#{google_region}"
+private_subnetwork = "cf-private-#{google_region}"
 %>
 ssl_cert: &ssl_cert |
   -----BEGIN CERTIFICATE-----
@@ -87,12 +94,13 @@ networks:
     - range: 10.200.0.0/16
       gateway: 10.200.0.1
       cloud_properties:
-        network_name: cf
-        subnetwork_name: cf-public
+        network_name: <%= network%>
+        subnetwork_name: <%= public_subnetwork%>
         ephemeral_external_ip: true
         tags:
           - cf-public
           - cf-internal
+          - bosh-internal
 
   - name: private
     type: manual
@@ -100,12 +108,12 @@ networks:
     - range: 192.168.0.0/16
       gateway: 192.168.0.1
       cloud_properties:
-        network_name: cf
-        subnetwork_name: cf-private
+        network_name: <%= network%>
+        subnetwork_name: <%= private_subnetwork%>
         ephemeral_external_ip: true
         tags:
-          - cf-public
           - cf-internal
+          - bosh-internal
 
   - name: vip
     type: vip
