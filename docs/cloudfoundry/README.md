@@ -27,16 +27,24 @@ You must have followed the [Deploy supporting infrastructure automatically](../b
 
 ### Steps
 1. Download the Cloud Foundry Terraform file - [cloudfoundry.tf](cloudfoundry.tf) - and save it to the same directory where you saved the BOSH director's `main.tf` file.
+
+1. Export your preferred region and zone (you may skip this if already set from the previous BOSH deployment instructions)
+
+  ```
+  $ export region=us-east1
+  $ export zone=us-east1-d
+  ```
+
 1. Use Terraform's `plan` feature to confirm that the new resources will be created:
 
   ```
-  $ terraform plan
+  $ terraform plan -var region=${region} -var zone=${zone}
   ```
 
 1. Create the resources
 
   ```
-  $ terraform apply
+  $ terraform apply -var region=${region} -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
@@ -165,6 +173,13 @@ Before working this section, you must have deployed the supporting infrastructur
   $ gcloud compute ssh bosh-bastion
   ```
 
+1. Export the region and zone on the bastion host:
+
+  ```
+  $ zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+  $ zone=${zone##*/}
+  $ region=${zone%-*}
+
 1. Target and login into your BOSH environment:
 
   ```
@@ -189,16 +204,13 @@ Before working this section, you must have deployed the supporting infrastructur
   $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
   ```
 
-1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and update it with your properties (at the top of the file):
-    - `director_uuid = '{{DIRECTOR_UUID}}'`: replace `{{DIRECTOR_UUID}}` with your BOSH UUID (run `bosh status --uuid`)
-    - `vip_ip = 'VIP_IP'`: replace `VIP_IP` with the static IP reserved previously (named `cf`)
+1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and use `sed` to modify a few values in it:
 
-    * Alternatively, use `sed` to replace these values automatically:
-
-      ```
-      $ sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
-      $ sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
-      ```
+  ```
+  $ sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
+  $ sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
+  $ sed -i s#{{REGION}}#$region# cloudfoundry.yml
+  ```
 
 1. Target the deployment file and deploy:
 

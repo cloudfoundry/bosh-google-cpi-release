@@ -31,13 +31,20 @@ The following diagram provides an overview of the deployment:
   $ export projectid=REPLACE_WITH_YOUR_PROJECT_ID
   ```
 
+1. Export your preferred compute region and zone:
+
+  ```
+  $ export region=us-east1
+  $ export zone=us-east1-d
+  ```
+
 1. Configure `gcloud`:
 
   ```
   $ gcloud auth login
   $ gcloud config set project ${projectid}
-  $ gcloud config set compute/zone us-east1-b
-  $ gcloud config set compute/region us-east1
+  $ gcloud config set compute/zone ${zone}
+  $ gcloud config set compute/region ${region}
   ```
   
 1. Create a service account and key:
@@ -79,21 +86,20 @@ You must have the `terraform` CLI installed on your workstation. See
   ```
   provider "google" {
     project = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
-    region = "us-east1"
+    ...
   }
-  ...
   ```
 
 1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
 
   ```
-  $ terraform plan
+  $ terraform plan -var region=${region} -var zone=${zone}
   ```
 
 1. Create the resources:
 
   ```
-  $ terraform apply
+  $ terraform apply -var region=${region} -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director. Go ahead to the [Deploy BOSH](#deploy-bosh) section to do that. 
@@ -183,8 +189,11 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Configure `gcloud` to use the correct zone and region:
 
   ```
-  $ gcloud config set compute/zone us-east1-b
-  $ gcloud config set compute/region us-east1
+  $ zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+  $ zone=${zone##*/}
+  $ region=${zone%-*}
+  $ gcloud config set compute/zone ${zone}
+  $ gcloud config set compute/region ${region}
   ```
 
 1. Create a **password-less** SSH key:
@@ -258,7 +267,7 @@ Before working this section, you must have deployed the supporting infrastructur
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
           network_name: cf
-          subnetwork_name: bosh-us-east1
+          subnetwork_name: bosh-{{REGION}}
           ephemeral_external_ip: true
           tags:
             - bosh-internal
@@ -345,7 +354,7 @@ Before working this section, you must have deployed the supporting infrastructur
 
         google: &google_properties
           project: {{PROJECT_ID}}
-          default_zone: us-east1-b
+          default_zone: {{ZONE}}
 
         agent:
           mbus: nats://nats:nats-password@10.0.0.6:4222
@@ -393,6 +402,18 @@ Before working this section, you must have deployed the supporting infrastructur
 
   ```
   sed -i s#{{SSH_KEY_PATH}}#$HOME/.ssh/bosh# manifest.yml
+  ```
+
+1. Run this `sed` command to insert the region for your director:
+
+  ```
+  sed -i s#{{REGION}}#$region# manifest.yml
+  ```
+
+1. Run this `sed` command to insert the zone for your director:
+
+  ```
+  sed -i s#{{ZONE}}#$zone# manifest.yml
   ```
 
 1. Deploy the new manifest to create a BOSH Director:

@@ -8,7 +8,7 @@ common_password = "c1oudc0w"
 deployment_name = "cf"
 
 # Google network settings
-google_region = "us-east1"
+google_region = "{{REGION}}"
 network = "cf"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
