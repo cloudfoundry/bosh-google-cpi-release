@@ -34,8 +34,8 @@ resources:
   - name: bosh-cpi-src
     type: git
     source:
-      uri: https://github.com/evandbrown/bosh-google-cpi-release.git
-      branch: heavy-stemcells
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      branch: master
 
   - name: bosh-src
     type: git
