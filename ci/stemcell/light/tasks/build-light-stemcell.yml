@@ -12,7 +12,7 @@ outputs:
   - name: raw-stemcell
 
 run:
-  path: bosh-cpi-src/ci/stemcell/tasks/build-light-stemcell.sh
+  path: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.sh
 
 params:
   BUCKET_NAME: ""

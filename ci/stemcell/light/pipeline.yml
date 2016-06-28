@@ -21,7 +21,7 @@ jobs:
         - {trigger: false, get: bosh-cpi-src}
 
       - task: create-light-stemcell
-        file: bosh-cpi-src/ci/stemcell/tasks/build-light-stemcell.yml
+        file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
         privileged: true
         params:
           BUCKET_NAME:     {{google_stemcells_bucket_name}}
@@ -54,7 +54,7 @@ jobs:
         - {trigger: false, get: bosh-cpi-src}
 
       - task: create-light-stemcell
-        file: bosh-cpi-src/ci/stemcell/tasks/build-light-stemcell.yml
+        file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
         privileged: true
         params:
           BUCKET_NAME:     {{google_stemcells_bucket_name}}
