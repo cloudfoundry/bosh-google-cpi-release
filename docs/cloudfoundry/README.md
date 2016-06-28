@@ -179,6 +179,7 @@ Before working this section, you must have deployed the supporting infrastructur
   $ zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
   $ zone=${zone##*/}
   $ region=${zone%-*}
+  ```
 
 1. Target and login into your BOSH environment:
 
