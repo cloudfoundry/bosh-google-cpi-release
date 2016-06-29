@@ -1,10 +1,6 @@
-# BOSH Google Compute Engine CPI [![Build Status](https://travis-ci.org/frodenas/bosh-google-cpi.png)](https://travis-ci.org/frodenas/bosh-google-cpi)
+# BOSH Google Compute Engine CPI
 
-This is an **experimental** external [BOSH CPI](http://bosh.io/docs/bosh-components.html#cpi) for [Google Compute Engine](https://cloud.google.com/compute/).
-
-## Disclaimer
-
-This is **NOT** presently a production ready CPI. This is a work in progress. It is suitable for experimentation and may not become supported in the future.
+This is an external [BOSH CPI](http://bosh.io/docs/bosh-components.html#cpi) for [Google Compute Engine](https://cloud.google.com/compute/) that is jointly developed by Pivotal and Google.
 
 ## Usage
 
@@ -102,20 +98,19 @@ The BOSH Google Compute Engine CPI supports these [BOSH Networks Types](http://b
 
 | Type    | Description
 |:-------:|:-----------
-| dynamic | To use DHCP assigned IPs by Google Compute Engine
+| manual  | To use manually- or BOSH-assigned private IPs
+| dynamic | To use DHCP-assigned private IPs from Google Compute Engine
 | vip     | To use previously allocated Google Compute Engine Static IPs
 
 
-These options are specified under `cloud_properties` at the [networks](http://bosh.io/docs/networks.html) section of a BOSH deployment manifest and are only valid for `dynamic` networks:
+These options are specified under `cloud_properties` at the [networks](http://bosh.io/docs/networks.html) section of a BOSH deployment manifest and are only valid for `manual` or `dynamic` networks:
 
 | Option                | Required | Type          | Description
 |:----------------------|:--------:|:------------- |:-----------
 | network_name          | N        | String        | The name of the [Google Compute Engine Network](https://cloud.google.com/compute/docs/networking#networks) the CPI will use when creating the instance (if not set, by default it will use the `default` network)
-| subnetwork_name       | N        | String        | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance (if the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field should be specified)
+| subnetwork_name       | N        | String        | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance (if the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field is required)
 | ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default)
 | ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default)
-| target_pool           | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
-| instance_group        | N        | String        | The name of the [Google Compute Engine Instance Group](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups) the instances should be added to
 | tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags
 
 ### BOSH Resource pool options
@@ -134,6 +129,8 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
 | preemptible         | N        | Boolean       | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default)
 | service_scopes      | N        | Array&lt;String&gt; | [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for your default service account that determine the level of access your instance has to other Google services (no scope is assigned to the instance by default)
+| target_pool         | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
+| backend_service     | N        | String        | The name of the [Google Compute Engine Backend Service](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups) the instances should be added to. The backend service must already be configured with an [Instance Group](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups)in the same zone as this instance
 
 ### BOSH Persistent Disks options
 
@@ -143,9 +140,9 @@ These options are specified under `cloud_properties` at the [disk_pools](http://
 |:-------|:--------:|:------ |:-----------
 | type   | N        | String | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview)
 
-## Deployment Manifest Example
+## Deployment Manifest Example - Dynamic Networking
 
-This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest:
+This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with dynamic networking:
 
 ```
 ---
@@ -168,6 +165,63 @@ networks:
       target_pool: my-load-balancer
       tags:
         - bosh
+
+  - name: public
+    type: vip
+    cloud_properties: {}
+...
+
+resource_pools:
+  - name: vms
+    network: private
+    stemcell:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      version: latest
+    cloud_properties:
+      instance_type: n1-standard-2
+      zone: us-central1-a
+      root_disk_size_gb: 20
+      root_disk_type: pd-ssd
+      automatic_restart: false
+      on_host_maintenance: MIGRATE
+      service_scopes:
+        - compute.readonly
+        - devstorage.read_write
+...
+
+disk_pools:
+  - name: disks
+    disk_size: 32_768
+    cloud_properties:
+      type: pd-ssd
+...
+
+```
+
+## Deployment Manifest Example - Manual Networking
+
+This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with manual networking. This assumes you've created a networked named `custom-network` and a subnetwork named `custom-subnetwork` with a CIDR of 10.0.0.0/24:
+
+```
+---
+name: example
+director_uuid: 38ce80c3-e9e9-4aac-ba61-97c676631b91
+
+...
+
+networks:
+  - name: private
+      type: manual
+      subnets:
+      - range: 10.0.0.0/24
+        gateway: 10.0.0.1
+        static: [10.0.0.2-10.0.0.100]
+        cloud_properties:
+          network_name: custom-network
+          subnetwork_name: custom-subnetwork
+          ephemeral_external_ip: true
+          tags:
+            - bosh
 
   - name: public
     type: vip
