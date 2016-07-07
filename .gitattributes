@@ -1,2 +1,3 @@
 config/*.yml -whitespace
+docs/*.tf eol=lf
 releases/*.yml -whitespace
