@@ -3,6 +3,7 @@ package client
 import (
 	"net/http"
 	"os"
+	"time"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -19,6 +20,8 @@ const (
 	computeScope = compute.ComputeScope
 	storageScope = storage.DevstorageFullControlScope
 	metadataHost = "metadata.google.internal"
+	retryMax     = 5
+	retryDelay   = 200
 )
 
 type GoogleClient struct {
@@ -26,6 +29,28 @@ type GoogleClient struct {
 	computeService *compute.Service
 	storageService *storage.Service
 	logger         boshlog.Logger
+}
+
+type RetryTransport struct {
+	Transport http.RoundTripper
+}
+
+func (rt *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	var resp *http.Response
+	var err error
+	var try uint64
+
+	for try = 0; try < retryMax; try++ {
+		resp, err = rt.Transport.RoundTrip(req)
+		if err != nil {
+			break
+		}
+		if resp.StatusCode < 500 || resp.StatusCode > 599 {
+			break
+		}
+		time.Sleep(retryDelay << try * time.Millisecond)
+	}
+	return resp, err
 }
 
 func NewGoogleClient(
@@ -63,12 +88,20 @@ func NewGoogleClient(
 		}
 	}
 
+	// Custom RoundTripper for retries
+	computeClient.Transport = &RetryTransport{
+		Transport: computeClient.Transport,
+	}
 	computeService, err := compute.New(computeClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 	computeService.UserAgent = userAgent
 
+	// Custom RoundTripper for retries
+	storageClient.Transport = &RetryTransport{
+		Transport: computeClient.Transport,
+	}
 	storageService, err := storage.New(storageClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Storage Service client")
