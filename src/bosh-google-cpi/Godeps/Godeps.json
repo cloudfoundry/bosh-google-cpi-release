@@ -1,6 +1,7 @@
 {
 	"ImportPath": "bosh-google-cpi",
 	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
 	"Packages": [
 		"./..."
 	],
@@ -254,11 +255,11 @@
 		},
 		{
 			"ImportPath": "google.golang.org/cloud/compute/metadata",
-			"Rev": "5ff67fe23b1ba3ed2135491d9bb2ca087c84bfde"
+			"Rev": "83ee71d0fec26977bad1662134fa1e8c91268025"
 		},
 		{
 			"ImportPath": "google.golang.org/cloud/internal",
-			"Rev": "5ff67fe23b1ba3ed2135491d9bb2ca087c84bfde"
+			"Rev": "83ee71d0fec26977bad1662134fa1e8c91268025"
 		}
 	]
 }
