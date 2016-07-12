@@ -21,7 +21,7 @@ const (
 	storageScope = storage.DevstorageFullControlScope
 	metadataHost = "metadata.google.internal"
 	retryMax     = 5
-	retryDelay   = 200
+	retryDelay   = 200 * time.Millisecond
 )
 
 type GoogleClient struct {
@@ -48,7 +48,7 @@ func (rt *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		if resp.StatusCode < 500 || resp.StatusCode > 599 {
 			break
 		}
-		time.Sleep(retryDelay << try * time.Millisecond)
+		time.Sleep(retryDelay << try)
 	}
 	return resp, err
 }
