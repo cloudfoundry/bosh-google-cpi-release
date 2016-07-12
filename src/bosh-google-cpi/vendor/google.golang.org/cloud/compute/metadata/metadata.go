@@ -27,11 +27,27 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
 
+	"golang.org/x/net/context"
+	"golang.org/x/net/context/ctxhttp"
+
 	"google.golang.org/cloud/internal"
+)
+
+const (
+	// metadataIP is the documented metadata server IP address.
+	metadataIP = "169.254.169.254"
+
+	// metadataHostEnv is the environment variable specifying the
+	// GCE metadata hostname.  If empty, the default value of
+	// metadataIP ("169.254.169.254") is used instead.
+	// This is variable name is not defined by any spec, as far as
+	// I know; it was made up for the Go package.
+	metadataHostEnv = "GCE_METADATA_HOST"
 )
 
 type cachedValue struct {
@@ -52,10 +68,10 @@ var (
 		Transport: &internal.Transport{
 			Base: &http.Transport{
 				Dial: (&net.Dialer{
-					Timeout:   750 * time.Millisecond,
+					Timeout:   2 * time.Second,
 					KeepAlive: 30 * time.Second,
 				}).Dial,
-				ResponseHeaderTimeout: 750 * time.Millisecond,
+				ResponseHeaderTimeout: 2 * time.Second,
 			},
 		},
 	}
@@ -63,7 +79,7 @@ var (
 		Transport: &internal.Transport{
 			Base: &http.Transport{
 				Dial: (&net.Dialer{
-					Timeout:   750 * time.Millisecond,
+					Timeout:   2 * time.Second,
 					KeepAlive: 30 * time.Second,
 				}).Dial,
 			},
@@ -104,14 +120,14 @@ func getETag(client *http.Client, suffix string) (value, etag string, err error)
 	// deployments. To enable spoofing of the metadata service, the environment
 	// variable GCE_METADATA_HOST is first inspected to decide where metadata
 	// requests shall go.
-	host := os.Getenv("GCE_METADATA_HOST")
+	host := os.Getenv(metadataHostEnv)
 	if host == "" {
 		// Using 169.254.169.254 instead of "metadata" here because Go
 		// binaries built with the "netgo" tag and without cgo won't
 		// know the search suffix for "metadata" is
 		// ".google.internal", and this IP address is documented as
 		// being stable anyway.
-		host = "169.254.169.254"
+		host = metadataIP
 	}
 	url := "http://" + host + "/computeMetadata/v1/" + suffix
 	req, _ := http.NewRequest("GET", url, nil)
@@ -157,29 +173,97 @@ func (c *cachedValue) get() (v string, err error) {
 	return
 }
 
-var onGCE struct {
-	sync.Mutex
-	set bool
-	v   bool
-}
+var (
+	onGCEOnce sync.Once
+	onGCE     bool
+)
 
 // OnGCE reports whether this process is running on Google Compute Engine.
 func OnGCE() bool {
-	defer onGCE.Unlock()
-	onGCE.Lock()
-	if onGCE.set {
-		return onGCE.v
-	}
-	onGCE.set = true
+	onGCEOnce.Do(initOnGCE)
+	return onGCE
+}
 
-	// We use the DNS name of the metadata service here instead of the IP address
-	// because we expect that to fail faster in the not-on-GCE case.
-	res, err := metaClient.Get("http://metadata.google.internal")
-	if err != nil {
+func initOnGCE() {
+	onGCE = testOnGCE()
+}
+
+func testOnGCE() bool {
+	// The user explicitly said they're on GCE, so trust them.
+	if os.Getenv(metadataHostEnv) != "" {
+		return true
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	resc := make(chan bool, 2)
+
+	// Try two strategies in parallel.
+	// See https://github.com/GoogleCloudPlatform/gcloud-golang/issues/194
+	go func() {
+		res, err := ctxhttp.Get(ctx, metaClient, "http://"+metadataIP)
+		if err != nil {
+			resc <- false
+			return
+		}
+		defer res.Body.Close()
+		resc <- res.Header.Get("Metadata-Flavor") == "Google"
+	}()
+
+	go func() {
+		addrs, err := net.LookupHost("metadata.google.internal")
+		if err != nil || len(addrs) == 0 {
+			resc <- false
+			return
+		}
+		resc <- strsContains(addrs, metadataIP)
+	}()
+
+	tryHarder := systemInfoSuggestsGCE()
+	if tryHarder {
+		res := <-resc
+		if res {
+			// The first strategy succeeded, so let's use it.
+			return true
+		}
+		// Wait for either the DNS or metadata server probe to
+		// contradict the other one and say we are running on
+		// GCE. Give it a lot of time to do so, since the system
+		// info already suggests we're running on a GCE BIOS.
+		timer := time.NewTimer(5 * time.Second)
+		defer timer.Stop()
+		select {
+		case res = <-resc:
+			return res
+		case <-timer.C:
+			// Too slow. Who knows what this system is.
+			return false
+		}
+	}
+
+	// There's no hint from the system info that we're running on
+	// GCE, so use the first probe's result as truth, whether it's
+	// true or false. The goal here is to optimize for speed for
+	// users who are NOT running on GCE. We can't assume that
+	// either a DNS lookup or an HTTP request to a blackholed IP
+	// address is fast. Worst case this should return when the
+	// metaClient's Transport.ResponseHeaderTimeout or
+	// Transport.Dial.Timeout fires (in two seconds).
+	return <-resc
+}
+
+// systemInfoSuggestsGCE reports whether the local system (without
+// doing network requests) suggests that we're running on GCE. If this
+// returns true, testOnGCE tries a bit harder to reach its metadata
+// server.
+func systemInfoSuggestsGCE() bool {
+	if runtime.GOOS != "linux" {
+		// We don't have any non-Linux clues available, at least yet.
 		return false
 	}
-	onGCE.v = res.Header.Get("Metadata-Flavor") == "Google"
-	return onGCE.v
+	slurp, _ := ioutil.ReadFile("/sys/class/dmi/id/product_name")
+	return strings.TrimSpace(string(slurp)) == "Google"
 }
 
 // Subscribe subscribes to a value from the metadata service.
@@ -341,4 +425,13 @@ func Scopes(serviceAccount string) ([]string, error) {
 		serviceAccount = "default"
 	}
 	return lines("instance/service-accounts/" + serviceAccount + "/scopes")
+}
+
+func strsContains(ss []string, s string) bool {
+	for _, v := range ss {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }
