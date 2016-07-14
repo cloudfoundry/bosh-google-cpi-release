@@ -200,12 +200,6 @@ jobs:
 
       agent:
         mbus: nats://nats:nats-password@${google_address_static_director}:4222
-        ntp: *ntp
-        blobstore:
-           options:
-             endpoint: http://${google_address_static_director}:25250
-             user: agent
-             password: agent-password
 
       ntp: &ntp
         - 169.254.169.254
@@ -227,11 +221,11 @@ cloud_provider:
     google: *google_properties
     agent:
       mbus: https://mbus:mbus-password@0.0.0.0:6868
-      blobstore:
-        provider: local
-        options:
-          blobstore_path: /var/vcap/micro_bosh/data/cache
-      ntp: *ntp
+    blobstore:
+      provider: local
+      options:
+        blobstore_path: /var/vcap/micro_bosh/data/cache
+    ntp: *ntp
 EOF
 
 pushd ${deployment_dir}

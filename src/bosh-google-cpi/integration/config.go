@@ -49,10 +49,10 @@ var (
 	  },
 	  "actions": {
 		"agent": {
-		  "mbus": "http://127.0.0.1",
-		  "blobstore": {
+		  "mbus": "http://127.0.0.1"
+		},
+		"blobstore": {
 			"type": "local"
-		  }
 		},
 		"registry": {
 		  "use_gce_metadata": true

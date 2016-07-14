@@ -8,12 +8,6 @@ import (
 type AgentOptions struct {
 	// Mbus URI
 	Mbus string
-
-	// List of NTP servers
-	Ntp []string
-
-	// Blobstore options
-	Blobstore BlobstoreOptions
 }
 
 // BlobstoreOptions are the blobstore options passed to the BOSH Agent (http://bosh.io/docs/bosh-components.html#agent).
@@ -29,11 +23,6 @@ type BlobstoreOptions struct {
 func (o AgentOptions) Validate() error {
 	if o.Mbus == "" {
 		return bosherr.Error("Must provide a non-empty Mbus")
-	}
-
-	err := o.Blobstore.Validate()
-	if err != nil {
-		return bosherr.WrapError(err, "Validating Blobstore configuration")
 	}
 
 	return nil

@@ -110,7 +110,7 @@ type VMSettings struct {
 }
 
 // NewAgentSettings creates new agent settings for a VM.
-func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSettings, env EnvSettings, agentOptions AgentOptions) AgentSettings {
+func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSettings, env EnvSettings, agentOptions AgentOptions, blobstoreOptions BlobstoreOptions, ntp []string) AgentSettings {
 	agentSettings := AgentSettings{
 		AgentID: agentID,
 		Disks: DisksSettings{
@@ -118,13 +118,13 @@ func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSet
 			Persistent: map[string]PersistentSettings{},
 		},
 		Blobstore: BlobstoreSettings{
-			Provider: agentOptions.Blobstore.Type,
-			Options:  agentOptions.Blobstore.Options,
+			Provider: blobstoreOptions.Type,
+			Options:  blobstoreOptions.Options,
 		},
 		Env:      EnvSettings(env),
 		Mbus:     agentOptions.Mbus,
 		Networks: networksSettings,
-		Ntp:      agentOptions.Ntp,
+		Ntp:      ntp,
 		VM: VMSettings{
 			Name: vmCID,
 		},

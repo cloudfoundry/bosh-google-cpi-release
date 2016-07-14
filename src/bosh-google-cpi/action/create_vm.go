@@ -23,6 +23,8 @@ type CreateVM struct {
 	registryClient        registry.Client
 	registryOptions       registry.ClientOptions
 	agentOptions          registry.AgentOptions
+	blobstoreOptions      registry.BlobstoreOptions
+	ntp                   []string
 	defaultRootDiskSizeGb int
 	defaultRootDiskType   string
 	defaultZone           string
@@ -37,19 +39,23 @@ func NewCreateVM(
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
+	blobstoreOptions registry.BlobstoreOptions,
+	ntp []string,
 	defaultRootDiskSizeGb int,
 	defaultRootDiskType string,
 	defaultZone string,
 ) CreateVM {
 	return CreateVM{
-		vmService:             vmService,
-		diskService:           diskService,
-		diskTypeService:       diskTypeService,
-		imageService:          imageService,
-		machineTypeService:    machineTypeService,
-		registryClient:        registryClient,
-		registryOptions:       registryOptions,
-		agentOptions:          agentOptions,
+		vmService:          vmService,
+		diskService:        diskService,
+		diskTypeService:    diskTypeService,
+		imageService:       imageService,
+		machineTypeService: machineTypeService,
+		registryClient:     registryClient,
+		registryOptions:    registryOptions,
+		agentOptions:       agentOptions,
+		blobstoreOptions:   blobstoreOptions,
+		ntp:                ntp,
 		defaultRootDiskSizeGb: defaultRootDiskSizeGb,
 		defaultRootDiskType:   defaultRootDiskType,
 		defaultZone:           defaultZone,
@@ -121,7 +127,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Create VM settings
 	agentNetworks := networks.AsRegistryNetworks()
-	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
+	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions, cv.blobstoreOptions, cv.ntp)
 	if err = cv.registryClient.Update(vm, agentSettings); err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating VM")
 	}

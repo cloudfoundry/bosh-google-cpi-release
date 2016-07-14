@@ -38,6 +38,8 @@ var _ = Describe("CreateVM", func() {
 		defaultRootDiskType      string
 		registryOptions          registry.ClientOptions
 		agentOptions             registry.AgentOptions
+		blobstore                registry.BlobstoreOptions
+		ntp                      []string
 		expectedVMProps          *instance.Properties
 		expectedInstanceNetworks instance.Networks
 		expectedAgentSettings    registry.AgentSettings
@@ -68,9 +70,9 @@ var _ = Describe("CreateVM", func() {
 		}
 		agentOptions = registry.AgentOptions{
 			Mbus: "http://fake-mbus",
-			Blobstore: registry.BlobstoreOptions{
-				Type: "fake-blobstore-type",
-			},
+		}
+		blobstore = registry.BlobstoreOptions{
+			Type: "fake-blobstore-type",
 		}
 		defaultRootDiskSizeGb = 0
 		defaultRootDiskType = ""
@@ -83,6 +85,8 @@ var _ = Describe("CreateVM", func() {
 			registryClient,
 			registryOptions,
 			agentOptions,
+			blobstore,
+			ntp,
 			defaultRootDiskSizeGb,
 			defaultRootDiskType,
 			"fake-default-zone",
@@ -380,6 +384,8 @@ var _ = Describe("CreateVM", func() {
 					registryClient,
 					registryOptions,
 					agentOptions,
+					blobstore,
+					ntp,
 					defaultRootDiskSizeGb,
 					defaultRootDiskType,
 					"fake-default-zone",
@@ -443,6 +449,8 @@ var _ = Describe("CreateVM", func() {
 					registryClient,
 					registryOptions,
 					agentOptions,
+					blobstore,
+					ntp,
 					defaultRootDiskSizeGb,
 					defaultRootDiskType,
 					"fake-default-zone",

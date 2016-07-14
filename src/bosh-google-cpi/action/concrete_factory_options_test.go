@@ -16,10 +16,10 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 		validOptions = ConcreteFactoryOptions{
 			Agent: registry.AgentOptions{
 				Mbus: "fake-mbus",
-				Ntp:  []string{},
-				Blobstore: registry.BlobstoreOptions{
-					Type: "fake-blobstore-type",
-				},
+			},
+			Ntp: []string{},
+			Blobstore: registry.BlobstoreOptions{
+				Type: "fake-blobstore-type",
 			},
 			Registry: registry.ClientOptions{
 				Protocol: "http",

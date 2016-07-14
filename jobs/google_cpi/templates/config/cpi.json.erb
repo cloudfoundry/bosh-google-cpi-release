@@ -10,11 +10,11 @@ JSON.dump(
   "actions" => {
     "agent" => {
       "mbus" => p("agent.mbus"),
-      "ntp"  => p("agent.ntp"),
-      "blobstore" => {
-        "type"    => p("agent.blobstore.provider"),
-        "options" => p("agent.blobstore.options"),
-      },
+    },
+    "ntp"  => p("ntp"),
+    "blobstore" => {
+      "type"    => p("blobstore.provider"),
+      "options" => p("blobstore.options"),
     },
     "registry" => {
       "use_gce_metadata" => true,

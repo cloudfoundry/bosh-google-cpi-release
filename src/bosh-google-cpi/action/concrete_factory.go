@@ -167,6 +167,8 @@ func NewConcreteFactory(
 				registryClient,
 				options.Registry,
 				options.Agent,
+				options.Blobstore,
+				options.Ntp,
 				googleClient.DefaultRootDiskSizeGb(),
 				googleClient.DefaultRootDiskType(),
 				googleClient.DefaultZone(),

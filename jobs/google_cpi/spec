@@ -29,13 +29,13 @@ properties:
 
   agent.mbus:
     description: "Mbus URL used by deployed BOSH agents"
-  agent.ntp:
+  ntp:
     description: "NTP configuration used by deployed BOSH agents"
     default: []
-  agent.blobstore.provider:
+  blobstore.provider:
     description: "Provider type for the blobstore used by deployed BOSH agents (e.g. dav, s3)"
     default: "dav"
-  agent.blobstore.options:
+  blobstore.options:
     description: "Options for the blobstore used by deployed BOSH agents"
     default: {}
 
