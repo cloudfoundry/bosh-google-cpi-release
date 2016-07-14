@@ -3,6 +3,7 @@ groups:
   - name: bosh-google-stemcell
     jobs:
       - ubuntu-trusty-stemcell
+      - ubuntu-trusty-stemcell-google
       - centos-7-stemcell
 
   - name: ubuntu
@@ -18,6 +19,39 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, get: stemcell, resource: ubuntu-stemcells}
+        - {trigger: false, get: bosh-cpi-src}
+
+      - task: create-light-stemcell
+        file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
+        privileged: true
+        params:
+          BUCKET_NAME:     {{google_stemcells_bucket_name}}
+
+      - aggregate:
+        - put: bosh-ubuntu-raw-stemcells
+          params:
+            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+            predefined_acl: "publicRead"
+
+        - put: bosh-ubuntu-light-stemcells
+          params:
+            file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
+            predefined_acl: "publicRead"
+
+        - put: bosh-ubuntu-raw-stemcells-sha1
+          params:
+            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+            predefined_acl: "publicRead"
+
+        - put: bosh-ubuntu-light-stemcells-sha1
+          params:
+            file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz.sha1
+            predefined_acl: "publicRead"
+
+  - name: ubuntu-trusty-stemcell-google
+    plan:
+      - aggregate:
+        - {trigger: true, get: stemcell, resource: ubuntu-stemcells-google}
         - {trigger: false, get: bosh-cpi-src}
 
       - task: create-light-stemcell
@@ -98,6 +132,13 @@ resources:
     source:
       regexp: bosh-stemcell-(.+)-google-kvm-ubuntu-trusty-go_agent.tgz
       bucket: bosh-google-stemcells-dev
+
+  - name: ubuntu-stemcells-google
+    type: gcs-resource
+    source:
+      json_key: {{google_json_key_data}}
+      bucket:   {{google_stemcells_bucket_name}}
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource

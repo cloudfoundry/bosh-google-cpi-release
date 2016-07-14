@@ -40,8 +40,8 @@ resources:
   - name: bosh-src
     type: git
     source:
-      uri: https://github.com/evandbrown/bosh.git
-      branch: google-stemcell
+      uri: https://github.com/cloudfoundry/bosh.git
+      branch: develop
 
   - name: google-kvm-ubuntu-trusty
     type: gcs-resource
