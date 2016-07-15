@@ -100,7 +100,7 @@ func NewGoogleClient(
 
 	// Custom RoundTripper for retries
 	storageClient.Transport = &RetryTransport{
-		Transport: computeClient.Transport,
+		Transport: storageClient.Transport,
 	}
 	storageService, err := storage.New(storageClient)
 	if err != nil {
