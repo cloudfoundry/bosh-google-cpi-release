@@ -16,4 +16,8 @@ pushd bosh-cpi-src
   bosh create release --name ${cpi_release_name} --version ${semver} --with-tarball
 popd
 
-mv bosh-cpi-src/dev_releases/${cpi_release_name}/${cpi_release_name}-${semver}.tgz candidate/
+image_path=bosh-cpi-src/dev_releases/${cpi_release_name}/${cpi_release_name}-${semver}.tgz
+echo -n $(sha1sum $image_path | awk '{print $1}') > $image_path.sha1
+
+mv ${image_path} candidate/
+mv ${image_path}.sha1 candidate/
