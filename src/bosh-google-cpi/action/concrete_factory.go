@@ -5,6 +5,7 @@ import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
+	"bosh-google-cpi/config"
 	"bosh-google-cpi/google/address_service"
 	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/client"
@@ -29,7 +30,7 @@ type ConcreteFactory struct {
 func NewConcreteFactory(
 	googleClient client.GoogleClient,
 	uuidGen boshuuid.Generator,
-	options ConcreteFactoryOptions,
+	cfg config.Config,
 	logger boshlog.Logger,
 ) ConcreteFactory {
 	operationService := operation.NewGoogleOperationService(
@@ -89,16 +90,16 @@ func NewConcreteFactory(
 	// Choose the correct registry.Client based on the
 	// value of ClientOptions.UseGCEMetadata
 	var registryClient registry.Client
-	switch options.Registry.UseGCEMetadata {
+	switch cfg.Cloud.Properties.Registry.UseGCEMetadata {
 	case true:
 		registryClient = registry.NewMetadataClient(
 			googleClient,
-			options.Registry,
+			cfg.Cloud.Properties.Registry,
 			logger,
 		)
 	default:
 		registryClient = registry.NewHTTPClient(
-			options.Registry,
+			cfg.Cloud.Properties.Registry,
 			logger,
 		)
 	}
@@ -165,8 +166,8 @@ func NewConcreteFactory(
 				imageService,
 				machineTypeService,
 				registryClient,
-				options.Registry,
-				options.Agent,
+				cfg.Cloud.Properties.Registry,
+				cfg.Cloud.Properties.Agent,
 				googleClient.DefaultRootDiskSizeGb(),
 				googleClient.DefaultRootDiskType(),
 				googleClient.DefaultZone(),

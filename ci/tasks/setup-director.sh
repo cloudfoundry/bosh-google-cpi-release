@@ -225,13 +225,9 @@ cloud_provider:
 
   properties:
     google: *google_properties
-    agent:
-      mbus: https://mbus:mbus-password@0.0.0.0:6868
-      blobstore:
-        provider: local
-        options:
-          blobstore_path: /var/vcap/micro_bosh/data/cache
-      ntp: *ntp
+    agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
+    blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
+    ntp: *ntp
 EOF
 
 pushd ${deployment_dir}

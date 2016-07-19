@@ -27,14 +27,28 @@ properties:
     description: "The name of the default Google Compute Engine Disk Type the CPI will use when creating the instances root disk"
     default: ""
 
+  blobstore.provider:
+    description: Provider of the blobstore used by director and agent (dav|simple)
+    default: 'dav'
+  blobstore.path:
+    description: local blobstore path
+  blobstore.address:
+    description: Address of blobstore server used by simple blobstore plugin
+  blobstore.port:
+    description: Port of blobstore server used by simple blobstore plugin
+    default: 25250
+  blobstore.agent.user:
+    description: Username agent uses to connect to blobstore used by simple blobstore plugin
+  blobstore.agent.password:
+    description: Password agent uses to connect to blobstore used by simple blobstore plugin
+    
+  ntp:
+    description: List of ntp server IPs
+    default:
+      - 169.254.169.254
+
   agent.mbus:
     description: "Mbus URL used by deployed BOSH agents"
-  agent.ntp:
-    description: "NTP configuration used by deployed BOSH agents"
-    default: []
-  agent.blobstore.provider:
-    description: "Provider type for the blobstore used by deployed BOSH agents (e.g. dav, s3)"
-    default: "dav"
   agent.blobstore.options:
     description: "Options for the blobstore used by deployed BOSH agents"
     default: {}
