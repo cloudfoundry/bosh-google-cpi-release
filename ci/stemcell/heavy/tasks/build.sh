@@ -59,6 +59,11 @@ sudo --preserve-env --set-home --user ubuntu -- /bin/bash --login -i <<SUDO
 SUDO
 
 image_name=bosh-stemcell-${CANDIDATE_BUILD_NUMBER}-google-kvm-${OS_NAME}-${OS_VERSION}-go_agent.tgz
+raw_image_name=bosh-stemcell-${CANDIDATE_BUILD_NUMBER}-google-kvm-${OS_NAME}-${OS_VERSION}-go_agent-raw.tgz
 image_path=stemcell/$image_name
+raw_image_path=stemcell/$raw_image_name
 mv /mnt/stemcells/google/kvm/${OS_NAME}/work/work/$image_name $image_path
+mv /mnt/stemcells/google/kvm/${OS_NAME}/work/work/$raw_image_name $raw_image_path
+
 echo -n $(sha1sum $image_path | awk '{print $1}') > $image_path.sha1
+echo -n $(sha1sum $raw_image_path | awk '{print $1}') > $raw_image_path.sha1
