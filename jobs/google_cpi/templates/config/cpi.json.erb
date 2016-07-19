@@ -1,24 +1,70 @@
 <%=
-JSON.dump(
-  "google" => {
-    "project" => p("google.project"),
-    "default_zone" => p("google.default_zone"),
-    "json_key" => p("google.json_key"),
-    "default_root_disk_size_gb" => p("google.default_root_disk_size_gb"),
-    "default_root_disk_type" => p("google.default_root_disk_type"),
-  },
-  "actions" => {
-    "agent" => {
-      "mbus" => p("agent.mbus"),
-      "ntp"  => p("agent.ntp"),
-      "blobstore" => {
-        "type"    => p("agent.blobstore.provider"),
-        "options" => p("agent.blobstore.options"),
+params = {
+  "cloud" => {
+    "plugin" => "google",
+    "properties" => {
+      "google" => {
+        "project" => p("google.project"),
+        "default_zone" => p("google.default_zone"),
+        "json_key" => p("google.json_key"),
+        "default_root_disk_size_gb" => p("google.default_root_disk_size_gb"),
+        "default_root_disk_type" => p("google.default_root_disk_type")
       },
-    },
-    "registry" => {
-      "use_gce_metadata" => true,
-    },
+      "registry" => {
+        "use_gce_metadata" => true
+      },
+      "agent" => {
+        "ntp" => p('ntp')
+      }
+    }
   }
-)
+}
+
+if_p('google.project') do |project|
+  params["cloud"]["properties"]["google"]["project"] = project
+end
+if_p('google.default_zone') do |default_zone|
+  params["cloud"]["properties"]["google"]["default_zone"] = default_zone
+end
+if_p('google.json_key') do |json_key|
+  params["cloud"]["properties"]["google"]["json_key"] = json_key
+end
+if_p('google.default_root_disk_size_gb') do |default_root_disk_size_gb|
+  params["cloud"]["properties"]["google"]["default_root_disk_size_gb"] = default_root_disk_size_gb
+end
+if_p('google.default_root_disk_type') do |default_root_disk_type|
+  params["cloud"]["properties"]["google"]["default_root_disk_type"] = default_root_disk_type
+end
+
+
+agent_params = params["cloud"]["properties"]["agent"]
+
+if_p('blobstore') do
+  agent_params["blobstore"] = {
+       "provider" => p('blobstore.provider'),
+       "options" => {}
+  }
+
+  blobstore = agent_params["blobstore"]
+
+  if p('blobstore.provider') == 'local'
+    blobstore["options"] = {
+      "blobstore_path" => p('blobstore.path')
+    }
+  else
+    blobstore["options"] = {
+      "endpoint" => "http://#{p(['agent.blobstore.address', 'blobstore.address'])}:#{p('blobstore.port')}",
+      "user" => p('blobstore.agent.user'),
+      "password" => p('blobstore.agent.password')
+    }
+  end
+end
+
+if_p('agent.mbus') do |mbus|
+  agent_params["mbus"] = mbus
+end.else_if_p('nats') do
+  agent_params["mbus"] = "nats://#{p('nats.user')}:#{p('nats.password')}@#{p(['agent.nats.address', 'nats.address'])}:#{p('nats.port')}"
+end
+
+JSON.dump(params)
 %>

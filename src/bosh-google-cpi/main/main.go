@@ -35,13 +35,13 @@ func main() {
 
 	flag.Parse()
 
-	config, err := config.NewConfigFromPath(*configFileOpt, fs)
+	cfg, err := config.NewConfigFromPath(*configFileOpt, fs)
 	if err != nil {
 		logger.Error(mainLogTag, "Loading config - %s", err.Error())
 		os.Exit(1)
 	}
 
-	dispatcher, err := buildDispatcher(config, logger, fs, cmdRunner, uuidGen)
+	dispatcher, err := buildDispatcher(cfg, logger, fs, cmdRunner, uuidGen)
 	if err != nil {
 		logger.Error(mainLogTag, "Building Dispatcher - %s", err)
 		os.Exit(1)
@@ -70,13 +70,13 @@ func basicDeps() (api.MultiLogger, boshsys.FileSystem, boshsys.CmdRunner, boshuu
 }
 
 func buildDispatcher(
-	config config.Config,
+	cfg config.Config,
 	logger api.MultiLogger,
 	fs boshsys.FileSystem,
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,
 ) (dispatcher.Dispatcher, error) {
-	googleClient, err := client.NewGoogleClient(config.Google, logger)
+	googleClient, err := client.NewGoogleClient(cfg.Cloud.Properties.Google, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func buildDispatcher(
 	actionFactory := action.NewConcreteFactory(
 		googleClient,
 		uuidGen,
-		config.Actions,
+		cfg,
 		logger,
 	)
 

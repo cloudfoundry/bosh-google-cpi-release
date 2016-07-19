@@ -118,7 +118,7 @@ func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSet
 			Persistent: map[string]PersistentSettings{},
 		},
 		Blobstore: BlobstoreSettings{
-			Provider: agentOptions.Blobstore.Type,
+			Provider: agentOptions.Blobstore.Provider,
 			Options:  agentOptions.Blobstore.Options,
 		},
 		Env:      EnvSettings(env),

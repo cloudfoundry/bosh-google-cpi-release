@@ -18,7 +18,7 @@ var _ = Describe("ConcreteFactoryOptions", func() {
 				Mbus: "fake-mbus",
 				Ntp:  []string{},
 				Blobstore: registry.BlobstoreOptions{
-					Type: "fake-blobstore-type",
+					Provider: "fake-blobstore-type",
 				},
 			},
 			Registry: registry.ClientOptions{

@@ -18,8 +18,8 @@ type AgentOptions struct {
 
 // BlobstoreOptions are the blobstore options passed to the BOSH Agent (http://bosh.io/docs/bosh-components.html#agent).
 type BlobstoreOptions struct {
-	// Blobstore type
-	Type string
+	// Blobstore provider
+	Provider string
 
 	// Blobstore options
 	Options map[string]interface{}
@@ -41,7 +41,7 @@ func (o AgentOptions) Validate() error {
 
 // Validate validates the Blobstore options.
 func (o BlobstoreOptions) Validate() error {
-	if o.Type == "" {
+	if o.Provider == "" {
 		return bosherr.Error("Must provide non-empty Type")
 	}
 

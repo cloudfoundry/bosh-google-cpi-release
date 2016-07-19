@@ -43,19 +43,22 @@ var (
 	region               = envOrDefault("REGION", "us-central1")
 
 	cfgContent = fmt.Sprintf(`{
-	  "google": {
-		"project": "%v",
-		"default_zone": "%v"
-	  },
-	  "actions": {
-		"agent": {
-		  "mbus": "http://127.0.0.1",
-		  "blobstore": {
-			"type": "local"
+	  "cloud": {
+		"plugin": "google",
+		"properties": {
+		  "google": {
+			"project": "%v",
+			"default_zone": "%v"
+		  },
+		  "agent": {
+			"mbus": "http://127.0.0.1",
+			"blobstore": {
+			  "provider": "local"
+			}
+		  },
+		  "registry": {
+			"use_gce_metadata": true
 		  }
-		},
-		"registry": {
-		  "use_gce_metadata": true
 		}
 	  }
 	}`, googleProject, zone)
@@ -63,12 +66,12 @@ var (
 
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
-	var config boshcfg.Config
+	var cfg boshcfg.Config
 	var in, out, errOut, errOutLog bytes.Buffer
 	var boshResponse boshdisp.Response
 	var googleClient client.GoogleClient
 
-	if config, err = boshcfg.NewConfigFromString(cfgContent); err != nil {
+	if cfg, err = boshcfg.NewConfigFromString(cfgContent); err != nil {
 		return boshResponse, err
 	}
 
@@ -76,14 +79,14 @@ func execCPI(request string) (boshdisp.Response, error) {
 	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, multiWriter, multiWriter)
 	multiLogger := boshapi.MultiLogger{Logger: logger, LogBuff: &errOutLog}
 	uuidGen := uuid.NewGenerator()
-	if googleClient, err = client.NewGoogleClient(config.Google, multiLogger); err != nil {
+	if googleClient, err = client.NewGoogleClient(cfg.Cloud.Properties.Google, multiLogger); err != nil {
 		return boshResponse, err
 	}
 
 	actionFactory := action.NewConcreteFactory(
 		googleClient,
 		uuidGen,
-		config.Actions,
+		cfg,
 		multiLogger,
 	)
 

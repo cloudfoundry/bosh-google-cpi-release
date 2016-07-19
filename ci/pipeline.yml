@@ -37,11 +37,11 @@ jobs:
         params: {file: candidate/*.tgz}
 
   - name: setup-infrastructure
-    serial: true
-    serial_groups: [director-ubuntu]
+    serial_groups: [run-bats, run-int]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
 
       - task: teardown-infrastructure
         file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
@@ -83,6 +83,7 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: teardown-infrastructure
+    serial_groups: [run-bats, run-int]
     plan:
       - aggregate:
         - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -107,13 +108,12 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: deploy-ubuntu
-    serial: true
-    serial_groups: [director-ubuntu]
+    serial_groups: [run-bats, run-int]
     plan:
       - aggregate:
-        - {trigger: false, passed: [build-candidate, setup-infrastructure], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true,  passed: [build-candidate],                       get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                                  get: bosh-init}
         - {trigger: false,                                                  get: bosh-release}
         - {trigger: false,                                                  get: dummy-boshrelease}
@@ -165,11 +165,13 @@ jobs:
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
 
   - name: run-bats
+    serial: true
+    serial_groups: [run-bats]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false,                                                  get: bats}
+        - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: false,                                          get: bats}
 
       - task: run-bats
         file: bosh-cpi-src/ci/tasks/run-bats.yml
@@ -196,10 +198,11 @@ jobs:
             private_key_data:                           {{private_key_data}}
 
   - name: run-int
+    serial_groups: [run-int]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false,                                                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
 
       - task: run-int
         file: bosh-cpi-src/ci/tasks/run-int.yml
@@ -327,8 +330,7 @@ resources:
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_stemcells_bucket_name}}
-      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
-
+      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 resource_types:
   - name: gcs-resource
     type: docker-image

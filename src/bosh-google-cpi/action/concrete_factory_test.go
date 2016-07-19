@@ -10,6 +10,7 @@ import (
 
 	clientfakes "bosh-google-cpi/google/client/fakes"
 
+	"bosh-google-cpi/config"
 	"bosh-google-cpi/google/address_service"
 	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/client"
@@ -34,13 +35,17 @@ var _ = Describe("ConcreteFactory", func() {
 		googleClient client.GoogleClient
 		logger       boshlog.Logger
 
-		options = ConcreteFactoryOptions{
-			Registry: registry.ClientOptions{
-				Protocol: "http",
-				Host:     "fake-host",
-				Port:     5555,
-				Username: "fake-username",
-				Password: "fake-password",
+		cfg = config.Config{
+			Cloud: config.Cloud{
+				Properties: config.CPIProperties{
+					Registry: registry.ClientOptions{
+						Protocol: "http",
+						Host:     "fake-host",
+						Port:     5555,
+						Username: "fake-username",
+						Password: "fake-password",
+					},
+				},
 			},
 		}
 
@@ -72,7 +77,7 @@ var _ = Describe("ConcreteFactory", func() {
 		factory = NewConcreteFactory(
 			googleClient,
 			uuidGen,
-			options,
+			cfg,
 			logger,
 		)
 	})
@@ -140,7 +145,7 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		registryClient = registry.NewHTTPClient(
-			options.Registry,
+			cfg.Cloud.Properties.Registry,
 			logger,
 		)
 
@@ -248,8 +253,8 @@ var _ = Describe("ConcreteFactory", func() {
 			imageService,
 			machineTypeService,
 			registryClient,
-			options.Registry,
-			options.Agent,
+			cfg.Cloud.Properties.Registry,
+			cfg.Cloud.Properties.Agent,
 			googleClient.DefaultRootDiskSizeGb(),
 			googleClient.DefaultRootDiskType(),
 			googleClient.DefaultZone(),
