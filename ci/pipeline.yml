@@ -36,6 +36,9 @@ jobs:
       - put: bosh-cpi-dev-artifacts
         params: {file: candidate/*.tgz}
 
+      - put: bosh-cpi-dev-artifacts-sha1
+        params: {file: candidate/*.tgz.sha1}
+
   - name: setup-infrastructure
     serial_groups: [run-bats, run-int]
     plan:
@@ -273,6 +276,13 @@ resources:
       json_key: {{google_json_key_data}}
       bucket:   {{google_releases_bucket_name}}
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
+
+  - name: bosh-cpi-dev-artifacts-sha1
+    type: gcs-resource
+    source:
+      json_key: {{google_json_key_data}}
+      bucket:   {{google_releases_bucket_name}}
+      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
 
   - name: bosh-cpi-artifacts
     type: gcs-resource
