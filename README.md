@@ -2,6 +2,22 @@
 
 This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 
+## Releases
+
+### CPI
+
+|Version   | Download   | SHA1  | Source  | Date   |
+|---|---|---|---|---|
+|22.0.0  | [link](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz) | [link](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz.sha1) | [link](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/releases/tag/v22) | 2016-07-19 |
+
+### Stemcell
+
+|Version   | Description | Download   | SHA1  | Date  |
+|---|---|---|---|---|
+|3262.2 (Heavy)  | bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent | [link](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz) | [link](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz.sha1) | 2016-07-19 |
+|3262.2 (Light)  |  light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent | [link](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz) | [link](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz.sha1) | 2016-07-19 |
+
+
 ## Usage
 If you are not familiar with [BOSH](http://bosh.io/) and its terminology please take a look at the [BOSH documentation](http://bosh.io/docs).
 

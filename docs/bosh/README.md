@@ -240,8 +240,8 @@ Before working this section, you must have deployed the supporting infrastructur
     - name: vms
       network: private
       stemcell:
-        url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3218-google-kvm-ubuntu-trusty-go_agent.tgz
-        sha1: 3626815e3fabe8afa7d91362eba1e4c0540795b2 
+        url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz
+        sha1: 31485d0831171a5f9e3d238f298c9fdcdda3c523
       cloud_properties:
         machine_type: n1-standard-4
         root_disk_size_gb: 40
@@ -383,13 +383,9 @@ Before working this section, you must have deployed the supporting infrastructur
 
     properties:
       google: *google_properties
-      agent:
-        mbus: https://mbus:mbus-password@0.0.0.0:6868
-        blobstore:
-          provider: local
-          options:
-            blobstore_path: /var/vcap/micro_bosh/data/cache
-        ntp: *ntp
+      agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
+      blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
+      ntp: *ntp
   ```
 
 1. Run this `sed` command to insert your Google Cloud Platform project ID into the manifest:
