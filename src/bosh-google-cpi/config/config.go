@@ -6,14 +6,23 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshsys "github.com/cloudfoundry/bosh-utils/system"
 
-	bgcaction "bosh-google-cpi/action"
 	bogcconfig "bosh-google-cpi/google/config"
+	"bosh-google-cpi/registry"
 )
 
 type Config struct {
-	Google bogcconfig.Config
+	Cloud Cloud
+}
 
-	Actions bgcaction.ConcreteFactoryOptions
+type Cloud struct {
+	Plugin     string
+	Properties CPIProperties
+}
+
+type CPIProperties struct {
+	Google   bogcconfig.Config
+	Agent    registry.AgentOptions
+	Registry registry.ClientOptions
 }
 
 func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error) {
@@ -58,12 +67,17 @@ func NewConfigFromString(configString string) (Config, error) {
 }
 
 func (c Config) Validate() error {
-	if err := c.Google.Validate(); err != nil {
+	if c.Cloud.Plugin != "google" {
+		return bosherr.Errorf("Unsupported cloud plugin type %q", c.Cloud.Plugin)
+	}
+	if err := c.Cloud.Properties.Google.Validate(); err != nil {
 		return bosherr.WrapError(err, "Validating Google configuration")
 	}
-
-	if err := c.Actions.Validate(); err != nil {
-		return bosherr.WrapError(err, "Validating Actions configuration")
+	if err := c.Cloud.Properties.Agent.Validate(); err != nil {
+		return bosherr.WrapError(err, "Validating agent configuration")
+	}
+	if err := c.Cloud.Properties.Registry.Validate(); err != nil {
+		return bosherr.WrapError(err, "Validating registry configuration")
 	}
 
 	return nil

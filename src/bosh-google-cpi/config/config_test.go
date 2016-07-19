@@ -8,7 +8,6 @@ import (
 
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 
-	bgcaction "bosh-google-cpi/action"
 	bgcconfig "bosh-google-cpi/google/config"
 
 	"bosh-google-cpi/registry"
@@ -19,26 +18,31 @@ var validGoogleConfig = bgcconfig.Config{
 	DefaultZone: "fake-default-zone",
 }
 
-var validActionsOptions = bgcaction.ConcreteFactoryOptions{
-	Agent: registry.AgentOptions{
-		Mbus: "fake-mbus",
-		Ntp:  []string{},
-		Blobstore: registry.BlobstoreOptions{
-			Type: "fake-blobstore-type",
-		},
-	},
-	Registry: registry.ClientOptions{
-		Protocol: "http",
-		Host:     "fake-host",
-		Port:     5555,
-		Username: "fake-username",
-		Password: "fake-password",
+var validAgentOptions = registry.AgentOptions{
+	Mbus: "fake-mbus",
+	Ntp:  []string{},
+	Blobstore: registry.BlobstoreOptions{
+		Provider: "fake-blobstore-type",
 	},
 }
 
+var validRegistryOptions = registry.ClientOptions{
+	Protocol: "http",
+	Host:     "fake-host",
+	Port:     5555,
+	Username: "fake-username",
+	Password: "fake-password",
+}
+
 var validConfig = Config{
-	Google:  validGoogleConfig,
-	Actions: validActionsOptions,
+	Cloud: Cloud{
+		Plugin: "google",
+		Properties: CPIProperties{
+			Google:   validGoogleConfig,
+			Agent:    validAgentOptions,
+			Registry: validRegistryOptions,
+		},
+	},
 }
 
 var _ = Describe("NewConfigFromPath", func() {
@@ -101,8 +105,8 @@ var _ = Describe("Config", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		It("returns error if goole section is not valid", func() {
-			config.Google = bgcconfig.Config{}
+		It("returns error if google section is not valid", func() {
+			config.Cloud.Properties.Google = bgcconfig.Config{}
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
@@ -110,12 +114,13 @@ var _ = Describe("Config", func() {
 		})
 
 		It("returns error if actions section is not valid", func() {
-			config.Actions.Agent = registry.AgentOptions{}
-			config.Actions.Registry = registry.ClientOptions{}
+
+			config.Cloud.Properties.Agent = registry.AgentOptions{}
+			config.Cloud.Properties.Registry = registry.ClientOptions{}
 
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Validating Actions configuration"))
+			Expect(err.Error()).To(ContainSubstring("Validating agent configuration"))
 		})
 	})
 })
