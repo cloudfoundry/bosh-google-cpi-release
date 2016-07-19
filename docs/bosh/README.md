@@ -28,37 +28,37 @@ The following diagram provides an overview of the deployment:
 1. Set your project ID:
 
   ```
-  $ export projectid=REPLACE_WITH_YOUR_PROJECT_ID
+  export projectid=REPLACE_WITH_YOUR_PROJECT_ID
   ```
 
 1. Export your preferred compute region and zone:
 
   ```
-  $ export region=us-east1
-  $ export zone=us-east1-d
+  export region=us-east1
+  export zone=us-east1-d
   ```
 
 1. Configure `gcloud`:
 
   ```
-  $ gcloud auth login
-  $ gcloud config set project ${projectid}
-  $ gcloud config set compute/zone ${zone}
-  $ gcloud config set compute/region ${region}
+  gcloud auth login
+  gcloud config set project ${projectid}
+  gcloud config set compute/zone ${zone}
+  gcloud config set compute/region ${region}
   ```
   
 1. Create a service account and key:
 
   ```
-  $ gcloud iam service-accounts create terraform-bosh
-  $ gcloud iam service-accounts keys create /tmp/terraform-bosh.key.json \
+  gcloud iam service-accounts create terraform-bosh
+  gcloud iam service-accounts keys create /tmp/terraform-bosh.key.json \
       --iam-account terraform-bosh@${projectid}.iam.gserviceaccount.com
   ```
 
 1. Grant the new service account editor access to your project:
 
   ```
-  $ gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${projectid} \
       --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
       --role roles/editor
   ```
@@ -66,7 +66,7 @@ The following diagram provides an overview of the deployment:
 1. Make your service account's key available in an environment variable to be used by `terraform`:
 
   ```
-  $ export GOOGLE_CREDENTIALS=$(cat /tmp/terraform-bosh.key.json)
+  export GOOGLE_CREDENTIALS=$(cat /tmp/terraform-bosh.key.json)
   ```
 
 <a name="deploy-automatic"></a>
@@ -93,13 +93,13 @@ You must have the `terraform` CLI installed on your workstation. See
 1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
 
   ```
-  $ terraform plan -var region=${region} -var zone=${zone}
+  terraform plan -var projectid=${projectid} -var region=${region} -var zone=${zone}
   ```
 
 1. Create the resources:
 
   ```
-  $ terraform apply -var region=${region} -var zone=${zone}
+  terraform apply -var projectid=${projectid} -var region=${region} -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director. Go ahead to the [Deploy BOSH](#deploy-bosh) section to do that. 
@@ -124,13 +124,13 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a new [network with custom subnetwork ranges](https://cloud.google.com/compute/docs/networking):
 
   ```
-  $ gcloud compute networks create cf --mode custom
+  gcloud compute networks create cf --mode custom
   ```
 
 1. Create a new subnetwork for BOSH:
 
   ```
-  $ gcloud compute networks subnets create bosh-us-east1 \
+  gcloud compute networks subnets create bosh-us-east1 \
       --network cf \
       --range 10.0.0.0/24 \
       --description "Subnet for BOSH Director and bastion"
@@ -139,7 +139,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all internal traffic between VMs with the `bosh-internal` tag:
 
   ```
-  $ gcloud compute firewall-rules create bosh-internal \
+  gcloud compute firewall-rules create bosh-internal \
     --description "BOSH internal traffic" \
     --network cf \
     --source-tags bosh-internal \
@@ -150,7 +150,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all SSH access to the bastion host that you will deploy the BOSH Director from:
 
   ```
-  $ gcloud compute firewall-rules create bosh-bastion \
+  gcloud compute firewall-rules create bosh-bastion \
     --description "BOSH bastion" \
     --network cf \
     --target-tags bosh-bastion \
@@ -160,7 +160,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a bastion VM that you will use to run `bosh-init` and deply the Director:
 
   ```
-  $ gcloud compute instances create bosh-bastion \
+  gcloud compute instances create bosh-bastion \
       --image ubuntu-14-04 \
       --subnet bosh-us-east1 \
       --private-network-ip 10.0.0.200 \
@@ -183,23 +183,23 @@ Before working this section, you must have deployed the supporting infrastructur
 1. SSH to the bastion VM you created in the previous step. All SSH commands after this should be run from the VM:
 
   ```
-  $ gcloud compute ssh bosh-bastion
+  gcloud compute ssh bosh-bastion
   ```
 
 1. Configure `gcloud` to use the correct zone and region:
 
   ```
-  $ zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-  $ zone=${zone##*/}
-  $ region=${zone%-*}
-  $ gcloud config set compute/zone ${zone}
-  $ gcloud config set compute/region ${region}
+  zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+  zone=${zone##*/}
+  region=${zone%-*}
+  gcloud config set compute/zone ${zone}
+  gcloud config set compute/region ${region}
   ```
 
 1. Create a **password-less** SSH key:
 
   ```
-  $ ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+  ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
   ```
 
 1. Navigate to your [project's web console](https://console.cloud.google.com/compute/metadata/sshKeys) and add the new SSH public key by pasting the contents of ~/.ssh/bosh.pub:
@@ -212,14 +212,14 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Confirm that `bosh-init` is installed by querying its version:
 
   ```
-  $ bosh-init -v
+  bosh-init -v
   ```
 
 1. Create and `cd` to a directory:
 
   ```
-  $ mkdir google-bosh-director
-  $ cd google-bosh-director
+  mkdir google-bosh-director
+  cd google-bosh-director
   ```
 
 1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml`:
@@ -419,13 +419,13 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Deploy the new manifest to create a BOSH Director:
 
   ```
-  $ bosh-init deploy manifest.yml
+  bosh-init deploy manifest.yml
   ```
 
 1. Target your BOSH environment:
 
   ```
-  $ bosh target 10.0.0.6
+  bosh target 10.0.0.6
   ```
 
 Your username is `admin` and password is `admin`.
