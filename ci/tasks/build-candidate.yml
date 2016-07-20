@@ -10,5 +10,6 @@ inputs:
   - name: version-semver
 outputs:
   - name: candidate
+  - name: sha1
 run:
   path: bosh-cpi-src/ci/tasks/build-candidate.sh
