@@ -10,7 +10,6 @@ This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 |---|---|---|
 |[22.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz)|d39ac2bc02fe5a2287c30e6c728729d2e68b8e1d|2016-07-19|
 |[23.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-23.tgz)|f4ec50c628af404f60870e933e558bf9b2c36424|2016-07-21|
-|[24.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.tgz)|a5bbdaa70837ddfbcc3048f93eb3b3422b34cf77|2016-07-21|
 [//]: # (new-cpi)
 
 ### Stemcell
