@@ -8,7 +8,7 @@ This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 
 |Version   | Download   | SHA1  | Date   |
 |---|---|---|---|
-|22.0.0  | https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz | d39ac2bc02fe5a2287c30e6c728729d2e68b8e1d | 2016-07-19 |
+|22.0.0  | [link](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz) | d39ac2bc02fe5a2287c30e6c728729d2e68b8e1d | 2016-07-19 |
 [//]: # (new-cpi)
 
 ### Stemcell

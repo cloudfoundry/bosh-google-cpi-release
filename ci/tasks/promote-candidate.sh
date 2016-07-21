@@ -45,7 +45,7 @@ EOF
   # Template markers in the README
   cpi_marker="\[//\]: # (new-cpi)"
   cpi_sha=$(sha1sum releases/$cpi_release_name/$cpi_blob | awk '{print $1}')
-  new_cpi="|$semver_version|$cpi_link|$cpi_sha|$today|"
+  new_cpi="|$semver_version|[link]($cpi_link)|$cpi_sha|$today|"
   sed -i "s^$cpi_marker^$new_cpi\n$cpi_marker^" README.md
 
   git diff | cat

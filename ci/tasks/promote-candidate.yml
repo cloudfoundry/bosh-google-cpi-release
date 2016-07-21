@@ -8,7 +8,6 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: bosh-cpi-release
-  - name: bosh-cpi-release-sha1
   - name: release-version-semver
 outputs:
   - name: promoted
