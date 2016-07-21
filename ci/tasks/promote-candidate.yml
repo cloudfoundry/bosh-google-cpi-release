@@ -9,6 +9,7 @@ inputs:
   - name: bosh-cpi-src
   - name: bosh-cpi-release
   - name: release-version-semver
+  - name: stemcell
 outputs:
   - name: promoted
 run:

@@ -236,10 +236,10 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, passed: [run-int,run-bats],                  get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-int,run-bats],    get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                                         get: release-version-semver, params: {bump: major}}
-
+        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false,                             get: release-version-semver, params: {bump: major}}
       
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
@@ -320,7 +320,7 @@ resources:
   - name: release-version-semver
     type: semver
     source:
-      key:               release-current-version
+      key:               release-version
       bucket:            {{version_semver_bucket_name}}
       access_key_id:     {{version_semver_access_key}}
       secret_access_key: {{version_semver_secret_key}}
