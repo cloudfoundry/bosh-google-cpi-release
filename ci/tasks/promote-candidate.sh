@@ -11,6 +11,11 @@ check_param release_blobs_secret_key
 # Version info
 semver_version=`cat release-version-semver/number`
 integer_version=`cut -d "." -f1 release-version-semver/number`
+echo $integer_version > promoted/integer_version
+echo "BOSH Google CPI BOSH Release v${integer_version}" > promoted/annotation_message
+
+today=$(date +%Y-%m-%d)
+cp -r bosh-cpi-src promoted/repo
 
 # CPI vars
 cpi_release_name="bosh-google-cpi"
@@ -24,13 +29,8 @@ stemcell_version=`cat stemcell/version`
 stemcell_url=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 stemcell_type=Heavy
 if [[ $stemcell_name == light* ]]; then stemcell_type=Light; fi
-
-today=$(date +%Y-%m-%d)
-
-echo $integer_version > promoted/integer_version
-echo "BOSH Google CPI BOSH Release v${integer_version}" > promoted/annotation_message
-
-cp -r bosh-cpi-src promoted/repo
+stemcell_sha=$(sha1sum stemcell/*.tgz | awk '{print $1}')
+new_stemcell="|[$stemcell_version ($stemcell_type)]($stemcell_url)|$stemcell_sha|$today|"
 
 dev_release=$(echo $PWD/bosh-cpi-release/*.tgz)
 
@@ -62,8 +62,6 @@ EOF
 
   # Insert Stemcell details into README.md
   stemcell_marker="\[//\]: # (new-stemcell)"
-  stemcell_sha=$(sha1sum stemcell/*.tgz | awk '{print $1}')
-  new_stemcell="|[$stemcell_version ($stemcell_type)]($stemcell_url)|$stemcell_sha|$today|"
   sed -i "s^$stemcell_marker^$new_stemcell\n$stemcell_marker^" README.md
 
   git diff | cat
