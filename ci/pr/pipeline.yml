@@ -4,22 +4,32 @@ jobs:
   plan:
   - aggregate:
     - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+
   - put: bosh-cpi-src-in
     params:
       path: bosh-cpi-src
       status: pending
   - task: unit-tests
     file: bosh-cpi-src/ci/pr/tasks/unit-tests.yml
-    on_success:
-      put: bosh-cpi-src-in
-      params:
-        path: bosh-cpi-src
-        status: success
-    on_failure:
-      put: bosh-cpi-src-in
-      params:
-        path: bosh-cpi-src
-        status: failure
+
+- name: build-candidate
+  serial: true
+  plan:
+    - aggregate:
+      - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
+
+    - task: build-release
+      file: bosh-cpi-src/ci/pr/tasks/build-candidate.yml
+      on_success:
+        put: bosh-cpi-src-in
+        params:
+          path: bosh-cpi-src
+          status: success
+      on_failure:
+        put: bosh-cpi-src-in
+        params:
+          path: bosh-cpi-src
+          status: failure
 
 resource_types:
 - name: pull-request
