@@ -99,7 +99,7 @@ func (n Networks) CanIPForward() bool {
 	return network.IPForwarding
 }
 
-func (n Networks) Tags() NetworkTags {
+func (n Networks) Tags() Tags {
 	network := n.Network()
 
 	return network.Tags

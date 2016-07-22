@@ -6,6 +6,7 @@ import (
 
 	. "bosh-google-cpi/action"
 
+	instance "bosh-google-cpi/google/instance_service"
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 
 	registryfakes "bosh-google-cpi/registry/fakes"
@@ -40,7 +41,7 @@ var _ = Describe("ConfigureNetworks", func() {
 					Default: []string{"fake-network-default"},
 					CloudProperties: NetworkCloudProperties{
 						NetworkName:         "fake-network-cloud-network-name",
-						Tags:                NetworkTags{"fake-network-cloud-network-tag"},
+						Tags:                instance.Tags([]string{"fake-network-cloud-network-tag"}),
 						EphemeralExternalIP: true,
 						IPForwarding:        false,
 					},

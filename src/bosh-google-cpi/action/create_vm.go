@@ -87,6 +87,11 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
+	// Validate VM tags
+	if err = cloudProps.Validate(); err != nil {
+		return "", bosherr.WrapError(err, "Creating VM")
+	}
+
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
@@ -101,6 +106,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,
 		BackendService:    cloudProps.BackendService,
+		Tags:              cloudProps.Tags,
 	}
 
 	// Create VM

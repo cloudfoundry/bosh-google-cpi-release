@@ -27,7 +27,7 @@ var _ = Describe("Network", func() {
 			SubnetworkName:      "fake-dynamic-network-subnetwork-name",
 			EphemeralExternalIP: true,
 			IPForwarding:        false,
-			Tags:                NetworkTags{"fake-dynamic-network-network-tag"},
+			Tags:                Tags{"fake-dynamic-network-network-tag"},
 		}
 
 		vipNetwork = Network{
@@ -41,7 +41,7 @@ var _ = Describe("Network", func() {
 			SubnetworkName:      "fake-vip-network-subnetwork-name",
 			EphemeralExternalIP: false,
 			IPForwarding:        true,
-			Tags:                NetworkTags{"fake-vip-network-network-tag"},
+			Tags:                Tags{"fake-vip-network-network-tag"},
 		}
 
 		unknownNetwork = Network{Type: "unknown"}
@@ -76,7 +76,7 @@ var _ = Describe("Network", func() {
 
 			Context("when network tags are not valid", func() {
 				BeforeEach(func() {
-					dynamicNetwork.Tags = NetworkTags{"invalid_network_tag"}
+					dynamicNetwork.Tags = Tags{"invalid_network_tag"}
 				})
 
 				It("returns an error", func() {

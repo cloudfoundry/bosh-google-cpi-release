@@ -29,7 +29,7 @@ var _ = Describe("Networks", func() {
 				CloudProperties: NetworkCloudProperties{
 					NetworkName:         "fake-network-1-cloud-network-name",
 					SubnetworkName:      "fake-network-1-cloud-subnetwork-name",
-					Tags:                NetworkTags{"fake-network-1-cloud-network-tag"},
+					Tags:                instance.Tags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 				},
@@ -54,7 +54,7 @@ var _ = Describe("Networks", func() {
 					Default:             []string{"fake-network-1-default"},
 					NetworkName:         "fake-network-1-cloud-network-name",
 					SubnetworkName:      "fake-network-1-cloud-subnetwork-name",
-					Tags:                instance.NetworkTags([]string{"fake-network-1-cloud-network-tag"}),
+					Tags:                instance.Tags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 				},

@@ -1,5 +1,9 @@
 package action
 
+import (
+	"bosh-google-cpi/google/instance_service"
+)
+
 type DiskCloudProperties struct {
 	DiskType string `json:"type,omitempty"`
 }
@@ -7,14 +11,14 @@ type DiskCloudProperties struct {
 type Environment map[string]interface{}
 
 type NetworkCloudProperties struct {
-	NetworkName         string      `json:"network_name,omitempty"`
-	SubnetworkName      string      `json:"subnetwork_name,omitempty"`
-	Tags                NetworkTags `json:"tags,omitempty"`
-	EphemeralExternalIP bool        `json:"ephemeral_external_ip,omitempty"`
-	IPForwarding        bool        `json:"ip_forwarding,omitempty"`
+	NetworkName         string        `json:"network_name,omitempty"`
+	SubnetworkName      string        `json:"subnetwork_name,omitempty"`
+	Tags                instance.Tags `json:"tags,omitempty"`
+	EphemeralExternalIP bool          `json:"ephemeral_external_ip,omitempty"`
+	IPForwarding        bool          `json:"ip_forwarding,omitempty"`
 }
 
-type NetworkTags []string
+type Tags []string
 
 type SnapshotMetadata struct {
 	Deployment string `json:"deployment,omitempty"`
@@ -43,6 +47,11 @@ type VMCloudProperties struct {
 	ServiceScopes     VMServiceScopes `json:"service_scopes,omitempty"`
 	TargetPool        string          `json:"target_pool,omitempty"`
 	BackendService    string          `json:"backend_service,omitempty"`
+	Tags              instance.Tags   `json:"tags,omitempty"`
+}
+
+func (n VMCloudProperties) Validate() error {
+	return n.Tags.Validate()
 }
 
 type VMServiceScopes []string

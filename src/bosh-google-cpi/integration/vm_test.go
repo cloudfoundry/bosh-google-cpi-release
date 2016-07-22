@@ -87,6 +87,81 @@ var _ = Describe("VM", func() {
 
 	})
 
+	It("can create a VM with tags", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+				   "tags": ["tag1", "tag2"]
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can create a VM with overlapping VM and network tags", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+				   "tags": ["tag1", "tag2", "integration-delete"]
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
 	It("executes the VM lifecycle with disk attachment hints", func() {
 		By("creating two disks")
 		var request, diskCID, diskCID2, vmCID string

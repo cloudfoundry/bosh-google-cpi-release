@@ -122,7 +122,7 @@ var _ = Describe("CreateVM", func() {
 					Default: []string{"fake-network-default"},
 					CloudProperties: NetworkCloudProperties{
 						NetworkName:         "fake-network-cloud-network-name",
-						Tags:                NetworkTags{"fake-network-cloud-network-tag"},
+						Tags:                instance.Tags([]string{"fake-network-cloud-network-tag"}),
 						EphemeralExternalIP: true,
 						IPForwarding:        false,
 					},
