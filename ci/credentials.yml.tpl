@@ -9,6 +9,7 @@ google_stemcells_bucket_name: # GCS bucket that contains stsemcells
 google_releases_bucket_name: # GCS bucket that releases are stored in
 github_deployment_key_bosh_google_cpi_release: |
   # GitHub deployment key for release artifacts
+github_pr_access_token: # An access token with repo:status access, used to test PRs
 
 # Google Cloud Platform configuration
 google_project: # Google project ID
