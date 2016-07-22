@@ -17,7 +17,6 @@ This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 
 |Version|SHA1|Date|
 |---|---|---|
-|[3262.2 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz)||2016-07-21|
 |[3262.2 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz)|f46d82a6ae6e89a5635cb3122389f0c8459a82e0|2016-07-22|
 [//]: # (new-stemcell)
 
