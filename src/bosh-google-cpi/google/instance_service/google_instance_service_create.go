@@ -36,7 +36,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps.ServiceScopes)
-	tagsParams, err := i.createTagsParams(networks)
+	tagsParams, err := i.createTagsParams(networks.Tags(), vmProps.Tags)
 	if err != nil {
 		return "", err
 	}
@@ -224,14 +224,19 @@ func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes Service
 	return serviceAccounts
 }
 
-func (i GoogleInstanceService) createTagsParams(networks Networks) (*compute.Tags, error) {
-	tags := &compute.Tags{}
-
-	for _, tag := range networks.Tags() {
-		tags.Items = append(tags.Items, tag)
+func (i GoogleInstanceService) createTagsParams(tags ...Tags) (*compute.Tags, error) {
+	tagDict := make(map[string]struct{})
+	for _, tagSet := range tags {
+		for _, tag := range tagSet {
+			tagDict[tag] = struct{}{}
+		}
 	}
 
-	return tags, nil
+	computeTags := &compute.Tags{}
+	for tag, _ := range tagDict {
+		computeTags.Items = append(computeTags.Items, tag)
+	}
+	return computeTags, nil
 }
 
 func (i GoogleInstanceService) addToTargetPool(instanceSelfLink string, targetPoolName string) error {

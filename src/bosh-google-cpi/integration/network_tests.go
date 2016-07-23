@@ -63,9 +63,8 @@ var _ = Describe("Network", func() {
 				  "default": {
 					"type": "dynamic",
 					"cloud_properties": {
-					  "tags": ["integration-delete"],
 					  "network_name": "%v",
-					  "tags": ["tag1", "tag2"]
+					  "tags": ["integration-delete", "tag1", "tag2"]
 					}
 				  }
 				},
@@ -75,7 +74,7 @@ var _ = Describe("Network", func() {
 			}`, existingStemcell, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
-			Expect(instance.Tags.Items).To(ConsistOf("tag1", "tag2"))
+			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
 		})
 
 		By("deleting the VM")
