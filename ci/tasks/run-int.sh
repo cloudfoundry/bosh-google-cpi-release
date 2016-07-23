@@ -15,7 +15,6 @@ check_param google_target_pool
 check_param google_backend_service
 check_param google_address_static_int
 check_param google_address_int
-check_param google_existing_stemcell
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
@@ -26,7 +25,6 @@ export CUSTOM_NETWORK_NAME=${google_network}
 export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
 export PRIVATE_IP=${google_address_static_int}
 export STEMCELL_URL=${stemcell_url}
-export EXISTING_STEMCELL=${google_existing_stemcell}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
 export ZONE=${google_zone}
