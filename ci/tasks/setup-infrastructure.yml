@@ -22,7 +22,6 @@ params:
   google_firewall_external:       replace-me
   google_address_director_ubuntu: replace-me
   google_address_bats_ubuntu:     replace-me
-  google_existing_stemcell:       replace-me
   google_target_pool:             replace-me 
   google_backend_service:         replace-me 
   google_address_int_ubuntu:      replace-me

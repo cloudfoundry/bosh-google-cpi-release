@@ -14,7 +14,6 @@ params:
   google_project:            replace-me 
   google_region:             replace-me 
   google_zone:               replace-me 
-  google_existing_stemcell:  replace-me 
   google_network:            replace-me 
   google_subnetwork:         replace-me 
   google_auto_network:       replace-me 

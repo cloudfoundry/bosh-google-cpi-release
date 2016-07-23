@@ -221,7 +221,6 @@ jobs:
             google_firewall_external:         {{google_firewall_external}}
             google_address_int:               {{google_address_int_ubuntu}}
             google_address_static_int:        {{google_address_static_int_ubuntu}}
-            google_existing_stemcell:         {{google_existing_stemcell}}
             google_target_pool:               {{google_target_pool}}
             google_backend_service:           {{google_backend_service}}
 
