@@ -15,7 +15,6 @@ github_pr_access_token: # An access token with repo:status access, used to test 
 google_project: # Google project ID
 google_region: # Default Google Compute Engine region
 google_zone: # Default Google Compute Engine zone (must be in {{google_region}}
-google_existing_stemcell: # Name of a stemcell in {{google_project}} that will be used for integration tests
 google_json_key_data: |
   # Google Compute Engine Service Account JSON (created in {{google_project}}
 

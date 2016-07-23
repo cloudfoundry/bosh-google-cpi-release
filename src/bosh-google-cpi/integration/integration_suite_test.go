@@ -23,8 +23,24 @@ func TestIntegration(t *testing.T) {
 var _ = SynchronizedBeforeSuite(func() []byte {
 	// Clean any straggler VMs
 	cleanVMs()
-	return nil
+
+	request := fmt.Sprintf(`{
+			  "method": "create_stemcell",
+			  "arguments": ["", {
+				  "name": "bosh-google-kvm-ubuntu-trusty",
+				  "version": "3215",
+				  "infrastructure": "google",
+				  "source_url": "%s"
+				}]
+			}`, stemcellURL)
+	stemcell := assertSucceedsWithResult(request).(string)
+
+	return []byte(stemcell)
 }, func(data []byte) {
+	// Ensure stemcell was initialized
+	existingStemcell = string(data)
+	Expect(existingStemcell).ToNot(BeEmpty())
+
 	// Required env vars
 	Expect(googleProject).ToNot(Equal(""), "GOOGLE_PROJECT must be set")
 	Expect(externalStaticIP).ToNot(Equal(""), "EXTERNAL_STATIC_IP must be set")
@@ -39,6 +55,16 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = SynchronizedAfterSuite(func() {
 	cleanVMs()
+	request := fmt.Sprintf(`{
+			  "method": "delete_stemcell",
+			  "arguments": ["%v"]
+			}`, existingStemcell)
+
+	response, err := execCPI(request)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(response.Error).To(BeNil())
+	Expect(response.Result).To(BeNil())
+
 }, func() {})
 
 func cleanVMs() {
