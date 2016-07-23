@@ -81,14 +81,6 @@ You must have the `terraform` CLI installed on your workstation. See
 
 ### Steps
 1. Download the BOSH terraform file - [main.tf](main.tf) - and save it on your workstation where `terraform` is installed.
-1. Edit `main.tf`, inserting your Google Cloud Project ID on the second line:
-
-  ```
-  provider "google" {
-    project = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
-    ...
-  }
-  ```
 
 1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
 
@@ -170,9 +162,9 @@ You must have the `gcloud` CLI installed on your workstation. See
 apt-get upgrade -y
 apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3
 gem install bosh_cli 
-curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.19.0/cf-cli_6.19.0_linux_x86-64.tgz
+curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.20.0/cf-cli_6.20.0_linux_x86-64.tgz
 tar -zxvf /tmp/cf.tgz && mv cf /usr/bin/cf && chmod +x /usr/bin/cf
-curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.94-linux-amd64
+curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.96-linux-amd64
 chmod +x /usr/bin/bosh-init"
   ```
 
@@ -230,11 +222,11 @@ Before working this section, you must have deployed the supporting infrastructur
 
   releases:
     - name: bosh
-      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=256.2
-      sha1: ff2f4e16e02f66b31c595196052a809100cfd5a8
+      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
+      sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
     - name: bosh-google-cpi
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-20.tgz
-      sha1: 9b4ada4267f1523f5d278e0813eb055e91ea15ed 
+      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.tgz
+      sha1: e2f77a0a8696b29fdb676cf447cfd9bc6841b648 
 
   resource_pools:
     - name: vms
