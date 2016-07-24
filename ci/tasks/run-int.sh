@@ -24,12 +24,12 @@ export NETWORK_NAME=${google_auto_network}
 export CUSTOM_NETWORK_NAME=${google_network}
 export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
 export PRIVATE_IP=${google_address_static_int}
-export STEMCELL_URL=${stemcell_url}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
+export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 
 echo "Setting up artifacts..."
 cp ./stemcell/*.tgz stemcell.tgz
