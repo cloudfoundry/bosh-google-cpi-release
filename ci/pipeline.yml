@@ -175,7 +175,6 @@ jobs:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [deploy-ubuntu],    get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-
         - {trigger: false,                                          get: bats}
 
       - task: run-bats

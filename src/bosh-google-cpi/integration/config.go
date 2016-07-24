@@ -31,13 +31,13 @@ var (
 	googleProject    = os.Getenv("GOOGLE_PROJECT")
 	externalStaticIP = os.Getenv("EXTERNAL_STATIC_IP")
 	keepResuableVM   = os.Getenv("KEEP_REUSABLE_VM")
+	stemcellURL      = os.Getenv("STEMCELL_URL")
 
 	// Configurable defaults
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")
 	customNetworkName    = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
 	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
 	ip                   = envOrDefault("PRIVATE_IP", "192.168.100.102")
-	stemcellURL          = envOrDefault("STEMCELL_URL", "https://storage.googleapis.com/evandbrown17/bosh-stemcell-3215-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz")
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
 	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
