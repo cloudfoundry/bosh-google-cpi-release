@@ -31,6 +31,12 @@ export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 
+# Divine the raw stemcell URL
+stemcell_url_base=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
+stemcell_url_base=${stemcell_url_base/light-/}
+stemcell_url_base=${stemcell_url_base/\.tgz/-raw\.tar\.gz}
+export STEMCELL_URL=$stemcell_url_base
+
 echo "Setting up artifacts..."
 cp ./stemcell/*.tgz stemcell.tgz
 
