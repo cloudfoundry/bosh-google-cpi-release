@@ -10,17 +10,16 @@ check_param release_blobs_secret_key
 
 # Version info
 semver_version=`cat release-version-semver/number`
-integer_version=`cut -d "." -f1 release-version-semver/number`
-echo $integer_version > promoted/integer_version
-echo "BOSH Google CPI BOSH Release v${integer_version}" > promoted/annotation_message
+echo $semver_version > promoted/semver_version
+echo "BOSH Google CPI BOSH Release v${semver_version}" > promoted/annotation_message
 
 today=$(date +%Y-%m-%d)
 cp -r bosh-cpi-src promoted/repo
 
 # CPI vars
 cpi_release_name="bosh-google-cpi"
-cpi_blob=${cpi_release_name}-${integer_version}.tgz 
-cpi_link=https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-$integer_version.tgz
+cpi_blob=${cpi_release_name}-${semver_version}.tgz
+cpi_link=https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-$semver_version.tgz
 
 # Stemcell vars
 stemcell_path=$(basename `ls stemcell/*.tgz`)
@@ -49,7 +48,7 @@ EOF
   bosh version
 
   echo "Finalizing CPI BOSH Release..."
-  bosh finalize release ${dev_release} --version ${integer_version}
+  bosh finalize release ${dev_release} --version ${semver_version}
 
   rm config/private.yml
 
@@ -69,7 +68,7 @@ EOF
 
   git config --global user.email cf-bosh-eng@pivotal.io
   git config --global user.name CI
-  git commit -m "BOSH Google CPI BOSH Release v${integer_version}"
+  git commit -m "BOSH Google CPI BOSH Release v${semver_version}"
 
   mv releases/$cpi_release_name/$cpi_blob ../
   echo $cpi_sha > ../$cpi_blob.sha1
