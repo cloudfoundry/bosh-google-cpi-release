@@ -113,7 +113,7 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: deploy-ubuntu
-    serial_groups: [run-bats, run-int]
+    serial_groups: [run-bats]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
