@@ -11,6 +11,7 @@ This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 |[22.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-22.tgz)|d39ac2bc02fe5a2287c30e6c728729d2e68b8e1d|2016-07-19|
 |[23.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-23.tgz)|f4ec50c628af404f60870e933e558bf9b2c36424|2016-07-21|
 |[24.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.tgz)|e2f77a0a8696b29fdb676cf447cfd9bc6841b648|2016-07-22|
+|[23.1.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-23.1.0.tgz)|0b13e0382ec64bbd8238c1b199c41b96e5cc1093|2016-07-25|
 [//]: # (new-cpi)
 
 ### Stemcell
@@ -18,6 +19,7 @@ This is a [BOSH](http://bosh.io/) release for the BOSH Google CPI.
 |Version|SHA1|Date|
 |---|---|---|
 |[3262.2 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz)|f46d82a6ae6e89a5635cb3122389f0c8459a82e0|2016-07-22|
+|[3262.2 (Heavy)](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.2-google-kvm-ubuntu-trusty-go_agent.tgz)|f294226d3ade9e27b67e4ef82b8cd5d3b4e23af7|2016-07-25|
 [//]: # (new-stemcell)
 
 ## Usage

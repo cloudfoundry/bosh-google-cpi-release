@@ -36,4 +36,6 @@ builds:
     version: '23'
   3906a98e-a4a7-4e29-8492-a8565638c81a:
     version: '24'
+  e20736ad-b1d0-4fa1-93fd-51a7bbc4c366:
+    version: 23.1.0
 format-version: '2'
