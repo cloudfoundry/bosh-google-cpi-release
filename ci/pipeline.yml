@@ -246,6 +246,9 @@ jobs:
             release_blobs_access_key: {{release_blobs_access_key}}
             release_blobs_secret_key: {{release_blobs_secret_key}}
 
+      - put: release-version-semver
+        params: {file: release-version-semver/number}
+
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
@@ -276,8 +279,11 @@ jobs:
             release_blobs_access_key: {{release_blobs_access_key}}
             release_blobs_secret_key: {{release_blobs_secret_key}}
 
+      - put: release-version-semver
+        params: {file: release-version-semver/number}
+
       - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
       - put: bosh-cpi-artifacts
         params:
@@ -306,8 +312,11 @@ jobs:
             release_blobs_access_key: {{release_blobs_access_key}}
             release_blobs_secret_key: {{release_blobs_secret_key}}
 
+      - put: release-version-semver
+        params: {file: release-version-semver/number}
+
       - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
       - put: bosh-cpi-artifacts
         params:
@@ -379,7 +388,7 @@ resources:
   - name: release-version-semver
     type: semver
     source:
-      key:               release-version
+      key:               release-current-version
       bucket:            {{version_semver_bucket_name}}
       access_key_id:     {{version_semver_access_key}}
       secret_access_key: {{version_semver_secret_key}}
@@ -415,7 +424,8 @@ resources:
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+
 resource_types:
   - name: gcs-resource
     type: docker-image
