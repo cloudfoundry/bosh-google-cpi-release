@@ -19,7 +19,7 @@ jobs:
           HYPERVISOR:             kvm
           OS_NAME:                ubuntu
           OS_VERSION:             trusty
-          CANDIDATE_BUILD_NUMBER: 3262
+          CANDIDATE_BUILD_NUMBER: 3262.2
 
       - aggregate:
         - put: google-kvm-ubuntu-trusty

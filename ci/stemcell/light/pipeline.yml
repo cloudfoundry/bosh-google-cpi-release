@@ -2,9 +2,7 @@
 groups:
   - name: bosh-google-stemcell
     jobs:
-      - ubuntu-trusty-stemcell
       - ubuntu-trusty-stemcell-google
-      - centos-7-stemcell
 
   - name: ubuntu
     jobs:
