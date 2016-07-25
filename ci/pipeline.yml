@@ -9,7 +9,9 @@ groups:
       - run-bats
       - run-int
       - teardown-infrastructure
-      - promote-candidate
+      - promote-candidate-major
+      - promote-candidate-minor
+      - promote-candidate-patch
 
 jobs:
   - name: test-unit
@@ -111,7 +113,7 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: deploy-ubuntu
-    serial_groups: [run-bats, run-int]
+    serial_groups: [run-bats]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -175,7 +177,6 @@ jobs:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [deploy-ubuntu],    get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-
         - {trigger: false,                                          get: bats}
 
       - task: run-bats
@@ -206,10 +207,8 @@ jobs:
     serial_groups: [run-int]
     plan:
       - aggregate:
-        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [deploy-ubuntu],    get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-
+        - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
 
       - task: run-int
         file: bosh-cpi-src/ci/tasks/run-int.yml
@@ -226,20 +225,49 @@ jobs:
             google_firewall_external:         {{google_firewall_external}}
             google_address_int:               {{google_address_int_ubuntu}}
             google_address_static_int:        {{google_address_static_int_ubuntu}}
-            google_existing_stemcell:         {{google_existing_stemcell}}
             google_target_pool:               {{google_target_pool}}
             google_backend_service:           {{google_backend_service}}
 
 
-  - name: promote-candidate
+  - name: promote-candidate-major
     serial: true
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false,                             get: release-version-semver, params: {bump: major}}
+      
+      - task: promote
+        file: bosh-cpi-src/ci/tasks/promote-candidate.yml
+        config:
+          params:
+            release_blobs_access_key: {{release_blobs_access_key}}
+            release_blobs_secret_key: {{release_blobs_secret_key}}
+
+      - put: bosh-cpi-src-out
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
+
+      - put: bosh-cpi-artifacts
+        params:
+          file: promoted/*.tgz
+          predefined_acl: "publicRead"
+      
+      - put: bosh-cpi-artifacts-sha1
+        params:
+          file: promoted/*.tgz.sha1
+          predefined_acl: "publicRead"
+
+  - name: promote-candidate-minor
+    serial: true
+    plan:
+      - aggregate:
+        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
       
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
@@ -260,6 +288,37 @@ jobs:
         params:
           file: promoted/*.tgz.sha1
           predefined_acl: "publicRead"
+
+  - name: promote-candidate-patch
+    serial: true
+    plan:
+      - aggregate:
+        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
+        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
+      
+      - task: promote
+        file: bosh-cpi-src/ci/tasks/promote-candidate.yml
+        config:
+          params:
+            release_blobs_access_key: {{release_blobs_access_key}}
+            release_blobs_secret_key: {{release_blobs_secret_key}}
+
+      - put: bosh-cpi-src-out
+        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/integer_version}
+
+      - put: bosh-cpi-artifacts
+        params:
+          file: promoted/*.tgz
+          predefined_acl: "publicRead"
+      
+      - put: bosh-cpi-artifacts-sha1
+        params:
+          file: promoted/*.tgz.sha1
+          predefined_acl: "publicRead"
+
 
 
 resources:

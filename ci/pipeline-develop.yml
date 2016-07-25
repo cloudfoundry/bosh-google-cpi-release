@@ -39,7 +39,7 @@ jobs:
         params: {file: candidate/*.tgz.sha1}
 
   - name: setup-infrastructure
-    serial_groups: [run-bats, run-int]
+    serial_groups: [run-bats,run-int]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -85,7 +85,7 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: teardown-infrastructure
-    serial_groups: [run-bats, run-int]
+    serial_groups: [run-bats,run-int]
     plan:
       - aggregate:
         - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -110,7 +110,7 @@ jobs:
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
 
   - name: deploy-ubuntu
-    serial_groups: [run-bats, run-int]
+    serial_groups: [run-bats]
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -118,7 +118,6 @@ jobs:
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                                  get: bosh-init}
         - {trigger: false,                                                  get: bosh-release}
-        - {trigger: false,                                                  get: dummy-boshrelease}
 
       - task: setup-director
         file: bosh-cpi-src/ci/tasks/setup-director.yml
@@ -140,28 +139,6 @@ jobs:
             private_key_data:               {{private_key_data}}
             director_username:              {{director_username}}
             director_password:              {{director_password}}
-        on_failure:
-          task: teardown-director
-          file: bosh-cpi-src/ci/tasks/teardown-director.yml
-
-      - task: deploy-dummy
-        file: bosh-cpi-src/ci/tasks/deploy-dummy.yml
-        config:
-          params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            google_network:           {{google_network}}
-            google_subnetwork:        {{google_subnetwork}}
-            google_subnetwork_range:  {{google_subnetwork_range}}
-            google_subnetwork_gw:     {{google_subnetwork_gw}}
-            google_firewall_internal: {{google_firewall_internal}}
-            google_address_director:  {{google_address_director_ubuntu}}
-            base_os:                  Ubuntu
-            stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
         on_failure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
@@ -203,8 +180,8 @@ jobs:
     serial_groups: [run-int]
     plan:
       - aggregate:
-        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
 
       - task: run-int
         file: bosh-cpi-src/ci/tasks/run-int.yml
@@ -221,7 +198,6 @@ jobs:
             google_firewall_external:         {{google_firewall_external}}
             google_address_int:               {{google_address_int_ubuntu}}
             google_address_static_int:        {{google_address_static_int_ubuntu}}
-            google_existing_stemcell:         {{google_existing_stemcell}}
             google_target_pool:               {{google_target_pool}}
             google_backend_service:           {{google_backend_service}}
 
@@ -295,18 +271,12 @@ resources:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
       branch: master
 
-  - name: dummy-boshrelease
-    type: git
-    source:
-      uri: https://github.com/pivotal-cf-experimental/dummy-boshrelease.git
-      branch: master
-
   - name: google-ubuntu-stemcell
     type: gcs-resource
     source:
       json_key: {{google_json_key_data}}
       bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 
 resource_types:
   - name: gcs-resource
