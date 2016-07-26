@@ -2,11 +2,18 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [24.2.0] - 2016-07-25
+
 ### Added
 - This changelog
 
-## [24.1.0] - 2015-12-03
+### Changed
+- 3262.4 stemcell
+
+### Fixed
+- All tests now use light stemcells
+
+## [24.1.0] - 2016-07-25
 
 ### Changed
 - Instance tags can be specified in any `cloud_properties` section of a BOSH manifest
@@ -17,5 +24,5 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
-[Unreleased]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24.1.0...HEAD
+[24.2.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24.1.0...v24.2.0
 [24.1.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24...v24.1.0
