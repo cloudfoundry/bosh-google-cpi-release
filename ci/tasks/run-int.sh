@@ -30,6 +30,7 @@ export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
+export CPI_ASYNC_DELETE=true
 
 # Divine the raw stemcell URL
 stemcell_url_base=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`

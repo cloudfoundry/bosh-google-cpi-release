@@ -43,6 +43,8 @@ var (
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
+	// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
+	asyncDelete = envOrDefault("CPI_ASYNC_DELETE", "true")
 
 	cfgContent = fmt.Sprintf(`{
 	  "cloud": {
