@@ -125,7 +125,7 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("can create a VM with overlapping VM and network tags", func() {
+	It("can create a VM with overlapping VM and network tags and VM properties that override network properties", func() {
 		By("creating a VM")
 		var vmCID string
 		request := fmt.Sprintf(`{
@@ -135,14 +135,18 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				   "machine_type": "n1-standard-1",
-				   "tags": ["tag1", "tag2", "integration-delete"]
+				   "tags": ["tag1", "tag2", "integration-delete"],
+				   "ephemeral_external_ip": false,
+				   "ip_forwarding": false
 				},
 				{
 				  "default": {
 					"type": "dynamic",
 					"cloud_properties": {
 					  "tags": ["integration-delete"],
-					  "network_name": "%v"
+					  "network_name": "%v",
+					  "ephemeral_external_ip": true,
+					  "ip_forwarding": true
 					}
 				  }
 				},
@@ -153,6 +157,8 @@ var _ = Describe("VM", func() {
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
+			Expect(instance.CanIpForward).To(Equal(false))
+			Expect(instance.NetworkInterfaces[0].AccessConfigs).To(BeEmpty())
 		})
 
 		By("deleting the VM")
@@ -162,6 +168,7 @@ var _ = Describe("VM", func() {
 			}`, vmCID)
 		assertSucceeds(request)
 	})
+
 	It("executes the VM lifecycle with disk attachment hints", func() {
 		By("creating two disks")
 		var request, diskCID, diskCID2, vmCID string

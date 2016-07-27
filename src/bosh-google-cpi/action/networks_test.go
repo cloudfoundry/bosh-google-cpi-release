@@ -18,7 +18,7 @@ var _ = Describe("Networks", func() {
 
 	BeforeEach(func() {
 		networks = Networks{
-			"fake-network-1-name": Network{
+			"fake-network-1-name": &Network{
 				Type:    "fake-network-1-type",
 				IP:      "fake-network-1-ip",
 				Gateway: "fake-network-1-gateway",
@@ -34,7 +34,7 @@ var _ = Describe("Networks", func() {
 					IPForwarding:        false,
 				},
 			},
-			"fake-network-2-name": Network{
+			"fake-network-2-name": &Network{
 				Type: "fake-network-2-type",
 				IP:   "fake-network-2-ip",
 				DHCP: true,
@@ -45,7 +45,7 @@ var _ = Describe("Networks", func() {
 	Describe("AsInstanceServiceNetworks", func() {
 		It("returns networks for the instance service", func() {
 			expectedInstanceNetworks := instance.Networks{
-				"fake-network-1-name": instance.Network{
+				"fake-network-1-name": &instance.Network{
 					Type:                "fake-network-1-type",
 					IP:                  "fake-network-1-ip",
 					Gateway:             "fake-network-1-gateway",
@@ -58,7 +58,7 @@ var _ = Describe("Networks", func() {
 					EphemeralExternalIP: true,
 					IPForwarding:        false,
 				},
-				"fake-network-2-name": instance.Network{
+				"fake-network-2-name": &instance.Network{
 					Type: "fake-network-2-type",
 					IP:   "fake-network-2-ip",
 				},

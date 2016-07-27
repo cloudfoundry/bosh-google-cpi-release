@@ -112,7 +112,7 @@ var _ = Describe("CreateVM", func() {
 			}
 
 			networks = Networks{
-				"fake-network-name": Network{
+				"fake-network-name": &Network{
 					Type:    "dynamic",
 					IP:      "fake-network-ip",
 					Gateway: "fake-network-gateway",
@@ -276,6 +276,25 @@ var _ = Describe("CreateVM", func() {
 			Expect(vmService.CreateCalled).To(BeFalse())
 			Expect(vmService.CleanUpCalled).To(BeFalse())
 			Expect(registryClient.UpdateCalled).To(BeFalse())
+		})
+
+		Context("when VM props override network props", func() {
+			BeforeEach(func() {
+				var t bool = true
+				cloudProps.EphemeralExternalIP = &t
+				cloudProps.IPForwarding = &t
+
+				networks["fake-network-name"].CloudProperties.IPForwarding = false
+				networks["fake-network-name"].CloudProperties.EphemeralExternalIP = false
+				expectedInstanceNetworks.Network().IPForwarding = true
+				expectedInstanceNetworks.Network().EphemeralExternalIP = true
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+			})
 		})
 
 		Context("when custom machine type is set", func() {
