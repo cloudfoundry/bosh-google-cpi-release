@@ -109,9 +109,9 @@ These options are specified under `cloud_properties` at the [networks](http://bo
 |:----------------------|:--------:|:------------- |:-----------
 | network_name          | N        | String        | The name of the [Google Compute Engine Network](https://cloud.google.com/compute/docs/networking#networks) the CPI will use when creating the instance (if not set, by default it will use the `default` network)
 | subnetwork_name       | N        | String        | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance (if the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field is required)
-| ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default)
-| ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default)
-| tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags
+| ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default). Can be overridden in resource_pools.
+| ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default). Can be overridden in resource_pools.
+| tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags. Will be merged with tags in resource_pools.
 
 ### BOSH Resource pool options
 
@@ -131,6 +131,9 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | service_scopes      | N        | Array&lt;String&gt; | [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for your default service account that determine the level of access your instance has to other Google services (no scope is assigned to the instance by default)
 | target_pool         | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
 | backend_service     | N        | String        | The name of the [Google Compute Engine Backend Service](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups) the instances should be added to. The backend service must already be configured with an [Instance Group](https://cloud.google.com/compute/docs/instance-groups/unmanaged-groups)in the same zone as this instance
+| ephemeral_external_ip | N        | Boolean       | Overrides the equivalent option in the networks section
+| ip_forwarding         | N        | Boolean       | Overrides the equivalent option in the networks section
+| tags                  | N        | Array&lt;String&gt; | Merged with tags from the networks section 
 
 ### BOSH Persistent Disks options
 

@@ -87,6 +87,15 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
+	// Certain properties defined in the Networks section of a manifest can be
+	// overridden by VM properties. Here, we see if any of the VM properties
+	// have been set and should override Network settings
+	if cloudProps.IPForwarding != nil {
+		vmNetworks.Network().IPForwarding = *cloudProps.IPForwarding
+	}
+	if cloudProps.EphemeralExternalIP != nil {
+		vmNetworks.Network().EphemeralExternalIP = *cloudProps.EphemeralExternalIP
+	}
 	// Validate VM tags
 	if err = cloudProps.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
