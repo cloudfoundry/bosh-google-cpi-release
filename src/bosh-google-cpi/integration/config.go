@@ -38,6 +38,8 @@ var (
 	customNetworkName    = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
 	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
 	ip                   = envOrDefault("PRIVATE_IP", "192.168.100.102")
+	ip2                  = envOrDefault("PRIVATE_IP", "192.168.100.103")
+	ip3                  = envOrDefault("PRIVATE_IP", "192.168.100.104")
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
 	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
@@ -66,6 +68,15 @@ var (
 	}`, googleProject, zone)
 )
 
+func toggleAsyncDelete() {
+	key := "CPI_ASYNC_DELETE"
+	current := os.Getenv(key)
+	if current == "" {
+		os.Setenv(key, "true")
+	} else {
+		os.Setenv(key, "")
+	}
+}
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
 	var cfg boshcfg.Config

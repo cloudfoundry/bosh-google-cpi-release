@@ -1,11 +1,14 @@
 package instance
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"os"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
+
+const asyncDeleteKey = "CPI_ASYNC_DELETE"
 
 func (i GoogleInstanceService) Delete(id string) error {
 	instance, found, err := i.Find(id, "")
@@ -22,8 +25,11 @@ func (i GoogleInstanceService) Delete(id string) error {
 		return bosherr.WrapErrorf(err, "Failed to delete Google Instance '%s'", id)
 	}
 
-	if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to delete Google Instance '%s'", id)
+	if os.Getenv(asyncDeleteKey) == "" {
+		i.logger.Debug(googleInstanceServiceLogTag, "Waiting for instance %q to delete", id)
+		if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
+			return bosherr.WrapErrorf(err, "Failed to delete Google Instance '%s'", id)
+		}
 	}
 
 	if err = i.removeFromTargetPool(instance.SelfLink); err != nil {
