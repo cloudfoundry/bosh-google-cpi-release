@@ -6,7 +6,7 @@ import (
 	"bosh-google-cpi/google/instance_service"
 )
 
-type Networks map[string]Network
+type Networks map[string]*Network
 
 type Network struct {
 	Type            string                 `json:"type,omitempty"`
@@ -23,7 +23,7 @@ func (ns Networks) AsInstanceServiceNetworks() instance.Networks {
 	networks := instance.Networks{}
 
 	for netName, network := range ns {
-		networks[netName] = instance.Network{
+		networks[netName] = &instance.Network{
 			Type:                network.Type,
 			IP:                  network.IP,
 			Gateway:             network.Gateway,

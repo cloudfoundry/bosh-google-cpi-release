@@ -6,7 +6,7 @@ import (
 
 const defaultNetworkName = "default"
 
-type Networks map[string]Network
+type Networks map[string]*Network
 
 func (n Networks) Validate() error {
 	var networks, vipNetworks int
@@ -37,7 +37,7 @@ func (n Networks) Validate() error {
 	return nil
 }
 
-func (n Networks) Network() Network {
+func (n Networks) Network() *Network {
 	for _, net := range n {
 		if !net.IsVip() {
 			// There can only be 1 dynamic or manual network
@@ -45,10 +45,10 @@ func (n Networks) Network() Network {
 		}
 	}
 
-	return Network{}
+	return &Network{}
 }
 
-func (n Networks) VipNetwork() Network {
+func (n Networks) VipNetwork() *Network {
 	for _, net := range n {
 		if net.IsVip() {
 			// There can only be 1 vip network
@@ -56,7 +56,7 @@ func (n Networks) VipNetwork() Network {
 		}
 	}
 
-	return Network{}
+	return &Network{}
 }
 
 func (n Networks) DNS() []string {

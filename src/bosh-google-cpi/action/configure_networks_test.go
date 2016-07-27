@@ -32,7 +32,7 @@ var _ = Describe("ConfigureNetworks", func() {
 	Describe("Run", func() {
 		BeforeEach(func() {
 			networks = Networks{
-				"fake-network-name": Network{
+				"fake-network-name": &Network{
 					Type:    "dynamic",
 					IP:      "fake-network-ip",
 					Gateway: "fake-network-gateway",

@@ -10,14 +10,14 @@ import (
 var _ = Describe("Networks", func() {
 	var (
 		err            error
-		dynamicNetwork Network
-		manualNetwork  Network
-		vipNetwork     Network
+		dynamicNetwork *Network
+		manualNetwork  *Network
+		vipNetwork     *Network
 		networks       Networks
 	)
 
 	BeforeEach(func() {
-		dynamicNetwork = Network{
+		dynamicNetwork = &Network{
 			Type:                "dynamic",
 			IP:                  "fake-dynamic-network-ip",
 			Gateway:             "fake-dynamic-network-gateway",
@@ -30,7 +30,7 @@ var _ = Describe("Networks", func() {
 			IPForwarding:        false,
 			Tags:                Tags{"fake-dynamic-network-network-tag"},
 		}
-		manualNetwork = Network{
+		manualNetwork = &Network{
 			Type:                "manual",
 			IP:                  "fake-manual-network-ip",
 			Gateway:             "fake-manual-network-gateway",
@@ -43,7 +43,7 @@ var _ = Describe("Networks", func() {
 			IPForwarding:        false,
 			Tags:                Tags{"fake-manual-network-network-tag"},
 		}
-		vipNetwork = Network{
+		vipNetwork = &Network{
 			Type:                "vip",
 			IP:                  "fake-vip-network-ip",
 			Gateway:             "fake-vip-network-gateway",
@@ -73,7 +73,7 @@ var _ = Describe("Networks", func() {
 
 		Context("when networks are not valid", func() {
 			BeforeEach(func() {
-				networks = Networks{"fake-network-name": Network{Type: "unknown"}}
+				networks = Networks{"fake-network-name": &Network{Type: "unknown"}}
 			})
 
 			It("returns an error", func() {
@@ -175,7 +175,7 @@ var _ = Describe("Networks", func() {
 			})
 
 			It("returns an emtpy network", func() {
-				Expect(networks.Network()).To(Equal(Network{}))
+				Expect(networks.Network()).To(Equal(&Network{}))
 			})
 		})
 	})
@@ -197,7 +197,7 @@ var _ = Describe("Networks", func() {
 			})
 
 			It("returns an emtpy network", func() {
-				Expect(networks.Network()).To(Equal(Network{}))
+				Expect(networks.Network()).To(Equal(&Network{}))
 			})
 		})
 	})
@@ -213,7 +213,7 @@ var _ = Describe("Networks", func() {
 			})
 
 			It("returns an emtpy network", func() {
-				Expect(networks.VipNetwork()).To(Equal(Network{}))
+				Expect(networks.VipNetwork()).To(Equal(&Network{}))
 			})
 		})
 	})
