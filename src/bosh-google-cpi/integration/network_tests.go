@@ -163,7 +163,9 @@ var _ = Describe("Network", func() {
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
+		toggleAsyncDelete()
 		assertSucceeds(request)
+		toggleAsyncDelete()
 	})
 
 	It("can create a VM in a subnet", func() {
@@ -329,7 +331,9 @@ var _ = Describe("Network", func() {
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
+		toggleAsyncDelete()
 		assertSucceeds(request)
+		toggleAsyncDelete()
 	})
 
 	It("execute the creation and deleting of a VM in a target pool", func() {
