@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"bosh-google-cpi/action"
 	boshapi "bosh-google-cpi/api"
@@ -37,14 +38,16 @@ var (
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")
 	customNetworkName    = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
 	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
-	ip                   = envOrDefault("PRIVATE_IP", "192.168.100.102")
-	ip2                  = envOrDefault("PRIVATE_IP", "192.168.100.103")
-	ip3                  = envOrDefault("PRIVATE_IP", "192.168.100.104")
+	ipAddrs              = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
 	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
+
+	// Channel that will be used to retrieve IPs to use
+	ips chan string
+
 	// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
 	asyncDelete = envOrDefault("CPI_ASYNC_DELETE", "true")
 
@@ -79,6 +82,7 @@ func toggleAsyncDelete() {
 		os.Setenv(key, "")
 	}
 }
+
 func execCPI(request string) (boshdisp.Response, error) {
 	var err error
 	var cfg boshcfg.Config

@@ -35,6 +35,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 			}`, stemcellURL)
 	stemcell := assertSucceedsWithResult(request).(string)
 
+	ips = make(chan string, len(ipAddrs))
+
+	// Parse IP addresses to be used and put on a chan
+	for _, addr := range ipAddrs {
+		ips <- addr
+	}
+
 	return []byte(stemcell)
 }, func(data []byte) {
 	// Ensure stemcell was initialized

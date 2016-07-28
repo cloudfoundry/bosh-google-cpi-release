@@ -39,7 +39,7 @@ google_subnetwork_gw: # The gateway IP of {{google_subnetwork}}
 
 # All of the following IP addresses must be within {{google_subnetwork}}'s CIDR
 # and be unique.
-google_address_static_int_ubuntu: # A private IP address in {{google_subnetwork}}
+google_address_static_int_ubuntu: # Three comma-delimited IP address in {{google_subnetwork}}
 google_address_static_director_ubuntu: # A private IP address in {{google_subnetwork}}
 google_address_static_bats_ubuntu: # A private IP address in {{google_subnetwork}}
 google_address_static_pair_bats_ubuntu: # Two comma-delimited IP address in {{google_subnetwork}}

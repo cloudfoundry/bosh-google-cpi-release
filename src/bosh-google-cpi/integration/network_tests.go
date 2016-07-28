@@ -210,7 +210,7 @@ var _ = Describe("Network", func() {
 	It("can create a VM with a static private IP", func() {
 		By("creating a VM")
 		var vmCID string
-
+		ip := <-ips
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -246,10 +246,12 @@ var _ = Describe("Network", func() {
 			  "arguments": ["%v"]
 			}`, vmCID)
 		assertSucceeds(request)
+		ips <- ip
 	})
 
 	It("can create a VM with a static private IP and ephemeral public IP", func() {
 		By("creating a VM")
+		ip := <-ips
 		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
@@ -287,10 +289,12 @@ var _ = Describe("Network", func() {
 			  "arguments": ["%v"]
 			}`, vmCID)
 		assertSucceeds(request)
+		ips <- ip
 	})
 
 	It("can create a VM with a static private IP and static public IP", func() {
 		By("creating a VM")
+		ip := <-ips
 		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
@@ -333,6 +337,7 @@ var _ = Describe("Network", func() {
 			}`, vmCID)
 		toggleAsyncDelete()
 		assertSucceeds(request)
+		ips <- ip
 		toggleAsyncDelete()
 	})
 
