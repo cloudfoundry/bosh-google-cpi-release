@@ -42,4 +42,6 @@ builds:
     version: 24.2.0
   75ff084a-a311-4a07-88e5-7b16e8d63769:
     version: 24.3.0
+  f66b7982-332c-49ec-add1-0bb66ea9f03e:
+    version: 24.4.0
 format-version: '2'
