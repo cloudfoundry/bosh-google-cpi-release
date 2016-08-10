@@ -144,7 +144,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, 
 		return nil, err
 	}
 	if !found {
-		return nil, bosherr.WrapErrorf(err, "Network '%s' does not exists", networks.NetworkName())
+		return nil, bosherr.WrapErrorf(err, "Network '%s' does not exist", networks.NetworkName())
 	}
 
 	subnetworkLink := ""
@@ -152,7 +152,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, 
 		subnetwork, err := i.subnetworkService.Find(networks.SubnetworkName(), util.RegionFromZone(zone))
 		if err != nil {
 			if err == subnet.ErrSubnetNotFound {
-				return nil, bosherr.WrapErrorf(err, "Subnetwork '%s' does not exists", networks.SubnetworkName())
+				return nil, bosherr.WrapErrorf(err, "Subnetwork '%s' does not exist", networks.SubnetworkName())
 			}
 			return nil, err
 		}
