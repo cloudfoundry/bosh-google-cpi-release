@@ -7,6 +7,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
+	subnet "bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
 )
@@ -30,7 +31,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if err != nil {
 		return "", err
 	}
-	networkInterfacesParams, err := i.createNetworkInterfacesParams(networks)
+	networkInterfacesParams, err := i.createNetworkInterfacesParams(networks, vmProps.Zone)
 	if err != nil {
 		return "", err
 	}
@@ -137,7 +138,7 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 	return metadata, nil
 }
 
-func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) ([]*compute.NetworkInterface, error) {
+func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, zone string) ([]*compute.NetworkInterface, error) {
 	network, found, err := i.networkService.Find(networks.NetworkName())
 	if err != nil {
 		return nil, err
@@ -148,12 +149,12 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks) 
 
 	subnetworkLink := ""
 	if networks.SubnetworkName() != "" {
-		subnetwork, found, err := i.subnetworkService.Find(networks.SubnetworkName(), "")
+		subnetwork, err := i.subnetworkService.Find(networks.SubnetworkName(), util.RegionFromZone(zone))
 		if err != nil {
+			if err == subnet.ErrSubnetNotFound {
+				return nil, bosherr.WrapErrorf(err, "Subnetwork '%s' does not exists", networks.SubnetworkName())
+			}
 			return nil, err
-		}
-		if !found {
-			return nil, bosherr.WrapErrorf(err, "Subnetwork '%s' does not exists", networks.SubnetworkName())
 		}
 		subnetworkLink = subnetwork.SelfLink
 	}
