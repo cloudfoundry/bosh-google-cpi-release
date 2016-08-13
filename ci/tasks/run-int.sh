@@ -58,6 +58,9 @@ echo "Looking for external IP..."
 external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
 export EXTERNAL_STATIC_IP=${external_ip}
 
+# Export zone
+export ZONE=${google_zone}
+
 # Setup Go and run tests
 export GOPATH=${PWD}/bosh-cpi-src
 export PATH=${GOPATH}/bin:$PATH

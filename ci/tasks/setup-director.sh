@@ -69,6 +69,7 @@ resource_pools:
     stemcell:
       url: file://stemcell.tgz
     cloud_properties:
+      zone: ${google_zone}
       machine_type: n1-standard-2
       root_disk_size_gb: 40
       root_disk_type: pd-standard

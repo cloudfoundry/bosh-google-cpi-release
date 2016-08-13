@@ -30,7 +30,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		resp, err := execCPI(request)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(resp.Error.Message).ToNot(BeEmpty())
@@ -46,7 +46,8 @@ var _ = Describe("VM", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -60,7 +61,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("locating the VM")
@@ -97,6 +98,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				   "machine_type": "n1-standard-1",
+					"zone": "%v",
 				   "tags": ["tag1", "tag2"]
 				},
 				{
@@ -111,7 +113,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
@@ -135,6 +137,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				   "machine_type": "n1-standard-1",
+				   "zone": "%v",
 				   "tags": ["tag1", "tag2", "integration-delete"],
 				   "ephemeral_external_ip": false,
 				   "ip_forwarding": false
@@ -153,7 +156,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
@@ -186,7 +189,8 @@ var _ = Describe("VM", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -200,7 +204,7 @@ var _ = Describe("VM", func() {
 				["%v", "%v"],
 				{}
 			  ]
-			}`, existingStemcell, networkName, diskCID, diskCID2)
+			}`, existingStemcell, zone, networkName, diskCID, diskCID2)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the disks")
@@ -234,7 +238,8 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "cpu": 2,
-				  "ram": 5120
+				  "ram": 5120,
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -248,7 +253,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
@@ -270,7 +275,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
-				  "zone": "us-central1-b"
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -284,7 +289,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
@@ -304,6 +309,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "automatic_restart": false
 				},
 				{
@@ -318,7 +324,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
@@ -340,6 +346,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "on_host_maintenance": "TERMINATE"
 				},
 				{
@@ -354,7 +361,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 
 		By("deleting the VM")
 		vmCID = assertSucceedsWithResult(request).(string)
@@ -376,6 +383,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "preemtible": true
 				},
 				{
@@ -390,7 +398,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
@@ -411,6 +419,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "service_scopes": ["devstorage.read_write"]
 				},
 				{
@@ -425,7 +434,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
@@ -453,6 +462,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "backend_service": "%v"
 				},
 				{
@@ -467,7 +477,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, backendService, networkName)
+			}`, existingStemcell, zone, backendService, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		ig, err := computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()

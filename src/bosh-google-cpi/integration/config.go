@@ -56,7 +56,7 @@ var (
 		"plugin": "google",
 		"properties": {
 		  "google": {
-			"project": "%v",
+			"project": "%v"
 		  },
 		  "agent": {
 			"mbus": "http://127.0.0.1",
