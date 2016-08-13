@@ -107,10 +107,6 @@ func (c GoogleClient) DefaultRootDiskType() string {
 	return c.config.DefaultRootDiskType
 }
 
-func (c GoogleClient) DefaultZone() string {
-	return c.config.DefaultZone
-}
-
 func (c GoogleClient) ComputeService() *compute.Service {
 	return c.computeService
 }

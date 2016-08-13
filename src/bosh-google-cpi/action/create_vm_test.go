@@ -85,7 +85,6 @@ var _ = Describe("CreateVM", func() {
 			agentOptions,
 			defaultRootDiskSizeGb,
 			defaultRootDiskType,
-			"fake-default-zone",
 		)
 	})
 
@@ -95,13 +94,13 @@ var _ = Describe("CreateVM", func() {
 			imageService.FindFound = true
 			machineTypeService.FindFound = true
 
-			diskService.FindDisk = disk.Disk{Zone: "fake-disk-zone"}
+			diskService.FindDisk = disk.Disk{Zone: "fake-default-zone"}
 			imageService.FindImage = image.Image{SelfLink: "fake-image-self-link"}
 			machineTypeService.FindMachineType = machinetype.MachineType{SelfLink: "fake-machine-type-self-link"}
 			diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 
 			cloudProps = VMCloudProperties{
-				Zone:              "",
+				Zone:              "fake-default-zone",
 				MachineType:       "fake-machine-type",
 				RootDiskSizeGb:    0,
 				RootDiskType:      "",
@@ -401,7 +400,6 @@ var _ = Describe("CreateVM", func() {
 					agentOptions,
 					defaultRootDiskSizeGb,
 					defaultRootDiskType,
-					"fake-default-zone",
 				)
 			})
 
@@ -464,7 +462,6 @@ var _ = Describe("CreateVM", func() {
 					agentOptions,
 					defaultRootDiskSizeGb,
 					defaultRootDiskType,
-					"fake-default-zone",
 				)
 			})
 
@@ -569,7 +566,7 @@ var _ = Describe("CreateVM", func() {
 			BeforeEach(func() {
 				diskService.FindFound = true
 				disks = []DiskCID{"fake-disk-1"}
-				expectedVMProps.Zone = "fake-disk-zone"
+				expectedVMProps.Zone = "fake-default-zone"
 			})
 
 			It("creates the vm at the right zone", func() {

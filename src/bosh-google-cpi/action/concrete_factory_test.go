@@ -197,7 +197,6 @@ var _ = Describe("ConcreteFactory", func() {
 			diskService,
 			diskTypeService,
 			vmService,
-			googleClient.DefaultZone(),
 		)))
 	})
 
@@ -257,7 +256,6 @@ var _ = Describe("ConcreteFactory", func() {
 			cfg.Cloud.Properties.Agent,
 			googleClient.DefaultRootDiskSizeGb(),
 			googleClient.DefaultRootDiskType(),
-			googleClient.DefaultZone(),
 		)))
 	})
 

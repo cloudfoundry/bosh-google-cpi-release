@@ -5,7 +5,6 @@ params = {
     "properties" => {
       "google" => {
         "project" => p("google.project"),
-        "default_zone" => p("google.default_zone"),
         "json_key" => p("google.json_key"),
         "default_root_disk_size_gb" => p("google.default_root_disk_size_gb"),
         "default_root_disk_type" => p("google.default_root_disk_type")
@@ -22,9 +21,6 @@ params = {
 
 if_p('google.project') do |project|
   params["cloud"]["properties"]["google"]["project"] = project
-end
-if_p('google.default_zone') do |default_zone|
-  params["cloud"]["properties"]["google"]["default_zone"] = default_zone
 end
 if_p('google.json_key') do |json_key|
   params["cloud"]["properties"]["google"]["json_key"] = json_key

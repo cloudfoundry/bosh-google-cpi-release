@@ -1,6 +1,8 @@
 package action
 
 import (
+	"fmt"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
@@ -25,7 +27,6 @@ type CreateVM struct {
 	agentOptions          registry.AgentOptions
 	defaultRootDiskSizeGb int
 	defaultRootDiskType   string
-	defaultZone           string
 }
 
 func NewCreateVM(
@@ -39,7 +40,6 @@ func NewCreateVM(
 	agentOptions registry.AgentOptions,
 	defaultRootDiskSizeGb int,
 	defaultRootDiskType string,
-	defaultZone string,
 ) CreateVM {
 	return CreateVM{
 		vmService:             vmService,
@@ -52,7 +52,6 @@ func NewCreateVM(
 		agentOptions:          agentOptions,
 		defaultRootDiskSizeGb: defaultRootDiskSizeGb,
 		defaultRootDiskType:   defaultRootDiskType,
-		defaultZone:           defaultZone,
 	}
 }
 
@@ -169,7 +168,7 @@ func (cv CreateVM) findZone(zoneName string, disks []DiskCID) (string, error) {
 		return zone, nil
 	}
 
-	return cv.defaultZone, nil
+	return "", fmt.Errorf("Could not find zone %q", zoneName)
 }
 
 func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {

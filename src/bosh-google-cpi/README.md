@@ -27,7 +27,6 @@ Create a configuration file:
 {
   "google": {
     "project": "my-gce-project",
-    "default_zone": "us-central1-a",
     "json_key": "{\"private_key_id\": \"...\"}",
     "default_root_disk_size_gb": 20,
     "default_root_disk_type": ""
@@ -64,7 +63,6 @@ Create a configuration file:
 | Option                                    | Required   | Type          | Description
 |:------------------------------------------|:----------:|:------------- |:-----------
 | google.project                            | Y          | String        | Google Compute Engine [Project](https://cloud.google.com/compute/docs/projects)
-| google.default_zone                       | Y          | String        | Google Compute Engine default [Zone](https://cloud.google.com/compute/docs/zones)
 | google.json_key                           | N         | String        | Contents of the Google Compute Engine [JSON file](https://developers.google.com/identity/protocols/application-default-credentials). Only required if you are not running the CPI inside a Google Compute Engine VM with `compute` and `devstorage.full_control` service scopes and/or the Google Cloud SDK has not been initialized
 | google.default_root_disk_size_gb          | N          | Integer       | The default size (in Gb) of the instance root disk (default is `10Gb`)
 | google.default_root_disk_type             | N          | String        | The name of the default [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
