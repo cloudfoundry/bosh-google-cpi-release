@@ -12,8 +12,8 @@ var _ = Describe("Snapshot", func() {
 		var diskCID, snapshotCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_disk",
-			  "arguments": [32768, {}, ""]
-			}`)
+			  "arguments": [32768, {"zone": "%v"}, ""]
+			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 
 		By("snapshotting the disk")
