@@ -99,9 +99,7 @@ compilation:
     machine_type: <%= properties.machine_type || "n1-standard-2" %>
     root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
     root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-    <% if properties.zone %>
     zone: <%= properties.zone %>
-    <% end %>
 
 update:
   canaries: <%= properties.canaries || 1 %>
@@ -139,9 +137,7 @@ resource_pools:
       machine_type: <%= properties.machine_type || "n1-standard-2" %>
       root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
       root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-      <% if properties.zone %>
       zone: <%= properties.zone %>
-      <% end %>
     <% if properties.password %>
     env:
       bosh:
@@ -200,6 +196,7 @@ properties:
     version: latest
   instances: 1
   vip: ${bats_ip}
+  zone: ${google_zone}
   static_ips: [${google_address_static_pair_bats}]
   networks:
     - name: default
