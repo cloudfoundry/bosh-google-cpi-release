@@ -8,8 +8,7 @@ import (
 )
 
 var validConfig = Config{
-	Project:     "fake-project",
-	DefaultZone: "fake-default-zone",
+	Project: "fake-project",
 }
 
 var _ = Describe("Config", func() {
@@ -33,14 +32,6 @@ var _ = Describe("Config", func() {
 			err := config.Validate()
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty Project"))
-		})
-
-		It("returns error if DefaultZone is empty", func() {
-			config.DefaultZone = ""
-
-			err := config.Validate()
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("Must provide a non-empty DefaultZone"))
 		})
 	})
 })

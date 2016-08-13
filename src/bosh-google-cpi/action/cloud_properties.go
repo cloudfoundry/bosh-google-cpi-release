@@ -6,6 +6,7 @@ import (
 
 type DiskCloudProperties struct {
 	DiskType string `json:"type,omitempty"`
+	Zone     string `json:"zone,omitempty"`
 }
 
 type Environment map[string]interface{}

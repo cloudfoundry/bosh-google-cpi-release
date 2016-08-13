@@ -15,8 +15,6 @@ templates:
 properties:
   google.project:
     description: "Google Compute Engine project"
-  google.default_zone:
-    description: "Google Compute Engine Default Zone"
   google.json_key:
     description: "Google Compute Engine JSON key"
     default: ""

@@ -36,13 +36,13 @@ var _ = Describe("CreateDisk", func() {
 		diskService = &diskfakes.FakeDiskService{}
 		diskTypeService = &disktypefakes.FakeDiskTypeService{}
 		vmService = &instancefakes.FakeInstanceService{}
-		createDisk = NewCreateDisk(diskService, diskTypeService, vmService, "fake-default-zone")
+		createDisk = NewCreateDisk(diskService, diskTypeService, vmService)
 	})
 
 	Describe("Run", func() {
 		BeforeEach(func() {
 			vmCID = ""
-			cloudProps = DiskCloudProperties{}
+			cloudProps = DiskCloudProperties{Zone: "fake-default-zone"}
 			diskService.CreateID = "fake-disk-id"
 		})
 
@@ -113,7 +113,7 @@ var _ = Describe("CreateDisk", func() {
 
 		Context("when disk type is set", func() {
 			BeforeEach(func() {
-				cloudProps = DiskCloudProperties{DiskType: "fake-disk-type"}
+				cloudProps = DiskCloudProperties{DiskType: "fake-disk-type", Zone: "fake-default-zone"}
 				diskTypeService.FindFound = true
 				diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-disk-type-self-link"}
 			})

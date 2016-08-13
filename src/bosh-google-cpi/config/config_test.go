@@ -14,8 +14,7 @@ import (
 )
 
 var validGoogleConfig = bgcconfig.Config{
-	Project:     "fake-project",
-	DefaultZone: "fake-default-zone",
+	Project: "fake-project",
 }
 
 var validAgentOptions = registry.AgentOptions{

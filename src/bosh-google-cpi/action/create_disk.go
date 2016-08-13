@@ -14,27 +14,23 @@ type CreateDisk struct {
 	diskService     disk.Service
 	diskTypeService disktype.Service
 	vmService       instance.Service
-	defaultZone     string
 }
 
 func NewCreateDisk(
 	diskService disk.Service,
 	diskTypeService disktype.Service,
 	vmService instance.Service,
-	defaultZone string,
 ) CreateDisk {
 	return CreateDisk{
 		diskService:     diskService,
 		diskTypeService: diskTypeService,
 		vmService:       vmService,
-		defaultZone:     defaultZone,
 	}
 }
 
 func (cd CreateDisk) Run(size int, cloudProps DiskCloudProperties, vmCID VMCID) (DiskCID, error) {
-	var diskType string
-	var zone = cd.defaultZone
-
+	var zone, diskType string
+	zone = cloudProps.Zone
 	// Find the VM (if provided) so we can create the disk in the same zone
 	if vmCID != "" {
 		vm, found, err := cd.vmService.Find(string(vmCID), "")

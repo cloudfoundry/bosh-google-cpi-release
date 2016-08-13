@@ -57,7 +57,6 @@ var (
 		"properties": {
 		  "google": {
 			"project": "%v",
-			"default_zone": "%v"
 		  },
 		  "agent": {
 			"mbus": "http://127.0.0.1",
@@ -70,7 +69,7 @@ var (
 		  }
 		}
 	  }
-	}`, googleProject, zone)
+	}`, googleProject)
 )
 
 func toggleAsyncDelete() {

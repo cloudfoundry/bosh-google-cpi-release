@@ -196,7 +196,6 @@ jobs:
 
       google: &google_properties
         project: ${google_project}
-        default_zone: ${google_zone}
 
       agent:
         mbus: nats://nats:nats-password@${google_address_static_director}:4222
