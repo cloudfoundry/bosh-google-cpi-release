@@ -19,7 +19,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -34,7 +35,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.CanIpForward).To(BeTrue())
@@ -57,7 +58,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -71,7 +73,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
@@ -94,7 +96,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -109,7 +112,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].AccessConfigs[0].NatIP).ToNot(BeEmpty())
@@ -132,7 +135,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -151,7 +155,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName, externalStaticIP)
+			}`, existingStemcell, zone, networkName, externalStaticIP)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].AccessConfigs[0].NatIP).ToNot(BeEmpty())
@@ -177,7 +181,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -192,7 +197,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, customNetworkName, customSubnetworkName)
+			}`, existingStemcell, zone, customNetworkName, customSubnetworkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].Network).To(ContainSubstring(customNetworkName))
@@ -217,7 +222,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -233,7 +239,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, ip, customNetworkName, customSubnetworkName)
+			}`, existingStemcell, zone, ip, customNetworkName, customSubnetworkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].NetworkIP).To(Equal(ip))
@@ -259,7 +265,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -276,7 +283,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, ip, customNetworkName, customSubnetworkName)
+			}`, existingStemcell, zone, ip, customNetworkName, customSubnetworkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].NetworkIP).To(Equal(ip))
@@ -302,7 +309,8 @@ var _ = Describe("Network", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -323,7 +331,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, ip, customNetworkName, customSubnetworkName, externalStaticIP)
+			}`, existingStemcell, zone, ip, customNetworkName, customSubnetworkName, externalStaticIP)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			Expect(instance.NetworkInterfaces[0].NetworkIP).To(Equal(ip))
@@ -351,6 +359,7 @@ var _ = Describe("Network", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
 				  "target_pool": "%v"
 				},
 				{
@@ -365,7 +374,7 @@ var _ = Describe("Network", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, targetPool, networkName)
+			}`, existingStemcell, zone, targetPool, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		tp, err := computeService.TargetPools.Get(googleProject, region, targetPool).Do()
 		Expect(err).ToNot(HaveOccurred())

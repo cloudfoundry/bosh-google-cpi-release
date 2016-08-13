@@ -177,8 +177,8 @@ var _ = Describe("VM", func() {
 		var request, diskCID, diskCID2, vmCID string
 		request = fmt.Sprintf(`{
 			  "method": "create_disk",
-			  "arguments": [32768, {}, ""]
-			}`)
+			  "arguments": [32768, {"zone": "%v"}, ""]
+			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 		diskCID2 = assertSucceedsWithResult(request).(string)
 

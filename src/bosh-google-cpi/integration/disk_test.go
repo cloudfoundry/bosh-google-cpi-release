@@ -14,8 +14,8 @@ var _ = Describe("Disk", func() {
 		var diskCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_disk",
-			  "arguments": [32768, {}, ""]
-			}`)
+			  "arguments": [32768, {"zone": "%v"}, ""]
+			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 
 		By("creating a VM")
@@ -26,7 +26,8 @@ var _ = Describe("Disk", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1"
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
 				},
 				{
 				  "default": {
@@ -40,7 +41,7 @@ var _ = Describe("Disk", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
+			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("attaching the disk")
@@ -98,8 +99,8 @@ var _ = Describe("Disk", func() {
 		var diskCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_disk",
-			  "arguments": [32768, {"type": "pd-ssd"}, ""]
-			}`)
+			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the disk")
