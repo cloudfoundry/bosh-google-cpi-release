@@ -30,7 +30,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, zone, networkName)
+			}`, existingStemcell, networkName)
 		resp, err := execCPI(request)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(resp.Error.Message).ToNot(BeEmpty())
