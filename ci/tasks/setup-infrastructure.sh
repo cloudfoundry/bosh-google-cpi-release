@@ -19,6 +19,7 @@ check_param google_address_bats_ubuntu
 check_param google_target_pool
 check_param google_backend_service 
 check_param google_address_int_ubuntu
+check_param google_service_account
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
@@ -31,6 +32,7 @@ gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
 echo "Setting up google infrastructure..."
+gcloud -q iam service-accounts create ${google_service_account}
 gcloud -q compute addresses create ${google_address_director_ubuntu}
 gcloud -q compute addresses create ${google_address_bats_ubuntu}
 gcloud -q compute addresses create ${google_address_int_ubuntu}

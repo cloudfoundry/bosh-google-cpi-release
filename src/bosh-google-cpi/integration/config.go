@@ -33,6 +33,7 @@ var (
 	externalStaticIP = os.Getenv("EXTERNAL_STATIC_IP")
 	keepResuableVM   = os.Getenv("KEEP_REUSABLE_VM")
 	stemcellURL      = os.Getenv("STEMCELL_URL")
+	serviceAccount   = os.Getenv("SERVICE_ACCOUNT")
 
 	// Configurable defaults
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")

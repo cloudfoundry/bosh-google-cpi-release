@@ -15,6 +15,7 @@ check_param google_target_pool
 check_param google_backend_service
 check_param google_address_static_int
 check_param google_address_int
+check_param google_service_account
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
@@ -29,6 +30,7 @@ export BACKEND_SERVICE=${google_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
+export SERVICE_ACCOUNT=${google_service_account}
 export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 export CPI_ASYNC_DELETE=true
 

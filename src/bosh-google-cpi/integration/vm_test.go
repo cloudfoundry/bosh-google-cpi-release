@@ -453,7 +453,7 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("executes the VM lifecycle with scopes", func() {
+	It("executes the VM lifecycle with default service account scopes", func() {
 		By("creating a VM")
 		var vmCID string
 		request := fmt.Sprintf(`{
@@ -489,6 +489,72 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
+	It("executes the VM lifecycle with a custom service account and scopes", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "service_account": "%v",
+				  "service_scopes": ["devstorage.read_write"]
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, serviceAccount, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("fails the VM lifecycle with a custom service account and no scopes", func() {
+		By("creating a VM")
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "service_account": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, serviceAccount, networkName)
+		err := assertFails(request)
+		Expect(err.Error()).To(ContainSubstring("You must define at least one service scope"))
+
+	})
 	It("executes the VM lifecycle with a backend service", func() {
 		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
 			instances := make([]string, len(ig.Items))

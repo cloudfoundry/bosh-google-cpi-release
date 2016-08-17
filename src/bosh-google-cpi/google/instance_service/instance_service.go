@@ -34,6 +34,7 @@ type Properties struct {
 	AutomaticRestart  bool
 	OnHostMaintenance string
 	Preemptible       bool
+	ServiceAccount    ServiceAccount
 	ServiceScopes     ServiceScopes
 	TargetPool        string
 	BackendService    string
@@ -41,3 +42,4 @@ type Properties struct {
 }
 
 type ServiceScopes []string
+type ServiceAccount string

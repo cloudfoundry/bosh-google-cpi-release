@@ -21,5 +21,6 @@ params:
   google_address_int:        replace-me 
   google_address_static_int: replace-me 
   google_backend_service:    replace-me 
+  google_service_account:    replace-me 
   google_json_key_data: |
     replace-me
