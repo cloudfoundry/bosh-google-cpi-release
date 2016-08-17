@@ -21,3 +21,4 @@ params:
   google_address_director_ubuntu: replace-me
   google_address_bats_ubuntu:     replace-me
   google_address_int_ubuntu:      replace-me
+  google_service_account:         replace-me 

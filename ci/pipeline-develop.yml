@@ -63,6 +63,7 @@ jobs:
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
+            google_service_account:         {{google_service_account}}
 
       - task: setup-infrastructure
         file: bosh-cpi-src/ci/tasks/setup-infrastructure.yml
@@ -83,6 +84,7 @@ jobs:
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
+            google_service_account:         {{google_service_account}}
 
   - name: teardown-infrastructure
     serial_groups: [run-bats,run-int]
@@ -108,6 +110,7 @@ jobs:
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
             google_address_int_ubuntu:      {{google_address_int_ubuntu}}
+            google_service_account:         {{google_service_account}}
 
   - name: deploy-ubuntu
     serial_groups: [run-bats]
@@ -200,6 +203,7 @@ jobs:
             google_address_static_int:        {{google_address_static_int_ubuntu}}
             google_target_pool:               {{google_target_pool}}
             google_backend_service:           {{google_backend_service}}
+            google_service_account:         {{google_service_account}}
 
 
 resources:

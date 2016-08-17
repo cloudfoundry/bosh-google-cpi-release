@@ -296,6 +296,22 @@ var _ = Describe("CreateVM", func() {
 			})
 		})
 
+		Context("when custom service account and service scopes are provided", func() {
+			BeforeEach(func() {
+				cloudProps.ServiceAccount = "fake-service-account"
+				cloudProps.ServiceScopes = []string{"fake-service-scope"}
+
+				expectedVMProps.ServiceScopes = instance.ServiceScopes([]string{"fake-service-scope"})
+				expectedVMProps.ServiceAccount = instance.ServiceAccount("fake-service-account")
+			})
+
+			It("creates the vm with a default service account and single scope", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+			})
+		})
+
 		Context("when custom machine type is set", func() {
 			BeforeEach(func() {
 				cloudProps.MachineType = ""

@@ -36,7 +36,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		return "", err
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
-	serviceAccountsParams := i.createServiceAccountsParams(vmProps.ServiceScopes)
+	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
 	tagsParams, err := i.createTagsParams(networks.Tags(), vmProps.Tags)
 	if err != nil {
 		return "", err
@@ -207,16 +207,20 @@ func (i GoogleInstanceService) createSchedulingParams(
 	return scheduling
 }
 
-func (i GoogleInstanceService) createServiceAccountsParams(serviceScopes ServiceScopes) []*compute.ServiceAccount {
+func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) []*compute.ServiceAccount {
 	var serviceAccounts []*compute.ServiceAccount
 
-	if len(serviceScopes) > 0 {
+	if vmProps.ServiceAccount == "" {
+		vmProps.ServiceAccount = "default"
+	}
+
+	if len(vmProps.ServiceScopes) > 0 {
 		var scopes []string
-		for _, serviceScope := range serviceScopes {
+		for _, serviceScope := range vmProps.ServiceScopes {
 			scopes = append(scopes, fmt.Sprintf("https://www.googleapis.com/auth/%s", serviceScope))
 		}
 		serviceAccount := &compute.ServiceAccount{
-			Email:  "default",
+			Email:  string(vmProps.ServiceAccount),
 			Scopes: scopes,
 		}
 		serviceAccounts = append(serviceAccounts, serviceAccount)

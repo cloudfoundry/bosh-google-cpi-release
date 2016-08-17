@@ -25,3 +25,4 @@ params:
   google_target_pool:             replace-me 
   google_backend_service:         replace-me 
   google_address_int_ubuntu:      replace-me
+  google_service_account:         replace-me 

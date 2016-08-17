@@ -111,6 +111,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
 		Preemptible:       cloudProps.Preemptible,
+		ServiceAccount:    instance.ServiceAccount(cloudProps.ServiceAccount),
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,
 		BackendService:    cloudProps.BackendService,

@@ -22,6 +22,7 @@ google_json_key_data: |
 # The following configuration values are names of resources that will be
 # automatically created and destroyed in the pipeline. They must not conflict
 # with existing resources in {{google_project}}
+google_service_account: # Name of a service account that will be used in integration tests
 google_auto_network: # Name of an auto-configured network in {{google_project}
 google_network: # Name of a manually-configured network in {{google_project}
 google_subnetwork: # Name of a manually-configured subnetwork in {{google_network}}
