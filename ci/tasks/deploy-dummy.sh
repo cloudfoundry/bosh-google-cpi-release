@@ -60,6 +60,7 @@ compilation:
   reuse_compilation_vms: true
   cloud_properties:
     machine_type: n1-standard-2
+    zone: ${google_zone}
     root_disk_size_gb: 20
     root_disk_type: pd-standard
 
@@ -77,6 +78,7 @@ resource_pools:
     network: private
     cloud_properties:
       machine_type: n1-standard-2
+      zone: ${google_zone}
       root_disk_size_gb: 20
       root_disk_type: pd-standard
 

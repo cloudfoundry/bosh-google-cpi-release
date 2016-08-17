@@ -14,6 +14,7 @@ Please see [CHANGELOG.md] for details of each release.
 |[24.2.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.2.0.tgz)|80d3ef039cb0ed014e97eeea10569598804659d3|2016-07-26|
 |[24.3.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.3.0.tgz)|f62cebd284d682121a5b4075d0c60a47dd3981ca|2016-07-27|
 |[24.4.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.4.0.tgz)|0c8c8efc316e5d1e0b2e4665b88dfb044b4b87a3|2016-08-10|
+|[25.0.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.0.0.tgz)|701874022ea1d17e7cf2d829fde166aaacbdd1ed|2016-08-14|
 [//]: # (new-cpi)
 
 ### Stemcell
