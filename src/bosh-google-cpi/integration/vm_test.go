@@ -172,6 +172,50 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
+	It("can create a VM with a public IP in a network with public IPs disabled ", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+				   "zone": "%v",
+				   "tags": ["tag1", "tag2", "integration-delete"],
+				   "ephemeral_external_ip": true,
+				   "ip_forwarding": false
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v",
+					  "ephemeral_external_ip": false,
+					  "ip_forwarding": true
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
+			Expect(instance.CanIpForward).To(Equal(false))
+			Expect(instance.NetworkInterfaces[0].AccessConfigs[0].Name).ToNot(BeEmpty())
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
 	It("executes the VM lifecycle with disk attachment hints", func() {
 		By("creating two disks")
 		var request, diskCID, diskCID2, vmCID string
