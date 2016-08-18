@@ -30,7 +30,7 @@ export BACKEND_SERVICE=${google_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
-export SERVICE_ACCOUNT=${google_service_account}
+export SERVICE_ACCOUNT=${google_service_account}@${google_project}.iam.gserviceaccount.com
 export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 export CPI_ASYNC_DELETE=true
 
