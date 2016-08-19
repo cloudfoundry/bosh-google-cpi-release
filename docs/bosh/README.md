@@ -225,8 +225,8 @@ Before working this section, you must have deployed the supporting infrastructur
       url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
       sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
     - name: bosh-google-cpi
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-24.4.0.tgz
-      sha1: 0c8c8efc316e5d1e0b2e4665b88dfb044b4b87a3
+      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.1.0.tgz
+      sha1: f99dff6860731921282dd1bcd097a74beaeb72a4
 
   resource_pools:
     - name: vms
