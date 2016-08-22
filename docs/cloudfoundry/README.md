@@ -211,6 +211,7 @@ Before working this section, you must have deployed the supporting infrastructur
   $ sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
   $ sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
   $ sed -i s#{{REGION}}#$region# cloudfoundry.yml
+  sed -i s#{{ZONE}}#zone# cloudfoundry.yml
   ```
 
 1. Target the deployment file and deploy:
