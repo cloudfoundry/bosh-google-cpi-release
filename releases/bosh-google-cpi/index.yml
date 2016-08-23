@@ -46,4 +46,6 @@ builds:
     version: 24.4.0
   5eff0228-6585-4639-9d63-3a21201fe7df:
     version: 25.0.0
+  ed02bd76-1428-4540-a543-1ee8a4218b6a:
+    version: 25.1.0
 format-version: '2'
