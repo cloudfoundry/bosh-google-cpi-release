@@ -31,20 +31,20 @@ You must have followed the [Deploy supporting infrastructure automatically](../b
 1. Export your preferred region and zone (you may skip this if already set from the previous BOSH deployment instructions)
 
   ```
-  $ export region=us-east1
-  $ export zone=us-east1-d
+  export region=us-east1
+  export zone=us-east1-d
   ```
 
 1. Use Terraform's `plan` feature to confirm that the new resources will be created:
 
   ```
-  $ terraform plan -var region=${region} -var zone=${zone}
+  terraform plan -var region=${region} -var zone=${zone}
   ```
 
 1. Create the resources
 
   ```
-  $ terraform apply -var region=${region} -var zone=${zone}
+  terraform apply -var region=${region} -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
@@ -65,7 +65,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a new subnetwork for public CloudFoundry components:
 
   ```
-  $ gcloud compute networks subnets create cf-public-us-east1 \
+  gcloud compute networks subnets create cf-public-us-east1 \
       --network cf \
       --range 10.200.0.0/16
   ```
@@ -73,7 +73,7 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create a new subnetwork for private CloudFoundry components:
 
   ```
-  $ gcloud compute networks subnets create cf-private-us-east1 \
+  gcloud compute networks subnets create cf-private-us-east1 \
       --network cf \
       --range 192.168.0.0/16
   ```
@@ -81,14 +81,14 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create the following firewalls and [set the appropriate rules](https://cloud.google.com/compute/docs/networking#addingafirewall):
 
   ```
-  $ gcloud compute firewall-rules create cf-public \
+  gcloud compute firewall-rules create cf-public \
     --network cf \
     --target-tags cf-public \
     --allow tcp:80,tcp:443,tcp:2222,tcp:4443
   ```
 
   ```
-  $ gcloud compute firewall-rules create cf-internal \
+  gcloud compute firewall-rules create cf-internal \
     --network cf \
     --target-tags cf-internal \
     --source-tags cf-internal,bosh-internal \
@@ -98,19 +98,19 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Reserve a new [static external IP address](https://cloud.google.com/compute/docs/instances-and-network#reserve_new_static):
 
   ```
-  $ gcloud compute addresses create cf
+  gcloud compute addresses create cf
   ```
 
 1. Capture the address in a variable:
 
   ```
-  $ address=`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`
+  address=`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`
   ```
 
 1. Create the following load balancing [health check](https://cloud.google.com/compute/docs/load-balancing/health-checks):
 
   ```
-  $ gcloud compute http-health-checks create cf-public \
+  gcloud compute http-health-checks create cf-public \
     --timeout "5s" \
     --check-interval "30s" \
     --healthy-threshold "10" \
@@ -123,14 +123,14 @@ You must have the `gcloud` CLI installed on your workstation. See
 1. Create the following load balancing [target pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools):
 
   ```
-  $ gcloud compute target-pools create cf-public \
+  gcloud compute target-pools create cf-public \
     --health-check cf-public
   ```
 
 1. Create the following load balancing [forwarding rules](https://cloud.google.com/compute/docs/load-balancing/network/forwarding-rules):
 
   ```
-  $ gcloud compute forwarding-rules create cf-http \
+  gcloud compute forwarding-rules create cf-http \
     --ip-protocol TCP \
     --port-range 80 \
     --target-pool cf-public \
@@ -138,7 +138,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
 
   ```
-  $ gcloud compute forwarding-rules create cf-https \
+  gcloud compute forwarding-rules create cf-https \
     --ip-protocol TCP \
     --port-range 443 \
     --target-pool cf-public \
@@ -146,7 +146,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
 
   ```
-  $ gcloud compute forwarding-rules create cf-ssh \
+  gcloud compute forwarding-rules create cf-ssh \
     --ip-protocol TCP \
     --port-range 2222 \
     --target-pool cf-public \
@@ -154,7 +154,7 @@ You must have the `gcloud` CLI installed on your workstation. See
   ```
 
   ```
-  $ gcloud compute forwarding-rules create cf-wss \
+  gcloud compute forwarding-rules create cf-wss \
     --ip-protocol TCP \
     --port-range 4443 \
     --target-pool cf-public \
@@ -170,21 +170,21 @@ Before working this section, you must have deployed the supporting infrastructur
 1. SSH to your bastion instance:
 
   ```
-  $ gcloud compute ssh bosh-bastion
+  gcloud compute ssh bosh-bastion
   ```
 
 1. Export the region and zone on the bastion host:
 
   ```
-  $ zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-  $ zone=${zone##*/}
-  $ region=${zone%-*}
+  zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+  zone=${zone##*/}
+  region=${zone%-*}
   ```
 
 1. Target and login into your BOSH environment:
 
   ```
-  $ bosh target <YOUR BOSH IP ADDRESS>
+  bosh target <YOUR BOSH IP ADDRESS>
   ```
 
   > **Note:** Your username is `admin` and password is `admin`.
@@ -192,32 +192,32 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Upload the required [Google BOSH Stemcell](http://bosh.io/docs/stemcell.html):
 
   ```
-  $ bosh upload stemcell https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.5-google-kvm-ubuntu-trusty-go_agent.tgz
+  bosh upload stemcell https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.5-google-kvm-ubuntu-trusty-go_agent.tgz
   ```
 
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
 
   ```
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=23
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.333.0
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=36
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1454.0
-  $ bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=23
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.333.0
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=36
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1454.0
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
   ```
 
 1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and use `sed` to modify a few values in it:
 
   ```
-  $ sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
-  $ sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
-  $ sed -i s#{{REGION}}#$region# cloudfoundry.yml
+  sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
+  sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
+  sed -i s#{{REGION}}#$region# cloudfoundry.yml
   ```
 
 1. Target the deployment file and deploy:
 
   ```
-  $ bosh deployment cloudfoundry.yml
-  $ bosh deploy
+  bosh deployment cloudfoundry.yml
+  bosh deploy
   ```
 
 Once deployed, you can target your Cloud Foundry environment using the [CF CLI](http://docs.cloudfoundry.org/cf-cli/). Your CF API endpoint is `https://api.<YOUR CF IP ADDRESS>.xip.io`, your username is `admin` and your password is `c1oudc0w`.
