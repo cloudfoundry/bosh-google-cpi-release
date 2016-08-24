@@ -36,6 +36,7 @@ func NewConcreteFactory(
 	operationService := operation.NewGoogleOperationService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
+		googleClient.ComputeBetaService(),
 		logger,
 	)
 
@@ -127,6 +128,7 @@ func NewConcreteFactory(
 	vmService := instance.NewGoogleInstanceService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
+		googleClient.ComputeBetaService(),
 		addressService,
 		backendServiceService,
 		networkService,
