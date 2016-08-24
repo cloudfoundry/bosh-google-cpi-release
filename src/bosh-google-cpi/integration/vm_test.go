@@ -76,11 +76,10 @@ var _ = Describe("VM", func() {
 
 		By("setting the VM's metadata")
 		m := map[string]string{
-			"director":           "director-val",
-			"name":               "name-val",
-			"id":                 "id-val",
-			"deployment":         "deployment-val",
-			"job":                "job-val",
+			"director":           "directorval",
+			"name":               "nameval",
+			"deployment":         "deploymentval",
+			"job":                "jobval",
 			"integration-delete": "",
 		}
 		mj, _ := json.Marshal(m)

@@ -10,7 +10,7 @@ import (
 )
 
 // The list of metadata key-value pairs that should be applied as labels
-var labelList []string = []string{"director", "name", "id", "deployment", "job"}
+var labelList []string = []string{"director", "name", "deployment", "job"}
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
 	// Find the instance
@@ -61,7 +61,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 	for _, l := range labelList {
 		if v, ok := vmMetadata[l]; ok {
-			labelsMap[l] = saveLabel(v.(string))
+			labelsMap[l] = SafeLabel(v.(string))
 		}
 	}
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
@@ -80,7 +80,8 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	return nil
 }
 
-func safeLabel(s string, maxlen int) string {
+func SafeLabel(s string) string {
+	maxlen := 63
 	s = strings.Replace(s, "/", "", -1)
 	s = strings.Replace(s, "-", "", -1)
 	if len(s) > maxlen {
