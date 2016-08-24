@@ -1,10 +1,11 @@
 package instance
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"strings"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	computebeta "google.golang.org/api/compute/v0.beta"
 )
 
@@ -60,7 +61,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 	for _, l := range labelList {
 		if v, ok := vmMetadata[l]; ok {
-			labelsMap[l] = v.(string)
+			labelsMap[l] = saveLabel(v.(string))
 		}
 	}
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
@@ -77,4 +78,13 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
 	return nil
+}
+
+func safeLabel(s string, maxlen int) string {
+	s = strings.Replace(s, "/", "", -1)
+	s = strings.Replace(s, "-", "", -1)
+	if len(s) > maxlen {
+		s = s[0:maxlen]
+	}
+	return s
 }
