@@ -5,6 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -38,6 +39,20 @@ func toStringArray(raw []interface{}) []string {
 
 func assertValidVM(id string, valFunc func(*compute.Instance)) {
 	listCall := computeService.Instances.AggregatedList(googleProject)
+	listCall.Filter(fmt.Sprintf("name eq %v", id))
+	aggregatedList, err := listCall.Do()
+	Expect(err).To(BeNil())
+	for _, list := range aggregatedList.Items {
+		if len(list.Instances) == 1 {
+			valFunc(list.Instances[0])
+			return
+		}
+	}
+	Fail(fmt.Sprintf("Instance %q not found\n", id))
+}
+
+func assertValidVMB(id string, valFunc func(*computebeta.Instance)) {
+	listCall := computeServiceB.Instances.AggregatedList(googleProject)
 	listCall.Filter(fmt.Sprintf("name eq %v", id))
 	aggregatedList, err := listCall.Do()
 	Expect(err).To(BeNil())

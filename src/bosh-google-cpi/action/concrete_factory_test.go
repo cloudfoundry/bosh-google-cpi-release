@@ -86,6 +86,7 @@ var _ = Describe("ConcreteFactory", func() {
 		operationService = operation.NewGoogleOperationService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
+			googleClient.ComputeBetaService(),
 			logger,
 		)
 
@@ -173,6 +174,7 @@ var _ = Describe("ConcreteFactory", func() {
 		vmService = instance.NewGoogleInstanceService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
+			googleClient.ComputeBetaService(),
 			addressService,
 			backendServiceService,
 			networkService,

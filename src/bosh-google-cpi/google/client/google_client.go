@@ -11,6 +11,7 @@ import (
 
 	"golang.org/x/oauth2"
 	oauthgoogle "golang.org/x/oauth2/google"
+	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
 )
@@ -22,10 +23,11 @@ const (
 )
 
 type GoogleClient struct {
-	config         config.Config
-	computeService *compute.Service
-	storageService *storage.Service
-	logger         boshlog.Logger
+	config          config.Config
+	computeService  *compute.Service
+	computeServiceB *computebeta.Service
+	storageService  *storage.Service
+	logger          boshlog.Logger
 }
 
 func NewGoogleClient(
@@ -75,6 +77,12 @@ func NewGoogleClient(
 	}
 	computeService.UserAgent = userAgent
 
+	computeServiceB, err := computebeta.New(computeClient)
+	if err != nil {
+		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
+	}
+	computeServiceB.UserAgent = userAgent
+
 	// Custom RoundTripper for retries
 	storageRetrier := &RetryTransport{
 		Base:       storageClient.Transport,
@@ -88,10 +96,11 @@ func NewGoogleClient(
 	storageService.UserAgent = userAgent
 
 	return GoogleClient{
-		config:         config,
-		computeService: computeService,
-		storageService: storageService,
-		logger:         logger,
+		config:          config,
+		computeService:  computeService,
+		computeServiceB: computeServiceB,
+		storageService:  storageService,
+		logger:          logger,
 	}, nil
 }
 
@@ -109,6 +118,10 @@ func (c GoogleClient) DefaultRootDiskType() string {
 
 func (c GoogleClient) ComputeService() *compute.Service {
 	return c.computeService
+}
+
+func (c GoogleClient) ComputeBetaService() *computebeta.Service {
+	return c.computeServiceB
 }
 
 func (c GoogleClient) StorageService() *storage.Service {
