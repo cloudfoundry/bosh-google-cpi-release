@@ -1,0 +1,68 @@
+azs:
+- name: z1
+  cloud_properties:
+    zone: {{ZONE-1}}
+- name: z2
+  cloud_properties:
+    zone: {{ZONE-2}}
+
+vm_types:
+- name: common
+  cloud_properties:
+    machine_type: n1-standard-2
+    root_disk_size_gb: 20
+    root_disk_type: pd-ssd
+
+- name: worker
+  cloud_properties:
+    machine_type: n1-standard-4
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+
+vm_extensions:
+- name: concourse-lb
+  cloud_properties:
+    backend_service: concourse
+
+compilation:
+  workers: 2
+  network: public
+  reuse_compilation_vms: true
+  az: z1
+  cloud_properties:
+    machine_type: n1-standard-4
+    root_disk_size_gb: 100
+    root_disk_type: pd-ssd
+    preemptible: true
+
+networks:
+  - name: public
+    type: manual
+    subnets:
+    - az: z1
+      range: 10.150.0.0/24
+      gateway: 10.150.0.1
+      cloud_properties:
+        network_name: concourse
+        subnetwork_name: concourse-public-{{REGION}}-1
+        ephemeral_external_ip: true
+        tags:
+          - concourse-public
+          - concourse-internal
+    - az: z2
+      range: 10.160.0.0/24
+      gateway: 10.160.0.1
+      cloud_properties:
+        network_name: concourse
+        subnetwork_name: concourse-public-{{REGION}}-2
+        ephemeral_external_ip: true
+        tags:
+          - concourse-public
+          - concourse-internal
+
+  - name: vip
+    type: vip
+    
+disk_types:
+- name: database
+  disk_size: 10240
