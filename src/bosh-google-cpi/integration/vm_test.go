@@ -1,10 +1,12 @@
 package integration
 
 import (
+	"encoding/json"
 	"fmt"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -71,6 +73,27 @@ var _ = Describe("VM", func() {
 			}`, vmCID)
 		exists := assertSucceedsWithResult(request).(bool)
 		Expect(exists).To(Equal(true))
+
+		By("setting the VM's metadata")
+		m := map[string]string{
+			"director":           "directorval",
+			"name":               "nameval",
+			"deployment":         "deploymentval",
+			"job":                "jobval",
+			"integration-delete": "",
+		}
+		mj, _ := json.Marshal(m)
+		request = fmt.Sprintf(`{
+			  "method": "set_vm_metadata",
+			  "arguments": [
+				"%v",
+				%v
+			  ]
+			}`, vmCID, string(mj))
+		assertSucceeds(request)
+		assertValidVMB(vmCID, func(instance *computebeta.Instance) {
+			Expect(instance.Labels).To(BeEquivalentTo(m))
+		})
 
 		By("rebooting the VM")
 		request = fmt.Sprintf(`{

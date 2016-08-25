@@ -10,6 +10,7 @@ import (
 	"bosh-google-cpi/google/operation_service"
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
+	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 )
 
@@ -20,6 +21,7 @@ const googleInstanceDescription = "Instance managed by BOSH"
 type GoogleInstanceService struct {
 	project               string
 	computeService        *compute.Service
+	computeServiceB       *computebeta.Service
 	addressService        address.Service
 	backendServiceService backendservice.Service
 	networkService        network.Service
@@ -33,6 +35,7 @@ type GoogleInstanceService struct {
 func NewGoogleInstanceService(
 	project string,
 	computeService *compute.Service,
+	computeServiceB *computebeta.Service,
 	addressService address.Service,
 	backendServiceService backendservice.Service,
 	networkService network.Service,
@@ -45,6 +48,7 @@ func NewGoogleInstanceService(
 	return GoogleInstanceService{
 		project:               project,
 		computeService:        computeService,
+		computeServiceB:       computeServiceB,
 		addressService:        addressService,
 		backendServiceService: backendServiceService,
 		networkService:        networkService,

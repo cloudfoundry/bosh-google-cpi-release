@@ -8,12 +8,14 @@ import (
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
+	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 
 	"testing"
 )
 
 var computeService *compute.Service
+var computeServiceB *computebeta.Service
 
 func TestIntegration(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -57,6 +59,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	client, err := google.DefaultClient(ctx, compute.ComputeScope)
 	Expect(err).To(BeNil())
 	computeService, err = compute.New(client)
+	computeServiceB, err = computebeta.New(client)
 	Expect(err).To(BeNil())
 })
 

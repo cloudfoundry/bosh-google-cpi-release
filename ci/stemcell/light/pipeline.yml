@@ -17,6 +17,7 @@ jobs:
         privileged: true
         params:
           BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
+          BOSHIO_TOKEN:    {{google_boshio_checksum_token}}
 
       - aggregate:
         - put: bosh-ubuntu-raw-stemcells
@@ -50,6 +51,7 @@ jobs:
         privileged: true
         params:
           BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
+          BOSHIO_TOKEN:    {{google_boshio_checksum_token}}
 
       - aggregate:
         - put: bosh-centos-raw-stemcells

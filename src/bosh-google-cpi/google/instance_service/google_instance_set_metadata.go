@@ -1,16 +1,20 @@
 package instance
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"strings"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
-	"google.golang.org/api/compute/v1"
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	computebeta "google.golang.org/api/compute/v0.beta"
 )
+
+// The list of metadata key-value pairs that should be applied as labels
+var labelList []string = []string{"director", "name", "deployment", "job"}
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
 	// Find the instance
-	instance, found, err := i.Find(id, "")
+	instance, found, err := i.FindBeta(id, "")
 	if err != nil {
 		return err
 	}
@@ -24,31 +28,64 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 
 	// Grab the original metadata items
 	for _, item := range metadata.Items {
-		metadataMap[item.Key] = *item.Value
+		metadataMap[item.Key] = item.Value
 	}
 
-	// Add or override the new metadata items
+	// Add or override the new metadata items.
 	for key, value := range vmMetadata {
 		metadataMap[key] = value.(string)
 	}
 
 	// Set the new metadata items
-	var metadataItems []*compute.MetadataItems
+	var metadataItems []*computebeta.MetadataItems
 	for key, value := range metadataMap {
 		mValue := value
-		metadataItems = append(metadataItems, &compute.MetadataItems{Key: key, Value: &mValue})
+		metadataItems = append(metadataItems, &computebeta.MetadataItems{Key: key, Value: mValue})
 	}
 	metadata.Items = metadataItems
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Setting metadata for Google Instance '%s'", id)
-	operation, err := i.computeService.Instances.SetMetadata(i.project, util.ResourceSplitter(instance.Zone), id, metadata).Do()
+	operation, err := i.computeServiceB.Instances.SetMetadata(i.project, util.ResourceSplitter(instance.Zone), id, metadata).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set metadata for Google Instance '%s'", id)
 	}
 
-	if _, err = i.operationService.Waiter(operation, instance.Zone, ""); err != nil {
+	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set metadata for Google Instance '%s'", id)
 	}
 
+	// Repeat the metadata process, but with labels
+	labelsMap := make(map[string]string)
+	for k, v := range instance.Labels {
+		labelsMap[k] = v
+	}
+	for _, l := range labelList {
+		if v, ok := vmMetadata[l]; ok {
+			labelsMap[l] = SafeLabel(v.(string))
+		}
+	}
+	labelsRequest := &computebeta.InstancesSetLabelsRequest{
+		LabelFingerprint: instance.LabelFingerprint,
+		Labels:           labelsMap,
+	}
+	i.logger.Debug(googleInstanceServiceLogTag, "Setting labels for Google Instance '%s'", id)
+	operation, err = i.computeServiceB.Instances.SetLabels(i.project, util.ResourceSplitter(instance.Zone), id, labelsRequest).Do()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
+	}
+
+	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
+	}
 	return nil
+}
+
+func SafeLabel(s string) string {
+	maxlen := 63
+	s = strings.Replace(s, "/", "", -1)
+	s = strings.Replace(s, "-", "", -1)
+	if len(s) > maxlen {
+		s = s[0:maxlen]
+	}
+	return s
 }

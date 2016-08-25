@@ -9,6 +9,7 @@ deployment_name = "cf"
 
 # Google network settings
 google_region = "{{REGION}}"
+google_zone = "{{ZONE}}"
 network = "cf"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
@@ -75,6 +76,7 @@ compilation:
   network: private
   reuse_compilation_vms: true
   cloud_properties:
+    zone: <%= google_zone%>
     machine_type: n1-standard-8
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
@@ -94,6 +96,7 @@ networks:
     - range: 10.200.0.0/16
       gateway: 10.200.0.1
       cloud_properties:
+        zone: <%= google_zone%>
         network_name: <%= network%>
         subnetwork_name: <%= public_subnetwork%>
         ephemeral_external_ip: true
@@ -108,6 +111,7 @@ networks:
     - range: 192.168.0.0/16
       gateway: 192.168.0.1
       cloud_properties:
+        zone: <%= google_zone%>
         network_name: <%= network%>
         subnetwork_name: <%= private_subnetwork%>
         ephemeral_external_ip: true
@@ -125,6 +129,7 @@ resource_pools:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       version: latest
     cloud_properties:
+      zone: <%= google_zone%>
       machine_type: n1-standard-4
       root_disk_size_gb: 20
       root_disk_type: pd-standard
@@ -135,6 +140,7 @@ resource_pools:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       version: latest
     cloud_properties:
+      zone: <%= google_zone%>
       machine_type: n1-standard-4
       root_disk_size_gb: 20
       root_disk_type: pd-standard
@@ -146,6 +152,7 @@ resource_pools:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       version: latest
     cloud_properties:
+      zone: <%= google_zone%>
       machine_type: n1-highmem-8
       root_disk_size_gb: 100
       root_disk_type: pd-standard
