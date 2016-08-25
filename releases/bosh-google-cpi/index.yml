@@ -48,4 +48,6 @@ builds:
     version: 25.0.0
   ed02bd76-1428-4540-a543-1ee8a4218b6a:
     version: 25.1.0
+  4827e173-0583-4894-ad0a-29e952db31e9:
+    version: 25.2.0
 format-version: '2'
