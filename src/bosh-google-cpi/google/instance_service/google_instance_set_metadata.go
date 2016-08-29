@@ -82,10 +82,16 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 
 func SafeLabel(s string) string {
 	maxlen := 63
-	s = strings.Replace(s, "/", "", -1)
-	s = strings.Replace(s, "-", "", -1)
+	// Replace common invalid chars
+	s = strings.Replace(s, "/", "-", -1)
+	s = strings.Replace(s, "_", "-", -1)
+
+	// Trim to max length
 	if len(s) > maxlen {
 		s = s[0:maxlen]
 	}
+
+	// Ensure the string doesn't end in -
+	s = strings.TrimSuffix(s, "-")
 	return s
 }
