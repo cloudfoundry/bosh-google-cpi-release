@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	iservice "bosh-google-cpi/google/instance_service"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	computebeta "google.golang.org/api/compute/v0.beta"
@@ -76,10 +77,10 @@ var _ = Describe("VM", func() {
 
 		By("setting the VM's metadata")
 		m := map[string]string{
-			"director":           "directorval",
-			"name":               "nameval",
-			"deployment":         "deploymentval",
-			"job":                "jobval",
+			"director":           "val-with-dashes",
+			"name":               "val_with_underscores",
+			"deployment":         "val-ending-in-dash-",
+			"job":                "val-that-is-definitely-for-sure-absolutely-longer-than-the-allowable-enforced-63-char-limit-and-should-be-truncated",
 			"integration-delete": "",
 		}
 		mj, _ := json.Marshal(m)
@@ -92,7 +93,23 @@ var _ = Describe("VM", func() {
 			}`, vmCID, string(mj))
 		assertSucceeds(request)
 		assertValidVMB(vmCID, func(instance *computebeta.Instance) {
+			// Apply label sanitization func
+			for k, v := range m {
+				m[k] = iservice.SafeLabel(v)
+			}
+
+			// GCE will add tags as labels with empty values. Account for this here.
+			for _, t := range iservice.TagList {
+				m[m[t]] = ""
+			}
+
+			// Labels should be an exact match
 			Expect(instance.Labels).To(BeEquivalentTo(m))
+
+			// Instance should have certain tags
+			for _, t := range iservice.TagList {
+				Expect(instance.Tags.Items).To(ContainElement(m[t]))
+			}
 		})
 
 		By("rebooting the VM")

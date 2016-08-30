@@ -10,7 +10,10 @@ import (
 )
 
 // The list of metadata key-value pairs that should be applied as labels
-var labelList []string = []string{"director", "name", "deployment", "job"}
+var LabelList []string = []string{"director", "name", "deployment", "job", "index"}
+
+// The list of metadata keys whose value will be automatically applied as a tag
+var TagList []string = []string{"job"}
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
 	// Find the instance
@@ -31,6 +34,9 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		metadataMap[item.Key] = item.Value
 	}
 
+	// TODO(evanbrown): Is it possible to update metadata, labels, and tags
+	// in a single PATCH request? The current method requires 4 requests to
+	// accomplish this.
 	// Add or override the new metadata items.
 	for key, value := range vmMetadata {
 		metadataMap[key] = value.(string)
@@ -54,12 +60,12 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		return bosherr.WrapErrorf(err, "Failed to set metadata for Google Instance '%s'", id)
 	}
 
-	// Repeat the metadata process, but with labels
+	// Apply labels to VM
 	labelsMap := make(map[string]string)
 	for k, v := range instance.Labels {
 		labelsMap[k] = v
 	}
-	for _, l := range labelList {
+	for _, l := range LabelList {
 		if v, ok := vmMetadata[l]; ok {
 			labelsMap[l] = SafeLabel(v.(string))
 		}
@@ -73,10 +79,33 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
-
 	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
+
+	// Apply tags to VM
+	// Re-retrieve the instance because labels will have changed the tag fingerprint
+	instance, _, err = i.FindBeta(id, "")
+	if err != nil {
+		return err
+	}
+	if instance.Tags.Items == nil {
+		instance.Tags.Items = make([]string, 0)
+	}
+	for _, t := range TagList {
+		if v, ok := vmMetadata[t]; ok {
+			instance.Tags.Items = append(instance.Tags.Items, SafeLabel(v.(string)))
+		}
+	}
+	i.logger.Debug(googleInstanceServiceLogTag, "Setting tags for Google Instance '%s'", id)
+	operation, err = i.computeServiceB.Instances.SetTags(i.project, util.ResourceSplitter(instance.Zone), id, instance.Tags).Do()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
+	}
+	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
+	}
+
 	return nil
 }
 
