@@ -117,14 +117,21 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	if err != nil {
 		return err
 	}
-	if instance.Tags.Items == nil {
-		instance.Tags.Items = make([]string, 0)
-	}
+
+	// Get existing instance tags
+	tags := make(Tags, 0)
+	tags = append(tags, Tags(instance.Tags.Items)...)
+
+	// Add metadata specified in TagList to tags
 	for _, t := range TagList {
 		if v, ok := vmMetadata[t.Key]; ok {
-			instance.Tags.Items = append(instance.Tags.Items, t.ValueFn(v.(string)))
+			tags = append(tags, t.ValueFn(v.(string)))
 		}
 	}
+
+	// Eliminate duplicate tags
+	instance.Tags.Items = tags.Unique()
+
 	i.logger.Debug(googleInstanceServiceLogTag, "Setting tags for Google Instance '%s'", id)
 	operation, err = i.computeServiceB.Instances.SetTags(i.project, util.ResourceSplitter(instance.Zone), id, instance.Tags).Do()
 	if err != nil {
