@@ -22,7 +22,7 @@ type Service interface {
 
 type AttachedDisks []string
 
-type Metadata map[string]interface{}
+type Metadata map[string]string
 
 type Properties struct {
 	Zone              string

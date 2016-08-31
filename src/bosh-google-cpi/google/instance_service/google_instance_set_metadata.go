@@ -13,32 +13,42 @@ import (
 var (
 	LabelList []LabelTagMetadata = []LabelTagMetadata{
 		{
-			Key:     "director",
-			ValueFn: SafeLabel,
+			Key:       "director",
+			CleanerFn: SafeLabel,
 		},
 		{
-			Key:     "name",
-			ValueFn: SafeLabel,
+			Key:       "name",
+			CleanerFn: SafeLabel,
 		},
 		{
-			Key:     "deployment",
-			ValueFn: SafeLabel,
+			Key:       "deployment",
+			CleanerFn: SafeLabel,
 		},
 		{
-			Key:     "job",
-			ValueFn: SafeLabel,
+			Key:       "job",
+			CleanerFn: SafeLabel,
 		},
 		{
-			Key:     "index",
-			ValueFn: func(s string) string { return "index-" + SafeLabel(s) },
+			Key:       "index",
+			CleanerFn: func(s string) string { return "index-" + SafeLabel(s) },
 		},
 	}
 
 	// The list of metadata keys whose value will be automatically applied as a tag
 	TagList []LabelTagMetadata = []LabelTagMetadata{
 		{
-			Key:     "job",
-			ValueFn: SafeLabel,
+			Key:       "job",
+			CleanerFn: SafeLabel,
+		},
+		{
+			ValFn: func(m map[string]string) string {
+				return m["deployment"] + "-" + m["job"]
+			},
+			CleanerFn: SafeLabel,
+		},
+		{
+			Key:       "deployment",
+			CleanerFn: SafeLabel,
 		},
 	}
 )
@@ -67,7 +77,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	// accomplish this.
 	// Add or override the new metadata items.
 	for key, value := range vmMetadata {
-		metadataMap[key] = value.(string)
+		metadataMap[key] = value
 	}
 
 	// Set the new metadata items
@@ -89,14 +99,14 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 
 	// Apply labels to VM
+	// First create a new map and copy existing labels into it
 	labelsMap := make(map[string]string)
 	for k, v := range instance.Labels {
 		labelsMap[k] = v
 	}
+
 	for _, l := range LabelList {
-		if v, ok := vmMetadata[l.Key]; ok {
-			labelsMap[l.Key] = l.ValueFn(v.(string))
-		}
+		labelsMap[l.Key] = l.Val(vmMetadata)
 	}
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
 		LabelFingerprint: instance.LabelFingerprint,
@@ -124,9 +134,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 
 	// Add metadata specified in TagList to tags
 	for _, t := range TagList {
-		if v, ok := vmMetadata[t.Key]; ok {
-			tags = append(tags, t.ValueFn(v.(string)))
-		}
+		tags = append(tags, t.Val(vmMetadata))
 	}
 
 	// Eliminate duplicate tags
@@ -146,8 +154,19 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 
 //
 type LabelTagMetadata struct {
-	Key     string
-	ValueFn func(string) string
+	Key       string
+	ValFn     func(map[string]string) string
+	CleanerFn func(string) string
+}
+
+func (l LabelTagMetadata) Val(m map[string]string) string {
+	var value string
+	if l.ValFn != nil {
+		value = l.ValFn(m)
+	} else {
+		value = m[l.Key]
+	}
+	return l.CleanerFn(value)
 }
 
 func SafeLabel(s string) string {
