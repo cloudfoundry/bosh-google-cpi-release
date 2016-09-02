@@ -10,7 +10,38 @@ import (
 )
 
 // The list of metadata key-value pairs that should be applied as labels
-var labelList []string = []string{"director", "name", "deployment", "job"}
+var (
+	LabelList []LabelTagMetadata = []LabelTagMetadata{
+		{
+			Key:     "director",
+			ValueFn: SafeLabel,
+		},
+		{
+			Key:     "name",
+			ValueFn: SafeLabel,
+		},
+		{
+			Key:     "deployment",
+			ValueFn: SafeLabel,
+		},
+		{
+			Key:     "job",
+			ValueFn: SafeLabel,
+		},
+		{
+			Key:     "index",
+			ValueFn: func(s string) string { return "index-" + SafeLabel(s) },
+		},
+	}
+
+	// The list of metadata keys whose value will be automatically applied as a tag
+	TagList []LabelTagMetadata = []LabelTagMetadata{
+		{
+			Key:     "job",
+			ValueFn: SafeLabel,
+		},
+	}
+)
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
 	// Find the instance
@@ -31,6 +62,9 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		metadataMap[item.Key] = item.Value
 	}
 
+	// TODO(evanbrown): Is it possible to update metadata, labels, and tags
+	// in a single PATCH request? The current method requires 4 requests to
+	// accomplish this.
 	// Add or override the new metadata items.
 	for key, value := range vmMetadata {
 		metadataMap[key] = value.(string)
@@ -54,14 +88,14 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		return bosherr.WrapErrorf(err, "Failed to set metadata for Google Instance '%s'", id)
 	}
 
-	// Repeat the metadata process, but with labels
+	// Apply labels to VM
 	labelsMap := make(map[string]string)
 	for k, v := range instance.Labels {
 		labelsMap[k] = v
 	}
-	for _, l := range labelList {
-		if v, ok := vmMetadata[l]; ok {
-			labelsMap[l] = SafeLabel(v.(string))
+	for _, l := range LabelList {
+		if v, ok := vmMetadata[l.Key]; ok {
+			labelsMap[l.Key] = l.ValueFn(v.(string))
 		}
 	}
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
@@ -73,11 +107,47 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
-
 	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
+
+	// Apply tags to VM
+	// Re-retrieve the instance because labels will have changed the tag fingerprint
+	instance, _, err = i.FindBeta(id, "")
+	if err != nil {
+		return err
+	}
+
+	// Get existing instance tags
+	tags := make(Tags, 0)
+	tags = append(tags, Tags(instance.Tags.Items)...)
+
+	// Add metadata specified in TagList to tags
+	for _, t := range TagList {
+		if v, ok := vmMetadata[t.Key]; ok {
+			tags = append(tags, t.ValueFn(v.(string)))
+		}
+	}
+
+	// Eliminate duplicate tags
+	instance.Tags.Items = tags.Unique()
+
+	i.logger.Debug(googleInstanceServiceLogTag, "Setting tags for Google Instance '%s'", id)
+	operation, err = i.computeServiceB.Instances.SetTags(i.project, util.ResourceSplitter(instance.Zone), id, instance.Tags).Do()
+	if err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
+	}
+	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
+	}
+
 	return nil
+}
+
+//
+type LabelTagMetadata struct {
+	Key     string
+	ValueFn func(string) string
 }
 
 func SafeLabel(s string) string {

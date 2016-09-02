@@ -36,6 +36,19 @@ func (t Tags) Validate() error {
 	return nil
 }
 
+func (t Tags) Unique() []string {
+	tagDict := make(map[string]struct{})
+	for _, tag := range t {
+		tagDict[tag] = struct{}{}
+	}
+
+	tagItems := make([]string, 0)
+	for tag, _ := range tagDict {
+		tagItems = append(tagItems, tag)
+	}
+	return tagItems
+}
+
 func (n Network) IsDynamic() bool { return n.Type == "dynamic" }
 
 func (n Network) IsVip() bool { return n.Type == "vip" }

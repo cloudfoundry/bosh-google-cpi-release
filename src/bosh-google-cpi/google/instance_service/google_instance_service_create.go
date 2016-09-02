@@ -37,10 +37,11 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
-	tagsParams, err := i.createTagsParams(networks.Tags(), vmProps.Tags)
-	if err != nil {
-		return "", err
-	}
+
+	// Handle tags
+	allTags := append(networks.Tags(), vmProps.Tags...)
+	tags := compute.Tags{}
+	tags.Items = allTags.Unique()
 
 	vm := &compute.Instance{
 		Name:              instanceName,
@@ -52,7 +53,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		NetworkInterfaces: networkInterfacesParams,
 		Scheduling:        schedulingParams,
 		ServiceAccounts:   serviceAccountsParams,
-		Tags:              tagsParams,
+		Tags:              &tags,
 	}
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
@@ -227,21 +228,6 @@ func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) 
 	}
 
 	return serviceAccounts
-}
-
-func (i GoogleInstanceService) createTagsParams(tags ...Tags) (*compute.Tags, error) {
-	tagDict := make(map[string]struct{})
-	for _, tagSet := range tags {
-		for _, tag := range tagSet {
-			tagDict[tag] = struct{}{}
-		}
-	}
-
-	computeTags := &compute.Tags{}
-	for tag, _ := range tagDict {
-		computeTags.Items = append(computeTags.Items, tag)
-	}
-	return computeTags, nil
 }
 
 func (i GoogleInstanceService) addToTargetPool(instanceSelfLink string, targetPoolName string) error {
