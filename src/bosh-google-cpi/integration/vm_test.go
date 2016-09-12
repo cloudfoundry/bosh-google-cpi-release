@@ -84,15 +84,12 @@ var _ = Describe("VM", func() {
 			"integration-delete": "",
 		}
 		expectLabels := map[string]string{
-			"director":                 "val-that-is-definitely-for-sure-absolutely-longer-than-the-allo",
-			"name":                     "val-with-underscores-ending-in-dash",
-			"deployment":               "deployment-name",
-			"job":                      "job-name",
-			"index":                    "index-0",
-			"integration-delete":       "",
-			"job-name":                 "",
-			"deployment-name":          "",
-			"deployment-name-job-name": "",
+			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
+			"name":               "val-with-underscores-ending-in-dash",
+			"deployment":         "deployment-name",
+			"job":                "job-name",
+			"index":              "n0",
+			"integration-delete": "",
 		}
 		mj, _ := json.Marshal(m)
 		request = fmt.Sprintf(`{
