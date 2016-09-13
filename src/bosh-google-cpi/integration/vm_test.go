@@ -61,7 +61,12 @@ var _ = Describe("VM", func() {
 				  }
 				},
 				[],
-				{}
+				{
+				  "bosh": {
+					  "group_name": "micro-google-dummy-dummy",
+					  "groups": ["micro-google", "dummy", "dummy", "micro-google-dummy", "dummy-dummy", "micro-google-dummy-dummy"]
+				  }
+				}
 			  ]
 			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
@@ -84,12 +89,17 @@ var _ = Describe("VM", func() {
 			"integration-delete": "",
 		}
 		expectLabels := map[string]string{
-			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
-			"name":               "val-with-underscores-ending-in-dash",
-			"deployment":         "deployment-name",
-			"job":                "job-name",
-			"index":              "n0",
-			"integration-delete": "",
+			"director":                 "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
+			"name":                     "val-with-underscores-ending-in-dash",
+			"deployment":               "deployment-name",
+			"job":                      "job-name",
+			"index":                    "n0",
+			"integration-delete":       "",
+			"micro-google":             "",
+			"dummy":                    "",
+			"micro-google-dummy":       "",
+			"dummy-dummy":              "",
+			"micro-google-dummy-dummy": "",
 		}
 		mj, _ := json.Marshal(m)
 		request = fmt.Sprintf(`{
