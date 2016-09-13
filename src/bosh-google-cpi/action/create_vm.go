@@ -95,6 +95,16 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	if cloudProps.EphemeralExternalIP != nil {
 		vmNetworks.Network().EphemeralExternalIP = *cloudProps.EphemeralExternalIP
 	}
+
+	// Extract any tags from env.bosh.groups
+	if boshenv, ok := env["bosh"]; ok {
+		if boshgroups, ok := boshenv.(map[string]interface{})["groups"]; ok {
+			for _, tag := range boshgroups.([]interface{}) {
+				cloudProps.Tags = append(cloudProps.Tags, tag.(string))
+			}
+		}
+	}
+
 	// Validate VM tags
 	if err = cloudProps.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
