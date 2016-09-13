@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -11,7 +12,8 @@ import (
 )
 
 var (
-	numFirstRe = regexp.MustCompile("^[0-9]")
+	numFirstRe  = regexp.MustCompile("^[0-9]")
+	mustMatchRe = regexp.MustCompile("^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$")
 )
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
@@ -67,8 +69,13 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 
 	for k, v := range vmMetadata {
-		labelsMap[k] = SafeLabel(v)
+		if l, err := SafeLabel(v); err == nil {
+			labelsMap[k] = l
+		} else {
+			i.logger.Debug(googleInstanceServiceLogTag, fmt.Sprintf("Skipped label for %q: %v", k, err))
+		}
 	}
+
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
 		LabelFingerprint: instance.LabelFingerprint,
 		Labels:           labelsMap,
@@ -85,11 +92,12 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	return nil
 }
 
-func SafeLabel(s string) string {
+func SafeLabel(s string) (string, error) {
 	maxlen := 61
 	// Replace common invalid chars
 	s = strings.Replace(s, "/", "-", -1)
 	s = strings.Replace(s, "_", "-", -1)
+	s = strings.Replace(s, ":", "-", -1)
 
 	// Trim to max length
 	if len(s) > maxlen {
@@ -105,5 +113,10 @@ func SafeLabel(s string) string {
 		s = "n" + s
 	}
 
-	return s
+	// The sanitized value should pass the GCE regex
+	if mustMatchRe.MatchString(s) {
+		return s, nil
+	}
+
+	return "", fmt.Errorf("Label value %q did not satisfy the GCE label regexp", s)
 }
