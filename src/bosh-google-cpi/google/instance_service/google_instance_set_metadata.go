@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"regexp"
 	"strings"
 
 	"bosh-google-cpi/api"
@@ -9,38 +10,8 @@ import (
 	computebeta "google.golang.org/api/compute/v0.beta"
 )
 
-// The list of metadata key-value pairs that should be applied as labels
 var (
-	LabelList []LabelTagMetadata = []LabelTagMetadata{
-		{
-			Key:     "director",
-			ValueFn: SafeLabel,
-		},
-		{
-			Key:     "name",
-			ValueFn: SafeLabel,
-		},
-		{
-			Key:     "deployment",
-			ValueFn: SafeLabel,
-		},
-		{
-			Key:     "job",
-			ValueFn: SafeLabel,
-		},
-		{
-			Key:     "index",
-			ValueFn: func(s string) string { return "index-" + SafeLabel(s) },
-		},
-	}
-
-	// The list of metadata keys whose value will be automatically applied as a tag
-	TagList []LabelTagMetadata = []LabelTagMetadata{
-		{
-			Key:     "job",
-			ValueFn: SafeLabel,
-		},
-	}
+	numFirstRe = regexp.MustCompile("^[0-9]")
 )
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
@@ -67,7 +38,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	// accomplish this.
 	// Add or override the new metadata items.
 	for key, value := range vmMetadata {
-		metadataMap[key] = value.(string)
+		metadataMap[key] = value
 	}
 
 	// Set the new metadata items
@@ -89,14 +60,14 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 
 	// Apply labels to VM
+	// First create a new map and copy existing labels into it
 	labelsMap := make(map[string]string)
 	for k, v := range instance.Labels {
 		labelsMap[k] = v
 	}
-	for _, l := range LabelList {
-		if v, ok := vmMetadata[l.Key]; ok {
-			labelsMap[l.Key] = l.ValueFn(v.(string))
-		}
+
+	for k, v := range vmMetadata {
+		labelsMap[k] = SafeLabel(v)
 	}
 	labelsRequest := &computebeta.InstancesSetLabelsRequest{
 		LabelFingerprint: instance.LabelFingerprint,
@@ -111,47 +82,11 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 		return bosherr.WrapErrorf(err, "Failed to set labels for Google Instance '%s'", id)
 	}
 
-	// Apply tags to VM
-	// Re-retrieve the instance because labels will have changed the tag fingerprint
-	instance, _, err = i.FindBeta(id, "")
-	if err != nil {
-		return err
-	}
-
-	// Get existing instance tags
-	tags := make(Tags, 0)
-	tags = append(tags, Tags(instance.Tags.Items)...)
-
-	// Add metadata specified in TagList to tags
-	for _, t := range TagList {
-		if v, ok := vmMetadata[t.Key]; ok {
-			tags = append(tags, t.ValueFn(v.(string)))
-		}
-	}
-
-	// Eliminate duplicate tags
-	instance.Tags.Items = tags.Unique()
-
-	i.logger.Debug(googleInstanceServiceLogTag, "Setting tags for Google Instance '%s'", id)
-	operation, err = i.computeServiceB.Instances.SetTags(i.project, util.ResourceSplitter(instance.Zone), id, instance.Tags).Do()
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
-	}
-	if _, err = i.operationService.WaiterB(operation, instance.Zone, ""); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to set tags for Google Instance '%s'", id)
-	}
-
 	return nil
 }
 
-//
-type LabelTagMetadata struct {
-	Key     string
-	ValueFn func(string) string
-}
-
 func SafeLabel(s string) string {
-	maxlen := 63
+	maxlen := 61
 	// Replace common invalid chars
 	s = strings.Replace(s, "/", "-", -1)
 	s = strings.Replace(s, "_", "-", -1)
@@ -161,7 +96,14 @@ func SafeLabel(s string) string {
 		s = s[0:maxlen]
 	}
 
-	// Ensure the string doesn't end in -
+	// Ensure the string doesn't begin or end in -
 	s = strings.TrimSuffix(s, "-")
+	s = strings.TrimPrefix(s, "-")
+
+	// Ensure the string doesn't begin with a number
+	if numFirstRe.MatchString(s) {
+		s = "n" + s
+	}
+
 	return s
 }
