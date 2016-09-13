@@ -2,6 +2,19 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [25.2.0] - 2016-08-18
+
+### Changed
+- Any metadata provided by bosh in the `set_vm_metadata` action will also be 
+  propagated to the VM as [labels](https://cloud.google.com/compute/docs/label-or-tag-resources),
+  allowing sorting and filter in the web console based on job, deployment, etc.
+
+## [25.1.0] - 2016-08-18
+
+### Added
+- The `service_account` cloud-config property may now use the e-mail address
+  of a custom service account.
+
 ## [25.0.0] - 2016-07-25
 
 ### Changed
@@ -45,6 +58,8 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[25.2.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.1.0...v25.2.0
+[25.1.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.0.0...v25.1.0
 [25.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24.4.0...v25.0.0
 [24.4.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24.3.0...v24.4.0
 [24.3.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v24.2.0...v24.3.0
