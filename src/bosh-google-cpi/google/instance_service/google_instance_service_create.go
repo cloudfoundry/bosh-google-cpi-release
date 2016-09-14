@@ -3,6 +3,7 @@ package instance
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
@@ -208,17 +209,29 @@ func (i GoogleInstanceService) createSchedulingParams(
 	return scheduling
 }
 
-func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) []*compute.ServiceAccount {
-	var serviceAccounts []*compute.ServiceAccount
+func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) (serviceAccounts []*compute.ServiceAccount) {
+	// No service account and no scopes, so return an empty slice.
+	if vmProps.ServiceAccount == "" && len(vmProps.ServiceScopes) == 0 {
+		return
+	}
 
-	if vmProps.ServiceAccount == "" {
+	// No service account, but scopes are specified. Set the "default" account.
+	if vmProps.ServiceAccount == "" && len(vmProps.ServiceScopes) > 0 {
 		vmProps.ServiceAccount = "default"
 	}
 
-	if len(vmProps.ServiceScopes) > 0 {
-		var scopes []string
-		for _, serviceScope := range vmProps.ServiceScopes {
-			scopes = append(scopes, fmt.Sprintf("https://www.googleapis.com/auth/%s", serviceScope))
+	// A service account, but no scopes. Set the "full access" scope.
+	if vmProps.ServiceAccount != "" && len(vmProps.ServiceScopes) == 0 {
+		vmProps.ServiceScopes = ServiceScopes([]string{"https://www.googleapis.com/auth/cloud-platform"})
+	}
+
+	// Format scopes and create a slice of *compute.ServiceAccount
+	var scopes []string
+	for _, scope := range vmProps.ServiceScopes {
+		if strings.HasPrefix(scope, "https://www.googleapis.com/auth/") {
+			scopes = append(scopes, scope)
+		} else {
+			scopes = append(scopes, fmt.Sprintf("https://www.googleapis.com/auth/%s", scope))
 		}
 		serviceAccount := &compute.ServiceAccount{
 			Email:  string(vmProps.ServiceAccount),
@@ -226,8 +239,7 @@ func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) 
 		}
 		serviceAccounts = append(serviceAccounts, serviceAccount)
 	}
-
-	return serviceAccounts
+	return
 }
 
 func (i GoogleInstanceService) addToTargetPool(instanceSelfLink string, targetPoolName string) error {

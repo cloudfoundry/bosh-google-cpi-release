@@ -496,9 +496,9 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("executes the VM lifecycle with default service account scopes", func() {
+	var vmCID string
+	It("executes the VM lifecycle with default service scopes and no service account", func() {
 		By("creating a VM")
-		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -523,6 +523,10 @@ var _ = Describe("VM", func() {
 			  ]
 			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+		})
 
 		By("deleting the VM")
 		request = fmt.Sprintf(`{
@@ -560,6 +564,11 @@ var _ = Describe("VM", func() {
 			  ]
 			}`, existingStemcell, zone, serviceAccount, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+		})
 
 		By("deleting the VM")
 		request = fmt.Sprintf(`{
@@ -569,8 +578,9 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("fails the VM lifecycle with a custom service account and no scopes", func() {
+	It("executes the VM lifecycle with a custom service account and no scopes", func() {
 		By("creating a VM")
+		var vmCID string
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
 			  "arguments": [
@@ -594,10 +604,21 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, zone, serviceAccount, networkName)
-		err := assertFails(request)
-		Expect(err.Error()).To(ContainSubstring("You must define at least one service scope"))
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+		})
 
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
 	})
+
 	It("executes the VM lifecycle with a backend service", func() {
 		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
 			instances := make([]string, len(ig.Items))
