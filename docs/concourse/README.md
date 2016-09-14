@@ -1,10 +1,10 @@
-# Deploying Concourseon Google Compute Engine
+# Deploying Concourse on Google Compute Engine
 
-This guide describes how to deploy [Concourse](https://www.concourse.io/) on [Google Compute Engine](https://cloud.google.com/) using BOSH. You will deploy a BOSH director as part of these instructions.
+This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google Compute Engine](https://cloud.google.com/) using BOSH. You will deploy a BOSH director as part of these instructions.
 
 ## Prerequisites
 * You must have the `terraform` CLI installed on your workstation. See [Download Terraform](https://www.terraform.io/downloads.html) for more details.
-* You must have the `gcloud` CLI installed on your workstation. See [cloud.google.com/sdk](cloud.google.com/sdk).
+* You must have the `gcloud` CLI installed on your workstation. See [cloud.google.com/sdk](https://cloud.google.com/sdk/).
 
 ### Setup your workstation
 

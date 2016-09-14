@@ -24,7 +24,7 @@ var _ = Describe("SetVMMetadata", func() {
 	)
 
 	BeforeEach(func() {
-		vmMetadata = map[string]interface{}{
+		vmMetadata = map[string]string{
 			"deployment": "fake-deployment",
 			"job":        "fake-job",
 			"index":      "fake-index",
