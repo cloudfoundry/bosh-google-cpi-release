@@ -209,10 +209,10 @@ func (i GoogleInstanceService) createSchedulingParams(
 	return scheduling
 }
 
-func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) (serviceAccounts []*compute.ServiceAccount) {
+func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) []*compute.ServiceAccount {
 	// No service account and no scopes, so return an empty slice.
 	if vmProps.ServiceAccount == "" && len(vmProps.ServiceScopes) == 0 {
-		return
+		return nil
 	}
 
 	// No service account, but scopes are specified. Set the "default" account.
@@ -233,13 +233,13 @@ func (i GoogleInstanceService) createServiceAccountsParams(vmProps *Properties) 
 		} else {
 			scopes = append(scopes, fmt.Sprintf("https://www.googleapis.com/auth/%s", scope))
 		}
-		serviceAccount := &compute.ServiceAccount{
-			Email:  string(vmProps.ServiceAccount),
-			Scopes: scopes,
-		}
-		serviceAccounts = append(serviceAccounts, serviceAccount)
 	}
-	return
+
+	serviceAccount := &compute.ServiceAccount{
+		Email:  string(vmProps.ServiceAccount),
+		Scopes: scopes,
+	}
+	return []*compute.ServiceAccount{serviceAccount}
 }
 
 func (i GoogleInstanceService) addToTargetPool(instanceSelfLink string, targetPoolName string) error {

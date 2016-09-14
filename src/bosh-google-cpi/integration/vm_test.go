@@ -507,7 +507,7 @@ var _ = Describe("VM", func() {
 				{
 				  "machine_type": "n1-standard-1",
 				  "zone": "%v",
-				  "service_scopes": ["devstorage.read_write"]
+				  "service_scopes": ["cloud-platform", "devstorage.read_write"]
 				},
 				{
 				  "default": {
