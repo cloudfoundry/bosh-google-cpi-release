@@ -19,7 +19,9 @@ import (
 const (
 	computeScope = compute.ComputeScope
 	storageScope = storage.DevstorageFullControlScope
-	metadataHost = "metadata.google.internal"
+	// Metadata Host needs to be IP address, rather than FQDN, in case the system
+	// is set up to use public DNS servers, which would not resolve correctly.
+	metadataHost = "169.254.169.254"
 )
 
 type GoogleClient struct {
