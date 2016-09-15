@@ -2,6 +2,12 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [25.4.0] - 2016-09-14
+
+### Changed
+- When using a custom service account, a default `cloud-platform` scope is used if
+  no custom scopes are specified.
+
 ## [25.3.0] - 2016-09-02
 
 ### Added
@@ -72,6 +78,7 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[25.4.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.3.0...v25.4.0
 [25.3.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.2.1...v25.3.0
 [25.2.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.2.0...v25.2.1
 [25.2.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.1.0...v25.2.0
