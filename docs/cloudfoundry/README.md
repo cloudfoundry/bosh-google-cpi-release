@@ -38,13 +38,13 @@ You must have followed the [Deploy supporting infrastructure automatically](../b
 1. Use Terraform's `plan` feature to confirm that the new resources will be created:
 
   ```
-  terraform plan -var region=${region} -var zone=${zone}
+  terraform plan -var projectid=${projectid} -var region=${region} -var zone=${zone}
   ```
 
 1. Create the resources
 
   ```
-  terraform apply -var region=${region} -var zone=${zone}
+  terraform apply -var projectid=${projectid} -var region=${region} -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
@@ -208,10 +208,10 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and use `sed` to modify a few values in it:
 
   ```
-  $ sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
-  $ sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
-  $ sed -i s#{{REGION}}#$region# cloudfoundry.yml
-  sed -i s#{{ZONE}}#zone# cloudfoundry.yml
+  sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
+  sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
+  sed -i s#{{REGION}}#$region# cloudfoundry.yml
+  sed -i s#{{ZONE}}#$zone# cloudfoundry.yml
   ```
 
 1. Target the deployment file and deploy:
