@@ -64,7 +64,7 @@ var _ = Describe("VM", func() {
 				{
 				  "bosh": {
 					  "group_name": "micro-google-dummy-dummy",
-					  "groups": ["micro-google", "dummy", "dummy", "micro-google-dummy", "dummy-dummy", "micro-google-dummy-dummy"]
+					  "groups": ["micro-google", "dummy", "dummy", "micro-google-dummy", "dummy-dummy", "micro-google-dummy-dummy-too-long-and-should-be-truncated-to-an-acceptable-length"]
 				  }
 				}
 			  ]
@@ -89,17 +89,17 @@ var _ = Describe("VM", func() {
 			"integration-delete": "",
 		}
 		expectLabels := map[string]string{
-			"director":                 "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
-			"name":                     "val-with-underscores-ending-in-dash",
-			"deployment":               "deployment-name",
-			"job":                      "job-name",
-			"index":                    "n0",
-			"integration-delete":       "",
-			"micro-google":             "",
-			"dummy":                    "",
-			"micro-google-dummy":       "",
-			"dummy-dummy":              "",
-			"micro-google-dummy-dummy": "",
+			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
+			"name":               "val-with-underscores-ending-in-dash",
+			"deployment":         "deployment-name",
+			"job":                "job-name",
+			"index":              "n0",
+			"integration-delete": "",
+			"micro-google":       "",
+			"dummy":              "",
+			"micro-google-dummy": "",
+			"dummy-dummy":        "",
+			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
 		}
 		mj, _ := json.Marshal(m)
 		request = fmt.Sprintf(`{

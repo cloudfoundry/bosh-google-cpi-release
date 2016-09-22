@@ -100,7 +100,9 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	if boshenv, ok := env["bosh"]; ok {
 		if boshgroups, ok := boshenv.(map[string]interface{})["groups"]; ok {
 			for _, tag := range boshgroups.([]interface{}) {
-				cloudProps.Tags = append(cloudProps.Tags, tag.(string))
+				// Ignore error as labels will be validated later
+				safeTag, _ := instance.SafeLabel(tag.(string))
+				cloudProps.Tags = append(cloudProps.Tags, safeTag)
 			}
 		}
 	}
