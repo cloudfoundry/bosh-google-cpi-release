@@ -56,4 +56,6 @@ builds:
     version: 25.3.0
   854651e4-4e89-4a9d-89c9-108fc54c935a:
     version: 25.4.0
+  6e3c25f1-fef8-4ceb-9106-51350e749970:
+    version: 25.4.1
 format-version: '2'

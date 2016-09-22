@@ -20,6 +20,7 @@ Please see [CHANGELOG.md] for details of each release.
 |[25.2.1](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.2.1.tgz)|7dde4c0ea5d49ea681fd04c2d0595afb3660fab9|2016-08-29|
 |[25.3.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.3.0.tgz)|69fb68b28937681203316f82e2765b0c9925ae01|2016-09-07|
 |[25.4.0](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.4.0.tgz)|662677c9013b41820381e60ad1230d5eadd7b713|2016-09-15|
+|[25.4.1](https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.4.1.tgz)|4dbc5c9611724eb270b510b96d5cbde9052f9c31|2016-09-22|
 [//]: # (new-cpi)
 
 ### Stemcell
@@ -33,6 +34,7 @@ Please see [CHANGELOG.md] for details of each release.
 |[3262.7 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.7-google-kvm-ubuntu-trusty-go_agent.tgz)|eccdb9f590f462f84083fe04894ddf27e886b53d|2016-08-18|
 |[3262.9 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.9-google-kvm-ubuntu-trusty-go_agent.tgz)|7af5fb52553c8d99d3d60cf884361d23f4f59d17|2016-09-07|
 |[3262.12 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent.tgz)|0fadc768d0d262f3d5354872710c121aecbb6f15|2016-09-15|
+|[3262.12 (Light)](https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent.tgz)|0fadc768d0d262f3d5354872710c121aecbb6f15|2016-09-22|
 [//]: # (new-stemcell)
 
 ## Usage
