@@ -188,18 +188,13 @@ Before working this section, you must have deployed the supporting infrastructur
   gcloud config set compute/region ${region}
   ```
 
-1. Create a **password-less** SSH key:
+1. Create a **password-less** SSH key and upload the public component:
 
   ```
   ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+  gcloud compute project-info add-metadata --metadata-from-file \
+           sshKeys=<( gcloud compute project-info describe --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key == "sshKeys") | .value' & echo "bosh:$(cat ~/.ssh/bosh.pub)" )
   ```
-
-1. Navigate to your [project's web console](https://console.cloud.google.com/compute/metadata/sshKeys) and add the new SSH public key by pasting the contents of ~/.ssh/bosh.pub:
-
-  ![](../img/add-ssh.png)
-
-  > **Important:** The username field should auto-populate the value `bosh` after you paste the public key. If it does not, be sure there are no newlines or carriage returns being pasted; the value you paste should be a single line.
-
 
 1. Confirm that `bosh-init` is installed by querying its version:
 
