@@ -240,7 +240,6 @@ jobs:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false,                             get: release-version-semver, params: {bump: major}}
       
       - task: promote
@@ -272,8 +271,7 @@ jobs:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
+        - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
       
       - task: promote
@@ -306,7 +304,6 @@ jobs:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: true,  passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
       
       - task: promote
