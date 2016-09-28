@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eux
 
 : ${BUCKET_NAME:?}
 : ${BOSHIO_TOKEN:=""}
@@ -32,15 +32,4 @@ pushd working_dir
 
   light_stemcell_path="${light_stemcell_dir}/${light_stemcell_name}"
   tar czvf "${light_stemcell_path}" *
-
-  checksum="$(sha1sum ${light_stemcell_path} | awk '{print $1}')"
-  echo -n "${checksum}" > ${light_stemcell_path}.sha1
-
-  if [ -n "${BOSHIO_TOKEN}" ]; then
-    curl -X POST \
-      --fail \
-      -d "sha1=${checksum}" \
-      -H "Authorization: bearer ${BOSHIO_TOKEN}" \
-      "https://bosh.io/checksums/${light_stemcell_name}"
-  fi
 popd
