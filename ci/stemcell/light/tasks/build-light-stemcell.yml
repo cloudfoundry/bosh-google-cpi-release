@@ -16,4 +16,3 @@ run:
 
 params:
   BUCKET_NAME:  ""
-  BOSHIO_TOKEN: ""
