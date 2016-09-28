@@ -48,6 +48,25 @@ You must have followed the [Deploy supporting infrastructure automatically](../b
   terraform apply -var projectid=${projectid} -var region=${region} -var zone=${zone}
   ```
 
+1. Create a service account and key:
+
+  ```
+  gcloud iam service-accounts create cf-component
+  gcloud iam service-accounts keys create /tmp/cf-component.key.json \
+      --iam-account cf-component@${projectid}.iam.gserviceaccount.com
+  ```
+
+1. Grant the new service account editor access and logging access to your project:
+
+  ```
+  gcloud projects add-iam-policy-binding ${projectid} \
+      --member serviceAccount:cf-component@${projectid}.iam.gserviceaccount.com \
+      --role "roles/editor" \
+      --role "roles/logging.logWriter" \
+      --role "roles/logging.configWriter"
+  ```
+
+
 Now you have the infrastructure ready to deploy Cloud Foundry. Go ahead to the [Deploy Cloud Foundry](#deploy-cloudfoundry) section to do that. 
 
 <a name="deploy-manually"></a>
@@ -213,6 +232,7 @@ Before working this section, you must have deployed the supporting infrastructur
   sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
   sed -i s#{{REGION}}#$region# cloudfoundry.yml
   sed -i s#{{ZONE}}#$zone# cloudfoundry.yml
+  sed -i s#{{PROJECT_ID}}#$projectid# cloudfoundry.yml
   ```
 
 1. Target the deployment file and deploy:

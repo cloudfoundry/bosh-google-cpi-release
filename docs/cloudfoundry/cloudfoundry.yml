@@ -13,6 +13,12 @@ google_zone = "{{ZONE}}"
 network = "cf"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
+
+# Google service account settings
+project_id = "{{PROJECT_ID}}"
+org, project = project_id.split(":")
+project_domain_prefix = [project, org].compact.join(".")
+cf_service_account = "cf-component@#{project_domain_prefix}.iam.gserviceaccount.com"
 %>
 ssl_cert: &ssl_cert |
   -----BEGIN CERTIFICATE-----
@@ -81,6 +87,9 @@ compilation:
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
     preemptible: true
+    service_account: <%= cf_service_account%>
+    service_scopes:
+      - cloud-platform
 
 update:
   canaries: 1
@@ -133,6 +142,9 @@ resource_pools:
       machine_type: n1-standard-4
       root_disk_size_gb: 20
       root_disk_type: pd-standard
+      service_account: <%= cf_service_account%>
+      service_scopes:
+        - cloud-platform
 
   - name: common-public
     network: public
@@ -145,6 +157,9 @@ resource_pools:
       root_disk_size_gb: 20
       root_disk_type: pd-standard
       target_pool: cf-public
+      service_account: <%= cf_service_account%>
+      service_scopes:
+        - cloud-platform
 
   - name: cells
     network: private
@@ -156,6 +171,9 @@ resource_pools:
       machine_type: n1-highmem-8
       root_disk_size_gb: 100
       root_disk_type: pd-standard
+      service_account: <%= cf_service_account%>
+      service_scopes:
+        - cloud-platform
 
 disk_pools:
   - name: consul
