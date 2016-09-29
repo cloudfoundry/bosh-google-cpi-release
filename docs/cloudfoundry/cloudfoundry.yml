@@ -88,8 +88,6 @@ compilation:
     root_disk_type: pd-ssd
     preemptible: true
     service_account: <%= cf_service_account%>
-    service_scopes:
-      - cloud-platform
 
 update:
   canaries: 1
@@ -143,8 +141,6 @@ resource_pools:
       root_disk_size_gb: 20
       root_disk_type: pd-standard
       service_account: <%= cf_service_account%>
-      service_scopes:
-        - cloud-platform
 
   - name: common-public
     network: public
@@ -158,8 +154,6 @@ resource_pools:
       root_disk_type: pd-standard
       target_pool: cf-public
       service_account: <%= cf_service_account%>
-      service_scopes:
-        - cloud-platform
 
   - name: cells
     network: private
@@ -172,8 +166,6 @@ resource_pools:
       root_disk_size_gb: 100
       root_disk_type: pd-standard
       service_account: <%= cf_service_account%>
-      service_scopes:
-        - cloud-platform
 
 disk_pools:
   - name: consul
