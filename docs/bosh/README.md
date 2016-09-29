@@ -225,15 +225,15 @@ Before working this section, you must have deployed the supporting infrastructur
       url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
       sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
     - name: bosh-google-cpi
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.1.0.tgz
-      sha1: f99dff6860731921282dd1bcd097a74beaeb72a4
+      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.4.1
+      sha1: 7761d8eb48c2a2fec50f4f637ce016735ad779dc
 
   resource_pools:
     - name: vms
       network: private
       stemcell:
-        url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.5-google-kvm-ubuntu-trusty-go_agent.tgz
-        sha1: b7ed64f1a929b9a8e906ad5faaed73134dc68c53
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.4
+        sha1: 0a93ba7468e7c1c543404f82bef295fbb21172f5
       cloud_properties:
         zone: {{ZONE}}
         machine_type: n1-standard-4
