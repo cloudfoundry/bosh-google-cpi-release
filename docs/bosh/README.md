@@ -232,7 +232,7 @@ Before working this section, you must have deployed the supporting infrastructur
     - name: vms
       network: private
       stemcell:
-        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.4
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3262.19
         sha1: 0a93ba7468e7c1c543404f82bef295fbb21172f5
       cloud_properties:
         zone: {{ZONE}}
