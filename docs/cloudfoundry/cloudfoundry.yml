@@ -10,7 +10,7 @@ deployment_name = "cf"
 # Google network settings
 google_region = "{{REGION}}"
 google_zone = "{{ZONE}}"
-network = "cf"
+network = "bosh"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
 
@@ -106,11 +106,12 @@ networks:
         zone: <%= google_zone%>
         network_name: <%= network%>
         subnetwork_name: <%= public_subnetwork%>
-        ephemeral_external_ip: true
+        ephemeral_external_ip: false
         tags:
           - cf-public
           - cf-internal
-          - bosh-internal
+          - internal
+          - no-ip
 
   - name: private
     type: manual
@@ -121,10 +122,11 @@ networks:
         zone: <%= google_zone%>
         network_name: <%= network%>
         subnetwork_name: <%= private_subnetwork%>
-        ephemeral_external_ip: true
+        ephemeral_external_ip: false
         tags:
           - cf-internal
-          - bosh-internal
+          - internal
+          - no-ip
 
   - name: vip
     type: vip

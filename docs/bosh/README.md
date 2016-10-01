@@ -232,8 +232,8 @@ Before working this section, you must have deployed the supporting infrastructur
     - name: vms
       network: private
       stemcell:
-        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3262.19
-        sha1: 0a93ba7468e7c1c543404f82bef295fbb21172f5
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3262.20
+        sha1: acfeb1f486b6111c235d95b2c073aaa3b770b556
       cloud_properties:
         zone: {{ZONE}}
         machine_type: n1-standard-4
@@ -259,11 +259,12 @@ Before working this section, you must have deployed the supporting infrastructur
         gateway: 10.0.0.1
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
-          network_name: cf
+          network_name: bosh
           subnetwork_name: bosh-{{REGION}}
-          ephemeral_external_ip: true
+          ephemeral_external_ip: false
           tags:
-            - bosh-internal
+            - internal
+            - no-ip
 
   jobs:
     - name: bosh
