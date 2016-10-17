@@ -659,11 +659,13 @@ var _ = Describe("VM", func() {
 		Expect(justInstances(ig)).To(ContainElement(ContainSubstring(vmCID)))
 
 		By("deleting the VM and confirming its removal from backend service instance group")
+		toggleAsyncDelete()
 		request = fmt.Sprintf(`{
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
 		assertSucceeds(request)
+		toggleAsyncDelete()
 		ig, err = computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
