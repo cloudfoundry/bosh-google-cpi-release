@@ -42,7 +42,7 @@ var (
 	ipAddrs              = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
 	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
-	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration-us-central1-a")
+	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
 

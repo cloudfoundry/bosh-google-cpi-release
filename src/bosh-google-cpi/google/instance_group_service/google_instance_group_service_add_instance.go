@@ -8,7 +8,8 @@ import (
 )
 
 func (i GoogleInstanceGroupService) AddInstance(id string, vmLink string) error {
-	instanceGroup, found, err := i.Find(id, "")
+	zone := util.ZoneFromURL(vmLink)
+	instanceGroup, found, err := i.Find(id, zone)
 	if err != nil {
 		return err
 	}
