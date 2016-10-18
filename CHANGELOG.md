@@ -2,6 +2,16 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [25.5.0] - 2016-10-17
+
+### Changed
+- Release uses Go 1.7.1
+
+### Fixed
+- A backend service previously could not have multiple instance groups
+  with the same name. This release fixes that, and you may have instance
+  groups with the same name associated to a backend service.
+
 ## [25.4.1] - 2016-09-14
 
 ### Fixed
@@ -84,6 +94,7 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[25.5.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.4.1...v25.5.0
 [25.4.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.4.0...v25.4.1
 [25.4.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.3.0...v25.4.0
 [25.3.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.2.1...v25.3.0
