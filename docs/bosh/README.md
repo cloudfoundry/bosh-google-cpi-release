@@ -1,6 +1,6 @@
 # Deploy BOSH on Google Cloud Platform
 
-These instructions walk  you through deploying a BOSH Director on Google Cloud Platform using manual networking.
+These instructions walk you through deploying a BOSH Director on Google Cloud Platform using manual networking and a network that allows private IP addresses with outbound Internet access provided by a NAT instance.
 
 ## Overview
 Here are a few important facts about the architecture of the BOSH deployment you will create in this guide:
@@ -73,8 +73,6 @@ The following diagram provides an overview of the deployment:
 ## Deploy supporting infrastructure automatically
 The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](terraform.io) you will provision all of the infrastructure required to run BOSH in just a few commands.
 
-If you would like a detailed understanding of what is being created, you may instead follow the instructions in [Deploy supporting infrastructure manually](#deploy-manual).
-
 ### Requirements
 You must have the `terraform` CLI installed on your workstation. See
 [Download Terraform](https://www.terraform.io/downloads.html) for more details.
@@ -96,81 +94,9 @@ You must have the `terraform` CLI installed on your workstation. See
 
 Now you have the infrastructure ready to deploy a BOSH director. Go ahead to the [Deploy BOSH](#deploy-bosh) section to do that. 
 
-<a name="deploy-manual"></a>
-## Deploy supporting infrastructure manually
-
-> **Note:** Do not follow the steps if you've already completed the [Deploy supporting infrastructure automatically](#deploy-automatic) instructions. Instead, skip ahead to the [Deploy BOSH](#deploy-bosh) section.
-
-The following instructions offer the most detailed path to getting BOSH up and
-running on Google Cloud Platform using the `gcloud` CLI. Although it is
-recommended you use the [Deploy supporting infrastructure automatically](#deploy-automatic)
-instructions for a production environment, these steps can be helpful in
-understanding exactly what is being provisioned to support your BOSH environment.
-
-### Requirements
-You must have the `gcloud` CLI installed on your workstation. See
-[https://cloud.google.com/sdk/](https://cloud.google.com/sdk/) for more details.
-
-### Steps
-
-1. Create a new [network with custom subnetwork ranges](https://cloud.google.com/compute/docs/networking):
-
-  ```
-  gcloud compute networks create cf --mode custom
-  ```
-
-1. Create a new subnetwork for BOSH:
-
-  ```
-  gcloud compute networks subnets create bosh-us-east1 \
-      --network cf \
-      --range 10.0.0.0/24 \
-      --description "Subnet for BOSH Director and bastion"
-  ```
-
-1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all internal traffic between VMs with the `bosh-internal` tag:
-
-  ```
-  gcloud compute firewall-rules create bosh-internal \
-    --description "BOSH internal traffic" \
-    --network cf \
-    --source-tags bosh-internal \
-    --target-tags bosh-internal \
-    --allow tcp,udp,icmp
-  ```
-
-1. Create a [firewall](https://cloud.google.com/compute/docs/networking#addingafirewall) to allow all SSH access to the bastion host that you will deploy the BOSH Director from:
-
-  ```
-  gcloud compute firewall-rules create bosh-bastion \
-    --description "BOSH bastion" \
-    --network cf \
-    --target-tags bosh-bastion \
-    --allow tcp:22
-  ```
-
-1. Create a bastion VM that you will use to run `bosh-init` and deply the Director:
-
-  ```
-  gcloud compute instances create bosh-bastion \
-      --image ubuntu-14-04 \
-      --subnet bosh-us-east1 \
-      --private-network-ip 10.0.0.200 \
-      --tags bosh-bastion,bosh-internal \
-      --scopes cloud-platform \
-      --metadata startup-script="apt-get update -y
-apt-get upgrade -y
-apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3
-gem install bosh_cli 
-curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.20.0/cf-cli_6.20.0_linux_x86-64.tgz
-tar -zxvf /tmp/cf.tgz && mv cf /usr/bin/cf && chmod +x /usr/bin/cf
-curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.96-linux-amd64
-chmod +x /usr/bin/bosh-init"
-  ```
-
 <a name="deploy-bosh"></a>
 ## Deploy BOSH
-Before working this section, you must have deployed the supporting infrastructure on Google Cloud Platform using either the [automatic](#deploy-automatic) or [manual](deploy-manual) steps provided earlier.
+Before working this section, you must have deployed the supporting infrastructure on Google Cloud Platform using the [automatic](#deploy-automatic) steps provided earlier.
 
 1. SSH to the bastion VM you created in the previous step. All SSH commands after this should be run from the VM:
 
@@ -220,15 +146,15 @@ Before working this section, you must have deployed the supporting infrastructur
       url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
       sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
     - name: bosh-google-cpi
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.1.0.tgz
-      sha1: f99dff6860731921282dd1bcd097a74beaeb72a4
+      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.4.1
+      sha1: 7761d8eb48c2a2fec50f4f637ce016735ad779dc
 
   resource_pools:
     - name: vms
       network: private
       stemcell:
-        url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.5-google-kvm-ubuntu-trusty-go_agent.tgz
-        sha1: b7ed64f1a929b9a8e906ad5faaed73134dc68c53
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3262.20
+        sha1: acfeb1f486b6111c235d95b2c073aaa3b770b556
       cloud_properties:
         zone: {{ZONE}}
         machine_type: n1-standard-4
@@ -254,11 +180,12 @@ Before working this section, you must have deployed the supporting infrastructur
         gateway: 10.0.0.1
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
-          network_name: cf
+          network_name: bosh
           subnetwork_name: bosh-{{REGION}}
-          ephemeral_external_ip: true
+          ephemeral_external_ip: false
           tags:
-            - bosh-internal
+            - internal
+            - no-ip
 
   jobs:
     - name: bosh

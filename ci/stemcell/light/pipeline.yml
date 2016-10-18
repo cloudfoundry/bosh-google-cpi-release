@@ -3,101 +3,120 @@ groups:
   - name: light-gce-stemcells
     jobs:
       - ubuntu-trusty-stemcell
-      - centos-7-stemcell
 
 jobs:
   - name: ubuntu-trusty-stemcell
     plan:
       - aggregate:
-        - {trigger: true, get: stemcell, resource: ubuntu-stemcells}
-        - {trigger: false, get: bosh-cpi-src}
-
+        - get: stemcell
+          resource: ubuntu-stemcells
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - get: bosh-cpi-src
+          trigger: false
+        - get: bosh-cli
+          trigger: false
+        - get: bosh-cpi-release
+          trigger: false
       - task: create-light-stemcell
         file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
-        privileged: true
         params:
           BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
-          BOSHIO_TOKEN:    {{google_boshio_checksum_token}}
 
       - aggregate:
         - put: bosh-ubuntu-raw-stemcells
           params:
             file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
             predefined_acl: "publicRead"
+        - put: bosh-ubuntu-raw-stemcells-sha1
+          params:
+            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+            predefined_acl: "publicRead"
+
+      - do:
+        - put: terraform
+          params:
+            generate_random_name: true
+            terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+
+        - task: deploy-skeletal
+          file: bosh-cpi-src/ci/stemcell/light/tasks/deploy-skeletal.yml
+          params:
+            SSH_PRIVATE_KEY: {{ssh_private_key}}
+            GCE_CREDENTIALS_JSON: {{gce_credentials_json}}
 
         - put: bosh-ubuntu-light-stemcells
           params:
             file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
             predefined_acl: "publicRead"
 
-        - put: bosh-ubuntu-raw-stemcells-sha1
+        - task: publish-boshio-checksum
+          file: bosh-cpi-src/ci/stemcell/light/tasks/publish-boshio-checksum.yml
           params:
-            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
-            predefined_acl: "publicRead"
+            BOSHIO_TOKEN: {{google_boshio_checksum_token}}
 
-        - put: bosh-ubuntu-light-stemcells-sha1
-          params:
-            file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz.sha1
-            predefined_acl: "publicRead"
-
-  - name: centos-7-stemcell
-    plan:
-      - aggregate:
-        - {trigger: true, get: stemcell, resource: centos-stemcells}
-        - {trigger: false, get: bosh-cpi-src}
-
-      - task: create-light-stemcell
-        file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
-        privileged: true
-        params:
-          BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
-          BOSHIO_TOKEN:    {{google_boshio_checksum_token}}
-
-      - aggregate:
-        - put: bosh-centos-raw-stemcells
-          params:
-            file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz
-            predefined_acl: "publicRead"
-
-        - put: bosh-centos-light-stemcells
-          params:
-            file: light-stemcell/light-bosh-stemcell-*-google-kvm-centos-7-go_agent.tgz
-            predefined_acl: "publicRead"
-
-        - put: bosh-centos-raw-stemcells-sha1
-          params:
-            file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz.sha1
-            predefined_acl: "publicRead"
-
-        - put: bosh-centos-light-stemcells-sha1
-          params:
-            file: light-stemcell/light-bosh-stemcell-*-google-kvm-centos-7-go_agent.tgz.sha1
-            predefined_acl: "publicRead"
+        ensure:
+          task: destroy-skeletal
+          file: bosh-cpi-src/ci/stemcell/light/tasks/destroy-skeletal.yml
+          ensure:
+            put: terraform
+            params:
+              env_name_file: terraform/name
+              terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+              action: destroy
+            get_params:
+              action: destroy
 
 resources:
+  - name: bosh-cli
+    type: s3
+    source:
+      bucket: bosh-cli-artifacts
+      regexp: bosh-cli-(\d+\.\d+\.\d+)-linux-amd64
+
+  - name: bosh-cpi-release
+    type: bosh-io-release
+    source:
+      repository: cloudfoundry-incubator/bosh-google-cpi-release
+
   - name: bosh-cpi-src
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
       branch: master
 
-  - name: ubuntu-stemcells
-    type: s3
+  - name: terraform
+    type: terraform
     source:
-      regexp: bosh-stemcell-(.+)-google-kvm-ubuntu-trusty-go_agent.tgz
-      bucket: bosh-google-stemcells-dev
+      storage:
+        bucket: {{terraform_bucket_name}}
+        bucket_path: stemcell-ci-terraform/
+        access_key_id: {{terraform_bucket_access_key}}
+        secret_access_key: {{terraform_bucket_secret_key}}
+        endpoint: storage.googleapis.com
+      vars:
+        gce_project_id: {{gce_project_id}}
+        gce_credentials_json: {{gce_credentials_json}}
+
+  - name: ubuntu-stemcells
+    type: bosh-io-pr-force-regular
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
     source:
-      json_key: {{google_raw_stemcells_json_key_data}}
+      json_key: {{gce_credentials_json}}
       bucket:   {{google_raw_stemcells_bucket_name}}
       regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
 
   - name: bosh-ubuntu-raw-stemcells-sha1
     type: gcs-resource
     source:
-      json_key: {{google_raw_stemcells_json_key_data}}
+      json_key: {{gce_credentials_json}}
       bucket:   {{google_raw_stemcells_bucket_name}}
       regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
 
@@ -121,48 +140,18 @@ resources:
       region:            {{google_light_stemcells_region}}
       regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz.sha1
 
-  - name: centos-stemcells
-    type: s3
-    source:
-      regexp: bosh-stemcell-(.+)-google-kvm-centos-7-go_agent.tgz
-      bucket: bosh-google-stemcells-dev
-
-  - name: bosh-centos-raw-stemcells
-    type: gcs-resource
-    source:
-      json_key: {{google_raw_stemcells_json_key_data}}
-      bucket:   {{google_raw_stemcells_bucket_name}}
-      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent-raw.tar.gz
-
-  - name: bosh-centos-raw-stemcells-sha1
-    type: gcs-resource
-    source:
-      json_key: {{google_raw_stemcells_json_key_data}}
-      bucket:   {{google_raw_stemcells_bucket_name}}
-      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent-raw.tar.gz.sha1
-
-  - name: bosh-centos-light-stemcells
-    type: s3
-    source:
-      bucket:            {{google_light_stemcells_bucket_name}}
-      access_key_id:     {{google_light_stemcells_access_key_id}}
-      secret_access_key: {{google_light_stemcells_secret_access_key}}
-      endpoint:          {{google_light_stemcells_endpoint}}
-      region:            {{google_light_stemcells_region}}
-      regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent.tgz
-
-  - name: bosh-centos-light-stemcells-sha1
-    type: s3
-    source:
-      bucket:            {{google_light_stemcells_bucket_name}}
-      access_key_id:     {{google_light_stemcells_access_key_id}}
-      secret_access_key: {{google_light_stemcells_secret_access_key}}
-      endpoint:          {{google_light_stemcells_endpoint}}
-      region:            {{google_light_stemcells_region}}
-      regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent.tgz.sha1
-
 resource_types:
   - name: gcs-resource
     type: docker-image
     source:
       repository: frodenas/gcs-resource
+  # TODO: remove this image once resource PR is merged
+  # https://www.pivotaltracker.com/story/show/130877947
+  - name: bosh-io-pr-force-regular
+    type: docker-image
+    source:
+      repository: boshcpi/bosh-io-pr-force-regular
+  - name: terraform
+    type: docker-image
+    source:
+      repository: ljfranklin/terraform-resource

@@ -669,7 +669,6 @@ var _ = Describe("VM", func() {
 		ig, err = computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
-
 	})
 
 })

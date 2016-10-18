@@ -83,9 +83,14 @@ configint: check-proj
 		gcloud --project=$(GOOGLE_PROJECT) compute target-pools create cfintegration2 --region=us-central1; \
 	fi
 
-	@gcloud compute instance-groups unmanaged describe cfintegration-us-central1-a --zone us-central1-a &> /dev/null; if [ $$? -ne 0 ]; then \
-		echo "Creating instance group cfintegration-us-central1-a"; \
-		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged create cfintegration-us-central1-a --zone us-central1-a; \
+	@gcloud compute instance-groups unmanaged describe cfintegration --zone us-central1-a &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance group cfintegration in us-central1-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged create cfintegration --zone us-central1-a; \
+	fi
+
+	@gcloud compute instance-groups unmanaged describe cfintegration --zone us-central1-b &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance group cfintegration in us-central1-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged create cfintegration --zone us-central1-b; \
 	fi
 
 	@gcloud compute http-health-checks describe cfintegration &> /dev/null; if [ $$? -ne 0 ]; then \
@@ -96,7 +101,8 @@ configint: check-proj
 	@gcloud compute backend-services describe cfintegration &> /dev/null; if [ $$? -ne 0 ]; then \
 		echo "Creating backend service cfintegration"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute backend-services create "cfintegration" --http-health-check "cfintegration" --port-name "http" --timeout "30"; \
-        gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration-us-central1-a" --zone "us-central1-a" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"; \
+        gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration" --zone "us-central1-a" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"; \
+        gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration" --zone "us-central1-b" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"; \
 	fi
 
 	@echo "Your project is ready for integration tests."
@@ -144,8 +150,13 @@ cleanint: check-proj
 	fi
 
 	@gcloud compute instance-groups unmanaged describe cfintegration-us-central1-a --zone us-central1-a &> /dev/null; if [ $$? -eq 0 ]; then \
-		echo "Deleting instance group cfintegration-us-central1-a"; \
-		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration-us-central1-a --zone us-central1-a --quiet; \
+		echo "Deleting instance group cfintegration in us-central1-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration --zone us-central1-a --quiet; \
+	fi
+
+	@gcloud compute instance-groups unmanaged describe cfintegration --zone us-central1-b &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting instance group cfintegration in us-central1-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration --zone us-central1-b --quiet; \
 	fi
 
 	@echo "All integration tests resources have been removed. You will need to run the configint target before doing integration tests again."

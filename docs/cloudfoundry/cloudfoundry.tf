@@ -1,21 +1,46 @@
+variable "projectid" {
+    type = "string"
+}
+
+variable "region" {
+    type = "string"
+    default = "us-east1"
+}
+
+variable "zone" {
+    type = "string"
+    default = "us-east1-d"
+}
+
+variable "bosh_network" {
+    type = "string"
+    default = "bosh"
+}
+
+provider "google" {
+    project = "${var.projectid}"
+    region = "${var.region}"
+}
+
 // Subnet for the public Cloud Foundry components
 resource "google_compute_subnetwork" "cf-public-subnet-1" {
   name          = "cf-public-${var.region}"
   ip_cidr_range = "10.200.0.0/16"
-  network       = "${google_compute_network.cf.self_link}"
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
+
 }
 
 // Subnet for the private Cloud Foundry components
 resource "google_compute_subnetwork" "cf-private-subnet-1" {
   name          = "cf-private-${var.region}"
   ip_cidr_range = "192.168.0.0/16"
-  network       = "${google_compute_network.cf.self_link}"
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
 }
 
 // Allow access to CloudFoundry router
 resource "google_compute_firewall" "cf-public" {
   name    = "cf-public"
-  network = "${google_compute_network.cf.name}"
+  network       = "${var.bosh_network}"
 
   allow {
     protocol = "tcp"
@@ -23,27 +48,6 @@ resource "google_compute_firewall" "cf-public" {
   }
 
   target_tags = ["cf-public"]
-}
-
-// Allow open access to between internal VMs
-resource "google_compute_firewall" "cf-internal" {
-  name    = "cf-internal"
-  network = "${google_compute_network.cf.name}"
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-  }
-
-  allow {
-    protocol = "udp"
-  }
-
-  target_tags = ["cf-internal"]
-  source_tags = ["cf-internal", "bosh-internal"]
 }
 
 // Static IP address for forwarding rule

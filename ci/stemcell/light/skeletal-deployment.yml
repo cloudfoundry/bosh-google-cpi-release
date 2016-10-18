@@ -1,0 +1,72 @@
+---
+name: skeletal-gce
+
+releases:
+- name: bosh-google-cpi
+  url: file://assets/cpi.tgz
+
+resource_pools:
+- name: vms
+  network: private
+  stemcell:
+    url: file://assets/stemcell.tgz
+  cloud_properties:
+    machine_type: f1-micro
+    root_disk_type: pd-standard
+    zone: ((gce_zone))
+    tags:
+    - ((skeletal_firewall_tag))
+
+disk_pools:
+- name: disks
+  disk_size: 1_000
+  cloud_properties: {type: pd-standard} # 4x cheaper than pd-ssd
+
+networks:
+- name: private
+  type: dynamic
+  cloud_properties:
+    network_name: ((network_name))
+    subnetwork_name: ((subnetwork_name))
+- name: public
+  type: vip
+
+instance_groups:
+- name: skeletal
+  instances: 1
+
+  jobs: []
+
+  resource_pool: vms
+  persistent_disk_pool: disks
+
+  networks:
+  - name: private
+    default: [dns, gateway]
+  - name: public
+    static_ips: [ ((skeletal_external_ip)) ]
+
+  properties:
+    google: &google_properties
+      project: ((gce_project_id))
+      json_key: ((gce_credentials_json))
+      default_zone: ((gce_zone))
+
+    ntp: &ntp [169.254.169.254]
+
+cloud_provider:
+  template: {name: google_cpi, release: bosh-google-cpi}
+
+  ssh_tunnel:
+    host: ((skeletal_external_ip))
+    port: 22
+    user: vcap
+    private_key: ((ssh_private_key))
+
+  mbus: ((gce_cloud_provider_mbus))
+
+  properties:
+    google: *google_properties
+    agent: {mbus: ((gce_cloud_provider_agent_mbus)) }
+    blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
+    ntp: *ntp

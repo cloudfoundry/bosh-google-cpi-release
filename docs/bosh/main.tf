@@ -1,6 +1,5 @@
 variable "projectid" {
     type = "string"
-    default = "REPLACE-WITH-YOUR-GOOGLE-PROJECT-ID"
 }
 
 variable "region" {
@@ -18,21 +17,31 @@ provider "google" {
     region = "${var.region}"
 }
 
-resource "google_compute_network" "cf" {
-  name       = "cf"
+resource "google_compute_network" "bosh" {
+  name       = "bosh"
+}
+
+resource "google_compute_route" "nat-primary" {
+  name        = "nat-primary"
+  dest_range  = "0.0.0.0/0"
+  network       = "${google_compute_network.bosh.name}"
+  next_hop_instance = "${google_compute_instance.nat-instance-private-with-nat-primary.name}"
+  next_hop_instance_zone = "${var.zone}"
+  priority    = 800
+  tags = ["no-ip"]
 }
 
 // Subnet for the BOSH director
 resource "google_compute_subnetwork" "bosh-subnet-1" {
   name          = "bosh-${var.region}"
   ip_cidr_range = "10.0.0.0/24"
-  network       = "${google_compute_network.cf.self_link}"
+  network       = "${google_compute_network.bosh.self_link}"
 }
 
 // Allow SSH to BOSH bastion
 resource "google_compute_firewall" "bosh-bastion" {
   name    = "bosh-bastion"
-  network = "${google_compute_network.cf.name}"
+  network = "${google_compute_network.bosh.name}"
 
   allow {
     protocol = "icmp"
@@ -46,10 +55,10 @@ resource "google_compute_firewall" "bosh-bastion" {
   target_tags = ["bosh-bastion"]
 }
 
-// Allow open access between internal MVs
-resource "google_compute_firewall" "bosh-internal" {
-  name    = "bosh-internal"
-  network = "${google_compute_network.cf.name}"
+// Allow all traffic within subnet
+resource "google_compute_firewall" "intra-subnet-open" {
+  name    = "intra-subnet-open"
+  network = "${google_compute_network.bosh.name}"
 
   allow {
     protocol = "icmp"
@@ -57,13 +66,15 @@ resource "google_compute_firewall" "bosh-internal" {
 
   allow {
     protocol = "tcp"
+    ports    = ["1-65535"]
   }
 
   allow {
     protocol = "udp"
+    ports    = ["1-65535"]
   }
-  target_tags = ["bosh-internal"]
-  source_tags = ["bosh-internal"]
+
+  source_tags = ["internal"]
 }
 
 // BOSH bastion host
@@ -72,7 +83,7 @@ resource "google_compute_instance" "bosh-bastion" {
   machine_type = "n1-standard-1"
   zone         = "${var.zone}"
 
-  tags = ["bosh-bastion", "bosh-internal"]
+  tags = ["bosh-bastion", "internal"]
 
   disk {
     image = "ubuntu-1404-trusty-v20160627"
@@ -100,4 +111,34 @@ EOT
   service_account {
     scopes = ["cloud-platform"]
   }
+}
+
+// NAT server (primary)
+resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
+  name         = "nat-instance-primary"
+  machine_type = "n1-standard-1"
+  zone         = "${var.zone}"
+
+  tags = ["nat", "internal"]
+
+  disk {
+    image = "ubuntu-1404-trusty-v20160627"
+  }
+
+  network_interface {
+    subnetwork = "${google_compute_subnetwork.bosh-subnet-1.name}"
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  can_ip_forward = true
+
+  metadata_startup_script = <<EOT
+#!/bin/bash
+apt-get update -y
+apt-get upgrade -y
+sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+EOT
 }
