@@ -150,6 +150,7 @@ func NewConcreteFactory(
 			"delete_disk": NewDeleteDisk(diskService),
 			"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
 			"detach_disk": NewDetachDisk(vmService, registryClient),
+			"has_disk":    NewHasDisk(diskService),
 
 			// Snapshot management
 			"snapshot_disk":   NewSnapshotDisk(snapshotService, diskService),

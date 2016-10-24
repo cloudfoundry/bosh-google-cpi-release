@@ -18,6 +18,13 @@ var _ = Describe("Disk", func() {
 			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 
+		By("confirming a disk exists")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+
 		By("creating a VM")
 		var vmCID string
 		request = fmt.Sprintf(`{
@@ -71,6 +78,14 @@ var _ = Describe("Disk", func() {
 			  "arguments": ["%v"]
 			}`, diskCID)
 		assertSucceeds(request)
+
+		By("confirming a disk does not exist")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		found := assertSucceedsWithResult(request).(bool)
+		Expect(found).To(BeFalse())
 
 		By("creating a disk in the same zone as a VM")
 		request = fmt.Sprintf(`{
