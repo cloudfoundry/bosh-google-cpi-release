@@ -95,7 +95,7 @@ Before working this section, you must have deployed the supporting infrastructur
 1. Upload the required [Google BOSH Stemcell](http://bosh.io/docs/stemcell.html):
 
   ```
-  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3262.20
+  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
   ```
 
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):

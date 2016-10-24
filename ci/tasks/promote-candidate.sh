@@ -29,7 +29,6 @@ stemcell_url=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 stemcell_type=Heavy
 if [[ $stemcell_name == light* ]]; then stemcell_type=Light; fi
 stemcell_sha=$(sha1sum stemcell/*.tgz | awk '{print $1}')
-new_stemcell="|[$stemcell_version ($stemcell_type)]($stemcell_url)|$stemcell_sha|$today|"
 
 dev_release=$(echo $PWD/bosh-cpi-release/*.tgz)
 
@@ -58,10 +57,6 @@ EOF
   cpi_sha=$(sha1sum releases/$cpi_release_name/$cpi_blob | awk '{print $1}')
   new_cpi="|[$semver_version]($cpi_link)|$cpi_sha|$today|"
   sed -i "s^$cpi_marker^$new_cpi\n$cpi_marker^" README.md
-
-  # Insert Stemcell details into README.md
-  stemcell_marker="\[//\]: # (new-stemcell)"
-  sed -i "s^$stemcell_marker^$new_stemcell\n$stemcell_marker^" README.md
 
   git diff | cat
   git add .

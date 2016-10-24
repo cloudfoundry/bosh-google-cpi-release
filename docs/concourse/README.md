@@ -137,8 +137,8 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
     - name: vms
       network: private
       stemcell:
-        url: https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.5-google-kvm-ubuntu-trusty-go_agent.tgz
-        sha1: b7ed64f1a929b9a8e906ad5faaed73134dc68c53
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
+        sha1: c3fc743a5e3ec2a3f50e29851363331c6cd19b43
       cloud_properties:
         zone: {{ZONE}}
         machine_type: n1-standard-4
@@ -329,7 +329,7 @@ Complete the following steps from your bastion instance.
 1. Upload the required [Google BOSH Stemcell](http://bosh.io/docs/stemcell.html):
 
   ```
-  bosh upload stemcell https://storage.googleapis.com/bosh-cpi-artifacts/light-bosh-stemcell-3262.7-google-kvm-ubuntu-trusty-go_agent.tgz
+  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
   ```
 
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
