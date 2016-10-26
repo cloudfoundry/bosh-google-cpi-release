@@ -2,14 +2,14 @@
 groups:
   - name: light-gce-stemcells
     jobs:
-      - ubuntu-trusty-stemcell
+      - ubuntu-trusty-stemcell-3263
 
 jobs:
-  - name: ubuntu-trusty-stemcell
+  - name: ubuntu-trusty-stemcell-3263
     plan:
       - aggregate:
         - get: stemcell
-          resource: ubuntu-stemcells
+          resource: ubuntu-stemcell-3263
           trigger: true
           version: every
           params:
@@ -100,11 +100,12 @@ resources:
         gce_project_id: {{gce_project_id}}
         gce_credentials_json: {{gce_credentials_json}}
 
-  - name: ubuntu-stemcells
-    type: bosh-io-stemcell
+  - name: ubuntu-stemcell-3263
+    type: bosh-io-stemcell-version-family
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
+      version_family: "3263"
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
@@ -139,3 +140,9 @@ resource_types:
     type: docker-image
     source:
       repository: ljfranklin/terraform-resource
+  # TODO: switch back to using canonical resource after PR is merged #133222913
+  - name: bosh-io-stemcell-version-family
+    type: docker-image
+    source:
+      repository: boshcpi/bosh-io-stemcell-resource
+      tag: PR-version-family
