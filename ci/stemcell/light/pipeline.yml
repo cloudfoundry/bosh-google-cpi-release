@@ -101,7 +101,7 @@ resources:
         gce_credentials_json: {{gce_credentials_json}}
 
   - name: ubuntu-stemcells
-    type: bosh-io-pr-force-regular
+    type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
@@ -130,27 +130,11 @@ resources:
       region:            {{google_light_stemcells_region}}
       regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 
-  - name: bosh-ubuntu-light-stemcells-sha1
-    type: s3
-    source:
-      bucket:            {{google_light_stemcells_bucket_name}}
-      access_key_id:     {{google_light_stemcells_access_key_id}}
-      secret_access_key: {{google_light_stemcells_secret_access_key}}
-      endpoint:          {{google_light_stemcells_endpoint}}
-      region:            {{google_light_stemcells_region}}
-      regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz.sha1
-
 resource_types:
   - name: gcs-resource
     type: docker-image
     source:
       repository: frodenas/gcs-resource
-  # TODO: remove this image once resource PR is merged
-  # https://www.pivotaltracker.com/story/show/130877947
-  - name: bosh-io-pr-force-regular
-    type: docker-image
-    source:
-      repository: boshcpi/bosh-io-pr-force-regular
   - name: terraform
     type: docker-image
     source:
