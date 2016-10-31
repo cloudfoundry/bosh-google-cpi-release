@@ -33,6 +33,7 @@ The following diagram provides an overview of the deployment:
   export projectid=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
+  export service_account_email=terraform-bosh@${projectid}.iam.gserviceaccount.com
   ```
 
 1. Configure `gcloud` to use your preferred region and zone:
@@ -47,7 +48,7 @@ The following diagram provides an overview of the deployment:
   ```
   gcloud iam service-accounts create terraform-bosh
   gcloud iam service-accounts keys create ~/terraform-bosh.key.json \
-      --iam-account terraform-bosh@${projectid}.iam.gserviceaccount.com
+      --iam-account ${service_account_email}
   ```
 
 1. Grant the new service account editor access to your project:
@@ -100,7 +101,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       hashicorp/terraform:light plan \
         -var projectid=${projectid} \
         -var region=${region} \
-        -var zone=${zone}
+        -var zone=${zone} \
+        -var service_account_email=${service_account_email}
   ```
 
 1. Create the resources:
@@ -113,7 +115,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       hashicorp/terraform:light apply \
         -var projectid=${projectid} \
         -var region=${region} \
-        -var zone=${zone}
+        -var zone=${zone} \
+        -var service_account_email=${service_account_email}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
