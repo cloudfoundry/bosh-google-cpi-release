@@ -1,21 +1,21 @@
 ---
 <%
 # CF settings
-director_uuid = "{{DIRECTOR_UUID}}"
-vip_ip = "{{VIP_IP}}"
+director_uuid = ENV['director']
+vip_ip = ENV['vip']
 root_domain = "#{vip_ip}.xip.io"
 common_password = "c1oudc0w"
 deployment_name = "cf"
 
 # Google network settings
-google_region = "{{REGION}}"
-google_zone = "{{ZONE}}"
+google_region = ENV['region']
+google_zone = ENV['zone']
 network = "bosh"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
 
 # Google service account settings
-project_id = "{{PROJECT_ID}}"
+project_id = ENV['project_id']
 org, project = project_id.split(":")
 project_domain_prefix = [project, org].compact.join(".")
 cf_service_account = "cf-component@#{project_domain_prefix}.iam.gserviceaccount.com"
@@ -73,17 +73,17 @@ releases:
   - name: diego
     version: "0.1454.0"
   - name: garden-linux
-    version: "0.333.0"
+    version: "0.340.0"
   - name: etcd
     version: "36"
 
 compilation:
-  workers: 6
+  workers: 2
   network: private
   reuse_compilation_vms: true
   cloud_properties:
     zone: <%= google_zone%>
-    machine_type: n1-standard-8
+    machine_type: n1-standard-2
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
     preemptible: true
@@ -93,7 +93,7 @@ update:
   canaries: 1
   canary_watch_time: 30000-300000
   update_watch_time: 30000-300000
-  max_in_flight: 32
+  max_in_flight: 1
   serial: false
 
 networks:
@@ -139,7 +139,7 @@ resource_pools:
       version: latest
     cloud_properties:
       zone: <%= google_zone%>
-      machine_type: n1-standard-4
+      machine_type: n1-standard-1
       root_disk_size_gb: 20
       root_disk_type: pd-standard
       service_account: <%= cf_service_account%>
@@ -151,7 +151,7 @@ resource_pools:
       version: latest
     cloud_properties:
       zone: <%= google_zone%>
-      machine_type: n1-standard-4
+      machine_type: n1-standard-1
       root_disk_size_gb: 20
       root_disk_type: pd-standard
       target_pool: cf-public
@@ -164,7 +164,7 @@ resource_pools:
       version: latest
     cloud_properties:
       zone: <%= google_zone%>
-      machine_type: n1-highmem-8
+      machine_type: n1-standard-1
       root_disk_size_gb: 100
       root_disk_type: pd-standard
       service_account: <%= cf_service_account%>
@@ -177,10 +177,10 @@ disk_pools:
     disk_size: 1024
 
   - name: blobstore
-    disk_size: 102400
+    disk_size: 10240
 
   - name: mysql
-    disk_size: 102400
+    disk_size: 10240
 
   - name: diego-database
     disk_size: 1024
@@ -676,7 +676,7 @@ jobs:
         release: diego
       - name: metron_agent
         release: cf
-    instances: 3
+    instances: 1
     resource_pool: cells
     networks:
       - name: private
@@ -722,53 +722,6 @@ jobs:
             registration_interval: 20s
             uris:
               - "loggregator.<%= root_domain %>"
-
-  - name: smoke-tests
-    templates:
-      - name: smoke-tests
-        release: cf
-    lifecycle: errand
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: private
-        default: [dns, gateway]
-
-  - name: diego-acceptance-tests
-    templates:
-      - name: acceptance-tests
-        release: diego
-    lifecycle: errand
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: private
-        default: [dns, gateway]
-
-  - name: acceptance-tests
-    templates:
-      - name: acceptance-tests
-        release: cf
-    lifecycle: errand
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: private
-        default: [dns, gateway]
-
-  - name: acceptance-tests-internetless
-    templates:
-      - name: acceptance-tests
-        release: cf
-    lifecycle: errand
-    instances: 1
-    resource_pool: common
-    networks:
-      - name: private
-        default: [dns, gateway]
-    properties:
-      acceptance_tests:
-        include_internet_dependent: false
 
 properties:
   network_name: private
