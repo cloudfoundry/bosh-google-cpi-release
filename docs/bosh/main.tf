@@ -17,6 +17,11 @@ variable "prefix" {
     default = ""
 }
 
+variable "service_account_email" {
+    type = "string"
+    default = ""
+}
+
 provider "google" {
     project = "${var.projectid}"
     region = "${var.region}"
@@ -157,6 +162,7 @@ rm /etc/motd
 EOT
 
   service_account {
+    email = "${var.service_account_email}"
     scopes = ["cloud-platform"]
   }
 }

@@ -22,6 +22,7 @@ The following diagram provides an overview of the deployment:
 ### Signup
 1. [Sign up](https://cloud.google.com/compute/docs/signup) for Google Cloud Platform
 1. Create a [new project](https://console.cloud.google.com/iam-admin/projects)
+1. Enable the [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview) for your project
 
 ### Setup
 
@@ -30,10 +31,10 @@ The following diagram provides an overview of the deployment:
 1. Configure a few environment variables:
 
   ```
-  export projectid=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
+  export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
-  export service_account_email=terraform@${projectid}.iam.gserviceaccount.com
+  export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
   ```
 
 1. Configure `gcloud` to use your preferred region and zone:
@@ -54,7 +55,7 @@ The following diagram provides an overview of the deployment:
 1. Grant the new service account editor access to your project:
 
   ```
-  gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/owner
   ```
@@ -62,7 +63,7 @@ The following diagram provides an overview of the deployment:
 1. Make your service account's key available in an environment variable to be used by `terraform`:
 
   ```
-  export GOOGLE_CREDENTIALS=$(cat ~/terraform-bosh.key.json)
+  export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
   ```
 
 <a name="deploy-automatic"></a>
@@ -86,11 +87,11 @@ The following instructions offer the fastest path to getting BOSH up and running
     -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
     -v `pwd`:/$(basename `pwd`) \
     -w /$(basename `pwd`) \
-      hashicorp/terraform:light plan \
-        -var projectid=${projectid} \
-        -var region=${region} \
-        -var zone=${zone} \
-        -var service_account_email=${service_account_email}
+    hashicorp/terraform:light plan \
+      -var service_account_email=${service_account_email} \
+      -var project_id=${project_id} \
+      -var region=${region} \
+      -var zone=${zone}
   ```
 
 1. Create the resources:
@@ -100,11 +101,11 @@ The following instructions offer the fastest path to getting BOSH up and running
     -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
     -v `pwd`:/$(basename `pwd`) \
     -w /$(basename `pwd`) \
-      hashicorp/terraform:light apply \
-        -var projectid=${projectid} \
-        -var region=${region} \
-        -var zone=${zone} \
-        -var service_account_email=${service_account_email}
+    hashicorp/terraform:light apply \
+      -var service_account_email=${service_account_email} \
+      -var project_id=${project_id} \
+      -var region=${region} \
+      -var zone=${zone}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -123,27 +124,26 @@ Now you have the infrastructure ready to deploy a BOSH director.
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
 
   ```
-  gcloud iam service-accounts create terraform-bosh
+  service_account=bosh-user
+  service_account_email=${service_account}@${project_id}.iam.gserviceaccount.com
+  gcloud iam service-accounts create ${service_account}
   ```
 
 1. Grant the new service account editor access to your project:
 
   ```
-  gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/compute.instanceAdmin
-  gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/compute.storageAdmin
-  gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/storage.admin
-  gcloud projects add-iam-policy-binding ${projectid} \
+  gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role  roles/compute.networkAdmin
-  gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:${service_account_email} \
-    --role roles/compute.securityAdmin
   gcloud iam service-accounts add-iam-policy-binding ${service_account_email} \
     --member serviceAccount:${service_account_email} \
     --role roles/iam.serviceAccountActor
@@ -379,10 +379,12 @@ From your Cloud Shell instance, run the following command to delete the infrastr
     -v `pwd`:/$(basename `pwd`) \
     -w /$(basename `pwd`) \
     hashicorp/terraform:light destroy \
-      -var projectid=${projectid} \
+      -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone}
-  ```### Submitting a Pull Request
+  ```
+  
+### Submitting a Pull Request
 
 1. Fork the project.
 2. Create a topic branch.
