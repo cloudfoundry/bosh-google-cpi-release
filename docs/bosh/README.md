@@ -33,7 +33,7 @@ The following diagram provides an overview of the deployment:
   export projectid=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
-  export service_account_email=terraform-bosh@${projectid}.iam.gserviceaccount.com
+  export service_account_email=terraform@${projectid}.iam.gserviceaccount.com
   ```
 
 1. Configure `gcloud` to use your preferred region and zone:
@@ -46,8 +46,8 @@ The following diagram provides an overview of the deployment:
 1. Create a service account and key:
 
   ```
-  gcloud iam service-accounts create terraform-bosh
-  gcloud iam service-accounts keys create ~/terraform-bosh.key.json \
+  gcloud iam service-accounts create terraform
+  gcloud iam service-accounts keys create ~/terraform.key.json \
       --iam-account ${service_account_email}
   ```
 
@@ -56,19 +56,7 @@ The following diagram provides an overview of the deployment:
   ```
   gcloud projects add-iam-policy-binding ${projectid} \
     --member serviceAccount:${service_account_email} \
-    --role roles/compute.instanceAdmin
-  gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:${service_account_email} \
-    --role roles/compute.storageAdmin
-  gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:${service_account_email} \
-    --role roles/iam.serviceAccountActor 
-  gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:${service_account_email} \
-    --role roles/storage.admin
-  gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:${service_account_email} \
-    --role  roles/compute.networkAdmin
+    --role roles/owner
   ```
 
 1. Make your service account's key available in an environment variable to be used by `terraform`:
@@ -131,6 +119,35 @@ Now you have the infrastructure ready to deploy a BOSH director.
   ```
 
 1. If you see a warning indicating the VM isn't ready, log out, wait a few moments, and log in again.
+
+1. Create a service account. This service account will be used by BOSH and all VMs it creates:
+
+  ```
+  gcloud iam service-accounts create terraform-bosh
+  ```
+
+1. Grant the new service account editor access to your project:
+
+  ```
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/compute.instanceAdmin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/compute.storageAdmin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/storage.admin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:${service_account_email} \
+    --role  roles/compute.networkAdmin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/compute.securityAdmin
+  gcloud iam service-accounts add-iam-policy-binding ${service_account_email} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/iam.serviceAccountActor
+  ```
 
 1. Create a **password-less** SSH key and upload the public component:
 

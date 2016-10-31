@@ -17,11 +17,6 @@ variable "prefix" {
     default = ""
 }
 
-variable "service_account_email" {
-    type = "string"
-    default = ""
-}
-
 provider "google" {
     project = "${var.projectid}"
     region = "${var.region}"
@@ -138,7 +133,6 @@ cat > /etc/profile.d/bosh.sh <<'EOF'
 # Misc vars
 prefix=${var.prefix}
 ssh_key_path=$HOME/.ssh/bosh
-service_account_email=${var.service_account_email}
 
 # Vars from Terraform
 subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
