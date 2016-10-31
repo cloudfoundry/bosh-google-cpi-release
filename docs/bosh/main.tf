@@ -138,6 +138,7 @@ cat > /etc/profile.d/bosh.sh <<'EOF'
 # Misc vars
 prefix=${var.prefix}
 ssh_key_path=$HOME/.ssh/bosh
+service_account_email=${var.service_account_email}
 
 # Vars from Terraform
 subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
@@ -162,7 +163,6 @@ rm /etc/motd
 EOT
 
   service_account {
-    email = "${var.service_account_email}"
     scopes = ["cloud-platform"]
   }
 }

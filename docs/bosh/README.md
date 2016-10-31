@@ -55,19 +55,19 @@ The following diagram provides an overview of the deployment:
 
   ```
   gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --member serviceAccount:${service_account_email} \
     --role roles/compute.instanceAdmin
   gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --member serviceAccount:${service_account_email} \
     --role roles/compute.storageAdmin
   gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --member serviceAccount:${service_account_email} \
     --role roles/iam.serviceAccountActor 
   gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --member serviceAccount:${service_account_email} \
     --role roles/storage.admin
   gcloud projects add-iam-policy-binding ${projectid} \
-    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --member serviceAccount:${service_account_email} \
     --role  roles/compute.networkAdmin
   ```
 
