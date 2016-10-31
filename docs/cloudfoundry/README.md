@@ -1,6 +1,6 @@
 # Deploying Cloud Foundry on Google Compute Engine
 
-This guide describes how to deploy [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Compute Engine](https://cloud.google.com/) using BOSH. The BOSH director must have been created following the steps in the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide. You must use the same deployment steps here as you did in the BOSH instructions.
+This guide describes how to deploy a minimal [Cloud Foundry](https://www.cloudfoundry.org/) on [Google Compute Engine](https://cloud.google.com/) using BOSH. The BOSH director must have been created following the steps in the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide.
 
 
 ## Prerequisites
@@ -8,14 +8,11 @@ This guide describes how to deploy [Cloud Foundry](https://www.cloudfoundry.org/
 * You must have an existing BOSH director and bastion host created by following the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide.
 
 * Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
-    - 100 Cores
-    - 25 IP addresses
+    - 25 Cores
+    - 2 IP addresses
     - 1 Tb persistent disk
 
-<a name="deploy-automatic"></a>
 ## Deploy supporting infrastructure automatically
-
-> **Note:** Use this section if you also used the automatic steps in the BOSH deployment instructions.
 
 The following instructions offer the fastest path to getting Cloud Foundry up and running on Google Cloud Platform. Using [Terraform](terraform.io), you will provision all of the infrastructure required to run CloudFoundry injust a few commands.
 
@@ -92,17 +89,14 @@ Before working this section, you must have deployed the supporting infrastructur
 
   > **Note:** Your username is `admin` and password is `admin`.
 
-1. Upload the required [Google BOSH Stemcell](http://bosh.io/docs/stemcell.html):
-
-  ```
-  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
+  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.7
   ```
 
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
 
   ```
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-mysql-release?v=23
-  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.333.0
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.340.0
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=36
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1454.0
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231

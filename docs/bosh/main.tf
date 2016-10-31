@@ -12,17 +12,22 @@ variable "zone" {
     default = "us-east1-d"
 }
 
+variable "prefix" {
+    type = "string"
+    default = ""
+}
+
 provider "google" {
     project = "${var.projectid}"
     region = "${var.region}"
 }
 
 resource "google_compute_network" "bosh" {
-  name       = "bosh"
+  name       = "${var.prefix}bosh"
 }
 
 resource "google_compute_route" "nat-primary" {
-  name        = "nat-primary"
+  name        = "${var.prefix}nat-primary"
   dest_range  = "0.0.0.0/0"
   network       = "${google_compute_network.bosh.name}"
   next_hop_instance = "${google_compute_instance.nat-instance-private-with-nat-primary.name}"
@@ -33,14 +38,14 @@ resource "google_compute_route" "nat-primary" {
 
 // Subnet for the BOSH director
 resource "google_compute_subnetwork" "bosh-subnet-1" {
-  name          = "bosh-${var.region}"
+  name          = "${var.prefix}bosh-${var.region}"
   ip_cidr_range = "10.0.0.0/24"
   network       = "${google_compute_network.bosh.self_link}"
 }
 
 // Allow SSH to BOSH bastion
 resource "google_compute_firewall" "bosh-bastion" {
-  name    = "bosh-bastion"
+  name    = "${var.prefix}bosh-bastion"
   network = "${google_compute_network.bosh.name}"
 
   allow {
@@ -57,7 +62,7 @@ resource "google_compute_firewall" "bosh-bastion" {
 
 // Allow all traffic within subnet
 resource "google_compute_firewall" "intra-subnet-open" {
-  name    = "intra-subnet-open"
+  name    = "${var.prefix}intra-subnet-open"
   network = "${google_compute_network.bosh.name}"
 
   allow {
@@ -79,14 +84,14 @@ resource "google_compute_firewall" "intra-subnet-open" {
 
 // BOSH bastion host
 resource "google_compute_instance" "bosh-bastion" {
-  name         = "bosh-bastion"
+  name         = "${var.prefix}bosh-bastion"
   machine_type = "n1-standard-1"
   zone         = "${var.zone}"
 
   tags = ["bosh-bastion", "internal"]
 
   disk {
-    image = "ubuntu-1404-trusty-v20160627"
+    image = "ubuntu-1404-trusty-v20161020"
   }
 
   network_interface {
@@ -98,14 +103,57 @@ resource "google_compute_instance" "bosh-bastion" {
 
   metadata_startup_script = <<EOT
 #!/bin/bash
-apt-get update -y
-apt-get upgrade -y
-apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 jq
+cat > /etc/motd <<EOF
+
+
+
+
+#    #    ##    #####   #    #     #    #    #   ####
+#    #   #  #   #    #  ##   #     #    ##   #  #    #
+#    #  #    #  #    #  # #  #     #    # #  #  #
+# ## #  ######  #####   #  # #     #    #  # #  #  ###
+##  ##  #    #  #   #   #   ##     #    #   ##  #    #
+#    #  #    #  #    #  #    #     #    #    #   ####
+
+Startup scripts have not finished installing, and the tools you need
+are not ready yet. Please log out and log back in again in a few moments.
+This warning will not appear when the system is ready.
+EOF
+
+apt-get update
+apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 jq git
 gem install bosh_cli
 curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.20.0/cf-cli_6.20.0_linux_x86-64.tgz
 tar -zxvf /tmp/cf.tgz && mv cf /usr/bin/cf && chmod +x /usr/bin/cf
 curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.96-linux-amd64
 chmod +x /usr/bin/bosh-init
+
+cat > /etc/profile.d/bosh.sh <<'EOF'
+#!/bin/bash
+# Misc vars
+prefix=${var.prefix}
+ssh_key_path=$HOME/.ssh/bosh
+
+# Vars from Terraform
+subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
+network=${google_compute_network.bosh.name}
+
+
+# Vars from metadata service
+project_id=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+zone=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+zone=$${zone##*/}
+region=$${zone%-*}
+gcloud config set compute/zone $${zone}
+gcloud config set compute/region $${region}
+EOF
+
+# Clone repo
+mkdir /share
+chmod -R 777 /share
+git clone https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git /share
+
+rm /etc/motd
 EOT
 
   service_account {
@@ -115,14 +163,14 @@ EOT
 
 // NAT server (primary)
 resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
-  name         = "nat-instance-primary"
+  name         = "${var.prefix}nat-instance-primary"
   machine_type = "n1-standard-1"
   zone         = "${var.zone}"
 
   tags = ["nat", "internal"]
 
   disk {
-    image = "ubuntu-1404-trusty-v20160627"
+    image = "ubuntu-1404-trusty-v20161020"
   }
 
   network_interface {
@@ -136,8 +184,6 @@ resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
 
   metadata_startup_script = <<EOT
 #!/bin/bash
-apt-get update -y
-apt-get upgrade -y
 sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 EOT

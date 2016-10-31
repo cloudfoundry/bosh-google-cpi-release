@@ -20,29 +20,24 @@ The following diagram provides an overview of the deployment:
 ## Configure your [Google Cloud Platform](https://cloud.google.com/) environment
 
 ### Signup
-1. [Sign up](https://cloud.google.com/compute/docs/signup) and activate Google Compute Engine
-1. [Download and install](https://cloud.google.com/sdk/) the Google Cloud SDK command line tool.
+1. [Sign up](https://cloud.google.com/compute/docs/signup) for Google Cloud Platform
+1. Create a [new project](https://console.cloud.google.com/iam-admin/projects)
 
 ### Setup
 
-1. Set your project ID:
+1. In your new project, open Cloud Shell
+
+1. Configure a few environment variables:
 
   ```
-  export projectid=REPLACE_WITH_YOUR_PROJECT_ID
-  ```
-
-1. Export your preferred compute region and zone:
-
-  ```
+  export projectid=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
   ```
 
-1. Configure `gcloud`:
+1. Configure `gcloud` to use your preferred region and zone:
 
   ```
-  gcloud auth login
-  gcloud config set project ${projectid}
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
   ```
@@ -51,7 +46,7 @@ The following diagram provides an overview of the deployment:
 
   ```
   gcloud iam service-accounts create terraform-bosh
-  gcloud iam service-accounts keys create /tmp/terraform-bosh.key.json \
+  gcloud iam service-accounts keys create ~/terraform-bosh.key.json \
       --iam-account terraform-bosh@${projectid}.iam.gserviceaccount.com
   ```
 
@@ -59,60 +54,80 @@ The following diagram provides an overview of the deployment:
 
   ```
   gcloud projects add-iam-policy-binding ${projectid} \
-      --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
-      --role roles/editor
+    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --role roles/compute.instanceAdmin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --role roles/compute.storageAdmin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --role roles/iam.serviceAccountActor 
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --role roles/storage.admin
+  gcloud projects add-iam-policy-binding ${projectid} \
+    --member serviceAccount:terraform-bosh@${projectid}.iam.gserviceaccount.com \
+    --role  roles/compute.networkAdmin
   ```
 
 1. Make your service account's key available in an environment variable to be used by `terraform`:
 
   ```
-  export GOOGLE_CREDENTIALS=$(cat /tmp/terraform-bosh.key.json)
+  export GOOGLE_CREDENTIALS=$(cat ~/terraform-bosh.key.json)
   ```
 
 <a name="deploy-automatic"></a>
-## Deploy supporting infrastructure automatically
+## Deploy supporting infrastructure
 The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](terraform.io) you will provision all of the infrastructure required to run BOSH in just a few commands.
 
-### Requirements
-You must have the `terraform` CLI installed on your workstation. See
-[Download Terraform](https://www.terraform.io/downloads.html) for more details.
-
 ### Steps
-1. Download the BOSH terraform file - [main.tf](main.tf) - and save it on your workstation where `terraform` is installed.
+> **Note:** All of these steps should be performed inside the Cloud Shell in your browser.
+
+1. Clone this repository and go into the BOSH docs directory:
+
+  ```
+  git clone https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+  cd bosh-google-cpi-release/docs/bosh
+  ```
 
 1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
 
   ```
-  terraform plan -var projectid=${projectid} -var region=${region} -var zone=${zone}
+  docker run -i -t \
+    -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
+    -v `pwd`:/$(basename `pwd`) \
+    -w /$(basename `pwd`) \
+      hashicorp/terraform:light plan \
+        -var projectid=${projectid} \
+        -var region=${region} \
+        -var zone=${zone}
   ```
 
 1. Create the resources:
 
   ```
-  terraform apply -var projectid=${projectid} -var region=${region} -var zone=${zone}
+  docker run -i -t \
+    -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
+    -v `pwd`:/$(basename `pwd`) \
+    -w /$(basename `pwd`) \
+      hashicorp/terraform:light apply \
+        -var projectid=${projectid} \
+        -var region=${region} \
+        -var zone=${zone}
   ```
 
-Now you have the infrastructure ready to deploy a BOSH director. Go ahead to the [Deploy BOSH](#deploy-bosh) section to do that. 
+Now you have the infrastructure ready to deploy a BOSH director.
 
 <a name="deploy-bosh"></a>
 ## Deploy BOSH
-Before working this section, you must have deployed the supporting infrastructure on Google Cloud Platform using the [automatic](#deploy-automatic) steps provided earlier.
 
-1. SSH to the bastion VM you created in the previous step. All SSH commands after this should be run from the VM:
+1. SSH to the bastion VM you created in the previous step. You can use Cloud Shell to SSH to the bastion, or you can connect from any workstation with `gcloud` installed. All SSH commands after this should be run from the bastion VM.
 
   ```
   gcloud compute ssh bosh-bastion
   ```
 
-1. Configure `gcloud` to use the correct zone and region:
-
-  ```
-  zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-  zone=${zone##*/}
-  region=${zone%-*}
-  gcloud config set compute/zone ${zone}
-  gcloud config set compute/region ${region}
-  ```
+1. If you see a warning indicating the VM isn't ready, log out, wait a few moments, and log in again.
 
 1. Create a **password-less** SSH key and upload the public component:
 
@@ -135,7 +150,7 @@ Before working this section, you must have deployed the supporting infrastructur
   cd google-bosh-director
   ```
 
-1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml`:
+1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml.erb`:
 
   ```
   ---
@@ -146,18 +161,18 @@ Before working this section, you must have deployed the supporting infrastructur
       url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
       sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
     - name: bosh-google-cpi
-      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.4.1
-      sha1: 7761d8eb48c2a2fec50f4f637ce016735ad779dc
+      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.6.0
+      sha1: 3e01539a1228d62b8015feb388df2234978efaf6
 
   resource_pools:
     - name: vms
       network: private
       stemcell:
-        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
-        sha1: c3fc743a5e3ec2a3f50e29851363331c6cd19b43
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.7
+        sha1: a09ce8b4acfa9876f52ee7b4869b4b23f27d5ace
       cloud_properties:
-        zone: {{ZONE}}
-        machine_type: n1-standard-4
+        zone: <%= ENV['zone'] %>
+        machine_type: n1-standard-1
         root_disk_size_gb: 40
         root_disk_type: pd-standard
         service_scopes:
@@ -180,8 +195,8 @@ Before working this section, you must have deployed the supporting infrastructur
         gateway: 10.0.0.1
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
-          network_name: bosh
-          subnetwork_name: bosh-{{REGION}}
+          network_name: <%= ENV['network'] %>
+          subnetwork_name: <%= ENV['subnetwork'] %>
           ephemeral_external_ip: false
           tags:
             - internal
@@ -268,7 +283,7 @@ Before working this section, you must have deployed the supporting infrastructur
           resurrector_enabled: true
 
         google: &google_properties
-          project: {{PROJECT_ID}}
+          project: <%= ENV['project_id'] %>
 
         agent:
           mbus: nats://nats:nats-password@10.0.0.6:4222
@@ -291,7 +306,7 @@ Before working this section, you must have deployed the supporting infrastructur
       host: 10.0.0.6
       port: 22
       user: bosh
-      private_key: {{SSH_KEY_PATH}}
+      private_key: <%= ENV['ssh_key_path'] %>
 
     mbus: https://mbus:mbus-password@10.0.0.6:6868
 
@@ -302,28 +317,10 @@ Before working this section, you must have deployed the supporting infrastructur
       ntp: *ntp
   ```
 
-1. Run this `sed` command to insert your Google Cloud Platform project ID into the manifest:
+1. Use `erb` to substitute variables in the template:
 
   ```
-  sed -i s#{{PROJECT_ID}}#`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`# manifest.yml
-  ```
-
-1. Run this `sed` command to insert the full path of the SSH private key you created earlier:
-
-  ```
-  sed -i s#{{SSH_KEY_PATH}}#$HOME/.ssh/bosh# manifest.yml
-  ```
-
-1. Run this `sed` command to insert the region for your director:
-
-  ```
-  sed -i s#{{REGION}}#$region# manifest.yml
-  ```
-
-1. Run this `sed` command to insert the zone for your director:
-
-  ```
-  sed -i s#{{ZONE}}#$zone# manifest.yml
+  erb manifest.yml.erb > manifest.yml
   ```
 
 1. Deploy the new manifest to create a BOSH Director:
@@ -352,7 +349,20 @@ support for an existing issue by voting it up. When submitting a bug report, ple
 including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
  failing specs.
 
-### Submitting a Pull Request
+### Delete resources
+
+From your Cloud Shell instance, run the following command to delete the infrastructure you created in this lab:
+
+  ```
+  docker run -i -t \
+    -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
+    -v `pwd`:/$(basename `pwd`) \
+    -w /$(basename `pwd`) \
+    hashicorp/terraform:light destroy \
+      -var projectid=${projectid} \
+      -var region=${region} \
+      -var zone=${zone}
+  ```### Submitting a Pull Request
 
 1. Fork the project.
 2. Create a topic branch.

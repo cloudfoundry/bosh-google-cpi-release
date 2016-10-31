@@ -14,7 +14,11 @@ variable "zone" {
 
 variable "bosh_network" {
     type = "string"
-    default = "bosh"
+}
+
+variable "prefix" {
+    type = "string"
+    default = ""
 }
 
 provider "google" {
@@ -24,7 +28,7 @@ provider "google" {
 
 // Subnet for the public Cloud Foundry components
 resource "google_compute_subnetwork" "cf-public-subnet-1" {
-  name          = "cf-public-${var.region}"
+  name          = "${var.prefix}cf-public-${var.region}"
   ip_cidr_range = "10.200.0.0/16"
   network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
 
@@ -32,14 +36,14 @@ resource "google_compute_subnetwork" "cf-public-subnet-1" {
 
 // Subnet for the private Cloud Foundry components
 resource "google_compute_subnetwork" "cf-private-subnet-1" {
-  name          = "cf-private-${var.region}"
+  name          = "${var.prefix}cf-private-${var.region}"
   ip_cidr_range = "192.168.0.0/16"
   network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
 }
 
 // Allow access to CloudFoundry router
 resource "google_compute_firewall" "cf-public" {
-  name    = "cf-public"
+  name    = "${var.prefix}cf-public"
   network       = "${var.bosh_network}"
 
   allow {
@@ -52,12 +56,12 @@ resource "google_compute_firewall" "cf-public" {
 
 // Static IP address for forwarding rule
 resource "google_compute_address" "cf" {
-  name = "cf"
+  name = "${var.prefix}cf"
 }
 
 // Health check
 resource "google_compute_http_health_check" "cf-public" {
-  name                = "cf-public"
+  name                = "${var.prefix}cf-public"
   host                = "api.${google_compute_address.cf.address}.xip.io"
   request_path        = "/info"
   check_interval_sec  = 30 
@@ -69,7 +73,7 @@ resource "google_compute_http_health_check" "cf-public" {
 
 // Load balancing target pool
 resource "google_compute_target_pool" "cf-public" {
-  name = "cf-public"
+  name = "${var.prefix}cf-public"
 
   health_checks = [
     "${google_compute_http_health_check.cf-public.name}"
@@ -78,7 +82,7 @@ resource "google_compute_target_pool" "cf-public" {
 
 // HTTP forwarding rule
 resource "google_compute_forwarding_rule" "cf-http" {
-  name        = "cf-http"
+  name        = "${var.prefix}cf-http"
   target      = "${google_compute_target_pool.cf-public.self_link}"
   port_range  = "80"
   ip_protocol = "TCP"
@@ -87,7 +91,7 @@ resource "google_compute_forwarding_rule" "cf-http" {
 
 // HTTP forwarding rule
 resource "google_compute_forwarding_rule" "cf-https" {
-  name        = "cf-https"
+  name        = "${var.prefix}cf-https"
   target      = "${google_compute_target_pool.cf-public.self_link}"
   port_range  = "443"
   ip_protocol = "TCP"
@@ -96,7 +100,7 @@ resource "google_compute_forwarding_rule" "cf-https" {
 
 // SSH forwarding rule
 resource "google_compute_forwarding_rule" "cf-ssh" {
-  name        = "cf-ssh"
+  name        = "${var.prefix}cf-ssh"
   target      = "${google_compute_target_pool.cf-public.self_link}"
   port_range  = "2222"
   ip_protocol = "TCP"
@@ -105,7 +109,7 @@ resource "google_compute_forwarding_rule" "cf-ssh" {
 
 // WSS forwarding rule
 resource "google_compute_forwarding_rule" "cf-wss" {
-  name        = "cf-wss"
+  name        = "${var.prefix}cf-wss"
   target      = "${google_compute_target_pool.cf-public.self_link}"
   port_range  = "4443"
   ip_protocol = "TCP"
