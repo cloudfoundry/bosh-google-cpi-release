@@ -23,7 +23,7 @@ The following diagram provides an overview of the deployment:
 1. [Sign up](https://cloud.google.com/compute/docs/signup) for Google Cloud Platform
 1. Create a [new project](https://console.cloud.google.com/iam-admin/projects)
 1. Enable the [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview) for your project
-
+1. Enable the [Project API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
 ### Setup
 
 1. In your new project, open Cloud Shell
@@ -89,7 +89,7 @@ The following instructions offer the fastest path to getting BOSH up and running
     -w /$(basename `pwd`) \
     hashicorp/terraform:light plan \
       -var service_account_email=${service_account_email} \
-      -var project_id=${project_id} \
+      -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone}
   ```
@@ -103,7 +103,7 @@ The following instructions offer the fastest path to getting BOSH up and running
     -w /$(basename `pwd`) \
     hashicorp/terraform:light apply \
       -var service_account_email=${service_account_email} \
-      -var project_id=${project_id} \
+      -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone}
   ```
@@ -124,8 +124,8 @@ Now you have the infrastructure ready to deploy a BOSH director.
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
 
   ```
-  service_account=bosh-user
-  service_account_email=${service_account}@${project_id}.iam.gserviceaccount.com
+  export service_account=bosh-user
+  export service_account_email=${service_account}@${project_id}.iam.gserviceaccount.com
   gcloud iam service-accounts create ${service_account}
   ```
 
@@ -195,9 +195,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
         machine_type: n1-standard-1
         root_disk_size_gb: 40
         root_disk_type: pd-standard
-        service_scopes:
-          - compute
-          - devstorage.full_control
+        service_account: <%= ENV['service_account_email'] %>
 
   disk_pools:
     - name: disks
@@ -361,15 +359,13 @@ Your username is `admin` and password is `admin`.
 
 * [Deploying Cloud Foundry on Google Compute Engine](../cloudfoundry/README.md)
 
-### Submitting an Issue
-We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
-Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
-support for an existing issue by voting it up. When submitting a bug report, please include a
-[Gist](http://gist.github.com/) that includes a stack trace and any details that may be necessary to reproduce the bug,
-including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
- failing specs.
-
 ### Delete resources
+
+From your `bosh-bastion` instance, delete your BOSH director:
+
+  ```
+  bosh-init delete manifest.yml
+  ```
 
 From your Cloud Shell instance, run the following command to delete the infrastructure you created in this lab:
 
@@ -383,7 +379,16 @@ From your Cloud Shell instance, run the following command to delete the infrastr
       -var region=${region} \
       -var zone=${zone}
   ```
-  
+ 
+### Submitting an Issue
+We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
+Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
+support for an existing issue by voting it up. When submitting a bug report, please include a
+[Gist](http://gist.github.com/) that includes a stack trace and any details that may be necessary to reproduce the bug,
+including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
+ failing specs.
+
+ 
 ### Submitting a Pull Request
 
 1. Fork the project.

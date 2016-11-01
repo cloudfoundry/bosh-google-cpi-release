@@ -1,15 +1,15 @@
 ---
 <%
 # CF settings
-director_uuid = "{{DIRECTOR_UUID}}"
-vip_ip = "{{VIP_IP}}"
+director_uuid = "<%= ENV['director'] %>"
+vip_ip = "<%= ENV['vip'] %>"
 root_domain = "#{vip_ip}.xip.io"
 common_password = "c1oudc0w"
 deployment_name = "cf"
 
 # Google network settings
-google_region = "{{REGION}}"
-google_zone = "{{ZONE}}"
+google_region = "<%= ENV['region'] %>"
+google_zone = "<%= ENV['zone'] %>"
 network = "bosh"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"

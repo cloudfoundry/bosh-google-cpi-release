@@ -136,21 +136,21 @@ chmod +x /usr/bin/bosh-init
 cat > /etc/profile.d/bosh.sh <<'EOF'
 #!/bin/bash
 # Misc vars
-prefix=${var.prefix}
-ssh_key_path=$HOME/.ssh/bosh
+export prefix=${var.prefix}
+export ssh_key_path=$HOME/.ssh/bosh
 
 # Vars from Terraform
-subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
-network=${google_compute_network.bosh.name}
+export subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
+export network=${google_compute_network.bosh.name}
 
 
 # Vars from metadata service
-project_id=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
-zone=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-zone=$${zone##*/}
-region=$${zone%-*}
-gcloud config set compute/zone $${zone}
-gcloud config set compute/region $${region}
+export project_id=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id)
+export zone=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
+export zone=$${zone##*/}
+export region=$${zone%-*}
+export gcloud config set compute/zone $${zone}
+export gcloud config set compute/region $${region}
 EOF
 
 # Clone repo
