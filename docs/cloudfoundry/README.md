@@ -69,8 +69,6 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   ```
   gcloud iam service-accounts create cf-component
-  gcloud iam service-accounts keys create ~/cf-component.key.json \
-      --iam-account cf-component@${project_id}.iam.gserviceaccount.com
   ```
 
 1. Grant the new service account editor access and logging access to your project:
