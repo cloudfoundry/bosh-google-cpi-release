@@ -33,6 +33,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   ```
   terraform plan \
+    -var bosh_network=${network} \
     -var projectid=${project_id} \
     -var region=${region} \
     -var zone=${zone}
@@ -42,6 +43,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   ```
   terraform apply \
+    -var bosh_network=${network} \
     -var projectid=${project_id} \
     -var region=${region} \
     -var zone=${zone}
@@ -50,16 +52,16 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. Create a service account and key that will be used by Cloud Foundry VMs:
 
   ```
-  gcloud iam service-accounts create cf
-  gcloud iam service-accounts keys create ~/cf.key.json \
-      --iam-account cf@${projectid}.iam.gserviceaccount.com
+  gcloud iam service-accounts create cf-component
+  gcloud iam service-accounts keys create ~/cf-component.key.json \
+      --iam-account cf-component@${project_id}.iam.gserviceaccount.com
   ```
 
 1. Grant the new service account editor access and logging access to your project:
 
   ```
-  gcloud projects add-iam-policy-binding ${projectid} \
-      --member serviceAccount:cf@${projectid}.iam.gserviceaccount.com \
+  gcloud projects add-iam-policy-binding ${project_id} \
+      --member serviceAccount:cf-component@${project_id}.iam.gserviceaccount.com \
       --role "roles/editor" \
       --role "roles/logging.logWriter" \
       --role "roles/logging.configWriter"
@@ -69,7 +71,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. Target and login into your BOSH environment:
 
   ```
-  bosh target <YOUR BOSH IP ADDRESS>
+  bosh target 10.0.0.6
   ```
 
   > **Note:** Your username is `admin` and password is `admin`.
@@ -77,8 +79,8 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. Export several environment variables:
 
   ```
-  vip=$(terraform output ip)
-  director=$(bosh status --uuid)
+  export vip=$(terraform output ip)
+  export director=$(bosh status --uuid)
   ```
 
 1. Upload the stemcell:
@@ -95,12 +97,6 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=36
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1454.0
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
-  ```
-
-1. Use `erb` to substitute variables in the Cloud Foundry manifest:
-
-  ```
-  erb manifest.yml.erb > manifest.yml
   ```
 
 1. Target the deployment file and deploy:

@@ -1,21 +1,21 @@
 ---
 <%
 # CF settings
-director_uuid = "<%= ENV['director'] %>"
-vip_ip = "<%= ENV['vip'] %>"
+director_uuid = ENV['director']
+vip_ip = ENV['vip']
 root_domain = "#{vip_ip}.xip.io"
 common_password = "c1oudc0w"
 deployment_name = "cf"
 
 # Google network settings
-google_region = "<%= ENV['region'] %>"
-google_zone = "<%= ENV['zone'] %>"
+google_region = ENV['region']
+google_zone = ENV['zone']
 network = "bosh"
 public_subnetwork = "cf-public-#{google_region}"
 private_subnetwork = "cf-private-#{google_region}"
 
 # Google service account settings
-project_id = "{{PROJECT_ID}}"
+project_id = ENV['project_id']
 org, project = project_id.split(":")
 project_domain_prefix = [project, org].compact.join(".")
 cf_service_account = "cf-component@#{project_domain_prefix}.iam.gserviceaccount.com"
