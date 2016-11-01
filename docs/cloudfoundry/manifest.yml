@@ -85,7 +85,8 @@ compilation:
   network: compilation
   reuse_compilation_vms: true
   cloud_properties:
-    zone: <%= google_zone%>
+    zone: <%= google_zone_compilation%>
+    region: <%= google_region_compilation%>
     machine_type: n1-standard-2
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
@@ -107,6 +108,7 @@ networks:
       gateway: 10.200.0.1
       cloud_properties:
         zone: <%= google_zone_compilation%>
+        region: <%= google_region_compilation%>
         network_name: <%= network%>
         subnetwork_name: <%= compilation_subnetwork%>
         ephemeral_external_ip: false
