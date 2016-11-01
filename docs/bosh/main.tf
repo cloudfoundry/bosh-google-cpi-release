@@ -126,7 +126,7 @@ This warning will not appear when the system is ready.
 EOF
 
 apt-get update
-apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 jq git
+apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 jq git unzip
 gem install bosh_cli
 curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.20.0/cf-cli_6.20.0_linux_x86-64.tgz
 tar -zxvf /tmp/cf.tgz && mv cf /usr/bin/cf && chmod +x /usr/bin/cf
@@ -155,9 +155,12 @@ EOF
 
 # Clone repo
 mkdir /share
-chmod -R 777 /share
 git clone https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git /share
+chmod -R 777 /share
 
+# Install Terraform
+wget https://releases.hashicorp.com/terraform/0.7.7/terraform_0.7.7_linux_amd64.zip
+unzip terraform*.zip -d /usr/local/bin
 rm /etc/motd
 EOT
 

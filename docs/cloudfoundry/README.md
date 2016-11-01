@@ -26,33 +26,25 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. `cd` into the Cloud Foundry docs directory that you cloned when you created the BOSH bastion:
 
   ```
-  cd /share/bosh-google-cpi-release/docs/cloudfoundry
+  cd /share/docs/cloudfoundry
   ```
 
 1. View the Terraform execution plan to see the resources that will be created:
 
   ```
-  docker run -i -t \
-    -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
-    -v `pwd`:/$(basename `pwd`) \
-    -w /$(basename `pwd`) \
-    hashicorp/terraform:light plan \
-      -var projectid=${project_id} \
-      -var region=${region} \
-      -var zone=${zone}
+  terraform plan \
+    -var projectid=${project_id} \
+    -var region=${region} \
+    -var zone=${zone}
   ```
 
 1. Create the resources:
 
   ```
-  docker run -i -t \
-    -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
-    -v `pwd`:/$(basename `pwd`) \
-    -w /$(basename `pwd`) \
-    hashicorp/terraform:light apply \
-      -var projectid=${project_id} \
-      -var region=${region} \
-      -var zone=${zone}
+  terraform apply \
+    -var projectid=${project_id} \
+    -var region=${region} \
+    -var zone=${zone}
   ```
 
 1. Create a service account and key that will be used by Cloud Foundry VMs:
@@ -82,6 +74,13 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   > **Note:** Your username is `admin` and password is `admin`.
 
+1. Export several environment variables:
+
+  ```
+  vip=$(terraform output ip)
+  director=$(bosh status --uuid)
+  ```
+
 1. Upload the stemcell:
 
   ```
@@ -98,20 +97,16 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=231
   ```
 
-1. Download the [cloudfoundry.yml](cloudfoundry.yml) deployment manifest file and use `sed` to modify a few values in it:
+1. Use `erb` to substitute variables in the Cloud Foundry manifest:
 
   ```
-  sed -i s#{{VIP_IP}}#`gcloud compute addresses describe cf | grep ^address: | cut -f2 -d' '`# cloudfoundry.yml
-  sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# cloudfoundry.yml
-  sed -i s#{{REGION}}#$region# cloudfoundry.yml
-  sed -i s#{{ZONE}}#$zone# cloudfoundry.yml
-  sed -i s#{{PROJECT_ID}}#$projectid# cloudfoundry.yml
+  erb manifest.yml.erb > manifest.yml
   ```
 
 1. Target the deployment file and deploy:
 
   ```
-  bosh deployment cloudfoundry.yml
+  bosh deployment manifest.yml
   bosh deploy
   ```
 

@@ -115,3 +115,7 @@ resource "google_compute_forwarding_rule" "cf-wss" {
   ip_protocol = "TCP"
   ip_address  = "${google_compute_address.cf.address}"
 }
+
+output "ip" {
+    value = "${google_compute_address.cf.address}"
+}
