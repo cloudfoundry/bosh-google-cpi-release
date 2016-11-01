@@ -104,6 +104,12 @@ Before working this section, you must have deployed the supporting infrastructur
   gcloud compute ssh bosh-bastion
   ```
 
+1. Once on the VM, update its Google Cloud SDK to the latest:
+
+  ```
+  sudo gcloud components update
+  ```
+
 1. Configure `gcloud` to use the correct zone and region:
 
   ```
