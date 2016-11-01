@@ -10,9 +10,12 @@ deployment_name = "cf"
 # Google network settings
 google_region = ENV['region']
 google_zone = ENV['zone']
-network = "bosh"
-public_subnetwork = "cf-public-#{google_region}"
-private_subnetwork = "cf-private-#{google_region}"
+google_region_compilation = ENV['region_compilation']
+google_zone_compilation = ENV['zone_compilation']
+
+network = ENV['network']
+compilation_subnetwork = ENV['compilation_subnet']
+private_subnetwork = ENV['private_subnet']
 
 # Google service account settings
 project_id = ENV['project_id']
@@ -78,8 +81,8 @@ releases:
     version: "36"
 
 compilation:
-  workers: 2
-  network: private
+  workers: 12
+  network: compilation
   reuse_compilation_vms: true
   cloud_properties:
     zone: <%= google_zone%>
@@ -97,18 +100,17 @@ update:
   serial: false
 
 networks:
-  - name: public
+  - name: compilation
     type: manual
     subnets:
     - range: 10.200.0.0/16
       gateway: 10.200.0.1
       cloud_properties:
-        zone: <%= google_zone%>
+        zone: <%= google_zone_compilation%>
         network_name: <%= network%>
-        subnetwork_name: <%= public_subnetwork%>
+        subnetwork_name: <%= compilation_subnetwork%>
         ephemeral_external_ip: false
         tags:
-          - cf-public
           - cf-internal
           - internal
           - no-ip
@@ -144,8 +146,8 @@ resource_pools:
       root_disk_type: pd-standard
       service_account: <%= cf_service_account%>
 
-  - name: common-public
-    network: public
+  - name: gorouter
+    network: private
     stemcell:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       version: latest
@@ -156,6 +158,8 @@ resource_pools:
       root_disk_type: pd-standard
       target_pool: cf-public
       service_account: <%= cf_service_account%>
+      tags:
+        - cf-public
 
   - name: cells
     network: private
@@ -494,9 +498,9 @@ jobs:
       - name: metron_agent
         release: cf
     instances: 1
-    resource_pool: common-public
+    resource_pool: gorouter
     networks:
-      - name: public
+      - name: private
         default: [dns, gateway]
 
   - name: mysql-proxy

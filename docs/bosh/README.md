@@ -376,6 +376,16 @@ From your `bosh-bastion` instance, delete your BOSH director:
 From your Cloud Shell instance, run the following command to delete the infrastructure you created in this lab:
 
   ```
+  # Set a few vars, in case they were forgotten
+  export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
+  export region=us-east1
+  export zone=us-east1-d
+  export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
+
+  # Go to the place with the Terraform manifest
+  cd bosh-google-cpi-release/docs/bosh/
+
+  # Destroy the deployment
   docker run -i -t \
     -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
     -v `pwd`:/$(basename `pwd`) \

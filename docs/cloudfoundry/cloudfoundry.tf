@@ -7,12 +7,22 @@ variable "region" {
     default = "us-east1"
 }
 
+variable "region_compilation" {
+    type = "string"
+    default = "us-central1"
+}
+
 variable "zone" {
     type = "string"
     default = "us-east1-d"
 }
 
-variable "bosh_network" {
+variable "zone_compilation" {
+    type = "string"
+    default = "us-central1-b"
+}
+
+variable "network" {
     type = "string"
 }
 
@@ -28,10 +38,11 @@ provider "google" {
 }
 
 // Subnet for the public Cloud Foundry components
-resource "google_compute_subnetwork" "cf-public-subnet-1" {
-  name          = "${var.prefix}cf-public-${var.region}"
+resource "google_compute_subnetwork" "cf-compilation-subnet-1" {
+  name          = "${var.prefix}cf-compilation-${var.region_compilation}"
+  region        = "${var.region_compilation}"
   ip_cidr_range = "10.200.0.0/16"
-  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.network}"
 
 }
 
@@ -39,13 +50,13 @@ resource "google_compute_subnetwork" "cf-public-subnet-1" {
 resource "google_compute_subnetwork" "cf-private-subnet-1" {
   name          = "${var.prefix}cf-private-${var.region}"
   ip_cidr_range = "192.168.0.0/16"
-  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.bosh_network}"
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.network}"
 }
 
 // Allow access to CloudFoundry router
 resource "google_compute_firewall" "cf-public" {
   name    = "${var.prefix}cf-public"
-  network       = "${var.bosh_network}"
+  network       = "${var.network}"
 
   allow {
     protocol = "tcp"
@@ -120,3 +131,32 @@ resource "google_compute_forwarding_rule" "cf-wss" {
 output "ip" {
     value = "${google_compute_address.cf.address}"
 }
+
+output "network" {
+   value = "${var.network}"
+}
+output "private_subnet" {
+   value = "${google_compute_subnetwork.cf-private-subnet-1.name}"
+}
+
+output "compilation_subnet" {
+   value = "${google_compute_subnetwork.cf-compilation-subnet-1.name}"
+}
+
+output "zone" {
+  value = "${var.zone}"
+}
+
+output "zone_compilation" {
+  value = "${var.zone_compilation}"
+}
+
+output "region" {
+  value = "${var.region}"
+}
+
+output "region_compilation" {
+  value = "${var.region_compilation}"
+}
+
+

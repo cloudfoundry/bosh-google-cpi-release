@@ -6,10 +6,15 @@ This guide describes how to deploy a minimal [Cloud Foundry](https://www.cloudfo
 
 * You must have an existing BOSH director and bastion host created by following the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide.
 
-* Ensure that you have enough [Resource Quotas](https://cloud.google.com/compute/docs/resource-quotas) available:
-    - 25 Cores
+## Cost and resource requirements
+
+* This CF deployment (and the BOSH director/bastion pre-requisite) is small enough to fit in a default project [Resource Quota](https://cloud.google.com/compute/docs/resource-quotas). It consumes:
+    - 20 cores in a single region
+    - 24 pre-emptible cores in a second region **during compilation only**
     - 2 IP addresses
-    - 1 Tb persistent disk
+    - 600 Gb persistent disk
+
+You can view an estimate of the cost to run this deployment for an entire month at [this link](https://cloud.google.com/products/calculator/#id=f543773c-1848-47fc-b302-6568b0f0db94).
 
 ## Deploy supporting infrastructure automatically
 
@@ -29,24 +34,35 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   cd /share/docs/cloudfoundry
   ```
 
+1. Export a few vars to specify the location of compilation VMs:
+
+  ```
+  export region_compilation=us-central1
+  export zone_compilation=us-central1-b
+  ```
+
 1. View the Terraform execution plan to see the resources that will be created:
 
   ```
   terraform plan \
-    -var bosh_network=${network} \
+    -var network=${network} \
     -var projectid=${project_id} \
     -var region=${region} \
-    -var zone=${zone}
+    -var region_compilation=${region_compilation} \
+    -var zone=${zone} \
+    -var zone_compilation=${zone_compilation}
   ```
 
 1. Create the resources:
 
   ```
   terraform apply \
-    -var bosh_network=${network} \
+    -var network=${network} \
     -var projectid=${project_id} \
     -var region=${region} \
-    -var zone=${zone}
+    -var region_compilation=${region_compilation} \
+    -var zone=${zone} \
+    -var zone_compilation=${zone_compilation}
   ```
 
 1. Create a service account and key that will be used by Cloud Foundry VMs:
@@ -75,10 +91,18 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   > **Note:** Your username is `admin` and password is `admin`.
 
-1. Export several environment variables:
+1. Retrieve the outputs of your Terraform run to be used in your Cloud Foundry deployment:
 
   ```
   export vip=$(terraform output ip)
+  export zone=$(terraform output zone)
+  export zone_compilation=$(terraform output zone_compilation)
+  export region=$(terraform output region)
+  export region_compilation=$(terraform output region_compilation)
+  export private_subnet=$(terraform output private_subnet)
+  export compilation_subnet=$(terraform output compilation_subnet)
+  export network=$(terraform output network)
+
   export director=$(bosh status --uuid)
   ```
 
@@ -128,5 +152,8 @@ Then delete the infrastructure you created with terraform:
   terraform destroy \
     -var projectid=${project_id} \
     -var region=${region} \
-    -var zone=${zone}
+    -var zone=${zone} \
+    -var network=${network}
   ```
+
+**Important:** The BOSH bastion and director you created must also be destroyed. Follow the **Delete resources** instructions in the [Deploy BOSH on Google Cloud Platform](../bosh/README.md) guide.
