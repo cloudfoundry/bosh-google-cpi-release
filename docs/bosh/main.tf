@@ -149,8 +149,10 @@ export project_id=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google
 export zone=$$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
 export zone=$${zone##*/}
 export region=$${zone%-*}
-export gcloud config set compute/zone $${zone}
-export gcloud config set compute/region $${region}
+
+# Configure gcloud
+gcloud config set compute/zone $${zone}
+gcloud config set compute/region $${region}
 EOF
 
 # Clone repo

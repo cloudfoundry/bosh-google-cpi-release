@@ -22,6 +22,7 @@ variable "prefix" {
 }
 
 provider "google" {
+    credentials = ""
     project = "${var.projectid}"
     region = "${var.region}"
 }

@@ -153,6 +153,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
   ```
   ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+  ```
+
+  ```
   gcloud compute project-info add-metadata --metadata-from-file \
            sshKeys=<( gcloud compute project-info describe --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key == "sshKeys") | .value' & echo "bosh:$(cat ~/.ssh/bosh.pub)" )
   ```
