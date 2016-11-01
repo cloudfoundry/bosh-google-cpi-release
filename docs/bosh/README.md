@@ -364,6 +364,7 @@ Your username is `admin` and password is `admin`.
 From your `bosh-bastion` instance, delete your BOSH director:
 
   ```
+  cd ~/google-bosh-director
   bosh-init delete manifest.yml
   ```
 

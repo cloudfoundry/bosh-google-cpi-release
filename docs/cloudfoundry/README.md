@@ -111,3 +111,20 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   ```
 
 Once deployed, you can target your Cloud Foundry environment using the [CF CLI](http://docs.cloudfoundry.org/cf-cli/). Your CF API endpoint is `https://api.<YOUR CF IP ADDRESS>.xip.io`, your username is `admin` and your password is `c1oudc0w`.
+
+### Delete resources
+
+From your `bosh-bastion` instance, delete your Cloud Foundry deployment:
+
+  ```
+  bosh delete deployment cf
+  ```
+
+Then delete the infrastructure you created with terraform:
+  ```
+  cd /share/docs/cloudfoundry
+  terraform destroy \
+    -var projectid=${project_id} \
+    -var region=${region} \
+    -var zone=${zone}
+  ```
