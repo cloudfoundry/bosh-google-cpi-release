@@ -20,10 +20,12 @@ The following diagram provides an overview of the deployment:
 ## Configure your [Google Cloud Platform](https://cloud.google.com/) environment
 
 ### Signup
+
 1. [Sign up](https://cloud.google.com/compute/docs/signup) for Google Cloud Platform
 1. Create a [new project](https://console.cloud.google.com/iam-admin/projects)
 1. Enable the [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview) for your project
 1. Enable the [Project API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
+
 ### Setup
 
 1. In your new project, open Cloud Shell
