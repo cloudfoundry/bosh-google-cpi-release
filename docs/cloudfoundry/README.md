@@ -106,7 +106,14 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   bosh deploy
   ```
 
-Once deployed, you can target your Cloud Foundry environment using the [CF CLI](http://docs.cloudfoundry.org/cf-cli/). Your CF API endpoint is `https://api.<YOUR CF IP ADDRESS>.xip.io`, your username is `admin` and your password is `c1oudc0w`.
+Once deployed, you can target your Cloud Foundry environment using the [CF CLI](http://docs.cloudfoundry.org/cf-cli/):
+
+  ```
+  cf api https://api.${vip}.xip.io
+  cf login
+  ```
+
+Your username is `admin` and your password is `c1oudc0w`.
 
 ### Delete resources
 

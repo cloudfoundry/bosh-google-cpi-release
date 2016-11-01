@@ -83,7 +83,7 @@ compilation:
   reuse_compilation_vms: true
   cloud_properties:
     zone: <%= google_zone%>
-    machine_type: n1-standard-2
+    machine_type: n1-standard-1
     root_disk_size_gb: 100
     root_disk_type: pd-ssd
     preemptible: true
