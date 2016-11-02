@@ -1,6 +1,7 @@
 package dispatcher
 
 import (
+	"bytes"
 	"encoding/json"
 
 	bgcaction "bosh-google-cpi/action"
@@ -63,7 +64,9 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 
 	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", string(reqBytes))
 
-	if err := json.Unmarshal(reqBytes, &req); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(reqBytes))
+	decoder.UseNumber()
+	if err := decoder.Decode(&req); err != nil {
 		return c.buildCpiError("Must provide valid JSON payload")
 	}
 

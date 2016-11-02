@@ -28,13 +28,13 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 	request := fmt.Sprintf(`{
 			  "method": "create_stemcell",
-			  "arguments": ["", {
+			  "arguments": ["%s", {
 				  "name": "bosh-google-kvm-ubuntu-trusty",
 				  "version": "3215",
 				  "infrastructure": "google",
 				  "source_url": "%s"
 				}]
-			}`, stemcellURL)
+			}`, stemcellFile, stemcellURL)
 	stemcell := assertSucceedsWithResult(request).(string)
 
 	ips = make(chan string, len(ipAddrs))

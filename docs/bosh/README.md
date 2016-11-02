@@ -124,6 +124,12 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
 1. If you see a warning indicating the VM isn't ready, log out, wait a few moments, and log in again.
 
+1. Once on the VM, update its Google Cloud SDK to the latest:
+
+  ```
+  sudo gcloud components update
+  ```
+
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
 
   ```
