@@ -125,4 +125,21 @@ var _ = Describe("Disk", func() {
 			}`, diskCID)
 		assertSucceeds(request)
 	})
+
+	It("can create and delete a 1TB PD-SSD disk", func() {
+		By("creating a disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [1024000, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+	})
 })
