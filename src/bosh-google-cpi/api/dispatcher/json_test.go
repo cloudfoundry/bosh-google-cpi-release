@@ -2,6 +2,7 @@ package dispatcher_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 
 	. "github.com/onsi/ginkgo"
@@ -59,9 +60,9 @@ var _ = Describe("JSON", func() {
         }`))
 				Expect(caller.CallAction).To(Equal(action))
 				Expect(caller.CallArgs).To(Equal([]interface{}{
-					float64(123),
+					json.Number("123"),
 					"fake-arg",
-					[]interface{}{float64(123), "fake-arg"},
+					[]interface{}{json.Number("123"), "fake-arg"},
 					map[string]interface{}{"fake-arg2-key": "fake-arg2-value"},
 				}))
 			})
