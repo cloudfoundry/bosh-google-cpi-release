@@ -2,9 +2,82 @@
 groups:
   - name: light-gce-stemcells
     jobs:
+      - ubuntu-trusty-stemcell-latest
       - ubuntu-trusty-stemcell-3263
 
+shared:
+  - &get-cpi-src
+    get: bosh-cpi-src
+    trigger: false
+  - &get-bosh-cli
+    get: bosh-cli
+    trigger: false
+  - &get-cpi-release
+    get: bosh-cpi-release
+    trigger: false
+  - &create-light-stemcell
+    task: create-light-stemcell
+    file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
+    params:
+      BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
+  - &upload-raw-stemcells
+    aggregate:
+    - put: bosh-ubuntu-raw-stemcells
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+        predefined_acl: "publicRead"
+    - put: bosh-ubuntu-raw-stemcells-sha1
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+        predefined_acl: "publicRead"
+  - &verify-stemcell-boots
+    do:
+    - put: terraform
+      params:
+        generate_random_name: true
+        terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+    - task: deploy-skeletal
+      file: bosh-cpi-src/ci/stemcell/light/tasks/deploy-skeletal.yml
+      params:
+        SSH_PRIVATE_KEY: {{ssh_private_key}}
+        GCE_CREDENTIALS_JSON: {{gce_credentials_json}}
+    - put: bosh-ubuntu-light-stemcells
+      params:
+        file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
+        predefined_acl: "publicRead"
+    - task: publish-boshio-checksum
+      file: bosh-cpi-src/ci/stemcell/light/tasks/publish-boshio-checksum.yml
+      params:
+        BOSHIO_TOKEN: {{google_boshio_checksum_token}}
+    ensure:
+      task: destroy-skeletal
+      file: bosh-cpi-src/ci/stemcell/light/tasks/destroy-skeletal.yml
+      ensure:
+        put: terraform
+        params:
+          env_name_file: terraform/name
+          terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+          action: destroy
+        get_params:
+          action: destroy
+
 jobs:
+  - name: ubuntu-trusty-stemcell-latest
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-latest
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-raw-stemcells
+      - *verify-stemcell-boots
+
   - name: ubuntu-trusty-stemcell-3263
     plan:
       - aggregate:
@@ -14,60 +87,12 @@ jobs:
           version: every
           params:
             preserve_filename: true
-        - get: bosh-cpi-src
-          trigger: false
-        - get: bosh-cli
-          trigger: false
-        - get: bosh-cpi-release
-          trigger: false
-      - task: create-light-stemcell
-        file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
-        params:
-          BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
-
-      - aggregate:
-        - put: bosh-ubuntu-raw-stemcells
-          params:
-            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
-            predefined_acl: "publicRead"
-        - put: bosh-ubuntu-raw-stemcells-sha1
-          params:
-            file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
-            predefined_acl: "publicRead"
-
-      - do:
-        - put: terraform
-          params:
-            generate_random_name: true
-            terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
-
-        - task: deploy-skeletal
-          file: bosh-cpi-src/ci/stemcell/light/tasks/deploy-skeletal.yml
-          params:
-            SSH_PRIVATE_KEY: {{ssh_private_key}}
-            GCE_CREDENTIALS_JSON: {{gce_credentials_json}}
-
-        - put: bosh-ubuntu-light-stemcells
-          params:
-            file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
-            predefined_acl: "publicRead"
-
-        - task: publish-boshio-checksum
-          file: bosh-cpi-src/ci/stemcell/light/tasks/publish-boshio-checksum.yml
-          params:
-            BOSHIO_TOKEN: {{google_boshio_checksum_token}}
-
-        ensure:
-          task: destroy-skeletal
-          file: bosh-cpi-src/ci/stemcell/light/tasks/destroy-skeletal.yml
-          ensure:
-            put: terraform
-            params:
-              env_name_file: terraform/name
-              terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
-              action: destroy
-            get_params:
-              action: destroy
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-raw-stemcells
+      - *verify-stemcell-boots
 
 resources:
   - name: bosh-cli
@@ -99,6 +124,12 @@ resources:
       vars:
         gce_project_id: {{gce_project_id}}
         gce_credentials_json: {{gce_credentials_json}}
+
+  - name: ubuntu-stemcell-latest
+    type: bosh-io-stemcell-version-family
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
 
   - name: ubuntu-stemcell-3263
     type: bosh-io-stemcell-version-family
