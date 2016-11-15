@@ -37,6 +37,10 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. Export a few vars to specify the location of compilation VMs:
 
   ```
+  # You may be tempted to set these to the same value as your BOSH deployment (eg `us-east1`). 
+  # However, this may cause you to exceed your regional quotas. 
+  # By breaking apart the regions, you avoid this problem.
+
   export region_compilation=us-central1
   export zone_compilation=us-central1-b
   ```
