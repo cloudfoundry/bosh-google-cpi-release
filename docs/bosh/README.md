@@ -129,11 +129,14 @@ Now you have the infrastructure ready to deploy a BOSH director.
   ```
   sudo gcloud components update
   ```
+  
+  If it tells you to delete some executables, don't.
 
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
 
   ```
   export service_account=bosh-user
+  export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export service_account_email=${service_account}@${project_id}.iam.gserviceaccount.com
   gcloud iam service-accounts create ${service_account}
   ```
