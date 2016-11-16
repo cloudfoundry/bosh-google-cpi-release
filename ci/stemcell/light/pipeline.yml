@@ -41,14 +41,15 @@ shared:
       params:
         SSH_PRIVATE_KEY: {{ssh_private_key}}
         GCE_CREDENTIALS_JSON: {{gce_credentials_json}}
-    - put: bosh-ubuntu-light-stemcells
-      params:
-        file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
-        predefined_acl: "publicRead"
-    - task: publish-boshio-checksum
-      file: bosh-cpi-src/ci/stemcell/light/tasks/publish-boshio-checksum.yml
+    - task: publish-stemcell-and-checksum
+      file: bosh-cpi-src/ci/stemcell/light/tasks/publish-stemcell-and-checksum.yml
       params:
         BOSHIO_TOKEN: {{google_boshio_checksum_token}}
+        AWS_ACCESS_KEY_ID: {{google_light_stemcells_access_key_id}}
+        AWS_SECRET_ACCESS_KEY: {{google_light_stemcells_secret_access_key}}
+        AWS_DEFAULT_REGION: {{google_light_stemcells_region}}
+        AWS_ENDPOINT: {{google_light_stemcells_endpoint}}
+        OUTPUT_BUCKET: {{google_light_stemcells_bucket_name}}
     ensure:
       task: destroy-skeletal
       file: bosh-cpi-src/ci/stemcell/light/tasks/destroy-skeletal.yml
@@ -151,16 +152,6 @@ resources:
       json_key: {{gce_credentials_json}}
       bucket:   {{google_raw_stemcells_bucket_name}}
       regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
-
-  - name: bosh-ubuntu-light-stemcells
-    type: s3
-    source:
-      bucket:            {{google_light_stemcells_bucket_name}}
-      access_key_id:     {{google_light_stemcells_access_key_id}}
-      secret_access_key: {{google_light_stemcells_secret_access_key}}
-      endpoint:          {{google_light_stemcells_endpoint}}
-      region:            {{google_light_stemcells_region}}
-      regexp:            light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
 
 resource_types:
   - name: gcs-resource
