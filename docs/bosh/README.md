@@ -25,7 +25,7 @@ The following diagram provides an overview of the deployment:
 1. Create a [new project](https://console.cloud.google.com/iam-admin/projects)
 1. Enable the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview) for your project
 1. Enable the [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview) for your project
-1. Enable the [Project API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
+1. Enable the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview)
 
 ### Setup
 
@@ -367,11 +367,13 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
 Your username is `admin` and password is `admin`.
 
-### Deploy other software
+## Deploy other software
 
 * [Deploying Cloud Foundry on Google Compute Engine](../cloudfoundry/README.md)
 
-### Delete resources
+## Delete resources
+
+Follow these instructions when you're ready to delete your BOSH deployment.
 
 From your `bosh-bastion` instance, delete your BOSH director:
 
@@ -403,7 +405,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
       -var zone=${zone}
   ```
  
-### Submitting an Issue
+## Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
 support for an existing issue by voting it up. When submitting a bug report, please include a
@@ -412,7 +414,7 @@ including your gem version, Ruby version, and operating system. Ideally, a bug r
  failing specs.
 
  
-### Submitting a Pull Request
+## Submitting a Pull Request
 
 1. Fork the project.
 2. Create a topic branch.
