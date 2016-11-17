@@ -83,7 +83,7 @@ The following instructions offer the fastest path to getting BOSH up and running
   cd bosh-google-cpi-release/docs/bosh
   ```
 
-1. In a terminal from the same directory where `main.tf` is located, view the Terraform execution plan to see the resources that will be created:
+1. View the Terraform execution plan to see the resources that will be created:
 
   ```
   docker run -i -t \
