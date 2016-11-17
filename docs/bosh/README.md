@@ -119,6 +119,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
 1. SSH to the bastion VM you created in the previous step. You can use Cloud Shell to SSH to the bastion, or you can connect from any workstation with `gcloud` installed. All SSH commands after this should be run from the bastion VM.
 
   ```
+  gcloud auth login
+  gcloud config set project <your-project>
+  gcloud config set compute/zone us-east1-d
   gcloud compute ssh bosh-bastion
   ```
 
