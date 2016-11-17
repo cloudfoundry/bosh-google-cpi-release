@@ -28,6 +28,8 @@ pushd working_dir
   echo -n $(sha1sum ${raw_stemcell_path} | awk '{print $1}') > ${raw_stemcell_path}.sha1
 
   > image
+  light_stemcell_sha1=$(sha1sum image | awk '{print $1}')
+  sed -i '/^sha1: .*/c\sha1: '${light_stemcell_sha1}'' stemcell.MF
   echo "  source_url: https://storage.googleapis.com/${BUCKET_NAME}/${raw_stemcell_name}" >> stemcell.MF
 
   light_stemcell_path="${light_stemcell_dir}/${light_stemcell_name}"
