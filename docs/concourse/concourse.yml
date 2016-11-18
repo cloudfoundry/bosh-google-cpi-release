@@ -2,7 +2,8 @@
 <%
 director_uuid = "{{DIRECTOR_UUID}}"
 external_url = "http://{{EXTERNAL_IP}}"
-common_password = "c1oudc0w"
+common_password = REPLACE ME
+atc_password = REPLACE ME
 deployment_name = "concourse"
 %>
 name: <%= deployment_name %>
@@ -31,7 +32,7 @@ instance_groups:
     properties:
       external_url: <%= external_url %>
       basic_auth_username: concourse
-      basic_auth_password: ofcourse
+      basic_auth_password: <%= atc_password %>
       publicly_viewable: true
 
       postgresql_database: &atc_db atc
