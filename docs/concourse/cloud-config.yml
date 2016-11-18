@@ -1,10 +1,22 @@
+<%
+['zone', 'zone2', 'region'].each do |val|
+  if ENV[val].nil? || ENV[val].empty?
+    raise "Missing enviornment variable: #{val}"
+  end
+end
+
+zone_1 = ENV['zone']
+zone_2 = ENV['zone2']
+region = ENV['region']
+%>
+
 azs:
 - name: z1
   cloud_properties:
-    zone: {{ZONE-1}}
+    zone: <%=zone_1 %>
 - name: z2
   cloud_properties:
-    zone: {{ZONE-2}}
+    zone: <%=zone_2 %>
 
 vm_types:
 - name: common

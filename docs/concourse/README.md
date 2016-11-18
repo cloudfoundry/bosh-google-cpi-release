@@ -81,8 +81,8 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
 
   ```
   zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-  zone=${zone##*/}
-  region=${zone%-*}
+  export zone=${zone##*/}
+  export region=${zone%-*}
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
   ```
@@ -339,20 +339,21 @@ Complete the following steps from your bastion instance.
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=0.4.0
   ```
 
-1. Download the [cloud-config.yml](cloud-config.yml) manifest file and use `sed` to modify a few values in it:
+1. Download the [cloud-config.yml](cloud-config.yml) manifest file.
+
+1. Download the [concourse.yml](concourse.yml) manifest file and set a few environment variables:
 
   ```
-  sed -i s#{{REGION}}#$region# cloud-config.yml
-  sed -i s#{{ZONE-1}}#$zone# cloud-config.yml
-  sed -i s#{{ZONE-2}}#$zone2# cloud-config.yml
+  export external_ip=`gcloud compute addresses describe concourse --global | grep ^address: | cut -f2 -d' '`
+  export director_uuid=`bosh status --uuid 2>/dev/null`
   ```
 
-1. Download the [concourse.yml](concourse.yml) manifest file and use `sed` to modify a few values in it:
+1. Chose unique passwords for internal services and atc and export them
+   ```
+   export common_password=
+   export atc_password=
+   ```
 
-  ```
-  sed -i s#{{EXTERNAL_IP}}#`gcloud compute addresses describe concourse --global | grep ^address: | cut -f2 -d' '`# concourse.yml
-  sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# concourse.yml
-  ```
 
 1. Upload the cloud config:
 
