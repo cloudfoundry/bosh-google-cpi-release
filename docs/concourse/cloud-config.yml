@@ -1,7 +1,7 @@
 <%
 ['zone', 'zone2', 'region'].each do |val|
   if ENV[val].nil? || ENV[val].empty?
-    raise "Missing environment variable: #{val}"
+    raise "Missing enviornment variable: #{val}"
   end
 end
 

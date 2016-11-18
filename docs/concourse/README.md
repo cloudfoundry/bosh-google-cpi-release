@@ -77,7 +77,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   gcloud compute ssh bosh-bastion-concourse
   ```
 
-1. Configure `gcloud` to use the correct zone, region, and project:
+1. Configure `gcloud` to use the correct zone and region:
 
   ```
   zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
@@ -85,7 +85,6 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   export region=${zone%-*}
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
-  export project_id=`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`
   ```
 
 1. Explicitly set your secondary zone:
@@ -124,18 +123,6 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
 
   ```
   ---
-  <%
-  ['region', 'project_id', 'zone', 'ssh_key_path'].each do |val|
-    if ENV[val].nil? || ENV[val].empty?
-      raise "Missing environment variable: #{val}"
-    end
-  end
-
-  region = ENV['region']
-  project_id = ENV['common_password']
-  zone = ENV['zone']
-  ssh_key_path = ENV['ssh_key_path']
-  %>
   name: bosh
 
   releases:
@@ -153,7 +140,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
         url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
         sha1: c3fc743a5e3ec2a3f50e29851363331c6cd19b43
       cloud_properties:
-        zone: <%=zone %>
+        zone: {{ZONE}}
         machine_type: n1-standard-4
         root_disk_size_gb: 40
         root_disk_type: pd-standard
@@ -178,7 +165,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
           network_name: concourse
-          subnetwork_name: bosh-concourse-<%=region %>
+          subnetwork_name: bosh-concourse-{{REGION}}
           ephemeral_external_ip: true
           tags:
             - bosh-internal
@@ -264,7 +251,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
           resurrector_enabled: true
 
         google: &google_properties
-          project: <%=project_id %>
+          project: {{PROJECT_ID}}
 
         agent:
           mbus: nats://nats:nats-password@10.0.0.6:4222
@@ -287,7 +274,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       host: 10.0.0.6
       port: 22
       user: bosh
-      private_key: <%=ssh_key_path %>
+      private_key: {{SSH_KEY_PATH}}
 
     mbus: https://mbus:mbus-password@10.0.0.6:6868
 
@@ -298,10 +285,28 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       ntp: *ntp
   ```
 
+1. Run this `sed` command to insert your Google Cloud Platform project ID into the manifest:
+
+  ```
+  sed -i s#{{PROJECT_ID}}#`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`# manifest.yml
+  ```
+
 1. Run this `sed` command to insert the full path of the SSH private key you created earlier:
 
   ```
-  export ssh_key_path=$HOME/.ssh/bosh
+  sed -i s#{{SSH_KEY_PATH}}#$HOME/.ssh/bosh# manifest.yml
+  ```
+
+1. Run this `sed` command to insert the region for your director:
+
+  ```
+  sed -i s#{{REGION}}#$region# manifest.yml
+  ```
+
+1. Run this `sed` command to insert the zone for your director:
+
+  ```
+  sed -i s#{{ZONE}}#$zone# manifest.yml
   ```
 
 1. Deploy the new manifest to create a BOSH Director:
@@ -343,7 +348,7 @@ Complete the following steps from your bastion instance.
   export director_uuid=`bosh status --uuid 2>/dev/null`
   ```
 
-1. Chose unique passwords for internal services and ATC and export them
+1. Chose unique passwords for internal services and atc and export them
    ```
    export common_password=
    export atc_password=
