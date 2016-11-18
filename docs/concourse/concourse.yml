@@ -2,7 +2,7 @@
 <%
 ['director_uuid', 'common_password', 'atc_password', 'external_ip'].each do |val|
   if ENV[val].nil? || ENV[val].empty?
-    raise "Missing enviornment variable: #{val}"
+    raise "Missing environment variable: #{val}"
   end
 end
 
