@@ -120,7 +120,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   cd google-bosh-director
   ```
 
-1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml`:
+1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml.erb`:
 
   ```
   ---
@@ -298,10 +298,15 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       ntp: *ntp
   ```
 
-1. Run this `sed` command to insert the full path of the SSH private key you created earlier:
+1. Run this `export` command to set the full path of the SSH private key you created earlier:
 
   ```
   export ssh_key_path=$HOME/.ssh/bosh
+  ```
+
+1. Fill in the template values of the manifest with your environment variables:
+  ```
+  erb manifest.yml.erb > manifest.yml
   ```
 
 1. Deploy the new manifest to create a BOSH Director:
