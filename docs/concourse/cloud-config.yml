@@ -56,7 +56,7 @@ networks:
       gateway: 10.150.0.1
       cloud_properties:
         network_name: concourse
-        subnetwork_name: concourse-public-{{REGION}}-1
+        subnetwork_name: concourse-public-<%=region %>-1
         ephemeral_external_ip: true
         tags:
           - concourse-public
@@ -66,7 +66,7 @@ networks:
       gateway: 10.160.0.1
       cloud_properties:
         network_name: concourse
-        subnetwork_name: concourse-public-{{REGION}}-2
+        subnetwork_name: concourse-public-<%=region %>-2
         ephemeral_external_ip: true
         tags:
           - concourse-public
