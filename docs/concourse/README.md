@@ -77,14 +77,15 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   gcloud compute ssh bosh-bastion-concourse
   ```
 
-1. Configure `gcloud` to use the correct zone and region:
+1. Configure `gcloud` to use the correct zone, region, and project:
 
   ```
   zone=$(curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone)
-  zone=${zone##*/}
-  region=${zone%-*}
+  export zone=${zone##*/}
+  export region=${zone%-*}
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
+  export project_id=`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`
   ```
 
 1. Explicitly set your secondary zone:
@@ -119,10 +120,22 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   cd google-bosh-director
   ```
 
-1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml`:
+1. Use `vim` or `nano` to create a BOSH Director deployment manifest named `manifest.yml.erb`:
 
   ```
   ---
+  <%
+  ['region', 'project_id', 'zone', 'ssh_key_path'].each do |val|
+    if ENV[val].nil? || ENV[val].empty?
+      raise "Missing environment variable: #{val}"
+    end
+  end
+
+  region = ENV['region']
+  project_id = ENV['common_password']
+  zone = ENV['zone']
+  ssh_key_path = ENV['ssh_key_path']
+  %>
   name: bosh
 
   releases:
@@ -140,7 +153,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
         url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
         sha1: c3fc743a5e3ec2a3f50e29851363331c6cd19b43
       cloud_properties:
-        zone: {{ZONE}}
+        zone: <%=zone %>
         machine_type: n1-standard-4
         root_disk_size_gb: 40
         root_disk_type: pd-standard
@@ -165,7 +178,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
         static: [10.0.0.3-10.0.0.7]
         cloud_properties:
           network_name: concourse
-          subnetwork_name: bosh-concourse-{{REGION}}
+          subnetwork_name: bosh-concourse-<%=region %>
           ephemeral_external_ip: true
           tags:
             - bosh-internal
@@ -251,7 +264,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
           resurrector_enabled: true
 
         google: &google_properties
-          project: {{PROJECT_ID}}
+          project: <%=project_id %>
 
         agent:
           mbus: nats://nats:nats-password@10.0.0.6:4222
@@ -274,7 +287,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       host: 10.0.0.6
       port: 22
       user: bosh
-      private_key: {{SSH_KEY_PATH}}
+      private_key: <%=ssh_key_path %>
 
     mbus: https://mbus:mbus-password@10.0.0.6:6868
 
@@ -285,28 +298,15 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       ntp: *ntp
   ```
 
-1. Run this `sed` command to insert your Google Cloud Platform project ID into the manifest:
+1. Run this `export` command to set the full path of the SSH private key you created earlier:
 
   ```
-  sed -i s#{{PROJECT_ID}}#`curl -s -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/project/project-id`# manifest.yml
+  export ssh_key_path=$HOME/.ssh/bosh
   ```
 
-1. Run this `sed` command to insert the full path of the SSH private key you created earlier:
-
+1. Fill in the template values of the manifest with your environment variables:
   ```
-  sed -i s#{{SSH_KEY_PATH}}#$HOME/.ssh/bosh# manifest.yml
-  ```
-
-1. Run this `sed` command to insert the region for your director:
-
-  ```
-  sed -i s#{{REGION}}#$region# manifest.yml
-  ```
-
-1. Run this `sed` command to insert the zone for your director:
-
-  ```
-  sed -i s#{{ZONE}}#$zone# manifest.yml
+  erb manifest.yml.erb > manifest.yml
   ```
 
 1. Deploy the new manifest to create a BOSH Director:
@@ -339,20 +339,21 @@ Complete the following steps from your bastion instance.
   bosh upload release https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=0.4.0
   ```
 
-1. Download the [cloud-config.yml](cloud-config.yml) manifest file and use `sed` to modify a few values in it:
+1. Download the [cloud-config.yml](cloud-config.yml) manifest file.
+
+1. Download the [concourse.yml](concourse.yml) manifest file and set a few environment variables:
 
   ```
-  sed -i s#{{REGION}}#$region# cloud-config.yml
-  sed -i s#{{ZONE-1}}#$zone# cloud-config.yml
-  sed -i s#{{ZONE-2}}#$zone2# cloud-config.yml
+  export external_ip=`gcloud compute addresses describe concourse --global | grep ^address: | cut -f2 -d' '`
+  export director_uuid=`bosh status --uuid 2>/dev/null`
   ```
 
-1. Download the [concourse.yml](concourse.yml) manifest file and use `sed` to modify a few values in it:
+1. Chose unique passwords for internal services and ATC and export them
+   ```
+   export common_password=
+   export atc_password=
+   ```
 
-  ```
-  sed -i s#{{EXTERNAL_IP}}#`gcloud compute addresses describe concourse --global | grep ^address: | cut -f2 -d' '`# concourse.yml
-  sed -i s#{{DIRECTOR_UUID}}#`bosh status --uuid 2>/dev/null`# concourse.yml
-  ```
 
 1. Upload the cloud config:
 

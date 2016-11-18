@@ -1,9 +1,15 @@
 ---
 <%
-director_uuid = "{{DIRECTOR_UUID}}"
-external_url = "http://{{EXTERNAL_IP}}"
-common_password = REPLACE ME
-atc_password = REPLACE ME
+['director_uuid', 'common_password', 'atc_password', 'external_ip'].each do |val|
+  if ENV[val].nil? || ENV[val].empty?
+    raise "Missing environment variable: #{val}"
+  end
+end
+
+director_uuid = ENV['director_uuid']
+external_url = "http://ENV['external_ip']"
+common_password = ENV['common_password']
+atc_password = ENV['atc_password']
 deployment_name = "concourse"
 %>
 name: <%= deployment_name %>
