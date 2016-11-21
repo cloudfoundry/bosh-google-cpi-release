@@ -22,6 +22,13 @@ project_id = ENV['project_id']
 org, project = project_id.split(":")
 project_domain_prefix = [project, org].compact.join(".")
 cf_service_account = "cf-component@#{project_domain_prefix}.iam.gserviceaccount.com"
+
+# Ensure all expected ENV vars are set
+['director', 'vip', 'region', 'zone', 'region_compilation', 'zone_compilation', 'network', 'compilation_subnet', 'private_subnet', 'project_id'].each do |val|
+  if ENV[val].nil? || ENV[val].empty?
+    raise "Missing environment variable: #{val}"
+  end
+end
 %>
 ssl_cert: &ssl_cert |
   -----BEGIN CERTIFICATE-----
