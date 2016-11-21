@@ -189,6 +189,13 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
   ```
   ---
+  <%
+  ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'ssh_key_path'].each do |val|
+    if ENV[val].nil? || ENV[val].empty?
+      raise "Missing environment variable: #{val}"
+    end
+  end
+  %>
   name: bosh
 
   releases:
