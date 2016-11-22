@@ -36,6 +36,7 @@ instance_groups:
   - name: atc
     release: concourse
     properties:
+      bind_port: 80
       external_url: <%= external_url %>
       basic_auth_username: concourse
       basic_auth_password: <%= atc_password %>
