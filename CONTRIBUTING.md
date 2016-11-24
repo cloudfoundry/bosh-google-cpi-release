@@ -8,7 +8,9 @@ support for an existing issue by voting it up. When submitting a bug report, ple
 including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with failing specs.
 
 ## Submitting a Pull Request
+
 You can add a feature or bug-fix via pull request.
+
 1. Fork the project
 1. Create a branch for your feature or fix from the `develop` branch. Replace `your-feature-name` with a description of your feature or fix:
 
