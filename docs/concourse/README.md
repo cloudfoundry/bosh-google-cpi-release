@@ -132,7 +132,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   end
 
   region = ENV['region']
-  project_id = ENV['common_password']
+  project_id = ENV['project_id']
   zone = ENV['zone']
   ssh_key_path = ENV['ssh_key_path']
   %>
