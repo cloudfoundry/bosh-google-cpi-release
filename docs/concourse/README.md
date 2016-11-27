@@ -344,7 +344,7 @@ Complete the following steps from your bastion instance.
 1. Download the [concourse.yml](concourse.yml) manifest file and set a few environment variables:
 
   ```
-  export external_ip=`gcloud compute addresses describe concourse --global | grep ^address: | cut -f2 -d' '`
+  export external_ip=`gcloud compute addresses describe concourse | grep ^address: | cut -f2 -d' '`
   export director_uuid=`bosh status --uuid 2>/dev/null`
   ```
 
