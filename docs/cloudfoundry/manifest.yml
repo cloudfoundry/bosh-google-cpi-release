@@ -694,6 +694,9 @@ jobs:
     networks:
       - name: private
         default: [dns, gateway]
+    properties:
+      garden:
+        network_mtu: 1432
 
   - name: doppler
     templates:
