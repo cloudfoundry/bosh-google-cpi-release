@@ -34,7 +34,7 @@ vm_types:
 vm_extensions:
 - name: concourse-lb
   cloud_properties:
-    backend_service: concourse
+    target_pool: concourse-target-pool
 
 compilation:
   workers: 2
