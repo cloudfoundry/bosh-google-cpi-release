@@ -110,8 +110,11 @@ resources:
   - name: bosh-cpi-src
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      # TODO: change this back before submitting PR!!!!!
+      # uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      # branch: master
+      uri: https://github.com/ljfranklin/bosh-google-cpi-release.git
+      branch: PR-version-family
 
   - name: terraform
     type: terraform
