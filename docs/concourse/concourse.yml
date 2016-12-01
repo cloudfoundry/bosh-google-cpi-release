@@ -17,9 +17,9 @@ director_uuid: <%= director_uuid %>
 
 releases:
 - name: concourse
-  version: 1.5.1
+  version: 2.5.0
 - name: garden-runc
-  version: 0.4.0
+  version: 1.0.3
 
 instance_groups:
 - name: web

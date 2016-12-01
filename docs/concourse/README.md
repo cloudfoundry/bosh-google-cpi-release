@@ -335,8 +335,8 @@ Complete the following steps from your bastion instance.
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
 
   ```
-  bosh upload release https://bosh.io/d/github.com/concourse/concourse?v=1.5.1
-  bosh upload release https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=0.4.0
+  bosh upload release https://bosh.io/d/github.com/concourse/concourse?v=2.5.0
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry/garden-runc-release?v=1.0.3
   ```
 
 1. Download the [cloud-config.yml](cloud-config.yml) manifest file.
