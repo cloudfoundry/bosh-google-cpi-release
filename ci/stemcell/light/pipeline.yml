@@ -3,6 +3,7 @@ groups:
   - name: light-gce-stemcells
     jobs:
       - ubuntu-trusty-stemcell-latest
+      - ubuntu-trusty-stemcell-3312
       - ubuntu-trusty-stemcell-3263
 
 shared:
@@ -79,6 +80,22 @@ jobs:
       - *upload-raw-stemcells
       - *verify-stemcell-boots
 
+  - name: ubuntu-trusty-stemcell-3312
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-3312
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-raw-stemcells
+      - *verify-stemcell-boots
+
   - name: ubuntu-trusty-stemcell-3263
     plan:
       - aggregate:
@@ -111,9 +128,8 @@ resources:
     type: git
     source:
       # TODO: change this back before submitting PR!!!!!
-      # uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
       # branch: master
-      uri: https://github.com/ljfranklin/bosh-google-cpi-release.git
       branch: PR-version-family
 
   - name: terraform
@@ -134,6 +150,13 @@ resources:
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
+
+  - name: ubuntu-stemcell-3312
+    type: bosh-io-stemcell-version-family
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      version_family: "3312"
 
   - name: ubuntu-stemcell-3263
     type: bosh-io-stemcell-version-family
