@@ -52,6 +52,7 @@ var _ = Describe("CreateStemcell", func() {
 		Context("from a source url", func() {
 			BeforeEach(func() {
 				cloudProps.SourceURL = "fake-source-url"
+				cloudProps.SourceSha1 = "fake-source-sha1"
 				imageService.CreateFromURLID = "fake-stemcell-id"
 			})
 
@@ -62,6 +63,7 @@ var _ = Describe("CreateStemcell", func() {
 				Expect(imageService.CreateFromTarballCalled).To(BeFalse())
 				Expect(stemcellCID).To(Equal(StemcellCID("fake-stemcell-id")))
 				Expect(imageService.CreateFromURLSourceURL).To(Equal("fake-source-url"))
+				Expect(imageService.CreateFromURLSourceSha1).To(Equal("fake-source-sha1"))
 				Expect(imageService.CreateFromURLDescription).To(Equal("fake-stemcell-name/fake-stemcell-version"))
 			})
 
