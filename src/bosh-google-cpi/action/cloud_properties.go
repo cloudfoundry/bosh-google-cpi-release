@@ -30,6 +30,7 @@ type StemcellCloudProperties struct {
 	Version        string `json:"version,omitempty"`
 	Infrastructure string `json:"infrastructure,omitempty"`
 	SourceURL      string `json:"source_url,omitempty"`
+	SourceSha1     string `json:"raw_disk_sha1,omitempty"`
 }
 
 type VMCloudProperties struct {

@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/image_service"
+	image "bosh-google-cpi/google/image_service"
 )
 
 type FakeImageService struct {
@@ -9,6 +9,7 @@ type FakeImageService struct {
 	CreateFromURLErr         error
 	CreateFromURLID          string
 	CreateFromURLSourceURL   string
+	CreateFromURLSourceSha1  string
 	CreateFromURLDescription string
 
 	CreateFromTarballCalled      bool
@@ -26,9 +27,10 @@ type FakeImageService struct {
 	FindErr    error
 }
 
-func (i *FakeImageService) CreateFromURL(sourceURL string, description string) (string, error) {
+func (i *FakeImageService) CreateFromURL(sourceURL string, sourceSha1 string, description string) (string, error) {
 	i.CreateFromURLCalled = true
 	i.CreateFromURLSourceURL = sourceURL
+	i.CreateFromURLSourceSha1 = sourceSha1
 	i.CreateFromURLDescription = description
 	return i.CreateFromURLID, i.CreateFromURLErr
 }
