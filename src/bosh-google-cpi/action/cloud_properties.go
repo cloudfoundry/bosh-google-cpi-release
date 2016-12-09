@@ -30,6 +30,9 @@ type StemcellCloudProperties struct {
 	Version        string `json:"version,omitempty"`
 	Infrastructure string `json:"infrastructure,omitempty"`
 	SourceURL      string `json:"source_url,omitempty"`
+
+	// URL of an existing image (Image.SelfLink)
+	ImageURL string `json:"image_url,omitempty"`
 }
 
 type VMCloudProperties struct {
