@@ -46,6 +46,7 @@ var (
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
+	imageURL             = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
 
 	// Channel that will be used to retrieve IPs to use
 	ips chan string

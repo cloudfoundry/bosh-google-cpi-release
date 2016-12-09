@@ -202,6 +202,14 @@ var _ = Describe("CreateVM", func() {
 			Expect(registryClient.UpdateCalled).To(BeFalse())
 		})
 
+		It("uses the gcp image url directly if provided", func() {
+			stemcellLink := "https://www.googleapis.com/compute/v1/projects/fake/stemcell/path"
+			_, err = createVM.Run("fake-agent-id", StemcellCID(stemcellLink), cloudProps, networks, disks, env)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(imageService.FindCalled).To(BeFalse())
+			Expect(vmService.CreateVMProps.Stemcell).To(Equal(stemcellLink))
+		})
+
 		It("returns an error if stemcell is not found", func() {
 			imageService.FindFound = false
 

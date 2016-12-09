@@ -1,6 +1,8 @@
 package action
 
 import (
+	"strings"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/google/image_service"
@@ -19,6 +21,10 @@ func NewDeleteStemcell(
 }
 
 func (ds DeleteStemcell) Run(stemcellCID StemcellCID) (interface{}, error) {
+	if strings.HasPrefix(string(stemcellCID), "https://www.googleapis.com/compute/v1/projects/") {
+		return nil, nil
+	}
+
 	if err := ds.imageService.Delete(string(stemcellCID)); err != nil {
 		return nil, bosherr.WrapErrorf(err, "Deleting stemcell '%s'", stemcellCID)
 	}
