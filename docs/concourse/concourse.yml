@@ -74,10 +74,9 @@ instance_groups:
   - name: groundcrew
     release: concourse
     properties: 
-      groundcrew:
-        additional_resource_types:
-        - type: gcs-resource
-          image: docker:///frodenas/gcs-resource
+      additional_resource_types:
+      - type: gcs-resource
+        image: docker:///frodenas/gcs-resource
   - name: baggageclaim
     release: concourse
     properties: {}
