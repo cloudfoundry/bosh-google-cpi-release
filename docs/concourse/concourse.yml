@@ -86,6 +86,7 @@ instance_groups:
       garden:
         listen_network: tcp
         listen_address: 0.0.0.0:7777
+        network_mtu: 1432
 
 update:
   canaries: 1
