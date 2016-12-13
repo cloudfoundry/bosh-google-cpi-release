@@ -354,6 +354,14 @@ Complete the following steps from your bastion instance.
    export atc_password=
    ```
 
+1. (Optional) Enable https support for concourse atc
+
+  In `concourse.yml` under the atc properties block fill in the following fields:
+  ```
+  tls_bind_port: 443
+  tls_cert: << SSL Cert for HTTPS >>
+  tls_key: << SSL Private Key >>
+  ```
 
 1. Upload the cloud config:
 
