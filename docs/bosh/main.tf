@@ -1,3 +1,9 @@
+// Easier mainteance for updating GCE image string
+variable "latest_ubuntu" {
+    type = "string"
+    default = "ubuntu-1404-trusty-v20161109"
+}
+
 variable "projectid" {
     type = "string"
 }
@@ -96,7 +102,7 @@ resource "google_compute_instance" "bosh-bastion" {
   tags = ["bosh-bastion", "internal"]
 
   disk {
-    image = "ubuntu-1404-trusty-v20161020"
+    image = "${var.latest_ubuntu}"
   }
 
   network_interface {
@@ -113,14 +119,14 @@ cat > /etc/motd <<EOF
 
 
 
-#    #    ##    #####   #    #     #    #    #   ####
-#    #   #  #   #    #  ##   #     #    ##   #  #    #
-#    #  #    #  #    #  # #  #     #    # #  #  #
-# ## #  ######  #####   #  # #     #    #  # #  #  ###
-##  ##  #    #  #   #   #   ##     #    #   ##  #    #
-#    #  #    #  #    #  #    #     #    #    #   ####
+#    #     ##     #####    #    #   #   #    #    ####
+#    #    #  #    #    #   ##   #   #   ##   #   #    #
+#    #   #    #   #    #   # #  #   #   # #  #   #
+# ## #   ######   #####    #  # #   #   #  # #   #  ###
+##  ##   #    #   #   #    #   ##   #   #   ##   #    #
+#    #   #    #   #    #   #    #   #   #    #    ####
 
-Startup scripts have not finished installing, and the tools you need
+Startup scripts have not finished running, and the tools you need
 are not ready yet. Please log out and log back in again in a few moments.
 This warning will not appear when the system is ready.
 EOF
@@ -181,7 +187,7 @@ resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
   tags = ["nat", "internal"]
 
   disk {
-    image = "ubuntu-1404-trusty-v20161020"
+    image = "${var.latest_ubuntu}"
   }
 
   network_interface {

@@ -13,7 +13,9 @@ Here are a few important facts about the architecture of the BOSH deployment you
 1. Both bastion and BOSH director will be deployed to an isolated subnetwork in the parent network.
 1. The BOSH director will have a statically-assigned `10.0.0.6` IP address.
 
-The following diagram provides an overview of the deployment:
+The following diagram
+[[source image doc](https://docs.google.com/presentation/d/1iDjWRQqlAfTyDEvkhsn24ZYRK5GS86QhBqon_OFmNhQ)]
+provides an overview of the deployment:
 
 ![](../img/arch-overview.png)
 
@@ -29,7 +31,7 @@ The following diagram provides an overview of the deployment:
 
 ### Setup
 
-1. In your new project, open Cloud Shell
+1. In your new project, open Cloud Shell (the small `>_` prompt icon in the web console menu bar).
 
 1. Configure a few environment variables:
 
@@ -97,7 +99,7 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var zone=${zone}
   ```
 
-1. Create the resources:
+1. Create the resources (should take between 60-90 seconds):
 
   ```
   docker run -i -t \
@@ -124,13 +126,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
 1. If you see a warning indicating the VM isn't ready, log out, wait a few moments, and log in again.
 
-1. Once on the VM, update its Google Cloud SDK to the latest:
-
-  ```
-  sudo gcloud components update
-  ```
-  
-  If it tells you to delete some executables, don't.
+1. NOTE: During the `gcloud` commands below, if you see a suggestion to update, you can safely ignore it.
 
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
 
@@ -363,7 +359,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
   erb manifest.yml.erb > manifest.yml
   ```
 
-1. Deploy the new manifest to create a BOSH Director:
+1. Deploy the new manifest to create a BOSH Director. Note that this can take
+15-20 minutes to complete. You may want to consider starting this command in a
+terminal multiplexer such as `tmux` or `screen`.
 
   ```
   bosh-init deploy manifest.yml
@@ -385,11 +383,21 @@ Your username is `admin` and password is `admin`.
 
 Follow these instructions when you're ready to delete your BOSH deployment.
 
-From your `bosh-bastion` instance, delete your BOSH director:
+From your `bosh-bastion` instance, delete your BOSH director and other resources.
 
   ```
+  # Delete BOSH Director
   cd ~/google-bosh-director
   bosh-init delete manifest.yml
+
+  # Delete custom SSH key
+  boshkey="bosh:$(cat ~/.ssh/bosh.pub)"
+  gcloud compute project-info add-metadata --metadata-from-file \
+         sshKeys=<( gcloud compute project-info describe --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key == "sshKeys") | .value' | sed -e "s|$boshkey||" | grep -v ^$ )
+
+  # Delete IAM service account
+  export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
+  gcloud iam service-accounts delete bosh-user@${project_id}.iam.gserviceaccount.com
   ```
 
 From your Cloud Shell instance, run the following command to delete the infrastructure you created in this lab:
@@ -399,6 +407,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
+  export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
   export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
 
   # Go to the place with the Terraform manifest
@@ -413,6 +422,10 @@ From your Cloud Shell instance, run the following command to delete the infrastr
       -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone}
+
+  # Clean up your IAM credentials and key
+  gcloud iam service-accounts delete ${service_account_email}
+  rm ~/terraform.key.json
   ```
  
 ## Submitting an Issue
