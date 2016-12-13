@@ -46,7 +46,7 @@ The following diagram provides an overview of the deployment:
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
   ```
-  
+
 1. Create a service account and key:
 
   ```
@@ -129,7 +129,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
   ```
   sudo gcloud components update
   ```
-  
+
   If it tells you to delete some executables, don't.
 
 1. Create a service account. This service account will be used by BOSH and all VMs it creates:
@@ -156,6 +156,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
   gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role  roles/compute.networkAdmin
+  gcloud projects add-iam-policy-binding ${project_id} \
+    --member serviceAccount:${service_account_email} \
+    --role  roles/compute.securityAdmin
   gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/iam.serviceAccountActor
@@ -414,7 +417,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
       -var region=${region} \
       -var zone=${zone}
   ```
- 
+
 ## Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
@@ -423,7 +426,7 @@ support for an existing issue by voting it up. When submitting a bug report, ple
 including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
  failing specs.
 
- 
+
 ## Submitting a Pull Request
 
 1. Fork the project.
