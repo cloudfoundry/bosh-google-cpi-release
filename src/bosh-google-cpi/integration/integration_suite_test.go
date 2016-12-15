@@ -63,7 +63,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).To(BeNil())
 })
 
-var _ = SynchronizedAfterSuite(func() {
+var _ = SynchronizedAfterSuite(func() {}, func() {
 	cleanVMs()
 	request := fmt.Sprintf(`{
 			  "method": "delete_stemcell",
@@ -74,8 +74,7 @@ var _ = SynchronizedAfterSuite(func() {
 	Expect(err).ToNot(HaveOccurred())
 	Expect(response.Error).To(BeNil())
 	Expect(response.Result).To(BeNil())
-
-}, func() {})
+})
 
 func cleanVMs() {
 	// Initialize a compute API client
