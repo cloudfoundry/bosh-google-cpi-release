@@ -40,5 +40,11 @@ var _ = Describe("DeleteStemcell", func() {
 			Expect(err.Error()).To(ContainSubstring("fake-image-service-error"))
 			Expect(imageService.DeleteCalled).To(BeTrue())
 		})
+
+		It("ignores stemcells that are google images", func() {
+			_, err = deleteStemcell.Run("https://www.googleapis.com/compute/v1/projects/a/b/c/d/e/fake-stemcell-id")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(imageService.DeleteCalled).To(BeFalse())
+		})
 	})
 })

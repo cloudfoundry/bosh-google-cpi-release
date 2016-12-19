@@ -102,4 +102,18 @@ var _ = Describe("CreateStemcell", func() {
 			})
 		})
 	})
+
+	Context("from a image url", func() {
+		BeforeEach(func() {
+			cloudProps.ImageURL = "fake-image-url"
+		})
+
+		It("creates the stemcell", func() {
+			stemcellCID, err = createStemcell.Run("fake-stemcell-tarball", cloudProps)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(imageService.CreateFromTarballCalled).To(BeFalse())
+			Expect(imageService.CreateFromURLCalled).To(BeFalse())
+			Expect(stemcellCID).To(Equal(StemcellCID(cloudProps.ImageURL)))
+		})
+	})
 })

@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
@@ -184,7 +185,14 @@ func (cv CreateVM) findZone(zoneName string, disks []DiskCID) (string, error) {
 	return "", fmt.Errorf("Could not find zone %q", zoneName)
 }
 
+func isGcpImageURL(s string) bool {
+	return strings.HasPrefix(s, "https://www.googleapis.com/compute/v1/projects/")
+}
+
 func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {
+	if isGcpImageURL(stemcellID) {
+		return stemcellID, nil
+	}
 	stemcell, found, err := cv.imageService.Find(stemcellID)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Creating vm")
