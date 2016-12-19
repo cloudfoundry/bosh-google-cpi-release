@@ -39,6 +39,7 @@ provides an overview of the deployment:
   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
+  export ip_cidr_range=10.0.0.0/24
   export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
   ```
 
@@ -48,7 +49,7 @@ provides an overview of the deployment:
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
   ```
-  
+
 1. Create a service account and key:
 
   ```
@@ -96,7 +97,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var service_account_email=${service_account_email} \
       -var projectid=${project_id} \
       -var region=${region} \
-      -var zone=${zone}
+      -var zone=${zone} \
+      -var ip_cidr_range=${ip_cidr_range}
   ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -110,7 +112,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var service_account_email=${service_account_email} \
       -var projectid=${project_id} \
       -var region=${region} \
-      -var zone=${zone}
+      -var zone=${zone} \
+      -var ip_cidr_range=${ip_cidr_range}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -427,7 +430,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
   gcloud iam service-accounts delete ${service_account_email}
   rm ~/terraform.key.json
   ```
- 
+
 ## Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
@@ -436,7 +439,7 @@ support for an existing issue by voting it up. When submitting a bug report, ple
 including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
  failing specs.
 
- 
+
 ## Submitting a Pull Request
 
 1. Fork the project.
