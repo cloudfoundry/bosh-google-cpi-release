@@ -1,6 +1,8 @@
 package action
 
 import (
+	"encoding/json"
+
 	"bosh-google-cpi/google/instance_service"
 )
 
@@ -20,9 +22,9 @@ type NetworkCloudProperties struct {
 }
 
 type SnapshotMetadata struct {
-	Deployment string `json:"deployment,omitempty"`
-	Job        string `json:"job,omitempty"`
-	Index      string `json:"index,omitempty"`
+	Deployment string      `json:"deployment,omitempty"`
+	Job        string      `json:"job,omitempty"`
+	Index      json.Number `json:"index,omitempty"`
 }
 
 type StemcellCloudProperties struct {
