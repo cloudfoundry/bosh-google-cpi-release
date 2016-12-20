@@ -79,13 +79,13 @@ releases:
   - name: cf-mysql
     version: "23"
   - name: cf
-    version: "231"
+    version: "238"
   - name: diego
-    version: "0.1454.0"
+    version: "0.1463.0"
   - name: garden-linux
     version: "0.340.0"
   - name: etcd
-    version: "36"
+    version: "43"
 
 compilation:
   workers: 12
@@ -495,6 +495,95 @@ jobs:
         agent:
           services:
             blobstore: {}
+      blobstore:
+        tls:
+          cert: &blobstore_cert |
+            -----BEGIN CERTIFICATE-----
+            MIIEhzCCAm+gAwIBAgIRAOjmnMUgT34g5STe5Xo7OTUwDQYJKoZIhvcNAQELBQAw
+            FjEUMBIGA1UEAxMLYmxvYnN0b3JlQ0EwHhcNMTYxMjE4MTkxMTA3WhcNMTgxMjE4
+            MTkxMTA3WjAoMSYwJAYDVQQDEx1ibG9ic3RvcmUuc2VydmljZS5jZi5pbnRlcm5h
+            bDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMTPD+ZrScdB5I9IJueD
+            JklvwCOTtb/EAd9mwa17g37HvNkh8S+4HdH/Y0IVEPeWT9IBfyEJubR1AHAasm54
+            zLBnS6ogu5rvUwrQHMVSpwyr2H7IcRtsbsjcmd0YYAD1FvehmVDgE9+FjvUFzrAV
+            xbCij3t7g7a2dwJ0bJSvI/d4CJZ7IAAbqJmSk1r+ncaxFD/vlGhRuC74ehlsAd4p
+            fUUhJLb7M8FjogNG1Mvmj2YQOSrmNWA6B9oxNLeT6/NlF5Xl3lsMgGOvtzo2xojS
+            /+COkTVBmcXpAyCha/dFzxLK6BFLnACoZJTxUgEv7+I13mhT+woSsI+ApU3X3Lae
+            GskCAwEAAaOBvTCBujAOBgNVHQ8BAf8EBAMCA7gwHQYDVR0lBBYwFAYIKwYBBQUH
+            AwEGCCsGAQUFBwMCMB0GA1UdDgQWBBSK4VgxEGTJV0tkunX+CA999AXb1zAfBgNV
+            HSMEGDAWgBQvj7A7x2bLipulV6opisLoHS2wzjBJBgNVHREEQjBAgh8qLmJsb2Jz
+            dG9yZS5zZXJ2aWNlLmNmLmludGVybmFsgh1ibG9ic3RvcmUuc2VydmljZS5jZi5p
+            bnRlcm5hbDANBgkqhkiG9w0BAQsFAAOCAgEA5ayV1ekTM3eCdz6HAZ7zfcwIGbut
+            PLZrUca2DhOxnER3FiFsjcM+sRcfqeric48ZIIEl9lA8n3EG49mIcNYcfLGZFDf/
+            gVYYcJwa8BU/xYcX7518o4H6q91I4I73I5IIbkvM8MelJUi3Gc5wIKRe8Vfguu2t
+            dI+wD2tMw+9SLrqjahR2yGhp9n7w/YkRczSPpIA3GlCoRoFxKgP3P7W9Sl+rBy4h
+            Qcqg4ukh2OxNk+24fpdjIJrd4mp2Ecr0yu3y3tsbARFmXQWGistna3e/aipQkf0u
+            j2BR4f+XpSK1SH4uqAAtDNuNDgIdlyTI9kbmwkQ1D0j2sI5kgNVKYHbm8+KZ0lRb
+            NyE7rt+WX7PZknwaO/DaxulD0r6W4PHrXWldccTP+cn4B/l9FEoqi8mDQddhPrQc
+            4OSD629f+IG76sbPc+/bt8bsaoy+WFMk042Y+lvyY0N5zoLT9d2wg2pqCb2RRR/x
+            1OQ/GiivLN9WOZlBbyNITRFRipg/lkdLOC235sYZw+OnQ6OM3bBFtOWN8Y+3cJAk
+            Yvt4AKdTLKkYnQ2X96MqPeqcFraWNjtgN7KXUE/eQ9p3qfHgDTpRlhmn11Yxex/E
+            /Od+yobjgs+nEhsCkoRBIUCyE4pcSV0SAMxLXed24Wd8f6uubGzzA2fQQFOy6eIR
+            6aySa9PlXHk4GTU=
+            -----END CERTIFICATE-----
+          port: 443
+          private_key: &blobstore_key |
+            -----BEGIN RSA PRIVATE KEY-----
+            MIIEogIBAAKCAQEAxM8P5mtJx0Hkj0gm54MmSW/AI5O1v8QB32bBrXuDfse82SHx
+            L7gd0f9jQhUQ95ZP0gF/IQm5tHUAcBqybnjMsGdLqiC7mu9TCtAcxVKnDKvYfshx
+            G2xuyNyZ3RhgAPUW96GZUOAT34WO9QXOsBXFsKKPe3uDtrZ3AnRslK8j93gIlnsg
+            ABuomZKTWv6dxrEUP++UaFG4Lvh6GWwB3il9RSEktvszwWOiA0bUy+aPZhA5KuY1
+            YDoH2jE0t5Pr82UXleXeWwyAY6+3OjbGiNL/4I6RNUGZxekDIKFr90XPEsroEUuc
+            AKhklPFSAS/v4jXeaFP7ChKwj4ClTdfctp4ayQIDAQABAoIBADXfyKZ2sBePfhWK
+            1ruBNzXbFWmnwZTg/vI8mr/2k6Rc4OE/XVqGuAMIOg+Y3LApwWfnaPmOQ/uWG6yU
+            YkvDXaTcYeYMV86tvLm1BmstmPTrBbSPAgdTw2/Qk33mckFQ1hyra+CrtkT1tpB0
+            KoQhMaCMn2JaCVA22pUdcaux1dKj2dkOw1oWc0HalS/bh7WKXNWVRjD2xABdmAmQ
+            OB9RgAcQZl/Fvg+djHDq487Joq/ROJONhauf5ETVCEpkkKtu+EVEnR1fMaNiNvUJ
+            IIxy2ciUSNJnSvsSpGumgs4CmZevUCyI17tRJX1vxm1K3pT6TK+6AgjFQOidHvMU
+            +F0uN5ECgYEA8gNEX/Sjv4RTbHt2DH5OZ+tmIApE0b+bsRHvLlBOkSlvle4//nve
+            USB/P9bs4MMt+cuhGPH8bFziEtC9UGFSSpz7flhvVSOTEpQGZL6+bw+MEiyorSVl
+            9thBlHB4707QnDii7HPYvf0tb8uFhuAZb79C0+DuOClI2E7gcjiCWrcCgYEA0C75
+            Yl2i/G2xcCDDw8hTzHdwdQU4uSBmMpSkBAVbEwcyMZJGrvHnxtVRiCWzSFRmuP8t
+            AZZJta2xk/Q9XRGmhpcgVoG5jSlW4zf3yz/JPxZU12ksdEU4HDtuwvh7XufA4Gzv
+            oZ7V6v5uuTYpL02r2TLCs3qMKL9KISCzjokztn8CgYB82FKdbYZLdefTPp1XNJEd
+            6sF0Jdf6m+2lGqtYKPVezRFTNuSsUxoMn8cFF8p66DT/d5xTUgH1pLS7IBOJM6tP
+            8kuKkfRc500neFUUA5IZmNuZRJB/QZuoC0dJW/wG95GGBXGGqPxWhhS6ZzMqsNBu
+            ZSwEQTSipCl/7LC8O4qDYQKBgCNkuRVWIg2UgKQ1jdLNTiHm9IGQn7IppfZXewML
+            /g3gHVJ8MfQwQF13iuMAtdhIMSami3pHmMSAgT5MOdqG067yJpdOesNbEeCTdVdi
+            ws4s98Ofp+Ukl4OFPzF6mU7rS8lb++mYXXoUQ7LNWHcoV10X2i41WXrb+rhjHOPQ
+            w6/1AoGALqW2f5VXS+c5USXF4/MH/JaoaDuP0FrUz70Aa82UsjKAkL1Usau0lRNs
+            zYuZ2aDGYYUUxIYSEZ+rch/ycq67NcE3SpMRqDdbccDDDUoOT7mOKfT7EgZ43Tcg
+            YeUHcorJM1Eghdv2PEhPCMJktR2uGQ0WimAHs8yEeND+evVCQNc=
+            -----END RSA PRIVATE KEY-----
+          ca_cert: &blobstore_ca |
+            -----BEGIN CERTIFICATE-----
+            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
+            cXwrcbUgF1Qb/p98nHuzWw==
+            -----END CERTIFICATE-----
 
   - name: router
     templates:
@@ -745,6 +834,9 @@ properties:
     apps: private
     services: private
 
+  hm9000:
+    port: 9080
+
   ssl:
     skip_cert_verify: true
     https_only_mode: true
@@ -773,6 +865,7 @@ properties:
       servers:
         lan:
           - 0.consul.private.<%= deployment_name %>.microbosh
+      domain: cf.internal
     ca_cert: &consul_ca_cert |
       -----BEGIN CERTIFICATE-----
       MIIC+zCCAeOgAwIBAgIBADANBgkqhkiG9w0BAQUFADAfMQswCQYDVQQGEwJVUzEQ
@@ -895,6 +988,7 @@ properties:
   etcd:
     machines:
       - 0.etcd.private.<%= deployment_name %>.microbosh
+    advertise_urls_dns_suffix: &etcd_suffix etcd.service.cf.internal
 
   etcd_metrics_server:
     nats:
@@ -903,6 +997,12 @@ properties:
       port: 4222
       machines:
         - 0.nats.private.<%= deployment_name %>.microbosh
+    etcd:
+      require_ssl: false
+      ca_cert: *etcd_ca_cert
+      client_cert: *etcd_client_cert
+      client_key: *etcd_client_key
+      dns_suffix: *etcd_suffix
 
   blobstore:
     port: 80
