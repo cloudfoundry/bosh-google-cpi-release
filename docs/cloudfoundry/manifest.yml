@@ -79,7 +79,7 @@ releases:
   - name: cf-mysql
     version: "23"
   - name: cf
-    version: "238"
+    version: "240"
   - name: diego
     version: "0.1463.0"
   - name: garden-linux
@@ -485,7 +485,7 @@ jobs:
       route_registrar:
         routes:
           - name: blobstore
-            port: 80
+            port: 8080
             registration_interval: 20s
             tags:
               component: blobstore
@@ -525,7 +525,7 @@ jobs:
             /Od+yobjgs+nEhsCkoRBIUCyE4pcSV0SAMxLXed24Wd8f6uubGzzA2fQQFOy6eIR
             6aySa9PlXHk4GTU=
             -----END CERTIFICATE-----
-          port: 443
+          port: 4443
           private_key: &blobstore_key |
             -----BEGIN RSA PRIVATE KEY-----
             MIIEogIBAAKCAQEAxM8P5mtJx0Hkj0gm54MmSW/AI5O1v8QB32bBrXuDfse82SHx
@@ -1005,7 +1005,7 @@ properties:
       dns_suffix: *etcd_suffix
 
   blobstore:
-    port: 80
+    port: 8080
     secure_link:
       secret: "<%= common_password %>"
     admin_users:
@@ -1089,7 +1089,7 @@ properties:
       webdav_config:
         username: admin
         password: "<%= common_password %>"
-        private_endpoint: http://blobstore.service.cf.internal
+        private_endpoint: https://blobstore.service.cf.internal:4443
         public_endpoint: https://blobstore.<%= root_domain %>
         secret: "<%= common_password %>"
     droplets:
@@ -1097,7 +1097,7 @@ properties:
       webdav_config:
         username: admin
         password: "<%= common_password %>"
-        private_endpoint: http://blobstore.service.cf.internal
+        private_endpoint: https://blobstore.service.cf.internal:4443
         public_endpoint: https://blobstore.<%= root_domain %>
         secret: "<%= common_password %>"
     packages:
@@ -1105,7 +1105,7 @@ properties:
       webdav_config:
         username: admin
         password: "<%= common_password %>"
-        private_endpoint: http://blobstore.service.cf.internal
+        private_endpoint: https://blobstore.service.cf.internal:4443
         public_endpoint: https://blobstore.<%= root_domain %>
         secret: "<%= common_password %>"
     resource_pool:
@@ -1113,7 +1113,7 @@ properties:
       webdav_config:
         username: admin
         password: "<%= common_password %>"
-        private_endpoint: http://blobstore.service.cf.internal
+        private_endpoint: https://blobstore.service.cf.internal:4443
         public_endpoint: https://blobstore.<%= root_domain %>
         secret: "<%= common_password %>"
     service_name: cloud-controller-ng

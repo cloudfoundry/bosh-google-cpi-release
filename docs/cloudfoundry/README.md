@@ -121,7 +121,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.340.0
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=43
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1463.0
-  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=238
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=240
   ```
 
 1. Target the deployment file and deploy:
