@@ -22,7 +22,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   export zone2=us-east1-d
   ```
 
-1. Configure `gcloud`:
+1. Configure `gcloud` with a user who is an owner of the project:
 
   ```
   gcloud auth login
