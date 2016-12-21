@@ -53,6 +53,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Required env vars
 	Expect(googleProject).ToNot(Equal(""), "GOOGLE_PROJECT must be set")
 	Expect(externalStaticIP).ToNot(Equal(""), "EXTERNAL_STATIC_IP must be set")
+	Expect(serviceAccount).ToNot(Equal(""), "SERVICE_ACCOUNT must be set")
 
 	// Initialize a compute API client
 	ctx := context.Background()

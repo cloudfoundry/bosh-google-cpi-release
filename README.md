@@ -11,13 +11,41 @@ Stemcells are available on bosh.io: [http://bosh.io/stemcells/bosh-google-kvm-ub
 ## Usage
 If you are not familiar with [BOSH](http://bosh.io/) and its terminology please take a look at the [BOSH documentation](http://bosh.io/docs).
 
-## Deploy a BOSH Director on Google Cloud Platform
+### Deploy a BOSH Director on Google Cloud Platform
 Complete instructions for deploying a BOSH Director are available in the [docs/bosh/README.md](docs/bosh/README.md) file.
 
-## Deploy other software
+### Deploy other software
 After you have followed the instructions for deploying a BOSH director in [docs/bosh/README.md](docs/bosh/README.md), you may deploy releases like CloudFoundry by following the links below:
 
 * [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/cloudfoundry)
+
+## Developing
+Contributions to the CPI are welcome. Unit and integration tests for any new features are encouraged.
+
+### Running integration tests
+1. Set your project:
+
+  ```
+  export GOOGLE_PROJECT=your-project-id
+  ```
+
+1. Create the infrastructure required to run tests:
+
+  ```
+  make configint
+  ```
+
+1. Run the integration tests:
+
+  ```
+  make testint
+  ```
+
+To destroy the infrastructure required to run the integration tests, execute:
+
+  ```
+  make cleanint
+  ```
 
 ## Contributing
 For detailes on how to contribute to this project - including filing bug reports and contributing code changes - pleasee see [CONTRIBUTING.md].

@@ -46,13 +46,18 @@ testintci: get-deps
 	ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Runs the integration tests with coverage
-testint: check-proj check-destroy get-deps clean fmt
+testint: check-proj get-deps clean fmt
 	$(eval INTEGRATION_ADDRESS = $(shell gcloud --project=$(GOOGLE_PROJECT) compute addresses describe cfintegration --region=us-central1 | head  -n1 | cut -f2 -d' '))
-	#GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) go test -v -timeout=60m ./integration/... -ginkgo.slowSpecThreshold=500 -ginkgo.progress -ginkgo.v -ginkgo.p -ginkgo.randomizeAllSpecs --ginkgo.randomizeSuites $(GINKGO_ARGS)
-	GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
+    
+	CPI_ASYNC_DELETE=true STEMCELL_URL=https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz SERVICE_ACCOUNT=cfintegration@$(GOOGLE_PROJECT).iam.gserviceaccount.com GOOGLE_PROJECT=$(GOOGLE_PROJECT) EXTERNAL_STATIC_IP=$(INTEGRATION_ADDRESS) ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
 configint: check-proj
+	@gcloud --project=$(GOOGLE_PROJECT) iam service-accounts describe cfintegration@$(GOOGLE_PROJECT).iam.gserviceaccount.com &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating service account"; \
+		gcloud --project=$(GOOGLE_PROJECT) iam service-accounts create cfintegration; \
+	fi
+
 	@gcloud --project=$(GOOGLE_PROJECT) compute networks describe cfintegration &> /dev/null; if [ $$? -ne 0 ]; then \
 		echo "Creating network cfintegration"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute networks create cfintegration; \
@@ -109,6 +114,11 @@ configint: check-proj
 
 # Deletes the resources created by the configint target
 cleanint: check-proj
+	@gcloud --project=$(GOOGLE_PROJECT) --quiet iam service-accounts describe cfintegration@$(GOOGLE_PROJECT).iam.gserviceaccount.com &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Deleting service account"; \
+		gcloud --project=$(GOOGLE_PROJECT) iam service-accounts delete cfintegration@$(GOOGLE_PROJECT).iam.gserviceaccount.com; \
+	fi
+
 	@gcloud --project=$(GOOGLE_PROJECT) compute networks subnets describe cfintegration-custom-us-central1 --region=us-central1 &> /dev/null; if [ $$? -eq 0 ]; then \
 		echo "Deleting subnetwork cfintegration-custom-us-central1"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute networks subnets delete cfintegration-custom-us-central1 --region=us-central1 --quiet; \
@@ -169,6 +179,6 @@ check-proj:
 
 check-destroy:
 	@if test "$(DESTROY_OK)" = "" ; then \
-	  echo "This is a potentially destructive operation. Existing instances with the "integration-delete" tag will be deleted. You just set DESTROY_OK to acknowledge."; \
+	  echo "This is a potentially destructive operation. Existing instances with the "integration-delete" tag will be deleted. You must set DESTROY_OK to acknowledge."; \
 	  exit 1; \
 	fi
