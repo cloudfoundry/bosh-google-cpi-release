@@ -140,7 +140,6 @@ resources:
         bucket_path: stemcell-ci-terraform/
         access_key_id: {{terraform_bucket_access_key}}
         secret_access_key: {{terraform_bucket_secret_key}}
-        endpoint: storage.googleapis.com
       vars:
         gce_project_id: {{gce_project_id}}
         gce_credentials_json: {{gce_credentials_json}}
