@@ -22,7 +22,7 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
   export zone2=us-east1-d
   ```
 
-1. Configure `gcloud`:
+1. Configure `gcloud` with a user who is an owner of the project:
 
   ```
   gcloud auth login
@@ -98,6 +98,12 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
 
   ```
   ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+  ```
+
+1. Run this `export` command to set the full path of the SSH private key you created earlier:
+
+  ```
+  export ssh_key_path=$HOME/.ssh/bosh
   ```
 
 1. Navigate to your [project's web console](https://console.cloud.google.com/compute/metadata/sshKeys) and add the new SSH public key by pasting the contents of ~/.ssh/bosh.pub:
@@ -296,12 +302,6 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
       agent: {mbus: "https://mbus:mbus-password@0.0.0.0:6868"}
       blobstore: {provider: local, path: /var/vcap/micro_bosh/data/cache}
       ntp: *ntp
-  ```
-
-1. Run this `export` command to set the full path of the SSH private key you created earlier:
-
-  ```
-  export ssh_key_path=$HOME/.ssh/bosh
   ```
 
 1. Fill in the template values of the manifest with your environment variables:
