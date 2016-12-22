@@ -637,7 +637,7 @@ var _ = Describe("VM", func() {
 				{
 				  "machine_type": "n1-standard-1",
 				  "zone": "%v",
-				  "backend_service": "%v"
+				  "backend_service": {"name": "%v", "scheme": "external"}
 				},
 				{
 				  "default": {

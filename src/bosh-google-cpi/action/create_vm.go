@@ -30,6 +30,11 @@ type CreateVM struct {
 	defaultRootDiskType   string
 }
 
+type BackendService struct {
+	name   string
+	scheme string
+}
+
 func NewCreateVM(
 	vmService instance.Service,
 	diskService disk.Service,
@@ -113,6 +118,17 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
+	var bs BackendService
+	if bsString, ok := cloudProps.BackendService.(string); ok {
+		bs = BackendService{bsString, ""}
+	} else {
+		if bsMap, ok := cloudProps.BackendService.(map[string]interface{}); ok {
+			bs = BackendService{bsMap["name"].(string), bsMap["scheme"].(string)}
+		} else {
+			return "", bosherr.Errorf("Error parsing BackendService %v, type is %T", cloudProps.BackendService, cloudProps.BackendService)
+		}
+	}
+
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
@@ -127,7 +143,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		ServiceAccount:    instance.ServiceAccount(cloudProps.ServiceAccount),
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,
-		BackendService:    cloudProps.BackendService,
+		BackendService:    bs.name,
 		Tags:              cloudProps.Tags,
 	}
 
