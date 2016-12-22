@@ -146,18 +146,18 @@ This guide describes how to deploy [Concourse](http://concourse.ci/) on [Google 
 
   releases:
     - name: bosh
-      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
-      sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
+      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=260.1
+      sha1: 7fb8e99e28b67df6604e97ef061c5425460518d3
     - name: bosh-google-cpi
-      url: https://storage.googleapis.com/bosh-cpi-artifacts/bosh-google-cpi-25.1.0.tgz
-      sha1: f99dff6860731921282dd1bcd097a74beaeb72a4
+      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.6.2
+      sha1: b4865397d867655fdcc112bc5a7f9a5025cdf311
 
   resource_pools:
     - name: vms
       network: private
       stemcell:
-        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.8
-        sha1: c3fc743a5e3ec2a3f50e29851363331c6cd19b43
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3312.12
+        sha1: 3a2c407be6c1b3d04bb292ceb5007159100c85d7
       cloud_properties:
         zone: <%=zone %>
         machine_type: n1-standard-4
