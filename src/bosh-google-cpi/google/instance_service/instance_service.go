@@ -37,9 +37,14 @@ type Properties struct {
 	ServiceAccount    ServiceAccount
 	ServiceScopes     ServiceScopes
 	TargetPool        string
-	BackendService    string
+	BackendService    BackendService
 	Tags              Tags
 }
 
 type ServiceScopes []string
 type ServiceAccount string
+
+type BackendService struct {
+	Name   string
+	Scheme string
+}

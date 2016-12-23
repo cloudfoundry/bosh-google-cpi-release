@@ -139,7 +139,7 @@ var _ = Describe("CreateVM", func() {
 				OnHostMaintenance: "TERMINATE",
 				Preemptible:       true,
 				ServiceScopes:     []string{},
-				BackendService:    "fake-backend-service",
+				BackendService:    instance.BackendService{Name: "fake-backend-service", Scheme: "EXTERNAL"},
 			}
 
 			expectedInstanceNetworks = networks.AsInstanceServiceNetworks()

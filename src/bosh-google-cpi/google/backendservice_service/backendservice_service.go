@@ -1,6 +1,6 @@
 package backendservice
 
 type Service interface {
-	AddInstance(id, instanceId string) error
+	AddInstance(id, scheme, instanceId string) error
 	RemoveInstance(vmLink string) error
 }

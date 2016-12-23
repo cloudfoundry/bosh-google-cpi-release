@@ -7,6 +7,7 @@ import (
 	"bosh-google-cpi/google/operation_service"
 
 	"bosh-google-cpi/util"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"google.golang.org/api/compute/v1"
@@ -43,14 +44,20 @@ func NewGoogleBackendServiceService(
 // have more than one backend/instance group associated with it. In that case,
 // the instance will be added to each backend/instance group that is in the
 // same zone as the instance.
-func (i GoogleBackendServiceService) AddInstance(id, vmLink string) error {
+func (i GoogleBackendServiceService) AddInstance(id, scheme, vmLink string) error {
 	zone := util.ZoneFromURL(vmLink)
 	if zone == "" {
 		return bosherr.Errorf("Could not find VM zone in %q", vmLink)
 	}
 	i.logger.Debug(googleBackendServiceServiceLogTag, "Adding instance %q to all backends for Backend Service %q in zone %q", vmLink, id, zone)
 
-	backendService, found, err := i.find(id)
+	region := ""
+	if scheme == "INTERNAL" {
+		region = util.RegionFromZone(zone)
+	} else if scheme != "EXTERNAL" {
+		return bosherr.Errorf("Invalid BackendService load balancing scheme %q", scheme)
+	}
+	backendService, found, err := i.find(id, region)
 	if err != nil {
 		return err
 	}
@@ -119,9 +126,15 @@ func (i GoogleBackendServiceService) RemoveInstance(vmLink string) error {
 // is not found.
 // False and an error value are returned if an error occurred
 // while trying to find the Backend Service.
-func (i GoogleBackendServiceService) find(id string) (BackendService, bool, error) {
+func (i GoogleBackendServiceService) find(id, region string) (BackendService, bool, error) {
 	i.logger.Debug(googleBackendServiceServiceLogTag, "Finding Google Backend Service %q", id)
-	backendServiceItem, err := i.computeService.BackendServices.Get(i.project, id).Do()
+	var backendServiceItem *compute.BackendService
+	var err error
+	if region == "" {
+		backendServiceItem, err = i.computeService.BackendServices.Get(i.project, id).Do()
+	} else {
+		backendServiceItem, err = i.computeService.RegionBackendServices.Get(i.project, region, id).Do()
+	}
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return BackendService{}, false, nil

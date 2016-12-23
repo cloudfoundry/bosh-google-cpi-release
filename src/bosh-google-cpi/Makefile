@@ -110,6 +110,44 @@ configint: check-proj
         gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration" --zone "us-central1-b" --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"; \
 	fi
 
+	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration-ilb --zone us-central1-a &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance group cfintegration-ilb in us-central1-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged create cfintegration-ilb --zone us-central1-a; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration-ilb --zone us-central1-b &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance group cfintegration-ilb in us-central1-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged create cfintegration-ilb --zone us-central1-b; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute health-checks describe cfintegration &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating TCP health check cfintegration"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute health-checks create tcp cfintegration; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-a --zone us-central1-a &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance cfintegration-ilb-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instances create cfintegration-ilb-a --zone us-central1-a --network cfintegration; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-b --zone us-central1-b &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating instance cfintegration-ilb-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instances create cfintegration-ilb-b --zone us-central1-b --network cfintegration; \
+	fi
+
+	echo "Adding cfintegration-ilb-a to instance group cfintegration-ilb"; \
+	gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-a --zone us-central1-a
+
+	echo "Adding cfintegration-ilb-b to instance group cfintegration-ilb"; \
+	gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-b --zone us-central1-b
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute backend-services describe cfintegration --region us-central1 &> /dev/null; if [ $$? -ne 0 ]; then \
+		echo "Creating region backend service cfintegration"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute backend-services create "cfintegration" --region us-central1 --health-checks "cfintegration" --protocol TCP --load-balancing-scheme INTERNAL --timeout "30"; \
+        gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration-ilb" --zone "us-central1-a" --region us-central1; \
+        gcloud --project=$(GOOGLE_PROJECT) compute backend-services add-backend "cfintegration" --instance-group "cfintegration-ilb" --zone "us-central1-b" --region us-central1; \
+	fi
+
 	@echo "Your project is ready for integration tests."
 
 # Deletes the resources created by the configint target
@@ -149,6 +187,36 @@ cleanint: check-proj
 		gcloud --project=$(GOOGLE_PROJECT) compute http-health-checks delete cfintegration --quiet; \
 	fi
 
+	@gcloud --project=$(GOOGLE_PROJECT) compute backend-services describe cfintegration --region us-central1 &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting region backend service cfintegration"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute backend-services delete cfintegration --region us-central1 --quiet; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute health-checks describe cfintegration &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting TCP health check cfintegration"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute health-checks delete cfintegration --quiet; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-a --zone us-central1-a &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting instance cfintegration-ilb-a in us-central1-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instances delete cfintegration-ilb-a --zone us-central1-a --quiet; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-b --zone us-central1-b &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting instance cfintegration-ilb-b in us-central1-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instances delete cfintegration-ilb-b --zone us-central1-b --quiet; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration-ilb --zone us-central1-a &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting instance group cfintegration-ilb in us-central1-a"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration-ilb --zone us-central1-a --quiet; \
+	fi
+
+	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration-ilb --zone us-central1-b &> /dev/null; if [ $$? -eq 0 ]; then \
+		echo "Deleting instance group cfintegration-ilb in us-central1-b"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration-ilb --zone us-central1-b --quiet; \
+	fi
+
 	@gcloud --project=$(GOOGLE_PROJECT) compute networks describe cfintegration &> /dev/null; if [ $$? -eq 0 ]; then \
 		echo "Deleting network cfintegration"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute networks delete cfintegration --quiet; \
@@ -159,7 +227,7 @@ cleanint: check-proj
 		gcloud --project=$(GOOGLE_PROJECT) compute networks delete cfintegration-custom --quiet; \
 	fi
 
-	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration-us-central1-a --zone us-central1-a &> /dev/null; if [ $$? -eq 0 ]; then \
+	@gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged describe cfintegration --zone us-central1-a &> /dev/null; if [ $$? -eq 0 ]; then \
 		echo "Deleting instance group cfintegration in us-central1-a"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged delete cfintegration --zone us-central1-a --quiet; \
 	fi

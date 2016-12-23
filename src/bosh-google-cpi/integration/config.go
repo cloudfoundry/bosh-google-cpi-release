@@ -44,6 +44,7 @@ var (
 	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
 	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
 	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	ilbInstanceGroup     = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
 	zone                 = envOrDefault("ZONE", "us-central1-a")
 	region               = envOrDefault("REGION", "us-central1")
 	imageURL             = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
