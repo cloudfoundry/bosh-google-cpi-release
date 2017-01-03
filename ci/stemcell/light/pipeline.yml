@@ -65,6 +65,7 @@ shared:
 
 jobs:
   - name: ubuntu-trusty-stemcell-latest
+    disable_manual_trigger: true
     plan:
       - aggregate:
         - get: stemcell
@@ -81,6 +82,7 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3312
+    disable_manual_trigger: true
     plan:
       - aggregate:
         - get: stemcell
@@ -97,6 +99,7 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3263
+    disable_manual_trigger: true
     plan:
       - aggregate:
         - get: stemcell
