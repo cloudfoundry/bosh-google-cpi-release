@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 src_dir="$( cd "$( dirname "$0" )" && cd ../../../.. && pwd )"
 workspace_dir="$( cd "${src_dir}/.." && pwd )"

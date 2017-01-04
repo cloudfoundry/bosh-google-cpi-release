@@ -138,6 +138,7 @@ resources:
   - name: terraform
     type: terraform
     source:
+      delete_on_failure: true
       storage:
         bucket: {{terraform_bucket_name}}
         bucket_path: stemcell-ci-terraform/
