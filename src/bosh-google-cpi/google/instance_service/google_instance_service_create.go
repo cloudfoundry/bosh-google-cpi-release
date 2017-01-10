@@ -10,6 +10,7 @@ import (
 	"bosh-google-cpi/api"
 	subnet "bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/util"
+
 	"google.golang.org/api/compute/v1"
 )
 
@@ -77,7 +78,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		}
 	}
 
-	if vmProps.BackendService != "" {
+	if &vmProps.BackendService != nil && vmProps.BackendService.Name != "" {
 		if err := i.addToBackendService(operation.TargetLink, vmProps.BackendService); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Backend Service: %v", err)
 			i.CleanUp(vm.Name)
@@ -290,8 +291,8 @@ func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, targ
 	return nil
 }
 
-func (i GoogleInstanceService) addToBackendService(instanceSelfLink, backendServiceName string) error {
-	if err := i.backendServiceService.AddInstance(backendServiceName, instanceSelfLink); err != nil {
+func (i GoogleInstanceService) addToBackendService(instanceSelfLink string, backendService BackendService) error {
+	if err := i.backendServiceService.AddInstance(backendService.Name, backendService.Scheme, instanceSelfLink); err != nil {
 		return err
 	}
 

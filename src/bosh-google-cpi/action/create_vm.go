@@ -113,6 +113,19 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
+	var bs instance.BackendService
+	if bsString, ok := cloudProps.BackendService.(string); ok {
+		bs = instance.BackendService{Name: bsString, Scheme: "EXTERNAL"}
+	} else {
+		if bsMap, ok := cloudProps.BackendService.(map[string]interface{}); ok {
+			bs = instance.BackendService{Name: bsMap["name"].(string), Scheme: bsMap["scheme"].(string)}
+		} else if bsMap, ok := cloudProps.BackendService.(map[string]string); ok {
+			bs = instance.BackendService{Name: bsMap["name"], Scheme: bsMap["scheme"]}
+		} else if cloudProps.BackendService != nil {
+			return "", bosherr.Errorf("Error parsing BackendService %v, type is %T", cloudProps.BackendService, cloudProps.BackendService)
+		}
+	}
+
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
@@ -127,7 +140,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		ServiceAccount:    instance.ServiceAccount(cloudProps.ServiceAccount),
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,
-		BackendService:    cloudProps.BackendService,
+		BackendService:    bs,
 		Tags:              cloudProps.Tags,
 	}
 

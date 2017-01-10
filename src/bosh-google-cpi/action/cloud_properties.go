@@ -51,7 +51,7 @@ type VMCloudProperties struct {
 	ServiceAccount      VMServiceAccount `json:"service_account,omitempty"`
 	ServiceScopes       VMServiceScopes  `json:"service_scopes,omitempty"`
 	TargetPool          string           `json:"target_pool,omitempty"`
-	BackendService      string           `json:"backend_service,omitempty"`
+	BackendService      interface{}      `json:"backend_service,omitempty"`
 	Tags                instance.Tags    `json:"tags,omitempty"`
 	EphemeralExternalIP *bool            `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        *bool            `json:"ip_forwarding,omitempty"`

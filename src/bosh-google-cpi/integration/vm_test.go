@@ -637,7 +637,7 @@ var _ = Describe("VM", func() {
 				{
 				  "machine_type": "n1-standard-1",
 				  "zone": "%v",
-				  "backend_service": "%v"
+				  "backend_service": {"name": "%v", "scheme": "EXTERNAL"}
 				},
 				{
 				  "default": {
@@ -667,6 +667,58 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 		toggleAsyncDelete()
 		ig, err = computeService.InstanceGroups.ListInstances(googleProject, zone, instanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
+	})
+
+	It("executes the VM lifecycle with a region backend service", func() {
+		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
+			instances := make([]string, len(ig.Items))
+			for _, i := range ig.Items {
+				instances = append(instances, i.Instance)
+			}
+			return instances
+		}
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "backend_service": {"name": "%v", "scheme": "INTERNAL"}
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, backendService, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		ig, err := computeService.InstanceGroups.ListInstances(googleProject, zone, ilbInstanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
+		Expect(err).ToNot(HaveOccurred())
+		Expect(justInstances(ig)).To(ContainElement(ContainSubstring(vmCID)))
+
+		By("deleting the VM and confirming its removal from backend service instance group")
+		toggleAsyncDelete()
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+		toggleAsyncDelete()
+		ig, err = computeService.InstanceGroups.ListInstances(googleProject, zone, ilbInstanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
 	})
