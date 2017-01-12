@@ -33,6 +33,7 @@ google_address_bats_ubuntu: # Name of an external IP address used in BATS tests
 google_address_director_ubuntu: # Name of an external IP address used to create a director
 google_target_pool: # Name of a network target pool
 google_backend_service: # Name of a backend service
+google_region_backend_service: # Name of a region backend service
 
 # Networking configuration
 google_subnetwork_range: # The CIDR range of {{google_subnetwork}}

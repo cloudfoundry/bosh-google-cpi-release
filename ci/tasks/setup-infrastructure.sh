@@ -18,6 +18,7 @@ check_param google_address_director_ubuntu
 check_param google_address_bats_ubuntu
 check_param google_target_pool
 check_param google_backend_service 
+check_param google_region_backend_service
 check_param google_address_int_ubuntu
 check_param google_service_account
 
@@ -51,5 +52,9 @@ gcloud -q compute http-health-checks create ${google_backend_service}
 gcloud -q compute backend-services create ${google_backend_service} --http-health-check ${google_backend_service} --port-name "http" --timeout "30"
 gcloud -q compute backend-services add-backend ${google_backend_service} --instance-group ${google_backend_service} --zone ${google_zone} --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
 
-
+# Region Backend service
+gcloud -q compute instance-groups unmanaged create ${google_region_backend_service} --zone ${google_zone}
+gcloud -q compute health-checks create tcp ${google_region_backend_service}
+gcloud -q compute backend-services create ${google_region_backend_service} --region ${google_region} --health-checks ${google_region_backend_service} --protocol "TCP" --load_balancing_scheme "INTERNAL" --timeout "30"
+gcloud -q compute backend-services add-backend ${google_region_backend_service} --instance-group ${google_region_backend_service} --zone ${google_zone} --region ${google_region}
 

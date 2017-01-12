@@ -12,6 +12,7 @@ check_param google_json_key_data
 check_param google_auto_network
 check_param google_target_pool
 check_param google_backend_service
+check_param google_region_backend_service
 check_param google_network
 check_param google_subnetwork
 check_param google_firewall_internal
@@ -56,5 +57,8 @@ gcloud -q compute target-pools delete ${google_target_pool}
 gcloud -q compute backend-services delete ${google_backend_service}
 gcloud -q compute http-health-checks delete ${google_backend_service}
 gcloud -q compute instance-groups unmanaged delete ${google_backend_service}
+gcloud -q compute backend-services delete ${google_region_backend_service} --region ${google_region}
+gcloud -q compute health-checks delete ${google_region_backend_service}
+gcloud -q compute instance-groups unmanaged delete ${google_region_backend_service} --zone ${google_zone}
 
 set -e
