@@ -59,6 +59,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_backend_service:         {{google_backend_service}}
+            google_region_backend_service:  {{google_region_backend_service}}
             google_target_pool:             {{google_target_pool}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
@@ -80,6 +81,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_backend_service:         {{google_backend_service}}
+            google_region_backend_service:  {{google_region_backend_service}}
             google_target_pool:             {{google_target_pool}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
@@ -106,6 +108,7 @@ jobs:
             google_firewall_internal:       {{google_firewall_internal}}
             google_firewall_external:       {{google_firewall_external}}
             google_backend_service:         {{google_backend_service}}
+            google_region_backend_service:  {{google_region_backend_service}}
             google_target_pool:             {{google_target_pool}}
             google_address_director_ubuntu: {{google_address_director_ubuntu}}
             google_address_bats_ubuntu:     {{google_address_bats_ubuntu}}
@@ -203,7 +206,8 @@ jobs:
             google_address_static_int:        {{google_address_static_int_ubuntu}}
             google_target_pool:               {{google_target_pool}}
             google_backend_service:           {{google_backend_service}}
-            google_service_account:         {{google_service_account}}
+            google_region_backend_service:    {{google_region_backend_service}}
+            google_service_account:           {{google_service_account}}
 
 
 resources:

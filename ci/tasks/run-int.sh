@@ -13,6 +13,7 @@ check_param google_network
 check_param google_subnetwork
 check_param google_target_pool
 check_param google_backend_service
+check_param google_region_backend_service
 check_param google_address_static_int
 check_param google_address_int
 check_param google_service_account
@@ -27,6 +28,7 @@ export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
 export PRIVATE_IP=${google_address_static_int}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
+export ILB_INSTANCE_GROUP=${google_region_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
