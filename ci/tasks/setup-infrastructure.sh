@@ -34,9 +34,9 @@ gcloud config set compute/zone ${google_zone}
 
 echo "Setting up google infrastructure..."
 gcloud -q iam service-accounts create ${google_service_account}
-gcloud -q compute addresses create ${google_address_director_ubuntu}
-gcloud -q compute addresses create ${google_address_bats_ubuntu}
-gcloud -q compute addresses create ${google_address_int_ubuntu}
+gcloud -q compute addresses create ${google_address_director_ubuntu} --region ${google_region}
+gcloud -q compute addresses create ${google_address_bats_ubuntu} --region ${google_region}
+gcloud -q compute addresses create ${google_address_int_ubuntu} --region ${google_region}
 gcloud -q compute networks create ${google_auto_network}
 gcloud -q compute networks create ${google_network} --mode custom
 gcloud -q compute networks subnets create ${google_subnetwork} --network=${google_network} --range=${google_subnetwork_range}
@@ -49,12 +49,12 @@ gcloud -q compute target-pools create ${google_target_pool} --region=${google_re
 # Backend service
 gcloud -q compute instance-groups unmanaged create ${google_backend_service} --zone ${google_zone}
 gcloud -q compute http-health-checks create ${google_backend_service}
-gcloud -q compute backend-services create ${google_backend_service} --http-health-check ${google_backend_service} --port-name "http" --timeout "30"
+gcloud -q compute backend-services create ${google_backend_service} --http-health-checks ${google_backend_service} --port-name "http" --timeout "30"
 gcloud -q compute backend-services add-backend ${google_backend_service} --instance-group ${google_backend_service} --zone ${google_zone} --balancing-mode "UTILIZATION" --capacity-scaler "1" --max-utilization "0.8"
 
 # Region Backend service
 gcloud -q compute instance-groups unmanaged create ${google_region_backend_service} --zone ${google_zone}
 gcloud -q compute health-checks create tcp ${google_region_backend_service}
-gcloud -q compute backend-services create ${google_region_backend_service} --region ${google_region} --health-checks ${google_region_backend_service} --protocol "TCP" --load_balancing_scheme "INTERNAL" --timeout "30"
+gcloud -q compute backend-services create ${google_region_backend_service} --region ${google_region} --health-checks ${google_region_backend_service} --protocol "TCP" --load-balancing-scheme "INTERNAL" --timeout "30"
 gcloud -q compute backend-services add-backend ${google_region_backend_service} --instance-group ${google_region_backend_service} --zone ${google_zone} --region ${google_region}
 

@@ -21,7 +21,7 @@ ENV GOROOT /usr/local/go
 ENV PATH $PATH:$GOROOT/bin
 
 # Install Google Cloud SDK
-ENV GCLOUD_SDK_VERSION 120.0.0
+ENV GCLOUD_SDK_VERSION 139.0.1
 RUN curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz | tar -v -C /usr/local -xz
 ENV PATH $PATH:/usr/local/google-cloud-sdk/bin
 
