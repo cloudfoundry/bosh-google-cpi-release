@@ -1,17 +1,11 @@
 ---
 platform: linux
 
-# TODO: change this back when submitting PR!
-# image_resource:
-#   type: docker-image
-#   source:
-#     repository: boshcpi/gce-cpi-release
-#     tag: v2
 image_resource:
   type: docker-image
   source:
     repository: boshcpi/gce-cpi-release
-    tag: PR-add-aws-cli
+    tag: v2
 
 inputs:
   - name: light-stemcell
