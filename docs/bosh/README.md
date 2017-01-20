@@ -196,18 +196,18 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
   releases:
     - name: bosh
-      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=257.3
-      sha1: e4442afcc64123e11f2b33cc2be799a0b59207d0
+      url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=260.3
+      sha1: 22c79db2a785efa9cbc32c62b8094500e952e170
     - name: bosh-google-cpi
-      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.6.0
-      sha1: 3e01539a1228d62b8015feb388df2234978efaf6
+      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.6.2
+      sha1: b4865397d867655fdcc112bc5a7f9a5025cdf311
 
   resource_pools:
     - name: vms
       network: private
       stemcell:
-        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.7
-        sha1: a09ce8b4acfa9876f52ee7b4869b4b23f27d5ace
+        url: https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3312.15
+        sha1: 3ac3ee83750f75bd74e8d3e3ad97808db23c30ba
       cloud_properties:
         zone: <%= ENV['zone'] %>
         machine_type: n1-standard-1

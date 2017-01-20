@@ -111,7 +111,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 1. Upload the stemcell:
 
   ```
-  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3263.7
+  bosh upload stemcell https://bosh.io/d/stemcells/bosh-google-kvm-ubuntu-trusty-go_agent?v=3312.15
   ```
 
 1. Upload the required [BOSH Releases](http://bosh.io/docs/release.html):
