@@ -59,6 +59,7 @@ gcloud -q compute http-health-checks delete ${google_backend_service}
 gcloud -q compute instance-groups unmanaged delete ${google_backend_service}
 gcloud -q compute backend-services delete ${google_region_backend_service} --region ${google_region}
 gcloud -q compute health-checks delete ${google_region_backend_service}
+gcloud -q compute instances delete ${google_region_backend_service} --zone ${google_zone}
 gcloud -q compute instance-groups unmanaged delete ${google_region_backend_service} --zone ${google_zone}
 
 set -e
