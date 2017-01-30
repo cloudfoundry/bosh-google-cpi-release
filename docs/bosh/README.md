@@ -73,7 +73,7 @@ provides an overview of the deployment:
 
 <a name="deploy-automatic"></a>
 ## Deploy supporting infrastructure
-The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](terraform.io) you will provision all of the infrastructure required to run BOSH in just a few commands.
+The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](https://www.terraform.io/) you will provision all of the infrastructure required to run BOSH in just a few commands.
 
 ### Steps
 > **Note:** All of these steps should be performed inside the Cloud Shell in your browser.
