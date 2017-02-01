@@ -30,6 +30,7 @@ variable "service_account_email" {
 
 variable "baseip" {
     type = "string"
+    default = "10.0.0.0"
 }
 
 provider "google" {
