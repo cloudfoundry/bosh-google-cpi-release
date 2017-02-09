@@ -696,14 +696,15 @@ var _ = Describe("VM", func() {
 					"type": "dynamic",
 					"cloud_properties": {
 					  "tags": ["integration-delete"],
-					  "network_name": "%v"
+					  "network_name": "%v",
+					  "subnetwork_name": "%v"
 					}
 				  }
 				},
 				[],
 				{}
 			  ]
-			}`, existingStemcell, zone, backendService, networkName)
+			}`, existingStemcell, zone, regionBackendService, customNetworkName, customSubnetworkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		ig, err := computeService.InstanceGroups.ListInstances(googleProject, zone, ilbInstanceGroup, &compute.InstanceGroupsListInstancesRequest{InstanceState: "RUNNING"}).Do()

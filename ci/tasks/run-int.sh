@@ -28,6 +28,7 @@ export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
 export PRIVATE_IP=${google_address_static_int}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
+export REGION_BACKEND_SERVICE=${google_region_backend_service}
 export ILB_INSTANCE_GROUP=${google_region_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
