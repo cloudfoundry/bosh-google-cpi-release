@@ -55,7 +55,7 @@ gcloud -q compute backend-services add-backend ${google_backend_service} --insta
 # Region Backend service
 gcloud -q compute instance-groups unmanaged create ${google_region_backend_service} --zone ${google_zone}
 gcloud -q compute health-checks create tcp ${google_region_backend_service}
-gcloud -q compute instances create ${google_region_backend_service} --zone ${google_zone} --network ${google_network} --machine-type f1-micro
+gcloud -q compute instances create ${google_region_backend_service} --zone ${google_zone} --network ${google_network} --subnet ${google_subnetwork} --machine-type f1-micro
 gcloud -q compute instance-groups unmanaged add-instances ${google_region_backend_service} --instances ${google_region_backend_service} --zone ${google_zone}
 gcloud -q compute backend-services create ${google_region_backend_service} --region ${google_region} --health-checks ${google_region_backend_service} --protocol "TCP" --load-balancing-scheme "INTERNAL" --timeout "30"
 gcloud -q compute backend-services add-backend ${google_region_backend_service} --instance-group ${google_region_backend_service} --zone ${google_zone} --region ${google_region}
