@@ -80,8 +80,14 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   ```
   gcloud projects add-iam-policy-binding ${project_id} \
       --member serviceAccount:cf-component@${project_id}.iam.gserviceaccount.com \
-      --role "roles/editor" \
-      --role "roles/logging.logWriter" \
+      --role "roles/editor"
+      
+  gcloud projects add-iam-policy-binding ${project_id} \
+      --member serviceAccount:cf-component@${project_id}.iam.gserviceaccount.com \
+      --role "roles/logging.logWriter"
+      
+  gcloud projects add-iam-policy-binding ${project_id} \
+      --member serviceAccount:cf-component@${project_id}.iam.gserviceaccount.com \
       --role "roles/logging.configWriter"
   ```
 
