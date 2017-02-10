@@ -39,6 +39,7 @@ provides an overview of the deployment:
   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
   export region=us-east1
   export zone=us-east1-d
+  export base_ip=10.0.0.0
   export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
   ```
 
@@ -48,7 +49,7 @@ provides an overview of the deployment:
   gcloud config set compute/zone ${zone}
   gcloud config set compute/region ${region}
   ```
-  
+
 1. Create a service account and key:
 
   ```
@@ -96,7 +97,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var service_account_email=${service_account_email} \
       -var projectid=${project_id} \
       -var region=${region} \
-      -var zone=${zone}
+      -var zone=${zone} \
+      -var baseip=${base_ip}
   ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -110,7 +112,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var service_account_email=${service_account_email} \
       -var projectid=${project_id} \
       -var region=${region} \
-      -var zone=${zone}
+      -var zone=${zone} \
+      -var baseip=${base_ip}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -186,7 +189,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
   ```
   ---
   <%
-  ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'ssh_key_path'].each do |val|
+  ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'ssh_key_path', 'base_ip'].each do |val|
     if ENV[val].nil? || ENV[val].empty?
       raise "Missing environment variable: #{val}"
     end
@@ -227,9 +230,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
     - name: private
       type: manual
       subnets:
-      - range: 10.0.0.0/29
-        gateway: 10.0.0.1
-        static: [10.0.0.3-10.0.0.7]
+      - range: <%= ENV['base_ip'] %>/29
+        gateway: <%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 1 }.join('.') %>
+        static: [<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 3 }.join('.')%>-<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 7 }.join('.') %>]
         cloud_properties:
           network_name: <%= ENV['network'] %>
           subnetwork_name: <%= ENV['subnetwork'] %>
@@ -263,7 +266,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
 
       networks:
         - name: private
-          static_ips: [10.0.0.6]
+          static_ips: [<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>]
           default:
             - dns
             - gateway
@@ -283,13 +286,13 @@ Now you have the infrastructure ready to deploy a BOSH director.
           adapter: postgres
 
         dns:
-          address: 10.0.0.6
+          address: <%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>
           domain_name: microbosh
           db: *db
           recursor: 169.254.169.254
 
         blobstore:
-          address: 10.0.0.6
+          address: <%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>
           port: 25250
           provider: dav
           director:
@@ -322,11 +325,11 @@ Now you have the infrastructure ready to deploy a BOSH director.
           project: <%= ENV['project_id'] %>
 
         agent:
-          mbus: nats://nats:nats-password@10.0.0.6:4222
+          mbus: nats://nats:nats-password@<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>:4222
           ntp: *ntp
           blobstore:
              options:
-               endpoint: http://10.0.0.6:25250
+               endpoint: http://<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>:25250
                user: agent
                password: agent-password
 
@@ -339,12 +342,12 @@ Now you have the infrastructure ready to deploy a BOSH director.
       release: bosh-google-cpi
 
     ssh_tunnel:
-      host: 10.0.0.6
+      host: <%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>
       port: 22
       user: bosh
       private_key: <%= ENV['ssh_key_path'] %>
 
-    mbus: https://mbus:mbus-password@10.0.0.6:6868
+    mbus: https://mbus:mbus-password@<%= ENV['base_ip'].split('.').tap{|i| i[-1] = i[-1].to_i + 6 }.join('.') %>:6868
 
     properties:
       google: *google_properties
@@ -421,13 +424,14 @@ From your Cloud Shell instance, run the following command to delete the infrastr
     hashicorp/terraform:light destroy \
       -var projectid=${project_id} \
       -var region=${region} \
-      -var zone=${zone}
+      -var zone=${zone} \
+      -var baseip=${base_ip}
 
   # Clean up your IAM credentials and key
   gcloud iam service-accounts delete ${service_account_email}
   rm ~/terraform.key.json
   ```
- 
+
 ## Submitting an Issue
 We use the [GitHub issue tracker](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/issues) to track bugs and features.
 Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You can indicate
@@ -436,7 +440,7 @@ support for an existing issue by voting it up. When submitting a bug report, ple
 including your gem version, Ruby version, and operating system. Ideally, a bug report should include a pull request with
  failing specs.
 
- 
+
 ## Submitting a Pull Request
 
 1. Fork the project.

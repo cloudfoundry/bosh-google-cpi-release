@@ -28,6 +28,11 @@ variable "service_account_email" {
     default = ""
 }
 
+variable "baseip" {
+    type = "string"
+    default = "10.0.0.0"
+}
+
 provider "google" {
     project = "${var.projectid}"
     region = "${var.region}"
@@ -50,7 +55,7 @@ resource "google_compute_route" "nat-primary" {
 // Subnet for the BOSH director
 resource "google_compute_subnetwork" "bosh-subnet-1" {
   name          = "${var.prefix}bosh-${var.region}"
-  ip_cidr_range = "10.0.0.0/24"
+  ip_cidr_range = "${var.baseip}/24"
   network       = "${google_compute_network.bosh.self_link}"
 }
 
