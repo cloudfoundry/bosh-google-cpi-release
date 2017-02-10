@@ -50,6 +50,9 @@ RUN ruby-install ruby 2.1.2 && \
 # Install Bundler and BOSH CLI
 RUN /bin/bash -l -c "gem install bundler bosh_cli --no-ri --no-rdoc"
 
+# Install AWS CLI (used to upload stemcell)
+RUN pip install awscli
+
 # receipt generator
 RUN cd /tmp && \
     curl -o certify-artifacts -L https://s3.amazonaws.com/bosh-certification-generator-releases/certify-artifacts-linux-amd64 && \

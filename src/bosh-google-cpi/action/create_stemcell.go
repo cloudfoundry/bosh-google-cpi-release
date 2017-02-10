@@ -38,7 +38,7 @@ func (cs CreateStemcell) Run(stemcellPath string, cloudProps StemcellCloudProper
 	case cloudProps.ImageURL != "":
 		stemcell = cloudProps.ImageURL
 	case cloudProps.SourceURL != "":
-		stemcell, err = cs.imageService.CreateFromURL(cloudProps.SourceURL, description)
+		stemcell, err = cs.imageService.CreateFromURL(cloudProps.SourceURL, cloudProps.SourceSha1, description)
 	default:
 		stemcell, err = cs.imageService.CreateFromTarball(stemcellPath, description)
 	}

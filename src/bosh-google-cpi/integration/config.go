@@ -29,12 +29,13 @@ var (
 	existingStemcell string
 
 	// Provided by user
-	googleProject    = os.Getenv("GOOGLE_PROJECT")
-	externalStaticIP = os.Getenv("EXTERNAL_STATIC_IP")
-	keepResuableVM   = os.Getenv("KEEP_REUSABLE_VM")
-	stemcellURL      = os.Getenv("STEMCELL_URL")
-	stemcellFile     = os.Getenv("STEMCELL_FILE")
-	serviceAccount   = os.Getenv("SERVICE_ACCOUNT")
+	googleProject    = envRequired("GOOGLE_PROJECT")
+	externalStaticIP = envRequired("EXTERNAL_STATIC_IP")
+	keepResuableVM   = envRequired("KEEP_REUSABLE_VM")
+	stemcellURL      = envRequired("STEMCELL_URL")
+	stemcellSHA1     = envRequired("STEMCELL_SHA1")
+	stemcellFile     = envRequired("STEMCELL_FILE")
+	serviceAccount   = envRequired("SERVICE_ACCOUNT")
 
 	// Configurable defaults
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")
@@ -133,6 +134,13 @@ func execCPI(request string) (boshdisp.Response, error) {
 		return boshResponse, err
 	}
 	return boshResponse, nil
+}
+
+func envRequired(key string) (val string) {
+	if val = os.Getenv(key); val == "" {
+		panic(fmt.Sprintf("Could not find required environment variable '%s'", key))
+	}
+	return
 }
 
 func envOrDefault(key, defaultVal string) (val string) {

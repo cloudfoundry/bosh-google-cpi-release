@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 src_dir="$( cd "$( dirname "$0" )" && cd ../../../.. && pwd )"
 workspace_dir="$( cd "${src_dir}/.." && pwd )"
@@ -37,7 +37,7 @@ pushd "${output_dir}" > /dev/null
 
   echo "${SSH_PRIVATE_KEY}" > bosh.pem # CLI has trouble with newlines in variable
 
-  ${bosh_cli} -n build-manifest \
+  ${bosh_cli} -n interpolate \
     -v gce_cloud_provider_mbus="${gce_cloud_provider_mbus}" \
     -v gce_cloud_provider_agent_mbus="${gce_cloud_provider_agent_mbus}" \
     -v gce_credentials_json="'${GCE_CREDENTIALS_JSON}'" \
