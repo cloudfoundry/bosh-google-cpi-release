@@ -17,13 +17,7 @@ Use the `testint` target to run integration tests.
 This command will run all possible integration tests, and may take close to an hour to complete:
 
 ```
-$ GOOGLE_PROJECT=evandbrown17 KEEP_REUSABLE_VM=true GINKGO_ARGS=-ginkgo.focus=Stemcell make testint
-```
-
-Setting KEEP_REUSABLE_VM will prevent the VM created by tests from being deleted, allowing it to be reused in future runs. This is helpful when writing tests and iterating quickly as it eliminates VM start time on subsequent test runs:
-
-```
-$ GOOGLE_PROJECT=evandbrown17 KEEP_REUSABLE_VM=true make testint
+$ GOOGLE_PROJECT=evandbrown17 GINKGO_ARGS=-ginkgo.focus=Stemcell make testint
 ```
 
 Finally, you can pass arguments to Ginkgo. To run only the stemcell tests, set the focus:

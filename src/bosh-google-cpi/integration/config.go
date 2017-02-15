@@ -20,10 +20,6 @@ import (
 	"github.com/cloudfoundry/bosh-utils/uuid"
 )
 
-const (
-	reusableVMName = "google-cpi-int-tests"
-)
-
 var (
 	// A stemcell that will be created in integration_suite_test.go
 	existingStemcell string
@@ -31,7 +27,6 @@ var (
 	// Provided by user
 	googleProject    = envRequired("GOOGLE_PROJECT")
 	externalStaticIP = envRequired("EXTERNAL_STATIC_IP")
-	keepResuableVM   = envRequired("KEEP_REUSABLE_VM")
 	stemcellURL      = envRequired("STEMCELL_URL")
 	stemcellSHA1     = envRequired("STEMCELL_SHA1")
 	stemcellFile     = envRequired("STEMCELL_FILE")
