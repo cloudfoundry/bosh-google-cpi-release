@@ -28,11 +28,11 @@ var (
 	googleProject    = envRequired("GOOGLE_PROJECT")
 	externalStaticIP = envRequired("EXTERNAL_STATIC_IP")
 	stemcellURL      = envRequired("STEMCELL_URL")
-	stemcellSHA1     = envRequired("STEMCELL_SHA1")
-	stemcellFile     = envRequired("STEMCELL_FILE")
 	serviceAccount   = envRequired("SERVICE_ACCOUNT")
 
 	// Configurable defaults
+	stemcellFile         = envOrDefault("STEMCELL_FILE", "")
+	stemcellSHA1         = envOrDefault("STEMCELL_SHA1", "")
 	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")
 	customNetworkName    = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
 	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
