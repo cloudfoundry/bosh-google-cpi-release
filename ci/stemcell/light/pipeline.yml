@@ -1,11 +1,4 @@
 ---
-groups:
-  - name: light-gce-stemcells
-    jobs:
-      - ubuntu-trusty-stemcell-latest
-      - ubuntu-trusty-stemcell-3312
-      - ubuntu-trusty-stemcell-3263
-
 shared:
   - &get-cpi-src
     get: bosh-cpi-src
@@ -88,23 +81,6 @@ shared:
           action: destroy
 
 jobs:
-  - name: ubuntu-trusty-stemcell-latest
-    disable_manual_trigger: true
-    plan:
-      - aggregate:
-        - get: stemcell
-          resource: ubuntu-stemcell-latest
-          trigger: true
-          version: every
-          params:
-            preserve_filename: true
-        - *get-cpi-src
-        - *get-bosh-cli
-        - *get-cpi-release
-      - *create-light-stemcell
-      - *upload-raw-stemcells
-      - *verify-stemcell-boots
-
   - name: ubuntu-trusty-stemcell-3312
     disable_manual_trigger: true
     plan:
@@ -139,6 +115,23 @@ jobs:
       - *upload-raw-stemcells
       - *verify-stemcell-boots
 
+  - name: ubuntu-trusty-stemcell-3363
+    disable_manual_trigger: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-3363
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-raw-stemcells
+      - *verify-stemcell-boots
+
 resources:
   - name: bosh-cli
     type: s3
@@ -155,7 +148,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      branch: PR-version-family
 
   - name: terraform
     type: terraform
@@ -170,12 +163,6 @@ resources:
         gce_project_id: {{gce_project_id}}
         gce_credentials_json: {{gce_credentials_json}}
 
-  - name: ubuntu-stemcell-latest
-    type: bosh-io-stemcell-version-family
-    source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
-      force_regular: true
-
   - name: ubuntu-stemcell-3312
     type: bosh-io-stemcell-version-family
     source:
@@ -189,6 +176,13 @@ resources:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
       version_family: "3263"
+
+  - name: ubuntu-stemcell-3363
+    type: bosh-io-stemcell-version-family
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      version_family: "3363"
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
