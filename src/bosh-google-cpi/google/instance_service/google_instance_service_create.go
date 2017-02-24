@@ -11,7 +11,7 @@ import (
 	subnet "bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/util"
 
-	"google.golang.org/api/compute/v1"
+	"google.golang.org/api/compute/v0.beta"
 )
 
 const defaultRootDiskSizeGb = 10
@@ -56,15 +56,16 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		Scheduling:        schedulingParams,
 		ServiceAccounts:   serviceAccountsParams,
 		Tags:              &tags,
+		Labels:            vmProps.Labels,
 	}
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
-	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
+	operation, err := i.computeServiceB.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		return "", api.NewVMCreationFailedError(err.Error(), true)
 	}
 
-	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
+	if operation, err = i.operationService.WaiterB(operation, vmProps.Zone, ""); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		i.CleanUp(vm.Name)
 		return "", api.NewVMCreationFailedError(err.Error(), true)
@@ -134,7 +135,7 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 
 	var metadataItems []*compute.MetadataItems
 	userDataValue := string(ud)
-	metadataItem := &compute.MetadataItems{Key: userDataKey, Value: &userDataValue}
+	metadataItem := &compute.MetadataItems{Key: userDataKey, Value: userDataValue}
 	metadataItems = append(metadataItems, metadataItem)
 	metadata := &compute.Metadata{Items: metadataItems}
 

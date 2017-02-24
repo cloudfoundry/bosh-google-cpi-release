@@ -2,18 +2,11 @@ package instance
 
 import (
 	"fmt"
-	"regexp"
-	"strings"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	computebeta "google.golang.org/api/compute/v0.beta"
-)
-
-var (
-	numFirstRe  = regexp.MustCompile("^[0-9]")
-	mustMatchRe = regexp.MustCompile("^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$")
 )
 
 func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error {
@@ -90,33 +83,4 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 
 	return nil
-}
-
-func SafeLabel(s string) (string, error) {
-	maxlen := 61
-	// Replace common invalid chars
-	s = strings.Replace(s, "/", "-", -1)
-	s = strings.Replace(s, "_", "-", -1)
-	s = strings.Replace(s, ":", "-", -1)
-
-	// Trim to max length
-	if len(s) > maxlen {
-		s = s[0:maxlen]
-	}
-
-	// Ensure the string doesn't begin or end in -
-	s = strings.TrimSuffix(s, "-")
-	s = strings.TrimPrefix(s, "-")
-
-	// Ensure the string doesn't begin with a number
-	if numFirstRe.MatchString(s) {
-		s = "n" + s
-	}
-
-	// The sanitized value should pass the GCE regex
-	if mustMatchRe.MatchString(s) {
-		return s, nil
-	}
-
-	return "", fmt.Errorf("Label value %q did not satisfy the GCE label regexp", s)
 }
