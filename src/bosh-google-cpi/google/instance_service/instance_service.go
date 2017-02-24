@@ -39,6 +39,7 @@ type Properties struct {
 	TargetPool        string
 	BackendService    BackendService
 	Tags              Tags
+	Labels            Labels
 }
 
 type ServiceScopes []string

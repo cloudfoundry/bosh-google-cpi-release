@@ -108,7 +108,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		}
 	}
 
-	// Validate VM tags
+	// Validate VM tags and labels
 	if err = cloudProps.Validate(); err != nil {
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
@@ -142,6 +142,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		TargetPool:        cloudProps.TargetPool,
 		BackendService:    bs,
 		Tags:              cloudProps.Tags,
+		Labels:            cloudProps.Labels,
 	}
 
 	// Create VM

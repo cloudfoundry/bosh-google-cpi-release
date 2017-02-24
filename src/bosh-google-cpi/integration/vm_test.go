@@ -49,7 +49,11 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
-				  "zone": "%v"
+				  "zone": "%v",
+				  "labels": {
+					"label-1-key": "label-1-value",
+					"label-2-key": "label-2-value"
+				  }
 				},
 				{
 				  "default": {
@@ -79,7 +83,21 @@ var _ = Describe("VM", func() {
 		exists := assertSucceedsWithResult(request).(bool)
 		Expect(exists).To(Equal(true))
 
-		By("setting the VM's metadata")
+		expectLabels := map[string]string{
+			"integration-delete": "",
+			"micro-google":       "",
+			"dummy":              "",
+			"micro-google-dummy": "",
+			"dummy-dummy":        "",
+			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
+			"label-1-key": "label-1-value",
+			"label-2-key": "label-2-value",
+		}
+		assertValidVMB(vmCID, func(instance *computebeta.Instance) {
+			// Labels should be an exact match
+			Expect(instance.Labels).To(BeEquivalentTo(expectLabels))
+		})
+
 		m := map[string]string{
 			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-allowable-enforced-63-char-limit-and-should-be-truncated",
 			"name":               "val_with_underscores_ending_in_dash-",
@@ -88,7 +106,7 @@ var _ = Describe("VM", func() {
 			"index":              "0",
 			"integration-delete": "",
 		}
-		expectLabels := map[string]string{
+		expectLabels = map[string]string{
 			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
 			"name":               "val-with-underscores-ending-in-dash",
 			"deployment":         "deployment-name",
@@ -100,6 +118,8 @@ var _ = Describe("VM", func() {
 			"micro-google-dummy": "",
 			"dummy-dummy":        "",
 			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
+			"label-1-key": "label-1-value",
+			"label-2-key": "label-2-value",
 		}
 		mj, _ := json.Marshal(m)
 		request = fmt.Sprintf(`{

@@ -54,12 +54,17 @@ type VMCloudProperties struct {
 	TargetPool          string           `json:"target_pool,omitempty"`
 	BackendService      interface{}      `json:"backend_service,omitempty"`
 	Tags                instance.Tags    `json:"tags,omitempty"`
+	Labels              instance.Labels  `json:"labels,omitempty"`
 	EphemeralExternalIP *bool            `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        *bool            `json:"ip_forwarding,omitempty"`
 }
 
 func (n VMCloudProperties) Validate() error {
 	if err := n.Tags.Validate(); err != nil {
+		return err
+	}
+
+	if err := n.Labels.Validate(); err != nil {
 		return err
 	}
 

@@ -133,6 +133,7 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | ephemeral_external_ip | N        | Boolean       | Overrides the equivalent option in the networks section
 | ip_forwarding         | N        | Boolean       | Overrides the equivalent option in the networks section
 | tags                  | N        | Array&lt;String&gt; | Merged with tags from the networks section
+| labels                  | N        | Map&lt;String,String&gt; | A dictionary of (key,value) labels applied to the VM
 
 ### BOSH Persistent Disks options
 
