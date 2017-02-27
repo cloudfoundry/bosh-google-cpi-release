@@ -128,18 +128,16 @@ configint: check-proj
 	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-a --zone us-central1-a &> /dev/null; if [ $$? -ne 0 ]; then \
 		echo "Creating instance cfintegration-ilb-a"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute instances create cfintegration-ilb-a --zone us-central1-a --network cfintegration; \
+		echo "Adding cfintegration-ilb-a to instance group cfintegration-ilb"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-a --zone us-central1-a; \
 	fi
 
 	@gcloud --project=$(GOOGLE_PROJECT) compute instances describe cfintegration-ilb-b --zone us-central1-b &> /dev/null; if [ $$? -ne 0 ]; then \
 		echo "Creating instance cfintegration-ilb-b"; \
 		gcloud --project=$(GOOGLE_PROJECT) compute instances create cfintegration-ilb-b --zone us-central1-b --network cfintegration; \
+		echo "Adding cfintegration-ilb-b to instance group cfintegration-ilb"; \
+		gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-b --zone us-central1-b; \
 	fi
-
-	echo "Adding cfintegration-ilb-a to instance group cfintegration-ilb"; \
-	gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-a --zone us-central1-a
-
-	echo "Adding cfintegration-ilb-b to instance group cfintegration-ilb"; \
-	gcloud --project=$(GOOGLE_PROJECT) compute instance-groups unmanaged add-instances cfintegration-ilb --instances cfintegration-ilb-b --zone us-central1-b
 
 	@gcloud --project=$(GOOGLE_PROJECT) compute backend-services describe cfintegration --region us-central1 &> /dev/null; if [ $$? -ne 0 ]; then \
 		echo "Creating region backend service cfintegration"; \
