@@ -9,12 +9,12 @@ This guide describes how to deploy a minimal [Cloud Foundry](https://www.cloudfo
 ## Cost and resource requirements
 
 * This CF deployment (and the BOSH director/bastion pre-requisite) is small enough to fit in a default project [Resource Quota](https://cloud.google.com/compute/docs/resource-quotas). It consumes:
-    - 20 cores in a single region
+    - 23 cores in a single region
     - 24 pre-emptible cores in a second region **during compilation only**
     - 2 IP addresses
-    - 600 Gb persistent disk
+    - 660 Gb persistent disk
 
-You can view an estimate of the cost to run this deployment for an entire month at [this link](https://cloud.google.com/products/calculator/#id=f543773c-1848-47fc-b302-6568b0f0db94).
+You can view an estimate of the cost to run this deployment for an entire month at [this link](https://cloud.google.com/products/calculator/#id=8de9b03b-79b9-4b0a-9d26-01dc4b40937f).
 
 ## Deploy supporting infrastructure automatically
 
@@ -103,6 +103,7 @@ The following instructions use [Terraform](terraform.io) to provision all of the
 
   ```
   export vip=$(terraform output ip)
+  export tcp_vip=$(terraform output tcp_ip)
   export zone=$(terraform output zone)
   export zone_compilation=$(terraform output zone_compilation)
   export region=$(terraform output region)
@@ -127,7 +128,8 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/garden-linux-release?v=0.340.0
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/etcd-release?v=43
   bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/diego-release?v=0.1463.0
-  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=240
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry/cf-release?v=249
+  bosh upload release https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.142.0
   ```
 
 1. Target the deployment file and deploy:
@@ -145,6 +147,13 @@ Once deployed, you can target your Cloud Foundry environment using the [CF CLI](
   ```
 
 Your username is `admin` and your password is `c1oudc0w`.
+
+### Optional: Setup TCP routing
+Setup your tcp router domain using the CLI:
+```
+  cf create-shared-domain tcp.${tcp_vip}.xip.io --router-group default-tcp
+  cf update-quota default --reserved-route-ports 10
+```
 
 ### Delete resources
 
