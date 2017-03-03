@@ -2,6 +2,43 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [25.7.0] - 2016-12-19
+
+### Fixed
+- Various docs changes
+
+### Changed
+- Labels may be specified in cloud properties
+- CF docs include TCP router
+- Use lateset Docker image in CIA
+- Support internal load balancer
+
+## [25.6.2] - 2016-12-19
+
+### Fixed
+- Improve tests
+- Corrects MTU on garden job
+
+### Changed
+- Support `ImageURL` for specifying stemcellA
+- Concourse docs incude SSL support
+- Docs require setting a password instead of using default
+
+## [25.6.1] - 2016-11-02
+
+### Fixed
+- Handles large disk sizes
+
+### Changed
+- CF docs run under free-tier quota
+- Integration tests can use local stemcell
+
+## [25.6.0] - 2016-10-27
+
+### Changed
+- Supports `has_disk` method
+- Improvements to stemcell pipelines
+
 ## [25.5.0] - 2016-10-17
 
 ### Changed
@@ -94,6 +131,10 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[25.7.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.2...v25.7.0
+[25.6.2]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.1...v25.6.2
+[25.6.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.0...v25.6.1
+[25.6.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.5.0...v25.6.0
 [25.5.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.4.1...v25.5.0
 [25.4.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.4.0...v25.4.1
 [25.4.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.3.0...v25.4.0
