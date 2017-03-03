@@ -1,0 +1,26 @@
+---
+packages:
+- name: bosh-google-cpi
+  version: c6b1d2bbb377529dccd6d09d82f2cc0b54452129
+  fingerprint: c6b1d2bbb377529dccd6d09d82f2cc0b54452129
+  sha1: 20dd80a895caddb8acd092877d77c67aa86c6822
+  dependencies:
+  - golang
+- name: golang
+  version: b7c20853a73ad56fad8d60b980503e22d3ac7f43
+  fingerprint: b7c20853a73ad56fad8d60b980503e22d3ac7f43
+  sha1: 7a753a5d3ad5b47128c5c68d65bb210bf56c5d12
+  dependencies: []
+jobs:
+- name: google_cpi
+  version: 134a472ce3b5764dcaf2de5636b34c8d1560286d
+  fingerprint: 134a472ce3b5764dcaf2de5636b34c8d1560286d
+  sha1: b831a2446c3ebf91e7d8d5fcb99c05dbe96d2ba1
+license:
+  version: 9bb85bd388bb9bbd1b279f7921e71cd318007cb6
+  fingerprint: 9bb85bd388bb9bbd1b279f7921e71cd318007cb6
+  sha1: a208ac221870e2e599854cf7ecb8910335318b32
+commit_hash: f6cbfbae
+uncommitted_changes: false
+name: bosh-google-cpi
+version: 25.7.0
