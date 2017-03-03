@@ -348,7 +348,7 @@ Complete the following steps from your bastion instance.
   export director_uuid=`bosh status --uuid 2>/dev/null`
   ```
 
-1. Chose unique passwords for internal services and ATC and export them
+1. Choose unique passwords for internal services and ATC and export them
    ```
    export common_password=
    export atc_password=
