@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"time"
 )
@@ -27,7 +28,7 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 		rt.RequestModifier(req)
 	}
 
-	// Save the response body for future retries as it will be read and closed
+	// Save the req body for future retries as it will be read and closed
 	// by Base.RoundTrip.
 	if req.Body != nil {
 		body, err = ioutil.ReadAll(req.Body)
@@ -36,18 +37,33 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 		}
 	}
 
-	var try int
-	for i := 0; i <= rt.MaxRetries; i++ {
+	for try := 0; try <= rt.MaxRetries; try++ {
 		r := bytes.NewReader(body)
 		req.Body = ioutil.NopCloser(r)
 		resp, err = rt.Base.RoundTrip(req)
-		if err != nil {
-			break
+
+		sleep := func() {
+			time.Sleep(200 * time.Millisecond << uint64(try*2))
 		}
-		if resp.StatusCode < 500 {
-			break
+
+		// Retry on net.Error
+		switch err.(type) {
+		case net.Error:
+			if !err.(net.Error).Temporary() {
+				return
+			}
+			sleep()
+			continue
+		case error:
+			return
 		}
-		time.Sleep(200 * time.Millisecond << uint64(try))
+
+		// Retry on status code >= 500
+		if resp.StatusCode >= 500 {
+			sleep()
+			continue
+		}
+		return
 	}
 	return
 }
