@@ -43,7 +43,7 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 		resp, err = rt.Base.RoundTrip(req)
 
 		sleep := func() {
-			time.Sleep(200 * time.Millisecond << uint64(try))
+			time.Sleep(200 * time.Millisecond << uint64(try*2))
 		}
 
 		// Retry on net.Error
