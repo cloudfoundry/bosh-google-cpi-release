@@ -20,7 +20,7 @@ func (e *errorTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 var _ = Describe("RetryTransport", func() {
 	Describe("Validate", func() {
-		FIt("It retries the maximum number of times and then fails", func() {
+		It("It retries the maximum number of times and then fails", func() {
 			maxRetries := 3
 			et := &errorTransport{}
 			client := http.Client{
