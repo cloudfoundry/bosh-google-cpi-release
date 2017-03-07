@@ -2,7 +2,14 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [25.7.0] - 2016-12-19
+## [25.7.1] - 2017-03-07
+
+### Fixed
+- Previously, requests to Google APIs that returned 5xx response codes were
+  retried. This change adds retry support to transport errors (net.Error) that
+  are known to be temporary.
+
+## [25.7.0] - 2017-03-03
 
 ### Fixed
 - Various docs changes
