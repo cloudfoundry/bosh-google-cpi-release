@@ -38,7 +38,7 @@ func NewGoogleClient(
 ) (GoogleClient, error) {
 	var err error
 	var computeClient, storageClient *http.Client
-	userAgent := "bosh-google-cpi/0.0.1"
+	userAgent := config.GetUserAgent()
 
 	if config.JSONKey != "" {
 		computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)

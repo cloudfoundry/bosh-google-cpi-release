@@ -5,6 +5,7 @@ params = {
     "properties" => {
       "google" => {
         "project" => p("google.project"),
+        "user_agent" => p("google.user_agent"),
         "json_key" => p("google.json_key"),
         "default_root_disk_size_gb" => p("google.default_root_disk_size_gb"),
         "default_root_disk_type" => p("google.default_root_disk_type")
@@ -21,6 +22,9 @@ params = {
 
 if_p('google.project') do |project|
   params["cloud"]["properties"]["google"]["project"] = project
+end
+if_p('google.user_agent') do |user_agent|
+  params["cloud"]["properties"]["google"]["user_agent"] = user_agent
 end
 if_p('google.json_key') do |json_key|
   params["cloud"]["properties"]["google"]["json_key"] = json_key
