@@ -8,7 +8,7 @@ var release string
 
 type Config struct {
 	Project               string `json:"project"`
-	UserAgent             string `json:"user_agent"`
+	UserAgentPrefix       string `json:"user_agent_prefix"`
 	JSONKey               string `json:"json_key"`
 	DefaultRootDiskSizeGb int    `json:"default_root_disk_size_gb"`
 	DefaultRootDiskType   string `json:"default_root_disk_type"`
@@ -19,10 +19,10 @@ func (c Config) GetUserAgent() string {
 	if release == "" {
 		boshCpiUserAgent = boshCpiUserAgent + "dev"
 	}
-	if c.UserAgent == "" {
+	if c.UserAgentPrefix == "" {
 		return boshCpiUserAgent
 	}
-	return c.UserAgent + " " + boshCpiUserAgent
+	return c.UserAgentPrefix + " " + boshCpiUserAgent
 }
 
 func (c Config) Validate() error {
