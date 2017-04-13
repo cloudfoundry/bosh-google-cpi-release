@@ -35,17 +35,33 @@ var _ = Describe("Config", func() {
 		})
 	})
 	Describe("UserAgent", func() {
-		It("returns a valid user agent string without external user agent", func() {
+		It("returns correct user agent string with release, without prefix", func() {
 			config.UserAgentPrefix = ""
+			CpiRelease = "0.0.1"
 			
 			userAgent := config.GetUserAgent()
-                        Expect(userAgent).To(Equal("bosh-google-cpi/dev"))
+                        Expect(userAgent).To(Equal("bosh-google-cpi/0.0.1"))
 		})
-		It("returns a valid user agent string with external user agent", func() {
+		It("returns correct user agent string with release, with prefix", func() {
 			config.UserAgentPrefix = "Kubo/0.0.2"
+			CpiRelease = "0.0.1"
 
 			userAgent := config.GetUserAgent()
-			Expect(userAgent).To(Equal("Kubo/0.0.2 bosh-google-cpi/dev"))
+			Expect(userAgent).To(Equal("Kubo/0.0.2 bosh-google-cpi/0.0.1"))
 		})
+		It("returns correct user agent string without release, with prefix", func() {
+                        config.UserAgentPrefix = "Kubo/0.0.2"
+                        CpiRelease = ""
+
+                        userAgent := config.GetUserAgent()
+                        Expect(userAgent).To(Equal("Kubo/0.0.2 bosh-google-cpi/dev"))
+                })
+		It("returns correct user agent string without release, without prefix", func() {
+                        config.UserAgentPrefix = ""
+                        CpiRelease = ""
+
+                        userAgent := config.GetUserAgent()
+                        Expect(userAgent).To(Equal("bosh-google-cpi/dev"))
+                })
 	})
 })
