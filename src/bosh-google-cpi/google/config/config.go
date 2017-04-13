@@ -4,6 +4,8 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
+var release string
+
 type Config struct {
 	Project               string `json:"project"`
 	UserAgent             string `json:"user_agent"`
@@ -13,7 +15,10 @@ type Config struct {
 }
 
 func (c Config) GetUserAgent() string {
-	boshCpiUserAgent := "bosh-google-cpi/0.0.1"
+	boshCpiUserAgent := "bosh-google-cpi/" + release
+	if release == "" {
+		boshCpiUserAgent = boshCpiUserAgent + "dev"
+	}
 	if c.UserAgent == "" {
 		return boshCpiUserAgent
 	}
