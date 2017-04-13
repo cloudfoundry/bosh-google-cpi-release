@@ -15,8 +15,8 @@ templates:
 properties:
   google.project:
     description: "Google Compute Engine project"
-  google.user_agent:
-    description: "User Agent"
+  google.user_agent_prefix:
+    description: "User Agent Prefix"
     default: ""
   google.json_key:
     description: "Google Compute Engine JSON key"
