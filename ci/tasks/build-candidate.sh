@@ -15,6 +15,7 @@ pushd bosh-cpi-src
   echo "Exposing release semver to bosh-google-cpi"
   echo ${semver} > "src/bosh-google-cpi/release"
 
+  # We have to use the --force flag because we just added the `src/bosh-google-cpi/release` file
   echo "Creating CPI BOSH Release..."
   bosh create release --name ${cpi_release_name} --version ${semver} --with-tarball --force
 popd

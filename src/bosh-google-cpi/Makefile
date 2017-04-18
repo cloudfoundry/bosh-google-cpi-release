@@ -2,11 +2,11 @@ default: test
 
 # Builds bosh-google-cpi for linux-amd64
 build:
-	go build -ldflags="-X bosh-google-cpi/google/config.CpiRelease=`cat release 2>/dev/null`" -o out/cpi bosh-google-cpi/main
+	go build -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" -o out/cpi bosh-google-cpi/main
 
 # Build cross-platform binaries
 build-all:
-	gox -output="out/cpi_{{.OS}}_{{.Arch}}" -ldflags="-X bosh-google-cpi/google/config.CpiRelease=`cat release 2>/dev/null`" bosh-google-cpi/main
+	gox -output="out/cpi_{{.OS}}_{{.Arch}}" -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" bosh-google-cpi/main
 
 # Prepration for tests
 get-deps:
