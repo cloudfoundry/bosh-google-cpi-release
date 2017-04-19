@@ -12,8 +12,12 @@ pushd bosh-cpi-src
   echo "Using BOSH CLI version..."
   bosh version
 
+  echo "Exposing release semver to bosh-google-cpi"
+  echo ${semver} > "src/bosh-google-cpi/release"
+
+  # We have to use the --force flag because we just added the `src/bosh-google-cpi/release` file
   echo "Creating CPI BOSH Release..."
-  bosh create release --name ${cpi_release_name} --version ${semver} --with-tarball
+  bosh create release --name ${cpi_release_name} --version ${semver} --with-tarball --force
 popd
 
 image_path=bosh-cpi-src/dev_releases/${cpi_release_name}/${cpi_release_name}-${semver}.tgz
