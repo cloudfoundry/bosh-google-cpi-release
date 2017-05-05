@@ -28,6 +28,7 @@ var _ = Describe("Networks", func() {
 				Default: []string{"fake-network-1-default"},
 				CloudProperties: NetworkCloudProperties{
 					NetworkName:         "fake-network-1-cloud-network-name",
+					NetworkProjectID:    "fake-network-1-cloud-network-project-id",
 					SubnetworkName:      "fake-network-1-cloud-subnetwork-name",
 					Tags:                instance.Tags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,
@@ -53,6 +54,7 @@ var _ = Describe("Networks", func() {
 					DNS:                 []string{"fake-network-1-dns"},
 					Default:             []string{"fake-network-1-default"},
 					NetworkName:         "fake-network-1-cloud-network-name",
+					NetworkProjectID:    "fake-network-1-cloud-network-project-id",
 					SubnetworkName:      "fake-network-1-cloud-subnetwork-name",
 					Tags:                instance.Tags([]string{"fake-network-1-cloud-network-tag"}),
 					EphemeralExternalIP: true,

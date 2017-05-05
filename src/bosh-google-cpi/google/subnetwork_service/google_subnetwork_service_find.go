@@ -9,13 +9,18 @@ import (
 var ErrRegionRequired error = errors.New("A region is required to find a subnet")
 var ErrSubnetNotFound error = errors.New("Subnet could not be found")
 
-func (s GoogleSubnetworkService) Find(id string, region string) (Subnetwork, error) {
+func (s GoogleSubnetworkService) Find(projectId, id, region string) (Subnetwork, error) {
 	if region == "" {
 		return Subnetwork{}, ErrRegionRequired
 	}
 
-	s.logger.Debug(googleSubnetworkServiceLogTag, "Finding Google Subnetwork '%s' in region '%s'", id, region)
-	subnetworkItem, err := s.computeService.Subnetworks.Get(s.project, util.ResourceSplitter(region), id).Do()
+	// Default to compute project if not specified
+	if projectId == "" {
+		projectId = s.project
+	}
+
+	s.logger.Debug(googleSubnetworkServiceLogTag, "Finding Google Subnetwork '%s' in region '%s' in project '%s'", id, region, projectId)
+	subnetworkItem, err := s.computeService.Subnetworks.Get(projectId, util.ResourceSplitter(region), id).Do()
 	if err != nil {
 		return Subnetwork{}, err
 	}

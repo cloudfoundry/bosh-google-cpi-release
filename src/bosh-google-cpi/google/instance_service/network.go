@@ -15,6 +15,7 @@ type Network struct {
 	DNS                 []string
 	Default             []string
 	NetworkName         string
+	NetworkProjectID    string
 	SubnetworkName      string
 	EphemeralExternalIP bool
 	IPForwarding        bool
