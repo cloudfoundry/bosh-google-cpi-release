@@ -22,6 +22,7 @@ import (
 	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/google/network_service"
 	"bosh-google-cpi/google/operation_service"
+	"bosh-google-cpi/google/project_service"
 	"bosh-google-cpi/google/snapshot_service"
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
@@ -139,8 +140,12 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		networkService = network.NewGoogleNetworkService(
+		projectService := project.NewGoogleProjectService(
 			googleClient.Project(),
+		)
+
+		networkService = network.NewGoogleNetworkService(
+			projectService,
 			googleClient.ComputeService(),
 			logger,
 		)
@@ -159,7 +164,7 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		subnetworkService = subnetwork.NewGoogleSubnetworkService(
-			googleClient.Project(),
+			projectService,
 			googleClient.ComputeService(),
 			logger,
 		)

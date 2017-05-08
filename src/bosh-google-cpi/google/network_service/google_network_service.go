@@ -3,24 +3,26 @@ package network
 import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 
+	"bosh-google-cpi/google/project_service"
+
 	"google.golang.org/api/compute/v1"
 )
 
 const googleNetworkServiceLogTag = "GoogleNetworkService"
 
 type GoogleNetworkService struct {
-	project        string
+	projectService project.Service
 	computeService *compute.Service
 	logger         boshlog.Logger
 }
 
 func NewGoogleNetworkService(
-	project string,
+	projectService project.Service,
 	computeService *compute.Service,
 	logger boshlog.Logger,
 ) GoogleNetworkService {
 	return GoogleNetworkService{
-		project:        project,
+		projectService: projectService,
 		computeService: computeService,
 		logger:         logger,
 	}
