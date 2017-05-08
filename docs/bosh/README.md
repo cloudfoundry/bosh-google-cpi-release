@@ -36,7 +36,7 @@ provides an overview of the deployment:
 1. Configure a few environment variables:
 
   ```
-  export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
+  export project_id=$(gcloud config get-value project)
   export region=us-east1
   export zone=us-east1-d
   export base_ip=10.0.0.0
