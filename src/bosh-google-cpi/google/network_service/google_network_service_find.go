@@ -9,12 +9,7 @@ import (
 func (n GoogleNetworkService) Find(projectId, id string) (Network, bool, error) {
 	n.logger.Debug(googleNetworkServiceLogTag, "Finding Google Network '%s'", id)
 
-	// Default to compute project if not specified
-	if projectId == "" {
-		projectId = n.project
-	}
-
-	networkItem, err := n.computeService.Networks.Get(projectId, id).Do()
+	networkItem, err := n.computeService.Networks.Get(n.projectService.Find(projectId), id).Do()
 	if err != nil {
 		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
 			return Network{}, false, nil

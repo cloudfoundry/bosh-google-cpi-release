@@ -14,13 +14,8 @@ func (s GoogleSubnetworkService) Find(projectId, id, region string) (Subnetwork,
 		return Subnetwork{}, ErrRegionRequired
 	}
 
-	// Default to compute project if not specified
-	if projectId == "" {
-		projectId = s.project
-	}
-
 	s.logger.Debug(googleSubnetworkServiceLogTag, "Finding Google Subnetwork '%s' in region '%s' in project '%s'", id, region, projectId)
-	subnetworkItem, err := s.computeService.Subnetworks.Get(projectId, util.ResourceSplitter(region), id).Do()
+	subnetworkItem, err := s.computeService.Subnetworks.Get(s.projcetService.Find(projectId), util.ResourceSplitter(region), id).Do()
 	if err != nil {
 		return Subnetwork{}, err
 	}
