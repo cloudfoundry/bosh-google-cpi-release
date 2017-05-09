@@ -15,7 +15,7 @@ type Environment map[string]interface{}
 
 type NetworkCloudProperties struct {
 	NetworkName         string        `json:"network_name,omitempty"`
-	NetworkProjectID    string        `json:"network_project_id,omitempty"`
+	NetworkProjectID    string        `json:"xpn_host_project_id,omitempty"`
 	SubnetworkName      string        `json:"subnetwork_name,omitempty"`
 	Tags                instance.Tags `json:"tags,omitempty"`
 	EphemeralExternalIP bool          `json:"ephemeral_external_ip,omitempty"`
