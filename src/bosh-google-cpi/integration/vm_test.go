@@ -52,8 +52,7 @@ var _ = Describe("VM", func() {
 				  "zone": "%v",
 				  "labels": {
 					"label-1-key": "label-1-value",
-					"label-2-key": "label-2-value",
-					"micro-google-dummy-dummy-too-long-and-should-be-truncated-to-an-acceptable-length": "yup",
+					"label-2-key": "label-2-value"
 				  }
 				},
 				{
@@ -85,7 +84,6 @@ var _ = Describe("VM", func() {
 		Expect(exists).To(Equal(true))
 
 		expectLabels := map[string]string{
-			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}
@@ -103,12 +101,11 @@ var _ = Describe("VM", func() {
 			"integration-delete": "",
 		}
 		expectLabels = map[string]string{
-			"director":   "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
-			"name":       "val-with-underscores-ending-in-dash",
-			"deployment": "deployment-name",
-			"job":        "job-name",
-			"index":      "n0",
-			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
+			"director":    "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
+			"name":        "val-with-underscores-ending-in-dash",
+			"deployment":  "deployment-name",
+			"job":         "job-name",
+			"index":       "n0",
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}
