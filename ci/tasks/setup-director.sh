@@ -215,12 +215,6 @@ cloud_provider:
     name: google_cpi
     release: bosh-google-cpi
 
-  ssh_tunnel:
-    host: ${director_ip}
-    port: 22
-    user: ${private_key_user}
-    private_key: ${private_key}
-
   mbus: https://mbus:mbus-password@${director_ip}:6868
 
   properties:
