@@ -66,6 +66,29 @@ provides an overview of the deployment:
     --role roles/owner
   ```
 
+1. **Optional**: Configure Cross Project Networking (XPN):
+
+  [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/_) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
+
+  Run the following commands to deploy BOSH with XPN:
+
+  ```
+  export xpn_host_project_id=<Existing Project ID that will become the XPN host>
+  export org_id=<Organization ID (a number), find with gcloud organizations list>
+  export email=<Email address used to sign into gcloud>
+
+  gcloud organizations add-iam-policy-binding ${org_id} \
+    --member user:${email} \
+    --role roles/compute.xpnAdmin
+
+  gcloud beta compute xpn enable ${xpn_host_project_id}
+  gcloud beta compute xpn associated-projects add ${project_id} --host-project=${xpn_host_project_id}
+
+  gcloud projects add-iam-policy-binding ${xpn_host_project_id} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/owner
+  ```
+
 1. Make your service account's key available in an environment variable to be used by `terraform`:
 
   ```
@@ -98,7 +121,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone} \
-      -var baseip=${base_ip}
+      -var baseip=${base_ip} \
+      -var xpn_host_projectid=${xpn_host_project_id-project_id}
   ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -113,7 +137,8 @@ The following instructions offer the fastest path to getting BOSH up and running
       -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone} \
-      -var baseip=${base_ip}
+      -var baseip=${base_ip} \
+      -var xpn_host_projectid=${xpn_host_project_id-project_id}
   ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -159,6 +184,9 @@ Now you have the infrastructure ready to deploy a BOSH director.
   gcloud projects add-iam-policy-binding ${project_id} \
     --member serviceAccount:${service_account_email} \
     --role roles/iam.serviceAccountActor
+  gcloud projects add-iam-policy-binding ${xpn_host_project_id} \
+    --member serviceAccount:${service_account_email} \
+    --role roles/compute.networkUser
   ```
 
 1. Create a **password-less** SSH key and upload the public component:
@@ -190,7 +218,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
   ```
   ---
   <%
-  ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'ssh_key_path', 'base_ip'].each do |val|
+  ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'xpn_host_project_id', 'ssh_key_path', 'base_ip'].each do |val|
     if ENV[val].nil? || ENV[val].empty?
       raise "Missing environment variable: #{val}"
     end
@@ -203,8 +231,8 @@ Now you have the infrastructure ready to deploy a BOSH director.
       url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=260.3
       sha1: 22c79db2a785efa9cbc32c62b8094500e952e170
     - name: bosh-google-cpi
-      url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.6.2
-      sha1: b4865397d867655fdcc112bc5a7f9a5025cdf311
+      url: https://storage.googleapis.com/develop-bosh-cpi-artifacts/bosh-google-cpi-0.0.265.tgz
+      sha1: e0fbc91fc363460a2a3160badfadf4b7dd4ab88f
 
   resource_pools:
     - name: vms
@@ -237,6 +265,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
         cloud_properties:
           network_name: <%= ENV['network'] %>
           subnetwork_name: <%= ENV['subnetwork'] %>
+          xpn_host_project_id: <%= ENV['xpn_host_project_id'] %>
           ephemeral_external_ip: false
           tags:
             - internal
@@ -409,6 +438,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
   ```
   # Set a few vars, in case they were forgotten
   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
+  export xpn_host_project_id=$(gcloud beta compute xpn get-host-project ${project_id} | grep name | cut -d : -f 2 - | tr -d '\n' | tr -d ' ')
   export region=us-east1
   export zone=us-east1-d
   export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
@@ -426,7 +456,8 @@ From your Cloud Shell instance, run the following command to delete the infrastr
       -var projectid=${project_id} \
       -var region=${region} \
       -var zone=${zone} \
-      -var baseip=${base_ip}
+      -var baseip=${base_ip} \
+      -var xpn_host_projectid=${xpn_host_project_id-project_id}
 
   # Clean up your IAM credentials and key
   gcloud iam service-accounts delete ${service_account_email}
