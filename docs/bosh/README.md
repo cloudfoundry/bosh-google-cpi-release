@@ -69,7 +69,7 @@ provides an overview of the deployment:
 <a name="deploy-xpn"></a>
 ### Optional: Setup Cross Project Networking (XPN)
 
-   [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/_) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
+   [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
 
    The host project must have the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview), [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview), and the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview) enabled. This project will be used to create the bosh network throughout this guide.
 
