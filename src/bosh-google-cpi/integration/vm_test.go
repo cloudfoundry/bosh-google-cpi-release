@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	computebeta "google.golang.org/api/compute/v0.beta"
-	"google.golang.org/api/compute/v1"
+	compute "google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("VM", func() {
@@ -68,7 +68,7 @@ var _ = Describe("VM", func() {
 				{
 				  "bosh": {
 					  "group_name": "micro-google-dummy-dummy",
-					  "groups": ["micro-google", "dummy", "dummy", "micro-google-dummy", "dummy-dummy", "micro-google-dummy-dummy-too-long-and-should-be-truncated-to-an-acceptable-length"]
+					  "groups": ["micro-google", "dummy", "dummy", "micro-google-dummy", "dummy-dummy"]
 				  }
 				}
 			  ]
@@ -84,12 +84,6 @@ var _ = Describe("VM", func() {
 		Expect(exists).To(Equal(true))
 
 		expectLabels := map[string]string{
-			"integration-delete": "",
-			"micro-google":       "",
-			"dummy":              "",
-			"micro-google-dummy": "",
-			"dummy-dummy":        "",
-			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}
@@ -107,17 +101,11 @@ var _ = Describe("VM", func() {
 			"integration-delete": "",
 		}
 		expectLabels = map[string]string{
-			"director":           "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
-			"name":               "val-with-underscores-ending-in-dash",
-			"deployment":         "deployment-name",
-			"job":                "job-name",
-			"index":              "n0",
-			"integration-delete": "",
-			"micro-google":       "",
-			"dummy":              "",
-			"micro-google-dummy": "",
-			"dummy-dummy":        "",
-			"micro-google-dummy-dummy-too-long-and-should-be-truncated-to": "",
+			"director":    "val-that-is-definitely-for-sure-absolutely-longer-than-the-al",
+			"name":        "val-with-underscores-ending-in-dash",
+			"deployment":  "deployment-name",
+			"job":         "job-name",
+			"index":       "n0",
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}

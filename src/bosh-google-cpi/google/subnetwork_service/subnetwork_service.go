@@ -1,5 +1,5 @@
 package subnetwork
 
 type Service interface {
-	Find(id string, region string) (Subnetwork, error)
+	Find(projectId string, id string, region string) (Subnetwork, error)
 }

@@ -75,6 +75,12 @@ func (n Networks) NetworkName() string {
 	return defaultNetworkName
 }
 
+func (n Networks) NetworkProjectID() string {
+	network := n.Network()
+
+	return network.NetworkProjectID
+}
+
 func (n Networks) SubnetworkName() string {
 	network := n.Network()
 

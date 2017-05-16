@@ -1,10 +1,15 @@
 ---
 groups:
-  - name: light-gce-stemcells
-    jobs:
-      - ubuntu-trusty-stemcell-latest
-      - ubuntu-trusty-stemcell-3312
-      - ubuntu-trusty-stemcell-3263
+- name: light-gce-stemcells
+  jobs:
+  - ubuntu-trusty-stemcell-3263
+  - ubuntu-trusty-stemcell-3312
+  - ubuntu-trusty-stemcell-3363
+  - centos-7-stemcell-3312
+  - centos-7-stemcell-3363
+- name: alpha
+  jobs:
+  - ubuntu-trusty-stemcell-alpha
 
 shared:
   - &get-cpi-src
@@ -21,6 +26,11 @@ shared:
     file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
     params:
       BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
+  - &create-light-alpha-stemcell
+    task: create-light-stemcell
+    file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
+    params:
+      BUCKET_NAME:     {{google_raw_alpha_stemcells_bucket_name}}
   - &cleanup-failed-run-instructions
     task: cleanup-failed-run-instructions
     config:
@@ -43,7 +53,7 @@ shared:
           * re-fly pipeline after commenting-out `disable_manual_trigger: true`
           * trigger failed jobs
           * re-fly pipeline after uncommenting `disable_manual_trigger: true`
-  - &upload-raw-stemcells
+  - &upload-ubuntu-raw-stemcells
     aggregate:
     - put: bosh-ubuntu-raw-stemcells
       params:
@@ -53,6 +63,55 @@ shared:
       params:
         file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
         predefined_acl: "publicRead"
+  - &upload-ubuntu-raw-alpha-stemcells
+    aggregate:
+    - put: bosh-ubuntu-raw-alpha-stemcells
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+        predefined_acl: "publicRead"
+    - put: bosh-ubuntu-raw-alpha-stemcells-sha1
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+        predefined_acl: "publicRead"
+  - &upload-centos-raw-stemcells
+    aggregate:
+    - put: bosh-centos-raw-stemcells
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz
+        predefined_acl: "publicRead"
+    - put: bosh-centos-raw-stemcells-sha1
+      params:
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz.sha1
+        predefined_acl: "publicRead"
+  - &verify-alpha-stemcell-boots
+    do:
+    - put: terraform
+      resource: alpha-terraform
+      params:
+        generate_random_name: true
+        terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+    - task: deploy-skeletal
+      file: bosh-cpi-src/ci/stemcell/light/tasks/deploy-skeletal.yml
+      params:
+        SSH_PRIVATE_KEY: {{ssh_private_key}}
+        GCE_CREDENTIALS_JSON: {{gce_alpha_credentials_json}}
+    - put: light-alpha-stemcell-bucket
+      params:
+        file: light-stemcell/light-bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent.tgz
+        predefined_acl: "publicRead"
+    on_failure:
+      *cleanup-failed-run-instructions
+    ensure:
+      task: destroy-skeletal
+      file: bosh-cpi-src/ci/stemcell/light/tasks/destroy-skeletal.yml
+      ensure:
+        put: alpha-terraform
+        params:
+          env_name_file: terraform/name
+          terraform_source: bosh-cpi-src/ci/stemcell/light/terraform/
+          action: destroy
+        get_params:
+          action: destroy
   - &verify-stemcell-boots
     do:
     - put: terraform
@@ -88,23 +147,6 @@ shared:
           action: destroy
 
 jobs:
-  - name: ubuntu-trusty-stemcell-latest
-    disable_manual_trigger: true
-    plan:
-      - aggregate:
-        - get: stemcell
-          resource: ubuntu-stemcell-latest
-          trigger: true
-          version: every
-          params:
-            preserve_filename: true
-        - *get-cpi-src
-        - *get-bosh-cli
-        - *get-cpi-release
-      - *create-light-stemcell
-      - *upload-raw-stemcells
-      - *verify-stemcell-boots
-
   - name: ubuntu-trusty-stemcell-3312
     disable_manual_trigger: true
     plan:
@@ -119,7 +161,7 @@ jobs:
         - *get-bosh-cli
         - *get-cpi-release
       - *create-light-stemcell
-      - *upload-raw-stemcells
+      - *upload-ubuntu-raw-stemcells
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3263
@@ -136,7 +178,74 @@ jobs:
         - *get-bosh-cli
         - *get-cpi-release
       - *create-light-stemcell
-      - *upload-raw-stemcells
+      - *upload-ubuntu-raw-stemcells
+      - *verify-stemcell-boots
+
+  - name: ubuntu-trusty-stemcell-3363
+    disable_manual_trigger: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-3363
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-ubuntu-raw-stemcells
+      - *verify-stemcell-boots
+
+  - name: ubuntu-trusty-stemcell-alpha
+    serial: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-alpha
+          trigger: false
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-alpha-stemcell
+      - *upload-ubuntu-raw-alpha-stemcells
+      - *verify-alpha-stemcell-boots
+
+  - name: centos-7-stemcell-3312
+    disable_manual_trigger: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: centos-stemcell-3312
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-centos-raw-stemcells
+      - *verify-stemcell-boots
+
+  - name: centos-7-stemcell-3363
+    disable_manual_trigger: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: centos-stemcell-3363
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-centos-raw-stemcells
       - *verify-stemcell-boots
 
 resources:
@@ -155,7 +264,20 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: master
+      branch: develop
+
+  - name: alpha-terraform
+    type: terraform
+    source:
+      delete_on_failure: true
+      storage:
+        bucket: {{terraform_bucket_name}}
+        bucket_path: alpha-stemcell-ci-terraform/
+        access_key_id: {{terraform_bucket_access_key}}
+        secret_access_key: {{terraform_bucket_secret_key}}
+      vars:
+        gce_project_id: {{gce_alpha_project_id}}
+        gce_credentials_json: {{gce_alpha_credentials_json}}
 
   - name: terraform
     type: terraform
@@ -170,25 +292,67 @@ resources:
         gce_project_id: {{gce_project_id}}
         gce_credentials_json: {{gce_credentials_json}}
 
-  - name: ubuntu-stemcell-latest
-    type: bosh-io-stemcell-version-family
-    source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
-      force_regular: true
-
   - name: ubuntu-stemcell-3312
-    type: bosh-io-stemcell-version-family
+    type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
       version_family: "3312"
 
   - name: ubuntu-stemcell-3263
-    type: bosh-io-stemcell-version-family
+    type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
       force_regular: true
       version_family: "3263"
+
+  - name: ubuntu-stemcell-3363
+    type: bosh-io-stemcell
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      version_family: "3363"
+
+  - name: ubuntu-stemcell-alpha
+    type: s3
+    source:
+      bucket: bosh-core-stemcells-candidate
+      regexp: google/bosh-stemcell-(.+)-google-kvm-ubuntu-trusty-go_agent.tgz
+
+  - name: bosh-ubuntu-raw-alpha-stemcells
+    type: gcs-resource
+    source:
+      json_key: {{gce_alpha_credentials_json}}
+      bucket:   {{google_raw_alpha_stemcells_bucket_name}}
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+
+  - name: bosh-ubuntu-raw-alpha-stemcells-sha1
+    type: gcs-resource
+    source:
+      json_key: {{gce_alpha_credentials_json}}
+      bucket:   {{google_raw_alpha_stemcells_bucket_name}}
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+
+  - name: light-alpha-stemcell-bucket
+    type: gcs-resource
+    source:
+      json_key: {{gce_alpha_credentials_json}}
+      bucket:   {{google_alpha_stemcells_bucket_name}}
+      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+
+  - name: centos-stemcell-3312
+    type: bosh-io-stemcell
+    source:
+      name: bosh-google-kvm-centos-7-go_agent
+      force_regular: true
+      version_family: "3312"
+
+  - name: centos-stemcell-3363
+    type: bosh-io-stemcell
+    source:
+      name: bosh-google-kvm-centos-7-go_agent
+      force_regular: true
+      version_family: "3363"
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
@@ -204,6 +368,20 @@ resources:
       bucket:   {{google_raw_stemcells_bucket_name}}
       regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
 
+  - name: bosh-centos-raw-stemcells
+    type: gcs-resource
+    source:
+      json_key: {{gce_credentials_json}}
+      bucket:   {{google_raw_stemcells_bucket_name}}
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent-raw.tar.gz
+
+  - name: bosh-centos-raw-stemcells-sha1
+    type: gcs-resource
+    source:
+      json_key: {{gce_credentials_json}}
+      bucket:   {{google_raw_stemcells_bucket_name}}
+      regexp:   bosh-stemcell-([0-9\.]+)-google-kvm-centos-7-go_agent-raw.tar.gz.sha1
+
 resource_types:
   - name: gcs-resource
     type: docker-image
@@ -213,9 +391,3 @@ resource_types:
     type: docker-image
     source:
       repository: ljfranklin/terraform-resource
-  # TODO: switch back to using canonical resource after PR is merged #133222913
-  - name: bosh-io-stemcell-version-family
-    type: docker-image
-    source:
-      repository: boshcpi/bosh-io-stemcell-resource
-      tag: PR-version-family
