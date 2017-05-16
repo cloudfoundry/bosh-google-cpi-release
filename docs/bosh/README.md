@@ -70,13 +70,19 @@ provides an overview of the deployment:
 
   [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/_) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
 
-  Run the following commands to deploy BOSH with XPN:
+  The host project must have the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview), [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview), and the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview) enabled.
+
+  To deploy the network in a host project export the host project ID:
 
   ```
-  export xpn_host_project_id=<Existing Project ID that will become the XPN host>
-  export org_id=<Organization ID (a number), find with gcloud organizations list>
-  export email=<Email address used to sign into gcloud>
+  export xpn_host_project_id=<existing project that will become the XPN host>
+  ```
 
+  Then setup the projects for XPN:
+
+  ```
+  export org_id=$(gcloud projects describe ${project_id} --format 'json' | jq -r '.parent.id')
+  export email=$(gcloud config get-value account)
   gcloud organizations add-iam-policy-binding ${org_id} \
     --member user:${email} \
     --role roles/compute.xpnAdmin
