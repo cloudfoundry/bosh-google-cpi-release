@@ -70,4 +70,6 @@ builds:
     version: 25.7.0
   f2ee47ae-e9ed-43d1-aad3-80202b89a67b:
     version: 25.7.1
+  1a7babe9-bad9-4015-bdbb-e4f5f8530ab6:
+    version: 25.8.0
 format-version: '2'
