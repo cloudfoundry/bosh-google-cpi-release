@@ -66,19 +66,20 @@ provides an overview of the deployment:
      --role roles/owner
    ```
 
-1. **Optional**: Configure Cross Project Networking (XPN):
+<a name="deploy-xpn"></a>
+### Optional: Setup Cross Project Networking (XPN)
 
-  [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/_) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
+   [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/_) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
 
-  The host project must have the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview), [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview), and the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview) enabled.
+   The host project must have the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview), [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview), and the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview) enabled. This project will be used to create the bosh network throughout this guide.
 
-  To deploy the network in a host project export the host project ID:
+1. Modify and export the host project ID:
 
    ```
    export xpn_host_project_id=<existing project that will become the XPN host>
    ```
 
-  Then setup the projects for XPN:
+1. Setup the projects for XPN:
 
    ```
    export org_id=$(gcloud projects describe ${project_id} --format 'json' | jq -r '.parent.id')
