@@ -238,8 +238,8 @@ Now you have the infrastructure ready to deploy a BOSH director.
        url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=260.3
        sha1: 22c79db2a785efa9cbc32c62b8094500e952e170
      - name: bosh-google-cpi
-       url: https://storage.googleapis.com/develop-bosh-cpi-artifacts/bosh-google-cpi-0.0.265.tgz
-       sha1: e0fbc91fc363460a2a3160badfadf4b7dd4ab88f
+       url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.8.0
+       sha1: bb943b492c025903b6c4a833e2f836e5c1479bbc
 
    resource_pools:
      - name: vms
