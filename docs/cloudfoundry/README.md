@@ -50,7 +50,8 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   ```
   terraform plan \
     -var network=${network} \
-    -var projectid=${project_id} \
+    -var project_id=${project_id} \
+    -var network_project_id=${network_project_id} \
     -var region=${region} \
     -var region_compilation=${region_compilation} \
     -var zone=${zone} \
@@ -62,7 +63,8 @@ The following instructions use [Terraform](terraform.io) to provision all of the
   ```
   terraform apply \
     -var network=${network} \
-    -var projectid=${project_id} \
+    -var project_id=${project_id} \
+    -var network_project_id=${network_project_id} \
     -var region=${region} \
     -var region_compilation=${region_compilation} \
     -var zone=${zone} \
@@ -167,7 +169,8 @@ Then delete the infrastructure you created with terraform:
   ```
   cd /share/docs/cloudfoundry
   terraform destroy \
-    -var projectid=${project_id} \
+    -var project_id=${project_id} \
+    -var network_project_id=${network_project_id} \
     -var region=${region} \
     -var zone=${zone} \
     -var network=${network}
