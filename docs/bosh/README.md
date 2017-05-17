@@ -464,7 +464,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var xpn_host_project_id=${xpn_host_project_id-project_id}
+       -var network_project_id=${network_project_id-project_id}
 
    # Clean up your IAM credentials and key
    gcloud iam service-accounts delete ${service_account_email}
