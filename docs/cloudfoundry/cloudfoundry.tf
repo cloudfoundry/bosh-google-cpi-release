@@ -1,4 +1,8 @@
-variable "projectid" {
+variable "project_id" {
+    type = "string"
+}
+
+variable "network_project_id" {
     type = "string"
 }
 
@@ -33,7 +37,7 @@ variable "prefix" {
 
 provider "google" {
     credentials = ""
-    project = "${var.projectid}"
+    project = "${var.project_id}"
     region = "${var.region}"
 }
 
@@ -42,21 +46,23 @@ resource "google_compute_subnetwork" "cf-compilation-subnet-1" {
   name          = "${var.prefix}cf-compilation-${var.region_compilation}"
   region        = "${var.region_compilation}"
   ip_cidr_range = "10.200.0.0/16"
-  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.network}"
-
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.network_project_id}/global/networks/${var.network}"
+  project       = "${var.network_project_id}"
 }
 
 // Subnet for the private Cloud Foundry components
 resource "google_compute_subnetwork" "cf-private-subnet-1" {
   name          = "${var.prefix}cf-private-${var.region}"
   ip_cidr_range = "192.168.0.0/16"
-  network       = "https://www.googleapis.com/compute/v1/projects/${var.projectid}/global/networks/${var.network}"
+  network       = "https://www.googleapis.com/compute/v1/projects/${var.network_project_id}/global/networks/${var.network}"
+  project       = "${var.network_project_id}"
 }
 
 // Allow access to CloudFoundry HTTP router
 resource "google_compute_firewall" "cf-public" {
   name    = "${var.prefix}cf-public"
-  network       = "${var.network}"
+  network = "${var.network}"
+  project = "${var.network_project_id}"
 
   allow {
     protocol = "tcp"
@@ -69,7 +75,8 @@ resource "google_compute_firewall" "cf-public" {
 // Allow access to CloudFoundry TCP router
 resource "google_compute_firewall" "cf-tcp-public" {
   name    = "${var.prefix}cf-tcp-public"
-  network       = "${var.network}"
+  network = "${var.network}"
+  project = "${var.network_project_id}"
 
   allow {
     protocol = "tcp"
