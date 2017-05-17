@@ -1,7 +1,7 @@
 ---
 <%
 # Ensure all expected ENV vars are set
-['director', 'vip', 'region', 'zone', 'region_compilation', 'zone_compilation', 'network', 'compilation_subnet', 'private_subnet', 'project_id', 'xpn_host_project_id'].each do |val|
+['director', 'vip', 'region', 'zone', 'region_compilation', 'zone_compilation', 'network', 'compilation_subnet', 'private_subnet', 'project_id', 'network_project_id'].each do |val|
   if ENV[val].nil? || ENV[val].empty?
     raise "Missing environment variable: #{val}"
   end
@@ -21,7 +21,7 @@ google_region_compilation = ENV['region_compilation']
 google_zone_compilation = ENV['zone_compilation']
 
 network = ENV['network']
-xpn_host_project_id = ENV['xpn_host_project_id']
+network_project_id = ENV['network_project_id']
 compilation_subnetwork = ENV['compilation_subnet']
 private_subnetwork = ENV['private_subnet']
 
@@ -120,7 +120,7 @@ networks:
         zone: <%= google_zone_compilation%>
         region: <%= google_region_compilation%>
         network_name: <%= network%>
-        xpn_host_project_id: <%= xpn_host_project_id %>
+        xpn_host_project_id: <%= network_project_id %>
         subnetwork_name: <%= compilation_subnetwork%>
         ephemeral_external_ip: false
         tags:
@@ -136,7 +136,7 @@ networks:
       cloud_properties:
         zone: <%= google_zone%>
         network_name: <%= network%>
-        xpn_host_project_id: <%= xpn_host_project_id %>
+        xpn_host_project_id: <%= network_project_id %>
         subnetwork_name: <%= private_subnetwork%>
         ephemeral_external_ip: false
         tags:

@@ -4,11 +4,11 @@ variable "latest_ubuntu" {
     default = "ubuntu-1404-trusty-v20170505"
 }
 
-variable "projectid" {
+variable "project_id" {
     type = "string"
 }
 
-variable "xpn_host_projectid" {
+variable "network_project_id" {
     type = "string"
 }
 
@@ -38,13 +38,13 @@ variable "baseip" {
 }
 
 provider "google" {
-    project = "${var.projectid}"
+    project = "${var.project_id}"
     region = "${var.region}"
 }
 
 resource "google_compute_network" "bosh" {
   name       = "${var.prefix}bosh"
-  project    = "${var.xpn_host_projectid}"
+  project    = "${var.network_project_id}"
 }
 
 resource "google_compute_route" "nat-primary" {
@@ -55,7 +55,7 @@ resource "google_compute_route" "nat-primary" {
   next_hop_instance_zone = "${var.zone}"
   priority               = 800
   tags                   = ["no-ip"]
-  project                = "${var.xpn_host_projectid}"
+  project                = "${var.network_project_id}"
 }
 
 // Subnet for the BOSH director
@@ -63,7 +63,7 @@ resource "google_compute_subnetwork" "bosh-subnet-1" {
   name          = "${var.prefix}bosh-${var.region}"
   ip_cidr_range = "${var.baseip}/24"
   network       = "${google_compute_network.bosh.self_link}"
-  project       = "${var.xpn_host_projectid}"
+  project       = "${var.network_project_id}"
 }
 
 // Allow SSH to BOSH bastion
@@ -81,14 +81,14 @@ resource "google_compute_firewall" "bosh-bastion" {
   }
 
   target_tags = ["bosh-bastion"]
-  project     = "${var.xpn_host_projectid}"
+  project     = "${var.network_project_id}"
 }
 
 // Allow all traffic within subnet
 resource "google_compute_firewall" "intra-subnet-open" {
   name    = "${var.prefix}intra-subnet-open"
   network = "${google_compute_network.bosh.name}"
-  project = "${var.xpn_host_projectid}"
+  project = "${var.network_project_id}"
 
   allow {
     protocol = "icmp"
@@ -121,7 +121,7 @@ resource "google_compute_instance" "bosh-bastion" {
 
   network_interface {
     subnetwork         = "${google_compute_subnetwork.bosh-subnet-1.name}"
-    subnetwork_project = "${var.xpn_host_projectid}"
+    subnetwork_project = "${var.network_project_id}"
     access_config {
       // Ephemeral IP
     }
@@ -163,7 +163,7 @@ export ssh_key_path=$HOME/.ssh/bosh
 # Vars from Terraform
 export subnetwork=${google_compute_subnetwork.bosh-subnet-1.name}
 export network=${google_compute_network.bosh.name}
-export xpn_host_project_id=${var.xpn_host_projectid}
+export network_project_id=${var.network_project_id}
 
 
 # Vars from metadata service
@@ -199,7 +199,7 @@ resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
   name         = "${var.prefix}nat-instance-primary"
   machine_type = "n1-standard-1"
   zone         = "${var.zone}"
-  project      = "${var.xpn_host_projectid}"
+  project      = "${var.network_project_id}"
 
   tags = ["nat", "internal"]
 
@@ -209,7 +209,7 @@ resource "google_compute_instance" "nat-instance-private-with-nat-primary" {
 
   network_interface {
     subnetwork = "${google_compute_subnetwork.bosh-subnet-1.name}"
-    subnetwork_project = "${var.xpn_host_projectid}"
+    subnetwork_project = "${var.network_project_id}"
     access_config {
       // Ephemeral IP
     }

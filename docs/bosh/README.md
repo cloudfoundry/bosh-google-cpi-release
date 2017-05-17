@@ -129,7 +129,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var xpn_host_projectid=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-project_id}
    ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -145,7 +145,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var xpn_host_projectid=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-project_id}
    ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -191,7 +191,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
    gcloud projects add-iam-policy-binding ${project_id} \
      --member serviceAccount:${service_account_email} \
      --role roles/iam.serviceAccountActor
-   gcloud projects add-iam-policy-binding ${xpn_host_project_id} \
+   gcloud projects add-iam-policy-binding ${network_project_id} \
      --member serviceAccount:${service_account_email} \
      --role roles/compute.networkUser
    ```
@@ -225,7 +225,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
    ```
    ---
    <%
-   ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'xpn_host_project_id', 'ssh_key_path', 'base_ip'].each do |val|
+   ['zone', 'service_account_email', 'network', 'subnetwork', 'project_id', 'network_project_id', 'ssh_key_path', 'base_ip'].each do |val|
      if ENV[val].nil? || ENV[val].empty?
        raise "Missing environment variable: #{val}"
      end
@@ -272,7 +272,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
          cloud_properties:
            network_name: <%= ENV['network'] %>
            subnetwork_name: <%= ENV['subnetwork'] %>
-           xpn_host_project_id: <%= ENV['xpn_host_project_id'] %>
+           xpn_host_project_id: <%= ENV['network_project_id'] %>
            ephemeral_external_ip: false
            tags:
              - internal
@@ -445,7 +445,7 @@ From your Cloud Shell instance, run the following command to delete the infrastr
    ```
    # Set a few vars, in case they were forgotten
    export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
-   export xpn_host_project_id=$(gcloud beta compute xpn get-host-project ${project_id} | grep name | cut -d : -f 2 - | tr -d '\n' | tr  -d ' ')
+   export network_project_id=$(gcloud beta compute xpn get-host-project ${project_id} | grep name | cut -d : -f 2 - | tr -d '\n' | tr  -d ' ')
    export region=us-east1
    export zone=us-east1-d
    export service_account_email=terraform@${project_id}.iam.gserviceaccount.com
