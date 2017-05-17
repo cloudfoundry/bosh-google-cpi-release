@@ -125,7 +125,7 @@ The following instructions offer the fastest path to getting BOSH up and running
      -w /$(basename `pwd`) \
      hashicorp/terraform:light plan \
        -var service_account_email=${service_account_email} \
-       -var projectid=${project_id} \
+       -var project_id=${project_id} \
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
@@ -141,7 +141,7 @@ The following instructions offer the fastest path to getting BOSH up and running
      -w /$(basename `pwd`) \
      hashicorp/terraform:light apply \
        -var service_account_email=${service_account_email} \
-       -var projectid=${project_id} \
+       -var project_id=${project_id} \
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
@@ -460,11 +460,11 @@ From your Cloud Shell instance, run the following command to delete the infrastr
      -v `pwd`:/$(basename `pwd`) \
      -w /$(basename `pwd`) \
      hashicorp/terraform:light destroy \
-       -var projectid=${project_id} \
+       -var project_id=${project_id} \
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var xpn_host_projectid=${xpn_host_project_id-project_id}
+       -var xpn_host_project_id=${xpn_host_project_id-project_id}
 
    # Clean up your IAM credentials and key
    gcloud iam service-accounts delete ${service_account_email}
