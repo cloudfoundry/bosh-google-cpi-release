@@ -14,6 +14,8 @@ import (
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
+	"context"
+	"crypto/tls"
 )
 
 const (
@@ -40,28 +42,35 @@ func NewGoogleClient(
 	var computeClient, storageClient *http.Client
 	userAgent := config.GetUserAgent()
 
+	newClient := &http.Client{
+		Transport: &http.Transport{
+			TLSNextProto: map[string]func(authority string, c *tls.Conn) http.RoundTripper{},
+		},
+	}
+	newContext := context.WithValue(oauth2.NoContext, oauth2.HTTPClient, newClient)
+
 	if config.JSONKey != "" {
 		computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
 		}
-		computeClient = computeJwtConf.Client(oauth2.NoContext)
+		computeClient = computeJwtConf.Client(newContext)
 
 		storageJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), storageScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
 		}
-		storageClient = storageJwtConf.Client(oauth2.NoContext)
+		storageClient = storageJwtConf.Client(newContext)
 	} else {
 		if v := os.Getenv("GCE_METADATA_HOST"); v == "" {
 			os.Setenv("GCE_METADATA_HOST", metadataHost)
 		}
-		computeClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope)
+		computeClient, err = oauthgoogle.DefaultClient(newContext, computeScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
 		}
 
-		storageClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, storageScope)
+		storageClient, err = oauthgoogle.DefaultClient(newContext, storageScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
 		}
