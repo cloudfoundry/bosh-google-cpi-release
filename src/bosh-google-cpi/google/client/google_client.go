@@ -9,8 +9,8 @@ import (
 
 	"bosh-google-cpi/google/config"
 
-	"context"
 	"crypto/tls"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	oauthgoogle "golang.org/x/oauth2/google"
 	computebeta "google.golang.org/api/compute/v0.beta"
