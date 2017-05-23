@@ -1,11 +1,8 @@
----
-golang/go1.7.1.darwin-amd64.tar.gz:
-  object_id: a221739e-d8d9-4d18-822c-53bc266ff3e2
-  sha: !binary |-
-    ZjMzZDViYWNmMmMzNWZlNTllZjc2ZThmYzBkODdkMjdiYTA0MzJhMw==
-  size: 81509752
-golang/go1.7.1.linux-amd64.tar.gz:
-  object_id: 4f8395e2-0e30-4310-b6ac-0fe2769e69ca
-  sha: !binary |-
-    OTE5YWIwMTMwNWFkYTAwNzhhOWZkZjhhMTJiYjU2ZmIwYjhhMTQ0NA==
-  size: 81618401
+golang/go1.8.1.darwin-amd64.tar.gz:
+  size: 89606703
+  object_id: c384257e-9abc-479c-7396-772e6ccee48f
+  sha: aecf5ec9360a004fdbff181269554892743f4bf6
+golang/go1.8.1.linux-amd64.tar.gz:
+  size: 91277742
+  object_id: c80fea59-9a98-4f2b-5aa2-a316530d1e1c
+  sha: a433f76c569055ff8536d796995518dd91a9fa5b
