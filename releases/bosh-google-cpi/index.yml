@@ -72,4 +72,6 @@ builds:
     version: 25.7.1
   1a7babe9-bad9-4015-bdbb-e4f5f8530ab6:
     version: 25.8.0
+  8cb52764-1f14-4b91-abcc-83aa44b94dd5:
+    version: 25.9.0
 format-version: '2'
