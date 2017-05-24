@@ -25,37 +25,42 @@ Developers may find it easier to set the GOPATH to the directory of the check-ou
 
 ```
 cd bosh-google-cpi-release
-export GOPATH=$pwd
+export GOPATH=$PWD
 PATH=$PATH:$GOPATH/bin
 ```
 
 ### Running integration tests
-1. Set your project:
+1. Set your project and [credentials](https://developers.google.com/identity/protocols/application-default-credentials) (alternatively, you may set `GOOGLE_CREDENTIALS` to the contents of your JSON credentials file):
 
   ```
   export GOOGLE_PROJECT=your-project-id
+  export GOOGLE_APPLICATION_CREDENTIALS=~/google_creds.json
   ```
 
 1. Create the infrastructure required to run tests:
 
   ```
-  make configint
+  pushd src/bosh-google-cpi/; make configint; popd
   ```
 
 1. Run the integration tests:
 
   ```
-  make testint
+  pushd src/bosh-google-cpi/; make testint; popd
   ```
 
-To destroy the infrastructure required to run the integration tests, execute:
+1. To destroy the infrastructure required to run the integration tests, execute:
 
   ```
-  make cleanint
+  pushd src/bosh-google-cpi/; make cleanint; popd
   ```
+
+#### Terraform Permissions
+
+The Google account which terraforms the environment should have, at a minimum, the following permissions: _Compute Image User_, _Compute Instance Admin_, _Compute Network Admin_, _Service Account Admin_.
 
 ## Contributing
-For detailes on how to contribute to this project - including filing bug reports and contributing code changes - pleasee see [CONTRIBUTING.md].
+For details on how to contribute to this project - including filing bug reports and contributing code changes - pleasee see [CONTRIBUTING.md].
 
 [CHANGELOG.md]: CHANGELOG.md
 [CONTRIBUTING.md]: CONTRIBUTING.md
