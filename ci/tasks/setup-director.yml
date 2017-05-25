@@ -4,7 +4,6 @@ image_resource:
   type: docker-image
   source:
     repository: boshcpi/gce-cpi-release
-    tag: v4
 inputs:
   - name: bosh-cpi-src
   - name: bosh-cpi-release

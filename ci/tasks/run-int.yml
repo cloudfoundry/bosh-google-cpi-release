@@ -4,24 +4,23 @@ image_resource:
   type: docker-image
   source:
     repository: boshcpi/gce-cpi-release
-    tag: v4
 inputs:
   - name: bosh-cpi-src
   - name: stemcell
 run:
   path: bosh-cpi-src/ci/tasks/run-int.sh
 params:
-  google_project:                replace-me 
-  google_region:                 replace-me 
-  google_zone:                   replace-me 
-  google_network:                replace-me 
-  google_subnetwork:             replace-me 
-  google_auto_network:           replace-me 
-  google_target_pool:            replace-me 
-  google_address_int:            replace-me 
-  google_address_static_int:     replace-me 
-  google_backend_service:        replace-me 
-  google_region_backend_service: replace-me 
-  google_service_account:        replace-me 
+  google_project:                replace-me
+  google_region:                 replace-me
+  google_zone:                   replace-me
+  google_network:                replace-me
+  google_subnetwork:             replace-me
+  google_auto_network:           replace-me
+  google_target_pool:            replace-me
+  google_address_int:            replace-me
+  google_address_static_int:     replace-me
+  google_backend_service:        replace-me
+  google_region_backend_service: replace-me
+  google_service_account:        replace-me
   google_json_key_data: |
     replace-me
