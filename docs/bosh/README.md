@@ -66,6 +66,13 @@ provides an overview of the deployment:
      --role roles/owner
    ```
 
+
+1. Make your service account's key available in an environment variable to be used by `terraform`:
+
+   ```
+   export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
+   ```
+
 <a name="deploy-xpn"></a>
 ### Optional: Setup Cross Project Networking (XPN)
 
@@ -94,12 +101,6 @@ provides an overview of the deployment:
    gcloud projects add-iam-policy-binding ${xpn_host_project_id} \
      --member serviceAccount:${service_account_email} \
      --role roles/owner
-   ```
-
-1. Make your service account's key available in an environment variable to be used by `terraform`:
-
-   ```
-   export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
    ```
 
 <a name="deploy-automatic"></a>
