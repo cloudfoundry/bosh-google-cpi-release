@@ -130,7 +130,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var network_project_id=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-$project_id}
    ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -146,7 +146,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var network_project_id=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-$project_id}
    ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
