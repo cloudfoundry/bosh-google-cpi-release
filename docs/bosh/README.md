@@ -66,6 +66,13 @@ provides an overview of the deployment:
      --role roles/owner
    ```
 
+
+1. Make your service account's key available in an environment variable to be used by `terraform`:
+
+   ```
+   export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
+   ```
+
 <a name="deploy-xpn"></a>
 ### Optional: Setup Cross Project Networking (XPN)
 
@@ -96,12 +103,6 @@ provides an overview of the deployment:
      --role roles/owner
    ```
 
-1. Make your service account's key available in an environment variable to be used by `terraform`:
-
-   ```
-   export GOOGLE_CREDENTIALS=$(cat ~/terraform.key.json)
-   ```
-
 <a name="deploy-automatic"></a>
 ## Deploy supporting infrastructure
 The following instructions offer the fastest path to getting BOSH up and running on Google Cloud Platform. Using [Terraform](https://www.terraform.io/) you will provision all of the infrastructure required to run BOSH in just a few commands.
@@ -129,7 +130,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var network_project_id=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-$project_id}
    ```
 
 1. Create the resources (should take between 60-90 seconds):
@@ -145,7 +146,7 @@ The following instructions offer the fastest path to getting BOSH up and running
        -var region=${region} \
        -var zone=${zone} \
        -var baseip=${base_ip} \
-       -var network_project_id=${xpn_host_project_id-project_id}
+       -var network_project_id=${xpn_host_project_id-$project_id}
    ```
 
 Now you have the infrastructure ready to deploy a BOSH director.
@@ -238,8 +239,8 @@ Now you have the infrastructure ready to deploy a BOSH director.
        url: https://bosh.io/d/github.com/cloudfoundry/bosh?v=260.3
        sha1: 22c79db2a785efa9cbc32c62b8094500e952e170
      - name: bosh-google-cpi
-       url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.8.0
-       sha1: bb943b492c025903b6c4a833e2f836e5c1479bbc
+       url: https://bosh.io/d/github.com/cloudfoundry-incubator/bosh-google-cpi-release?v=25.9.0
+       sha1: 3fbda22fde33878b54dec77f4182f8044be72687
 
    resource_pools:
      - name: vms
