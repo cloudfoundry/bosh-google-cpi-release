@@ -21,6 +21,8 @@ jobs:
 
       - task: unit-tests
         file: bosh-cpi-src/ci/tasks/unit-tests.yml
+        params:
+          GO_VERSION: 1.8.1
 
   - name: build-candidate
     serial: true
@@ -220,6 +222,7 @@ jobs:
         file: bosh-cpi-src/ci/tasks/run-int.yml
         config:
           params:
+            GO_VERSION:                       1.8.1
             google_project:                   {{google_project}}
             google_region:                    {{google_region}}
             google_zone:                      {{google_zone}}

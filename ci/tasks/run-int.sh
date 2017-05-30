@@ -17,6 +17,13 @@ check_param google_region_backend_service
 check_param google_address_static_int
 check_param google_address_int
 check_param google_service_account
+: ${GO_VERSION:?}
+
+current=$(go version)
+if [[ "$current" != *"$GO_VERSION"* ]]; then
+  echo "Go version is incorrect"
+  exit 1
+fi
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
