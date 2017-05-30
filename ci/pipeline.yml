@@ -21,8 +21,9 @@ jobs:
 
       - task: unit-tests
         file: bosh-cpi-src/ci/tasks/unit-tests.yml
-        params:
-          GO_VERSION: 1.8.1
+        config:
+          params:
+            GO_VERSION: 1.8.1
 
   - name: build-candidate
     serial: true
