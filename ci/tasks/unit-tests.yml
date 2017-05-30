@@ -9,3 +9,5 @@ inputs:
   - name: bosh-cpi-src
 run:
   path: bosh-cpi-src/ci/tasks/unit-tests.sh
+params:
+  GO_VERSION: ""
