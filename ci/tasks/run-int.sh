@@ -70,6 +70,8 @@ export ZONE=${google_zone}
 export GOPATH=${PWD}/bosh-cpi-src
 export PATH=${GOPATH}/bin:$PATH
 
+check_go_version $GOPATH
+
 cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
 env
 make testintci
