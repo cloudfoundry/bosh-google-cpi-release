@@ -25,4 +25,3 @@ params:
   google_service_account:        replace-me
   google_json_key_data: |
     replace-me
-  GO_VERSION: ""

@@ -17,13 +17,6 @@ check_param google_region_backend_service
 check_param google_address_static_int
 check_param google_address_int
 check_param google_service_account
-: ${GO_VERSION:?}
-
-current=$(go version)
-if [[ "$current" != *"$GO_VERSION"* ]]; then
-  echo "Go version is incorrect"
-  exit 1
-fi
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
@@ -76,6 +69,15 @@ export ZONE=${google_zone}
 # Setup Go and run tests
 export GOPATH=${PWD}/bosh-cpi-src
 export PATH=${GOPATH}/bin:$PATH
+
+release_go_version="$(cat "$GOPATH/packages/golang/spec" | \
+  grep linux | awk '{print $2}' | sed "s/golang\/go\(.*\)\.linux-amd65.tar.gz/\1/")"
+
+current=$(go version)
+if [[ "$current" != *"$release_go_version"* ]]; then
+  echo "Go version is incorrect"
+  exit 1
+fi
 
 cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
 env
