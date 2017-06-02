@@ -177,6 +177,8 @@ resource "google_compute_instance" "google_region_backend_service" {
   disk {
     image = "debian-cloud/debian-8"
   }
+
+  depends_on = ["google_compute_subnetwork.google_subnetwork"]
 }
 
 resource "google_compute_region_backend_service" "google_region_backend_service" {
