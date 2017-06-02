@@ -46,7 +46,7 @@ function add_on_exit {
 function check_go_version {
   local cpi_release=$1
   local release_go_version="$(cat "$cpi_release/packages/golang/spec" | \
-    grep linux | awk '{print $2}' | sed "s/golang\/go\(.*\)\.linux-amd65.tar.gz/\1/")"
+    grep linux | awk '{print $2}' | sed "s/golang\/go\(.*\)\.linux-amd64.tar.gz/\1/")"
 
   local current=$(go version)
   if [[ "$current" != *"$release_go_version"* ]]; then
