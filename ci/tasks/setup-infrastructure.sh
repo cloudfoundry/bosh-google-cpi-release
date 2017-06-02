@@ -16,10 +16,10 @@ check_param google_firewall_internal
 check_param google_firewall_external
 check_param google_address_director_ubuntu
 check_param google_address_bats_ubuntu
-check_param google_target_pool
-check_param google_backend_service 
-check_param google_region_backend_service
 check_param google_address_int_ubuntu
+check_param google_target_pool
+check_param google_backend_service
+check_param google_region_backend_service
 check_param google_service_account
 
 echo "Creating google json key..."

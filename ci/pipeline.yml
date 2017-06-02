@@ -245,7 +245,7 @@ jobs:
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: major}}
-      
+
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
@@ -263,7 +263,7 @@ jobs:
         params:
           file: promoted/*.tgz
           predefined_acl: "publicRead"
-      
+
       - put: bosh-cpi-artifacts-sha1
         params:
           file: promoted/*.tgz.sha1
@@ -277,7 +277,7 @@ jobs:
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
-      
+
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
@@ -295,7 +295,7 @@ jobs:
         params:
           file: promoted/*.tgz
           predefined_acl: "publicRead"
-      
+
       - put: bosh-cpi-artifacts-sha1
         params:
           file: promoted/*.tgz.sha1
@@ -309,7 +309,7 @@ jobs:
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats], get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
-      
+
       - task: promote
         file: bosh-cpi-src/ci/tasks/promote-candidate.yml
         config:
@@ -327,7 +327,7 @@ jobs:
         params:
           file: promoted/*.tgz
           predefined_acl: "publicRead"
-      
+
       - put: bosh-cpi-artifacts-sha1
         params:
           file: promoted/*.tgz.sha1

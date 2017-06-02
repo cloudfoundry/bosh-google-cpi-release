@@ -1,139 +1,177 @@
-variable "project" {
+variable "google_project" {
   type = "string"
 }
-
-variable "google_credentials" {
+variable "google_region" {
   type = "string"
 }
-
-variable "region" {
-  default = "us-central1"
+variable "google_zone" {
+  type = "string"
 }
-
-variable "zone_a" {
-  default = "us-central1-a"
+variable "google_json_key_data" {
+  type = "string"
 }
-
-variable "zone_b" {
-  default = "us-central1-b"
+variable "google_network" {
+  type = "string"
 }
-
-variable "env_name" {
+variable "google_auto_network" {
+  type = "string"
+}
+variable "google_subnetwork" {
+  type = "string"
+}
+variable "google_subnetwork_range" {
+  type = "string"
+}
+variable "google_firewall_internal" {
+  type = "string"
+}
+variable "google_firewall_external" {
+  type = "string"
+}
+variable "google_address_director_ubuntu" {
+  type = "string"
+}
+variable "google_address_bats_ubuntu" {
+  type = "string"
+}
+variable "google_address_int_ubuntu" {
+  type = "string"
+}
+variable "google_target_pool" {
+  type = "string"
+}
+variable "google_backend_service" {
+  type = "string"
+}
+variable "google_region_backend_service" {
+  type = "string"
+}
+variable "google_service_account" {
   type = "string"
 }
 
 provider "google" {
-  credentials = "${file(var.google_credentials)}"
-  project     = "${var.project}"
-  region      = "${var.region}"
+  credentials = "${var.google_json_key_data}"
+  project     = "${var.google_project}"
+  region      = "${var.google_region}"
 }
 
-// If you see `Error creating service account: googleapi: Error 403: Google Identity and Access Management (IAM) API has not been used in project`
-// then follow the instructions to fix
-// gcloud --project=$(GOOGLE_PROJECT) iam service-accounts create cfintegration
-resource "google_service_account" "cfintegration" {
-  account_id   = "${var.env_name}"
+resource "google_service_account" "google_service_account" {
+  account_id   = "${var.google_service_account}"
 }
 
-resource "google_compute_network" "cfintegration" {
-  name = "${var.env_name}"
-  auto_create_subnetworks = "true"
+resource "google_compute_address" "google_address_director_ubuntu" {
+  name = "${var.google_address_director_ubuntu}"
 }
 
-resource "google_compute_network" "cfintegration-custom" {
-  name = "${var.env_name}-custom"
-  auto_create_subnetworks = "false"
+resource "google_compute_address" "google_address_bats_ubuntu" {
+  name = "${var.google_address_bats_ubuntu}"
 }
 
-resource "google_compute_subnetwork" "cfintegration-custom-subnet" {
-  name          = "${var.env_name}-custom-subnet"
-  ip_cidr_range = "192.168.0.0/16"
-  network       = "${var.env_name}-custom"
-  region        = "${var.region}"
-  depends_on    = [ "google_compute_network.cfintegration-custom" ]
+resource "google_compute_address" "google_address_int_ubuntu" {
+  name = "${var.google_address_int_ubuntu}"
 }
 
-resource "google_compute_address" "cfintegration" {
-  name       = "${var.env_name}"
-  region     = "${var.region}"
-  depends_on = [ "google_compute_network.cfintegration" ]
+resource "google_compute_network" "google_auto_network" {
+  name = "${var.google_auto_network}"
 }
 
-resource "google_compute_target_pool" "cfintegration" {
-  name = "${var.env_name}"
+resource "google_compute_network" "google_network" {
+  name = "${var.google_network}"
+  auto_create_subnetworks = false
 }
 
-resource "google_compute_instance_group" "cfintegration_a" {
-  name        = "${var.env_name}"
-  zone        = "${var.zone_a}"
+resource "google_compute_subnetwork" "google_subnetwork" {
+  name          = "${var.google_subnetwork}"
+  ip_cidr_range = "${var.google_subnetwork_range}"
+  network       = "${google_compute_network.google_network.self_link}"
 }
 
-resource "google_compute_instance_group" "cfintegration_b" {
-  name        = "${var.env_name}"
-  zone        = "${var.zone_b}"
+resource "google_compute_firewall" "google_firewall_internal" {
+  name    = "${var.google_firewall_internal}"
+  network = "${google_compute_network.google_network.name}"
+
+  description = "BOSH CI Internal traffic"
+
+  allow {
+    protocol = "icmp"
+  }
+  allow {
+    protocol = "tcp"
+  }
+  allow {
+    protocol = "udp"
+  }
+
+  source_tags = ["${var.google_firewall_internal}"]
+  target_tags = ["${var.google_firewall_internal}"]
 }
 
-resource "google_compute_http_health_check" "cfintegration" {
-  name         = "${var.env_name}"
+resource "google_compute_firewall" "google_firewall_external" {
+  name    = "${var.google_firewall_external}"
+  network = "${google_compute_network.google_network.name}"
+
+  description = "BOSH CI External traffic"
+
+  allow {
+    protocol = "tcp"
+    ports = ["22", "443", "4222", "6868", "25250", "25555", "25777"]
+  }
+  allow {
+    protocol = "udp"
+    ports = ["53"]
+  }
+
+  target_tags = ["${var.google_firewall_external}"]
 }
 
-resource "google_compute_backend_service" "cfintegration" {
-  name        = "${var.env_name}"
+resource "google_compute_target_pool" "google_target_pool" {
+  name = "${var.google_target_pool}"
+}
+
+resource "google_compute_instance_group" "google_backend_service" {
+  name = "${var.google_backend_service}"
+  zone = "${var.google_zone}"
+}
+
+resource "google_compute_http_health_check" "google_backend_service" {
+  name         = "${var.google_backend_service}"
+}
+
+resource "google_compute_backend_service" "google_backend_service" {
+  name        = "${var.google_backend_service}"
   port_name   = "http"
   timeout_sec = 30
 
   backend {
-    group = "${google_compute_instance_group.cfintegration_a.self_link}"
-    balancing_mode = "UTILIZATION"
-    capacity_scaler = 1 # default 1
-    max_utilization = 0.8 # default 0.8
+    group = "${google_compute_instance_group.google_backend_service.self_link}"
   }
 
-  backend {
-    group = "${google_compute_instance_group.cfintegration_b.self_link}"
-    balancing_mode = "UTILIZATION"
-    capacity_scaler = 1 # default 1
-    max_utilization = 0.8 # default 0.8
-  }
-
-  health_checks = [ "${google_compute_http_health_check.cfintegration.self_link}" ]
-  depends_on    = [
-    "google_compute_http_health_check.cfintegration",
-    "google_compute_instance_group.cfintegration_a",
-    "google_compute_instance_group.cfintegration_b"
-  ]
+  health_checks = ["${google_compute_http_health_check.google_backend_service.self_link}"]
 }
 
-resource "google_compute_instance_group" "cfintegration-ilb-a" {
-  name        = "${var.env_name}-ilb"
-  zone        = "${var.zone_a}"
+resource "google_compute_instance_group" "google_region_backend_service" {
+  name = "${var.google_region_backend_service}"
+  zone = "${var.google_zone}"
 
-  instances = [
-    "${google_compute_instance.cfintegration-ilb-a.self_link}"
-  ]
+  instances = ["${google_compute_instance.google_region_backend_service.self_link}"]
 }
 
-resource "google_compute_instance_group" "cfintegration-ilb-b" {
-  name        = "${var.env_name}-ilb"
-  zone        = "${var.zone_b}"
+resource "google_compute_health_check" "google_region_backend_service" {
+  name         = "${var.google_region_backend_service}"
 
-  instances = [
-    "${google_compute_instance.cfintegration-ilb-b.self_link}"
-  ]
+  tcp_health_check {}
 }
 
-resource "google_compute_health_check" "cfintegration" {
-  name = "${var.env_name}"
-  tcp_health_check { }
-}
-
-resource "google_compute_instance" "cfintegration-ilb-a" {
-  name         = "${var.env_name}-ilb-a"
-  zone         = "${var.zone_a}"
+resource "google_compute_instance" "google_region_backend_service" {
+  name = "${var.google_region_backend_service}"
+  zone         = "${var.google_zone}"
   machine_type = "f1-micro"
 
   network_interface {
-    subnetwork = "${google_compute_subnetwork.cfintegration-custom-subnet.name}"
+    subnetwork = "${google_compute_subnetwork.google_subnetwork.name}"
+
+    address = "${cidrhost(var.google_subnetwork_range, -3)}"
   }
 
   disk {
@@ -141,35 +179,14 @@ resource "google_compute_instance" "cfintegration-ilb-a" {
   }
 }
 
-resource "google_compute_instance" "cfintegration-ilb-b" {
-  name         = "${var.env_name}-ilb-b"
-  zone         = "${var.zone_b}"
-  machine_type = "f1-micro"
-
-  network_interface {
-    subnetwork = "${google_compute_subnetwork.cfintegration-custom-subnet.name}"
-  }
-
-  disk {
-    image = "debian-cloud/debian-8"
-  }
-}
-
-resource "google_compute_region_backend_service" "region-cfintegration" {
-  name             = "region-${var.env_name}"
-  protocol         = "TCP"
-  timeout_sec      = 30
+resource "google_compute_region_backend_service" "google_region_backend_service" {
+  name        = "${var.google_region_backend_service}"
+  protocol    = "TCP"
+  timeout_sec = 30
 
   backend {
-    group = "${google_compute_instance_group.cfintegration-ilb-a.self_link}"
-  }
-  backend {
-    group = "${google_compute_instance_group.cfintegration-ilb-b.self_link}"
+    group = "${google_compute_instance_group.google_region_backend_service.self_link}"
   }
 
-  health_checks = [ "${google_compute_health_check.cfintegration.self_link}" ]
-}
-
-output "external_ip" {
-  value  = "${google_compute_address.cfintegration.address}"
+  health_checks = ["${google_compute_health_check.google_region_backend_service.self_link}"]
 }
