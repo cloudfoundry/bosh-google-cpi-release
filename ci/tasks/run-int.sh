@@ -30,19 +30,12 @@ export REGION_BACKEND_SERVICE=$(echo ${metadata} | jq --raw-output ".RegionBacke
 export SERVICE_ACCOUNT=$(echo ${metadata} | jq --raw-output ".TargetPool" )
 export EXTERNAL_STATIC_IP=$(echo ${metadata} | jq --raw-output ".IntegrationExternalIP" )
 export INT_STEMCELL="stemcell.tgz"
-# export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 export STEMCELL_URL="$( tar -xzf stemcell/stemcell.tgz -- stemcell.MF && cat stemcell.MF | grep source_url | awk '{print $2}' )"
 export CPI_ASYNC_DELETE=true
 
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
-
-# Divine the raw stemcell URL
-# stemcell_url_base=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
-# stemcell_url_base=${stemcell_url_base/light-/}
-# stemcell_url_base=${stemcell_url_base/\.tgz/-raw\.tar\.gz}
-# export STEMCELL_URL=$stemcell_url_base
 
 echo "Setting up artifacts..."
 cp ./stemcell/*.tgz stemcell.tgz

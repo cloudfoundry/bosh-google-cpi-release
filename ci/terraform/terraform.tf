@@ -38,6 +38,7 @@ resource "google_compute_address" "google_address_int_ubuntu" {
 
 resource "google_compute_network" "google_auto_network" {
   name = "${var.env_name}-auto"
+  auto_create_subnetworks = true
 }
 
 resource "google_compute_network" "google_custom_network" {
