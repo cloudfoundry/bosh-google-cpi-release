@@ -1,0 +1,21 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source: {repository: boshcpi/cpi-certification}
+
+inputs:
+  - name: bosh-cpi-src
+  - name: environment
+  - name: director-config
+
+outputs:
+  - name: bats-config
+
+run:
+  path: bosh-cpi-src/ci/tasks/prepare-bats.sh
+
+params:
+  bat_vcap_password: ""
+  director_password: ""
+  stemcell_name:     ""

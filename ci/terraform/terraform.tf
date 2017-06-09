@@ -206,9 +206,6 @@ output "IntegrationStaticIPs" {
 output "IntegrationExternalIP" {
   value = "${google_compute_address.google_address_int_ubuntu.address}"
 }
-output "BATsStaticIP" {
-  value = "${cidrhost(google_compute_subnetwork.google_subnetwork.ip_cidr_range, 7)}"
-}
 output "TargetPool" {
   value = "${google_compute_target_pool.google_target_pool.name}"
 }
@@ -223,4 +220,13 @@ output "ILBInstanceGroup" {
 }
 output "ServiceAccount" {
   value = "${google_service_account.google_service_account.email}"
+}
+output "BATsExternalIP" {
+  value = "${google_compute_address.google_address_bats_ubuntu.address}"
+}
+output "BATsStaticIPPair" {
+  value = "${cidrhost(google_compute_subnetwork.google_subnetwork.ip_cidr_range, 13)},${cidrhost(google_compute_subnetwork.google_subnetwork.ip_cidr_range, 14)}"
+}
+output "BATsStaticIP" {
+  value = "${cidrhost(google_compute_subnetwork.google_subnetwork.ip_cidr_range, 7)}"
 }

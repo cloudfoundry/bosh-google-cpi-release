@@ -56,7 +56,6 @@ jobs:
         - {trigger: false, get: certification}
         - {trigger: false, get: bosh-release}
         - {trigger: false, get: bats}
-        - {trigger: false, get: dummy-boshrelease}
       - put: terraform
         params:
           terraform_source: bosh-cpi-src/ci/terraform
@@ -68,7 +67,6 @@ jobs:
           environment: terraform
         params:
           google_json_key_data: {{google_json_key_data}}
-          director_username:    {{director_username}}
           director_password:    {{director_password}}
       - do:
         - task: deploy-director
@@ -76,28 +74,20 @@ jobs:
           input_mapping:
             pipelines: certification
             environment: terraform
-        - task: deploy-dummy
-          file: bosh-cpi-src/ci/tasks/deploy-dummy.yml
+        - task: prepare-bats
+          file: bosh-cpi-src/ci/tasks/prepare-bats.yml
+          input_mapping:
+            pipelines: certification
+            environment: terraform
           params:
-            google_project:           {{google_project}}
-            google_region:            {{google_region}}
-            google_zone:              {{google_zone}}
-            google_json_key_data:     {{google_json_key_data}}
-            base_os:                  Ubuntu
-            stemcell_name:            bosh-google-kvm-ubuntu-trusty-go_agent
-            director_username:        {{director_username}}
-            director_password:        {{director_password}}
+            bat_vcap_password: {{bat_vcap_password}}
+            director_password: {{director_password}}
+            stemcell_name:     bosh-google-kvm-ubuntu-trusty-go_agent
         - task: run-bats
-          file: bosh-cpi-src/ci/tasks/run-bats.yml
-          params:
-            google_project:                             {{google_project}}
-            google_region:                              {{google_region}}
-            google_zone:                                {{google_zone}}
-            google_json_key_data:                       {{google_json_key_data}}
-            base_os:                                    Ubuntu
-            stemcell_name:                              bosh-google-kvm-ubuntu-trusty-go_agent
-            bat_vcap_password:                          {{bat_vcap_password}}
-            private_key_data:                           {{private_key_data}}
+          file: certification/shared/tasks/run-bats.yml
+          input_mapping:
+            pipelines: certification
+            environment: terraform
         ensure:
           do:
             - task: teardown
@@ -201,13 +191,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
-
-  - name: dummy-boshrelease
-    type: git
-    source:
-      uri: https://github.com/pivotal-cf-experimental/dummy-boshrelease.git
-      branch: master
+      branch: gcp-certification
 
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell

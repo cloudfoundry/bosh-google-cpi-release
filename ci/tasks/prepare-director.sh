@@ -16,7 +16,6 @@ ci_output_dir="${workspace_dir}/director-config"
 
 # environment
 : ${google_json_key_data:?}
-: ${director_username:?}
 : ${director_password:?}
 : ${METADATA_FILE:=${ci_environment_dir}/metadata}
 : ${OUTPUT_DIR:=${ci_output_dir}}
@@ -58,7 +57,7 @@ cat > "${OUTPUT_DIR}/director.env" <<EOF
 #!/usr/bin/env bash
 
 export BOSH_ENVIRONMENT=${director_external_ip}
-export BOSH_CLIENT=${director_username}
+export BOSH_CLIENT=admin
 export BOSH_CLIENT_SECRET="${director_password}"
 EOF
 

@@ -18,5 +18,4 @@ run:
   path: bosh-cpi-src/ci/tasks/prepare-director.sh
 params:
   google_json_key_data: ""
-  director_username:    ""
   director_password:    ""
