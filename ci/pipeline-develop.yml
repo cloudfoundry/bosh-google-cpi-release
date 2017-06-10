@@ -39,7 +39,7 @@ jobs:
       - put: terraform
         params:
           terraform_source: bosh-cpi-src/ci/terraform
-          env_name: patch-follower
+          env_name: quick-bard
           action: destroy
         get_params:
           action: destroy
@@ -48,8 +48,8 @@ jobs:
     serial_groups: [run-bats]
     plan:
       - aggregate:
-        - {trigger: false,  get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false,  get: cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: false, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: false, get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false, get: bosh-deployment}
         - {trigger: false, get: bosh-cli}
@@ -91,7 +91,9 @@ jobs:
         ensure:
           do:
             - task: teardown
-              file: bosh-cpi-src/ci/tasks/teardown.yml
+              file: certification/shared/tasks/teardown.yml
+              input_mapping:
+                pipelines: certification
             - put: terraform
               params:
                 terraform_source: bosh-cpi-src/ci/terraform

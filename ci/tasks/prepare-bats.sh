@@ -6,7 +6,7 @@ set -e
 : ${director_password:?}
 : ${stemcell_name:?}
 
-source pipelines/shared/utils.sh
+source certification/shared/utils.sh
 source /etc/profile.d/chruby.sh
 chruby 2.1.7
 
@@ -18,7 +18,7 @@ director_config="${workspace_dir}/director-config"
 bats_dir="${workspace_dir}/bats"
 director_state_dir="${workspace_dir}/director-state"
 
-metadata="$( cat ${ci_environment_dir}/metadata} )"
+metadata="$( cat ${ci_environment_dir}/metadata )"
 
 # configuration
 : ${zone:=$(    echo ${metadata} | jq --raw-output ".Zone" )}
@@ -26,11 +26,9 @@ metadata="$( cat ${ci_environment_dir}/metadata} )"
 : ${subnetwork:=$(echo ${metadata} | jq --raw-output ".Subnetwork" )}
 : ${subnetwork_cidr:=$(echo ${metadata} | jq --raw-output ".SubnetworkCIDR" )}
 : ${google_subnetwork_gw:=$(echo ${metadata} | jq --raw-output ".SubnetworkGateway" )}
-
 : ${director_external_ip:=$(echo ${metadata} | jq --raw-output ".DirectorExternalIP" )}
 : ${internal_tag:=$(echo ${metadata} | jq --raw-output ".InternalTag" )}
 : ${external_tag:=$(echo ${metadata} | jq --raw-output ".ExternalTag" )}
-
 : ${bats_ip:=$( echo ${metadata} | jq --raw-output ".BATsExternalIP" )}
 : ${bats_static_ip_pair:=$(echo ${metadata} | jq --raw-output ".BATsStaticIPPair" )}
 : ${bats_static_ip:=$(echo ${metadata} | jq --raw-output ".BATsStaticIP" )}

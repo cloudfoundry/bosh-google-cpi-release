@@ -7,7 +7,9 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: environment
-  - name: director-config
+  - name: director-state
+  - name: bats
+  - name: certification
 
 outputs:
   - name: bats-config
