@@ -20,6 +20,8 @@ director_state_dir="${workspace_dir}/director-state"
 bosh_cli="${workspace_dir}/bosh-cli/*bosh-cli-*"
 chmod +x $bosh_cli
 
+creds_path() { bosh-cli int $director_state_dir/creds.yml --path="$1" ; }
+
 metadata="$( cat ${ci_environment_dir}/metadata )"
 
 # configuration
@@ -43,25 +45,23 @@ bats_spec="${output_dir}/bats-config.yml"
 bats_env="${output_dir}/bats.env"
 ssh_key="${output_dir}/shared.pem"
 
-echo "$($bosh_cli int $director_state_dir/creds.yml --path /jumpbox_ssh/private_key)" > ${ssh_key}
-
 # env file generation
 cat > "${bats_env}" <<EOF
 #!/usr/bin/env bash
 
-export BAT_DIRECTOR=${director_external_ip}
+export BOSH_ENVIRONMENT=${director_external_ip}
+export BOSH_CLIENT="admin"
+export BOSH_CLIENT_SECRET="$( creds_path /admin_password )"
+export BOSH_CA_CERT="$( creds_path /director_ssl/ca )"
 export BAT_DNS_HOST=${director_external_ip}
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
-export BAT_VCAP_PRIVATE_KEY="bats-config/shared.pem"
-export BAT_VCAP_PASSWORD=${bat_vcap_password}
-export BAT_DIRECTOR_USER=admin
-export BAT_DIRECTOR_PASSWORD="${director_password}"
+export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip"
 
 # bosh2 ssh info
 export BOSH_GW_HOST=${director_external_ip}
 export BOSH_GW_USER=jumpbox
-export BAT_PRIVATE_KEY="\$(cat bats-config/shared.pem)"
+export BAT_PRIVATE_KEY="$( creds_path /jumpbox_ssh/private_key )"
 EOF
 
 # BATs spec generation
