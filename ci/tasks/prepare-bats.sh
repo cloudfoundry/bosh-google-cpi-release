@@ -16,8 +16,9 @@ workspace_dir="$( cd ${release_dir} && cd .. && pwd )"
 ci_environment_dir="${workspace_dir}/environment"
 director_config="${workspace_dir}/director-config"
 bats_dir="${workspace_dir}/bats"
-bosh_cli="${workspace_dir}/bosh-cli/*bosh-cli-*"
 director_state_dir="${workspace_dir}/director-state"
+bosh_cli="${workspace_dir}/bosh-cli/*bosh-cli-*"
+chmod +x $bosh_cli
 
 metadata="$( cat ${ci_environment_dir}/metadata )"
 
@@ -61,19 +62,11 @@ export BOSH_GW_USER=jumpbox
 export BAT_PRIVATE_KEY=$($bosh_cli int $director_state_dir/creds.yml --path /jumpbox_ssh/private_key)
 EOF
 
-pushd "${bats_dir}" > /dev/null
-  ./write_gemfile
-  bundle install
-  bundle exec bosh -n target "${director_external_ip}"
-  BOSH_UUID="$(bundle exec bosh status --uuid)"
-popd > /dev/null
-
 # BATs spec generation
 cat > "${bats_spec}" <<EOF
 ---
 cpi: google
 properties:
-  uuid: ${BOSH_UUID}
   stemcell:
     name: ${stemcell_name}
     version: latest
