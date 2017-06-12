@@ -54,7 +54,7 @@ export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="$( creds_path /admin_password )"
 export BOSH_CA_CERT="$( creds_path /director_ssl/ca )"
 export BAT_DNS_HOST=${director_external_ip}
-export BAT_INFRASTRUCTURE=google
+export BAT_INFRASTRUCTURE=gcp
 export BAT_NETWORKING=dynamic
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip"
 
