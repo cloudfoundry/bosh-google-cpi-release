@@ -125,6 +125,7 @@ jobs:
             google_json_key_data:             {{google_json_key_data}}
         ensure:
           put: terraform
+          attempts: 5
           params:
             terraform_source: bosh-cpi-src/ci/terraform
             env_name_file: terraform/name

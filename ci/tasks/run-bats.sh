@@ -36,12 +36,10 @@ bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
 bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
 
 echo "Setting up artifacts..."
-echo "${private_key_data}" > ${private_key}
 cp ./stemcell/*.tgz stemcell.tgz
 
 echo "Setting up artifacts..."
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
-echo "${private_key_data}" > ${private_key}
 
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
@@ -68,12 +66,6 @@ export BAT_DNS_HOST=${director_ip}
 
 echo "Looking for bats IP..."
 bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
-
-echo "Creating private key..."
-echo "${private_key_data}" > ${private_key}
-chmod go-r ${private_key}
-eval $(ssh-agent)
-ssh-add ${private_key}
 
 echo "Using BOSH CLI version..."
 bosh version
