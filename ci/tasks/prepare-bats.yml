@@ -6,6 +6,7 @@ image_resource:
 
 inputs:
   - name: bosh-cpi-src
+  - name: bosh-cli
   - name: environment
   - name: director-state
   - name: bats

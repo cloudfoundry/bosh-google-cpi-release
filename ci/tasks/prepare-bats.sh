@@ -16,6 +16,7 @@ workspace_dir="$( cd ${release_dir} && cd .. && pwd )"
 ci_environment_dir="${workspace_dir}/environment"
 director_config="${workspace_dir}/director-config"
 bats_dir="${workspace_dir}/bats"
+bosh_cli="${workspace_dir}/bosh-cli/*bosh-cli-*"
 director_state_dir="${workspace_dir}/director-state"
 
 metadata="$( cat ${ci_environment_dir}/metadata )"
@@ -53,6 +54,11 @@ export BAT_VCAP_PRIVATE_KEY="bats-config/shared.pem"
 export BAT_VCAP_PASSWORD=${bat_vcap_password}
 export BAT_DIRECTOR_USER=admin
 export BAT_DIRECTOR_PASSWORD="${director_password}"
+
+# bosh2 ssh info
+export BOSH_GW_HOST=${director_external_ip}
+export BOSH_GW_USER=jumpbox
+export BAT_PRIVATE_KEY=$($bosh_cli int $director_state_dir/creds.yml --path /jumpbox_ssh/private_key)
 EOF
 
 pushd "${bats_dir}" > /dev/null

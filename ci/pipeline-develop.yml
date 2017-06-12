@@ -84,10 +84,7 @@ jobs:
             director_password: {{director_password}}
             stemcell_name:     bosh-google-kvm-ubuntu-trusty-go_agent
         - task: run-bats
-          file: certification/shared/tasks/run-bats.yml
-          input_mapping:
-            pipelines: certification
-            environment: terraform
+          file: bats/ci/tasks/run-bats.yml
         ensure:
           do:
             - task: teardown

@@ -82,6 +82,7 @@ EOF
 ${bosh_cli} interpolate \
   --ops-file ${bosh_deployment}/gcp/cpi.yml \
   --ops-file ${bosh_deployment}/powerdns.yml \
+  --ops-file ${bosh_deployment}/jumpbox-user.yml \
   --ops-file ${bosh_deployment}/external-ip-not-recommended.yml \
   --ops-file ${certification}/gcp/assets/ops/custom-releases.yml \
   -v bosh_release_uri="${BOSH_RELEASE_URI}" \
