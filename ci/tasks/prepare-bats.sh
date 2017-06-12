@@ -43,6 +43,8 @@ bats_spec="${output_dir}/bats-config.yml"
 bats_env="${output_dir}/bats.env"
 ssh_key="${output_dir}/shared.pem"
 
+echo "$($bosh_cli int $director_state_dir/creds.yml --path /jumpbox_ssh/private_key)" > ${ssh_key}
+
 # env file generation
 cat > "${bats_env}" <<EOF
 #!/usr/bin/env bash
@@ -59,7 +61,7 @@ export BAT_DIRECTOR_PASSWORD="${director_password}"
 # bosh2 ssh info
 export BOSH_GW_HOST=${director_external_ip}
 export BOSH_GW_USER=jumpbox
-export BAT_PRIVATE_KEY=$($bosh_cli int $director_state_dir/creds.yml --path /jumpbox_ssh/private_key)
+export BAT_PRIVATE_KEY="\$(cat bats-config/shared.pem)"
 EOF
 
 # BATs spec generation
