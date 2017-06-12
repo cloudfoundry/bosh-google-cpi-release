@@ -86,7 +86,7 @@ properties:
         static: ${bats_reserved_range}
         cloud_properties:
           network_name: ${network}
-          subnetwork_name: ${network}
+          subnetwork_name: ${subnetwork}
           ephemeral_external_ip: true
           tags:
             - ${internal_tag}
