@@ -20,7 +20,7 @@ director_state_dir="${workspace_dir}/director-state"
 bosh_cli="${workspace_dir}/bosh-cli/*bosh-cli-*"
 chmod +x $bosh_cli
 
-creds_path() { bosh-cli int $director_state_dir/creds.yml --path="$1" ; }
+creds_path() { $bosh_cli int $director_state_dir/creds.yml --path="$1" ; }
 
 metadata="$( cat ${ci_environment_dir}/metadata )"
 
