@@ -27,7 +27,7 @@ export TARGET_POOL=$(echo ${metadata} | jq --raw-output ".TargetPool" )
 export BACKEND_SERVICE=$(echo ${metadata} | jq --raw-output ".BackendService" )
 export ILB_INSTANCE_GROUP=$(echo ${metadata} | jq --raw-output ".ILBInstanceGroup" )
 export REGION_BACKEND_SERVICE=$(echo ${metadata} | jq --raw-output ".RegionBackendService" )
-export SERVICE_ACCOUNT=$(echo ${metadata} | jq --raw-output ".TargetPool" )
+export SERVICE_ACCOUNT=$(echo ${metadata} | jq --raw-output ".ServiceAccount" )
 export EXTERNAL_STATIC_IP=$(echo ${metadata} | jq --raw-output ".IntegrationExternalIP" )
 export INT_STEMCELL="stemcell.tgz"
 export STEMCELL_URL="$( tar -xzf stemcell/stemcell.tgz -- stemcell.MF && cat stemcell.MF | grep source_url | awk '{print $2}' )"
@@ -60,3 +60,6 @@ check_go_version $GOPATH
 cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
 env
 make testintci
+
+echo "Sleeping... waiting for VM's to be deleted"
+sleep $(( 60 * 5 ))

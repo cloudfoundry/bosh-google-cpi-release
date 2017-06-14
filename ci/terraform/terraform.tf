@@ -24,16 +24,6 @@ resource "google_service_account" "google_service_account" {
   account_id   = "${var.env_name}"
 }
 
-data "google_iam_policy" "service_account_actor" {
-  binding {
-    role = "roles/iam.serviceAccountActor"
-
-    members = [
-      "serviceAccount:${google_service_account.google_service_account.email}",
-    ]
-  }
-}
-
 resource "google_compute_address" "google_address_director_ubuntu" {
   name = "${var.env_name}-director-ubuntu"
 }

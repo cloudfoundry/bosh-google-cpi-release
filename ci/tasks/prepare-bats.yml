@@ -19,6 +19,4 @@ run:
   path: bosh-cpi-src/ci/tasks/prepare-bats.sh
 
 params:
-  bat_vcap_password: ""
-  director_password: ""
   stemcell_name:     ""

@@ -6,13 +6,12 @@ groups:
       - build-candidate
       - run-bats
       - run-int
-      - teardown-infrastructure
 
 jobs:
   - name: test-unit
     plan:
       - aggregate:
-        - {trigger: false, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
       - task: unit-tests
         file: bosh-cpi-src/ci/tasks/unit-tests.yml
 
@@ -20,8 +19,8 @@ jobs:
     serial: true
     plan:
       - aggregate:
-        - {trigger: false, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
-        - {trigger: false,                     get: version-semver, params: {bump: patch}}
+        - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
+        - {trigger: false,                      get: version-semver, params: {bump: patch}}
       - put: version-semver
         params: {file: version-semver/number}
       - task: build-release
@@ -31,25 +30,12 @@ jobs:
       - put: bosh-cpi-dev-artifacts-sha1
         params: {file: candidate/*.tgz.sha1}
 
-  - name: teardown-infrastructure
-    # serial_groups: [run-bats, run-int]
-    plan:
-      - aggregate:
-        - {get: bosh-cpi-src, resource: bosh-cpi-src-in}
-      - put: terraform
-        params:
-          terraform_source: bosh-cpi-src/ci/terraform
-          env_name: quick-bard
-          action: destroy
-        get_params:
-          action: destroy
-
   - name: run-bats
-    serial_groups: [run-bats]
+    serial: true
     plan:
       - aggregate:
         - {trigger: false, get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: true, get: cpi-release, resource: bosh-cpi-dev-artifacts, passed: [build-candidate]}
         - {trigger: false, get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false, get: bosh-deployment}
         - {trigger: false, get: bosh-cli}
@@ -80,11 +66,9 @@ jobs:
             pipelines: certification
             environment: terraform
           params:
-            bat_vcap_password: {{bat_vcap_password}}
-            director_password: {{director_password}}
-            stemcell_name:     bosh-google-kvm-ubuntu-trusty-go_agent
+            stemcell_name: bosh-google-kvm-ubuntu-trusty-go_agent
         - task: run-bats
-          file: bats/ci/tasks/run-bats.yml
+          file: certification/ci/tasks/run-bats.yml
         ensure:
           do:
             - task: teardown
@@ -100,10 +84,10 @@ jobs:
                 action: destroy
 
   - name: run-int
-    # serial_groups: [run-int]
+    serial: true
     plan:
       - aggregate:
-        - {trigger: false, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in, passed: [build-candidate]}
         - {trigger: false, get: stemcell, resource: google-ubuntu-stemcell}
       - put: terraform
         params:
@@ -122,7 +106,6 @@ jobs:
             google_json_key_data:             {{google_json_key_data}}
         ensure:
           put: terraform
-          attempts: 5
           params:
             terraform_source: bosh-cpi-src/ci/terraform
             env_name_file: terraform/name
@@ -197,13 +180,6 @@ resources:
     type: bosh-io-stemcell
     source:
       name: bosh-google-kvm-ubuntu-trusty-go_agent
-
-  # - name: google-ubuntu-stemcell
-  #   type: gcs-resource
-  #   source:
-  #     json_key: {{google_json_key_data}}
-  #     bucket: bosh-gce-raw-stemcells
-  #     regexp: bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
 
   - name: terraform
     type: terraform_type
