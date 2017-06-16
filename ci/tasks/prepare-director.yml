@@ -1,0 +1,21 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source: {repository: boshcpi/cpi-certification}
+inputs:
+  - name: bosh-cpi-src
+  - name: bosh-cli
+  - name: bosh-release
+  - name: cpi-release
+  - name: stemcell
+  - name: environment
+  - name: certification
+  - name: bosh-deployment
+outputs:
+  - name: director-config
+run:
+  path: bosh-cpi-src/ci/tasks/prepare-director.sh
+params:
+  google_json_key_data: ""
+  director_password:    ""

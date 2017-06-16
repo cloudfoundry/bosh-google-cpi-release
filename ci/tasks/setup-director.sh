@@ -105,7 +105,7 @@ jobs:
     templates:
       - name: nats
         release: bosh
-      - name: postgres
+      - name: postgres-9.4
         release: bosh
       - name: powerdns
         release: bosh

@@ -2,83 +2,51 @@
 
 set -e
 
-source bosh-cpi-src/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.1.2.sh
+# inputs
+release_dir="$( cd $(dirname $0) && cd ../.. && pwd )"
+source ${release_dir}/ci/tasks/utils.sh
+workspace_dir="$( cd ${release_dir} && cd .. && pwd )"
+environment_dir="${workspace_dir}/environment"
+stemcell_dir="${workspace_dir}/stemcell"
 
-check_param google_project
-check_param google_region
-check_param google_zone
-check_param google_json_key_data
-check_param google_network
-check_param google_subnetwork
-check_param google_target_pool
-check_param google_backend_service
-check_param google_region_backend_service
-check_param google_address_static_int
-check_param google_address_int
-check_param google_service_account
-: ${GO_VERSION:?}
+: ${STEMCELL:=${stemcell_dir}/stemcell.tgz}
+: ${METADATA_FILE:=${environment_dir}/metadata}
 
-current=$(go version)
-if [[ "$current" != *"$GO_VERSION"* ]]; then
-  echo "Go version is incorrect"
-  exit 1
-fi
+metadata="$( cat ${METADATA_FILE} )"
 
-# Initialize deployment artifacts
-google_json_key=google_key.json
+# configuration
+: ${google_json_key_data:?}
+echo "Creating google json key..."
+echo "${google_json_key_data}" > /tmp/google_key.json
 
-export INT_STEMCELL="stemcell.tgz"
-export NETWORK_NAME=${google_auto_network}
-export CUSTOM_NETWORK_NAME=${google_network}
-export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
-export PRIVATE_IP=${google_address_static_int}
-export TARGET_POOL=${google_target_pool}
-export BACKEND_SERVICE=${google_backend_service}
-export REGION_BACKEND_SERVICE=${google_region_backend_service}
-export ILB_INSTANCE_GROUP=${google_region_backend_service}
-export ZONE=${google_zone}
-export REGION=${google_region}
-export GOOGLE_PROJECT=${google_project}
-export SERVICE_ACCOUNT=${google_service_account}@${google_project}.iam.gserviceaccount.com
-export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
+export GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_key.json
+export GOOGLE_PROJECT=$(echo ${metadata} | jq --raw-output ".ProjectID" )
+export REGION=$(echo ${metadata} | jq --raw-output ".Region" )
+export ZONE=$(echo ${metadata} | jq --raw-output ".Zone" )
+export NETWORK_NAME=$(echo ${metadata} | jq --raw-output ".AutoNetwork" )
+export CUSTOM_NETWORK_NAME=$(echo ${metadata} | jq --raw-output ".CustomNetwork" )
+export CUSTOM_SUBNETWORK_NAME=$(echo ${metadata} | jq --raw-output ".Subnetwork" )
+export PRIVATE_IP=$(echo ${metadata} | jq --raw-output ".IntegrationStaticIPs" )
+export TARGET_POOL=$(echo ${metadata} | jq --raw-output ".TargetPool" )
+export BACKEND_SERVICE=$(echo ${metadata} | jq --raw-output ".BackendService" )
+export ILB_INSTANCE_GROUP=$(echo ${metadata} | jq --raw-output ".ILBInstanceGroup" )
+export REGION_BACKEND_SERVICE=$(echo ${metadata} | jq --raw-output ".RegionBackendService" )
+export SERVICE_ACCOUNT=$(echo ${metadata} | jq --raw-output ".ServiceAccount" )
+export EXTERNAL_STATIC_IP=$(echo ${metadata} | jq --raw-output ".IntegrationExternalIP" )
+export STEMCELL_URL="$( tar -xzf ${STEMCELL} -- stemcell.MF && cat stemcell.MF | grep source_url | awk '{print $2}' )"
 export CPI_ASYNC_DELETE=true
 
-# Divine the raw stemcell URL
-stemcell_url_base=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
-stemcell_url_base=${stemcell_url_base/light-/}
-stemcell_url_base=${stemcell_url_base/\.tgz/-raw\.tar\.gz}
-export STEMCELL_URL=$stemcell_url_base
-
-echo "Setting up artifacts..."
-cp ./stemcell/*.tgz stemcell.tgz
-
-
-echo "Creating google json key..."
-echo "${google_json_key_data}" > ${google_json_key}
-mkdir -p $HOME/.config/gcloud/
-cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
-
-echo "Configuring google account..."
-gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application_default_credentials.json
-gcloud config set project ${google_project}
-gcloud config set compute/region ${google_region}
-gcloud config set compute/zone ${google_zone}
-
-# Find external IP
-echo "Looking for external IP..."
-external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
-export EXTERNAL_STATIC_IP=${external_ip}
-
-# Export zone
-export ZONE=${google_zone}
-
-# Setup Go and run tests
-export GOPATH=${PWD}/bosh-cpi-src
+export GOPATH=${release_dir}
 export PATH=${GOPATH}/bin:$PATH
 
 check_go_version $GOPATH
 
-cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
-env
-make testintci
+pushd ${release_dir}/src/bosh-google-cpi
+  make testintci
+popd
+
+rm /tmp/google_key.json
+if [ -d "${environment_dir}" ]; then
+  echo "Sleeping... waiting for VM's to be deleted"
+  sleep $(( 60 * 5 ))
+fi
