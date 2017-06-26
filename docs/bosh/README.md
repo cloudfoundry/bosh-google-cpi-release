@@ -74,19 +74,19 @@ provides an overview of the deployment:
    ```
 
 <a name="deploy-xpn"></a>
-### Optional: Setup Cross Project Networking (XPN)
+### Optional: Setup Shared VPC (Formerly XPN)
 
-   [Cross Project Networking](https://cloud.google.com/compute/docs/xpn/) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use XPN and you must be signed in as an organization admin.
+   [Shared VPC](https://cloud.google.com/compute/docs/shared-vpc/) uses a host project to manage the network resources and client project(s) to deploy compute resources. An [organization](https://cloud.google.com/resource-manager/docs/quickstart-organizations) is required to use Shared VPC and you must be signed in as an organization admin.
 
    The host project must have the [GCE API](https://console.developers.google.com/apis/api/compute_component/overview), [IAM API](https://console.cloud.google.com/apis/api/iam.googleapis.com/overview), and the [Cloud Resource Manager API](https://console.cloud.google.com/apis/api/cloudresourcemanager.googleapis.com/overview) enabled. This project will be used to create the bosh network throughout this guide.
 
 1. Modify and export the host project ID:
 
    ```
-   export xpn_host_project_id=<existing project that will become the XPN host>
+   export xpn_host_project_id=<existing project that will host the VPC>
    ```
 
-1. Setup the projects for XPN:
+1. Setup the projects for Shared VPC:
 
    ```
    export org_id=$(gcloud projects describe ${project_id} --format 'json' | jq -r '.parent.id')
@@ -192,7 +192,7 @@ Now you have the infrastructure ready to deploy a BOSH director.
    gcloud projects add-iam-policy-binding ${project_id} \
      --member serviceAccount:${service_account_email} \
      --role roles/iam.serviceAccountActor
-   gcloud projects add-iam-policy-binding ${network_project_id} \
+   [ -n "${network_project_id}" ] && gcloud projects add-iam-policy-binding ${network_project_id} \
      --member serviceAccount:${service_account_email} \
      --role roles/compute.networkUser
    ```
