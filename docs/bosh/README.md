@@ -53,7 +53,7 @@ provides an overview of the deployment:
 1. Create a service account and key:
 
    ```
-   gcloud iam service-accounts create terraform
+   gcloud iam service-accounts create terraform --display-name terraform
    gcloud iam service-accounts keys create ~/terraform.key.json \
        --iam-account ${service_account_email}
    ```
