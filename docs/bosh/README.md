@@ -169,7 +169,6 @@ Now you have the infrastructure ready to deploy a BOSH director.
    ```
    export service_account=bosh-user
    export base_ip=10.0.0.0
-   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
    export service_account_email=${service_account}@${project_id}.iam.gserviceaccount.com
    gcloud iam service-accounts create ${service_account}
    ```
@@ -431,7 +430,6 @@ From your `bosh-bastion` instance, delete your BOSH director and other resources
           sshKeys=<( gcloud compute project-info describe --format=json | jq -r '.commonInstanceMetadata.items[] | select(.key ==  "sshKeys") | .value' | sed -e "s|$boshkey||" | grep -v ^$ )
 
    # Delete IAM service account
-   export project_id=$(gcloud config list 2>/dev/null | grep project | sed -e 's/project = //g')
    gcloud iam service-accounts delete bosh-user@${project_id}.iam.gserviceaccount.com
    ```
 
