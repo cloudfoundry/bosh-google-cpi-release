@@ -160,6 +160,10 @@ chmod +x /usr/bin/jq
 
 cat > /etc/profile.d/bosh.sh <<'EOF'
 #!/bin/bash
+
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # Misc vars
 export prefix=${var.prefix}
 export ssh_key_path=$HOME/.ssh/bosh
