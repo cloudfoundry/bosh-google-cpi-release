@@ -6,9 +6,11 @@ groups:
   - ubuntu-trusty-stemcell-3312
   - ubuntu-trusty-stemcell-3363
   - ubuntu-trusty-stemcell-3421
+  - ubuntu-trusty-stemcell-3431
   - centos-7-stemcell-3312
   - centos-7-stemcell-3363
   - centos-7-stemcell-3421
+  - centos-7-stemcell-3431
 - name: alpha
   jobs:
   - ubuntu-trusty-stemcell-alpha
@@ -221,6 +223,24 @@ jobs:
       - *upload-ubuntu-raw-stemcells
       - *verify-stemcell-boots
 
+  - name: ubuntu-trusty-stemcell-3431
+    disable_manual_trigger: true
+    serial: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: ubuntu-stemcell-3431
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-ubuntu-raw-stemcells
+      - *verify-stemcell-boots
+
   - name: ubuntu-trusty-stemcell-alpha
     serial: true
     plan:
@@ -280,6 +300,24 @@ jobs:
       - aggregate:
         - get: stemcell
           resource: centos-stemcell-3421
+          trigger: true
+          version: every
+          params:
+            preserve_filename: true
+        - *get-cpi-src
+        - *get-bosh-cli
+        - *get-cpi-release
+      - *create-light-stemcell
+      - *upload-centos-raw-stemcells
+      - *verify-stemcell-boots
+
+  - name: centos-7-stemcell-3431
+    disable_manual_trigger: true
+    serial: true
+    plan:
+      - aggregate:
+        - get: stemcell
+          resource: centos-stemcell-3431
           trigger: true
           version: every
           params:
@@ -363,6 +401,13 @@ resources:
       force_regular: true
       version_family: "3421"
 
+  - name: ubuntu-stemcell-3431
+    type: bosh-io-stemcell
+    source:
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      version_family: "3431"
+
   - name: ubuntu-stemcell-alpha
     type: s3
     source:
@@ -410,6 +455,13 @@ resources:
       name: bosh-google-kvm-centos-7-go_agent
       force_regular: true
       version_family: "3421"
+
+  - name: centos-stemcell-3431
+    type: bosh-io-stemcell
+    source:
+      name: bosh-google-kvm-centos-7-go_agent
+      force_regular: true
+      version_family: "3431"
 
   - name: bosh-ubuntu-raw-stemcells
     type: gcs-resource
