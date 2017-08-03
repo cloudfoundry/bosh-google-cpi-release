@@ -64,6 +64,18 @@ if_p('blobstore') do
     update_blobstore_options(blobstore, 'ssl_verify_peer')
     update_blobstore_options(blobstore, 's3_signature_version', 'signature_version')
     update_blobstore_options(blobstore, 's3_region', 'region')
+  elsif p('blobstore.provider') == "gcs"
+    blobstore["options"] = {
+      "bucket_name" => p('blobstore.bucket_name'),
+      "credentials_source" => p(['agent.blobstore.credentials_source', 'blobstore.credentials_source']),
+      "json_key" => p(['agent.blobstore.json_key', 'blobstore.json_key'], nil),
+    }
+    def update_blobstore_options(blobstore, manifest_key, rendered_key=manifest_key)
+      value = p(["agent.blobstore.#{manifest_key}", "blobstore.#{manifest_key}"], nil)
+      blobstore["options"][rendered_key] = value unless value.nil?
+    end
+    update_blobstore_options(blobstore, 'storage_class')
+    update_blobstore_options(blobstore, 'encryption_key')
   elsif p('blobstore.provider') == 'local'
     blobstore["options"] = {
       "blobstore_path" => p('blobstore.path')

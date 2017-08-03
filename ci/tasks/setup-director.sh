@@ -9,6 +9,7 @@ check_param google_project
 check_param google_region
 check_param google_zone
 check_param google_json_key_data
+check_param google_test_bucket_name
 check_param google_network
 check_param google_subnetwork
 check_param google_subnetwork_range
@@ -66,6 +67,7 @@ export BOSH_google_zone=$google_zone
 export BOSH_google_project=$google_project
 export BOSH_google_address_static_director=$google_address_static_director
 export BOSH_director_ip=$director_ip
+export BOSH_google_test_bucket_name=$google_test_bucket_name
 export BOSH_google_network=$google_network
 export BOSH_google_subnetwork_gw=$google_subnetwork_gw
 export BOSH_google_subnetwork=$google_subnetwork
@@ -184,13 +186,13 @@ instance_groups:
       db: *db
       http:
         user: registry
-        password: registry-password
-        port: 25777
-      username: registry
-      password: registry-password
-      port: 25777
 
     blobstore:
+      provider: gcs
+      bucket_name: ((google_test_bucket_name))
+      credentials_source: static
+      json_key: |
+        $(echo $google_json_key_data | tr -d '\n')
       address: ((google_address_static_director))
       director:
         user: director
@@ -199,7 +201,6 @@ instance_groups:
         user: agent
         password: agent-password
       port: 25250
-      provider: dav
 
     director:
       address: 127.0.0.1

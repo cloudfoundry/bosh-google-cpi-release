@@ -133,6 +133,7 @@ jobs:
             google_region:                  {{google_region}}
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
+            google_test_bucket_name:        {{google_test_bucket_name}}
             google_network:                 {{google_network}}
             google_subnetwork:              {{google_subnetwork}}
             google_subnetwork_range:        {{google_subnetwork_range}}

@@ -7,6 +7,7 @@ release_blobs_access_key: # GCS interop access key for release blobs
 release_blobs_secret_key: # GCS interop secret key key for release blobs
 google_stemcells_bucket_name: # GCS bucket that contains stsemcells
 google_releases_bucket_name: # GCS bucket that releases are stored in
+google_test_bucket_name: # GCS bucket used by the director in tests
 github_deployment_key_bosh_google_cpi_release: |
   # GitHub deployment key for release artifacts
 github_pr_access_token: # An access token with repo:status access, used to test PRs
