@@ -195,10 +195,10 @@ Now you have the infrastructure ready to deploy a BOSH director.
      --role roles/compute.networkUser
    ```
 
-1. Create a **password-less** SSH key and upload the public component:
+1. Create a passphrase-less SSH key and upload the public component:
 
    ```
-   ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh
+   ssh-keygen -t rsa -f ~/.ssh/bosh -C bosh -q -N ""
    ```
 
    ```
