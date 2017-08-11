@@ -14,11 +14,13 @@ raw_stemcell_dir="$PWD/raw-stemcell"
 
 echo "Creating light stemcell..."
 
+salt=$(date +%s)
 original_stemcell="$(echo ${stemcell_dir}/*.tgz)"
 original_stemcell_name="$(basename "${original_stemcell}")"
-raw_stemcell_name="$(basename "${original_stemcell}" .tgz)-raw.tar.gz"
+raw_stemcell_name="$(basename "${original_stemcell}" .tgz)-raw-$salt.tar.gz"
 light_stemcell_name="light-${original_stemcell_name}"
 
+echo "Using raw stemcell name: $raw_stemcell_name"
 
 bosh_io_light_stemcell_url="https://s3.amazonaws.com/$BOSH_IO_BUCKET_NAME/$light_stemcell_name"
 wget --spider "$bosh_io_light_stemcell_url"
