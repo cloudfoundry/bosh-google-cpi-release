@@ -3,6 +3,7 @@
 set -eu
 
 : ${BUCKET_NAME:?}
+: ${BOSH_IO_BUCKET_NAME:?} # used to check if current stemcell already exists
 
 # inputs
 stemcell_dir="$PWD/stemcell"
@@ -17,6 +18,15 @@ original_stemcell="$(echo ${stemcell_dir}/*.tgz)"
 original_stemcell_name="$(basename "${original_stemcell}")"
 raw_stemcell_name="$(basename "${original_stemcell}" .tgz)-raw.tar.gz"
 light_stemcell_name="light-${original_stemcell_name}"
+
+
+bosh_io_light_stemcell_url="https://s3.amazonaws.com/$BOSH_IO_BUCKET_NAME/$light_stemcell_name"
+wget --spider "$bosh_io_light_stemcell_url"
+if [[ "$?" != 0 ]]; then
+  echo "Google light stemcell '$light_stemcell_name' already exists!"
+  echo "You can download here: $bosh_io_light_stemcell_url"
+  exit 1
+fi
 
 mkdir working_dir
 pushd working_dir

@@ -29,12 +29,14 @@ shared:
     task: create-light-stemcell
     file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
     params:
-      BUCKET_NAME:     {{google_raw_stemcells_bucket_name}}
+      BUCKET_NAME:         {{google_raw_stemcells_bucket_name}}
+      BOSH_IO_BUCKET_NAME: {{bosh_io_light_stemcell_bucket}}
   - &create-light-alpha-stemcell
     task: create-light-stemcell
     file: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.yml
     params:
-      BUCKET_NAME:     {{google_raw_alpha_stemcells_bucket_name}}
+      BUCKET_NAME:         {{google_raw_alpha_stemcells_bucket_name}}
+      BOSH_IO_BUCKET_NAME: {{bosh_io_light_stemcell_bucket}}
   - &cleanup-failed-run-instructions
     task: cleanup-failed-run-instructions
     config:
@@ -345,7 +347,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: develop
+      branch: pivotal-bosh-cpi
 
   - name: alpha-terraform
     type: terraform

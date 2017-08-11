@@ -18,4 +18,5 @@ run:
   path: bosh-cpi-src/ci/stemcell/light/tasks/build-light-stemcell.sh
 
 params:
-  BUCKET_NAME:  ""
+  BUCKET_NAME:         ""
+  BOSH_IO_BUCKET_NAME: ""
