@@ -63,31 +63,31 @@ shared:
     aggregate:
     - put: bosh-ubuntu-raw-stemcells
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw-*.tar.gz
         predefined_acl: "publicRead"
     - put: bosh-ubuntu-raw-stemcells-sha1
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw-*.tar.gz.sha1
         predefined_acl: "publicRead"
   - &upload-ubuntu-raw-alpha-stemcells
     aggregate:
     - put: bosh-ubuntu-raw-alpha-stemcells
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw-*.tar.gz
         predefined_acl: "publicRead"
     - put: bosh-ubuntu-raw-alpha-stemcells-sha1
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz.sha1
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-ubuntu-trusty-go_agent-raw-*.tar.gz.sha1
         predefined_acl: "publicRead"
   - &upload-centos-raw-stemcells
     aggregate:
     - put: bosh-centos-raw-stemcells
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw-*.tar.gz
         predefined_acl: "publicRead"
     - put: bosh-centos-raw-stemcells-sha1
       params:
-        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw.tar.gz.sha1
+        file: raw-stemcell/bosh-stemcell-*-google-kvm-centos-7-go_agent-raw-*.tar.gz.sha1
         predefined_acl: "publicRead"
   - &verify-alpha-stemcell-boots
     do:
