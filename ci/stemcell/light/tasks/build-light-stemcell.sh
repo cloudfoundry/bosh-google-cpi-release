@@ -23,12 +23,14 @@ light_stemcell_name="light-${original_stemcell_name}"
 echo "Using raw stemcell name: $raw_stemcell_name"
 
 bosh_io_light_stemcell_url="https://s3.amazonaws.com/$BOSH_IO_BUCKET_NAME/$light_stemcell_name"
+set +e
 wget --spider "$bosh_io_light_stemcell_url"
-if [[ "$?" != 0 ]]; then
+if [[ "$?" == "0" ]]; then
   echo "Google light stemcell '$light_stemcell_name' already exists!"
   echo "You can download here: $bosh_io_light_stemcell_url"
   exit 1
 fi
+set -e
 
 mkdir working_dir
 pushd working_dir
