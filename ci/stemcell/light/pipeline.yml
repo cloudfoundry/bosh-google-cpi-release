@@ -1,18 +1,46 @@
 ---
 groups:
-- name: light-gce-stemcells
+- name: all
   jobs:
   - ubuntu-trusty-stemcell-3263
   - ubuntu-trusty-stemcell-3312
   - ubuntu-trusty-stemcell-3363
   - ubuntu-trusty-stemcell-3421
-  - ubuntu-trusty-stemcell-3431
   - ubuntu-trusty-stemcell-3445
+  - centos-7-stemcell-3421
+  - centos-7-stemcell-3445
+
+- name: "3312"
+  jobs:
+  - centos-7-stemcell-3312
+  - ubuntu-trusty-stemcell-3312
+
+- name: "3263"
+  jobs:
+  - ubuntu-trusty-stemcell-3263
+
+- name: "3363"
+  jobs:
+  - centos-7-stemcell-3363
+  - ubuntu-trusty-stemcell-3363
+
+- name: "3421"
+  jobs:
+  - centos-7-stemcell-3421
+  - ubuntu-trusty-stemcell-3421
+
+- name: "3445"
+  jobs:
+  - centos-7-stemcell-3445
+  - ubuntu-trusty-stemcell-3445
+
+- name: deprecated
+  jobs:
   - centos-7-stemcell-3312
   - centos-7-stemcell-3363
-  - centos-7-stemcell-3421
   - centos-7-stemcell-3431
-  - centos-7-stemcell-3445
+  - ubuntu-trusty-stemcell-3431
+
 - name: alpha
   jobs:
   - ubuntu-trusty-stemcell-alpha
