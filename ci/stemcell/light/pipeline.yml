@@ -184,7 +184,6 @@ shared:
 
 jobs:
   - name: ubuntu-trusty-stemcell-3312
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -202,7 +201,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3263
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -220,7 +218,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3363
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -238,7 +235,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3421
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -256,7 +252,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3431
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -274,7 +269,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: ubuntu-trusty-stemcell-3445
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -308,7 +302,6 @@ jobs:
       - *verify-alpha-stemcell-boots
 
   - name: centos-7-stemcell-3312
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -326,7 +319,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: centos-7-stemcell-3363
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -344,7 +336,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: centos-7-stemcell-3421
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -362,7 +353,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: centos-7-stemcell-3431
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
@@ -380,7 +370,6 @@ jobs:
       - *verify-stemcell-boots
 
   - name: centos-7-stemcell-3445
-    disable_manual_trigger: true
     serial: true
     plan:
       - aggregate:
