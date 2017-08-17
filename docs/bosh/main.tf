@@ -1,4 +1,4 @@
-// Easier mainteance for updating GCE image string
+// Easier maintenance for updating GCE image string
 variable "latest_ubuntu" {
     type = "string"
     default = "ubuntu-1404-trusty-v20170505"
@@ -147,12 +147,16 @@ This warning will not appear when the system is ready.
 EOF
 
 apt-get update
-apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 jq git unzip
+apt-get install -y build-essential zlibc zlib1g-dev ruby ruby-dev openssl libxslt-dev libxml2-dev libssl-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev sqlite3 git unzip
 gem install bosh_cli
-curl -o /tmp/cf.tgz https://s3.amazonaws.com/go-cli/releases/v6.20.0/cf-cli_6.20.0_linux_x86-64.tgz
+curl -L -o /tmp/cf.tgz "https://cli.run.pivotal.io/stable?release=linux64-binary&version=6.28.0&source=github-rel"
 tar -zxvf /tmp/cf.tgz && mv cf /usr/bin/cf && chmod +x /usr/bin/cf
 curl -o /usr/bin/bosh-init https://s3.amazonaws.com/bosh-init-artifacts/bosh-init-0.0.96-linux-amd64
 chmod +x /usr/bin/bosh-init
+curl -o /usr/bin/bosh2 https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.28-linux-amd64
+chmod +x /usr/bin/bosh2
+curl -L -o /usr/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+chmod +x /usr/bin/jq
 
 cat > /etc/profile.d/bosh.sh <<'EOF'
 #!/bin/bash

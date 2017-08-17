@@ -137,6 +137,7 @@ jobs:
             google_region:                  {{google_region}}
             google_zone:                    {{google_zone}}
             google_json_key_data:           {{google_json_key_data}}
+            google_test_bucket_name:        {{google_test_bucket_name}}
             google_network:                 {{google_network}}
             google_subnetwork:              {{google_subnetwork}}
             google_subnetwork_range:        {{google_subnetwork_range}}
@@ -425,11 +426,11 @@ resources:
       branch: master
 
   - name: google-ubuntu-stemcell
-    type: gcs-resource
+    type: bosh-io-stemcell
     source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      tarball: true
 
 resource_types:
   - name: gcs-resource
