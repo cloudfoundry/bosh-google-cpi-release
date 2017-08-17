@@ -21,7 +21,14 @@ check_param google_service_account
 # Initialize deployment artifacts
 google_json_key=google_key.json
 
-export INT_STEMCELL="stemcell.tgz"
+# Stemcell stuff
+export STEMCELL_VERSION=`cat stemcell/version`
+export STEMCELL_FILE=`pwd`/stemcell/image.tgz
+pushd stemcell
+  tar -zxvf stemcell.tgz
+  mv image image.tgz
+popd
+
 export NETWORK_NAME=${google_auto_network}
 export CUSTOM_NETWORK_NAME=${google_network}
 export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
@@ -34,18 +41,7 @@ export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 export SERVICE_ACCOUNT=${google_service_account}@${google_project}.iam.gserviceaccount.com
-export STEMCELL_URL=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
 export CPI_ASYNC_DELETE=true
-
-# Divine the raw stemcell URL
-stemcell_url_base=`cat stemcell/url | sed "s|gs://|https://storage.googleapis.com/|"`
-stemcell_url_base=${stemcell_url_base/light-/}
-stemcell_url_base=${stemcell_url_base/\.tgz/-raw\.tar\.gz}
-export STEMCELL_URL=$stemcell_url_base
-
-echo "Setting up artifacts..."
-cp ./stemcell/*.tgz stemcell.tgz
-
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}

@@ -30,12 +30,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 			  "method": "create_stemcell",
 			  "arguments": ["%s", {
 				  "name": "bosh-google-kvm-ubuntu-trusty",
-				  "version": "3215",
-				  "infrastructure": "google",
-				  "source_url": "%s",
-					"raw_disk_sha1": "%s"
+				  "version": "%s",
+				  "infrastructure": "google"
 				}]
-			}`, stemcellFile, stemcellURL, stemcellSHA1)
+			}`, stemcellFile, stemcellVersion)
 	stemcell := assertSucceedsWithResult(request).(string)
 
 	ips = make(chan string, len(ipAddrs))

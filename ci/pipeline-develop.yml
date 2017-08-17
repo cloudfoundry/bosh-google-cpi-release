@@ -235,27 +235,10 @@ resources:
       bucket:   {{google_releases_bucket_name}}
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
 
-  - name: bosh-cpi-artifacts
-    type: gcs-resource
-    source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi-([0-9]+)\.tgz
-
   - name: version-semver
     type: semver
     source:
       key:               current-version
-      bucket:            {{version_semver_bucket_name}}
-      access_key_id:     {{version_semver_access_key}}
-      secret_access_key: {{version_semver_secret_key}}
-      region:            {{version_semver_region}}
-      endpoint:          storage.googleapis.com
-
-  - name: release-version-semver
-    type: semver
-    source:
-      key:               release-current-version
       bucket:            {{version_semver_bucket_name}}
       access_key_id:     {{version_semver_access_key}}
       secret_access_key: {{version_semver_secret_key}}
@@ -281,11 +264,11 @@ resources:
       branch: master
 
   - name: google-ubuntu-stemcell
-    type: gcs-resource
+    type: bosh-io-stemcell
     source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      tarball: true
 
 resource_types:
   - name: gcs-resource
