@@ -426,11 +426,11 @@ resources:
       branch: master
 
   - name: google-ubuntu-stemcell
-    type: gcs-resource
+    type: bosh-io-stemcell
     source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_stemcells_bucket_name}}
-      regexp:   light-bosh-stemcell-([0-9\.]+)-google-kvm-ubuntu-trusty-go_agent.tgz
+      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      force_regular: true
+      tarball: true
 
 resource_types:
   - name: gcs-resource
