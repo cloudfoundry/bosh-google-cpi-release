@@ -125,7 +125,7 @@ jobs:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true,  passed: [build-candidate],                       get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false,                                                  get: bosh-init}
+        - {trigger: false,                                                  get: bosh-cli}
         - {trigger: false,                                                  get: bosh-release}
 
       - task: setup-director
@@ -152,6 +152,25 @@ jobs:
         on_failure:
           task: teardown-director
           file: bosh-cpi-src/ci/tasks/teardown-director.yml
+          config:
+            params:
+              google_project:                 {{google_project}}
+              google_region:                  {{google_region}}
+              google_zone:                    {{google_zone}}
+              google_json_key_data:           {{google_json_key_data}}
+              google_test_bucket_name:        {{google_test_bucket_name}}
+              google_network:                 {{google_network}}
+              google_subnetwork:              {{google_subnetwork}}
+              google_subnetwork_range:        {{google_subnetwork_range}}
+              google_subnetwork_gw:           {{google_subnetwork_gw}}
+              google_firewall_internal:       {{google_firewall_internal}}
+              google_firewall_external:       {{google_firewall_external}}
+              google_address_director:        {{google_address_director_ubuntu}}
+              google_address_static_director: {{google_address_static_director_ubuntu}}
+              private_key_user:               {{private_key_user}}
+              private_key_data:               {{private_key_data}}
+              director_username:              {{director_username}}
+              director_password:              {{director_password}}
 
   - name: run-bats
     serial: true
@@ -378,7 +397,7 @@ resources:
       region:            {{version_semver_region}}
       endpoint:          storage.googleapis.com
 
-  - name: bosh-init
+  - name: bosh-cli
     type: s3
     source:
       regexp: bosh-cli-([0-9.]+)-linux-amd64
