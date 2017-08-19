@@ -11,12 +11,10 @@ groups:
 
 - name: "3312"
   jobs:
-  - centos-7-stemcell-3312
   - ubuntu-trusty-stemcell-3312
 
 - name: "3363"
   jobs:
-  - centos-7-stemcell-3363
   - ubuntu-trusty-stemcell-3363
 
 - name: "3421"
