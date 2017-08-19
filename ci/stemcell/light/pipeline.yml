@@ -1,8 +1,7 @@
 ---
 groups:
-- name: all
+- name: all-gcp
   jobs:
-  - ubuntu-trusty-stemcell-3263
   - ubuntu-trusty-stemcell-3312
   - ubuntu-trusty-stemcell-3363
   - ubuntu-trusty-stemcell-3421
@@ -14,10 +13,6 @@ groups:
   jobs:
   - centos-7-stemcell-3312
   - ubuntu-trusty-stemcell-3312
-
-- name: "3263"
-  jobs:
-  - ubuntu-trusty-stemcell-3263
 
 - name: "3363"
   jobs:
@@ -39,6 +34,7 @@ groups:
   - centos-7-stemcell-3312
   - centos-7-stemcell-3363
   - centos-7-stemcell-3431
+  - ubuntu-trusty-stemcell-3263
   - ubuntu-trusty-stemcell-3431
 
 - name: alpha
