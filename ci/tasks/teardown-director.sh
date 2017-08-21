@@ -35,5 +35,5 @@ export BOSH_google_json_key_data=$google_json_key_data
 
 pushd ${deployment_dir}
   echo "Destroying BOSH Director..."
-  ./bosh delete-env -e micro-google --vars-store ${certs} --vars-env=BOSH ${manifest_filename}
+  ./bosh delete-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${certs} --vars-env=BOSH
 popd

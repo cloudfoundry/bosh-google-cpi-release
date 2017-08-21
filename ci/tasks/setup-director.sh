@@ -28,6 +28,7 @@ cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 manifest_filename="director-manifest.yml"
+manifest_state_filename="director-manifest-state.yml"
 
 echo "Setting up artifacts..."
 cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
@@ -300,7 +301,7 @@ pushd ${deployment_dir}
   ./bosh interpolate ${cert_template} -v internal_ip=${director_ip} --vars-store ${certs}
 
   echo "Deploying BOSH Director..."
-  ./bosh create-env ${manifest_filename} --vars-store ${certs} --vars-env=BOSH
+  ./bosh create-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${certs} --vars-env=BOSH
 
   echo "Logging into BOSH Director"
   # We need to fetch and specify the CA certificate as bosh-cli V2
