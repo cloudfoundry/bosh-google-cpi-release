@@ -8,6 +8,7 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 deployment_dir="${PWD}/deployment"
 google_json_key=${deployment_dir}/google_key.json
 manifest_filename="director-manifest.yml"
+manifest_state_filename="manifest-state.json"
 certs=certs.yml
 
 echo "Creating google json key..."

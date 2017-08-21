@@ -28,7 +28,7 @@ cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 manifest_filename="director-manifest.yml"
-manifest_state_filename="director-manifest-state.yml"
+manifest_state_filename="manifest-state.json"
 
 echo "Setting up artifacts..."
 cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
@@ -283,10 +283,9 @@ EOF
 
 pushd ${deployment_dir}
   function finish {
-    cp director-manifest-state.json manifest-state.json
     echo "Final state of director deployment:"
     echo "=========================================="
-    cat manifest-state.json
+    cat ${manifest_state_filename}
     echo "=========================================="
 
     cp -r $HOME/.bosh ./
