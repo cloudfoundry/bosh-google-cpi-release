@@ -2,6 +2,36 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [25.10.0] - 2017-08-17
+
+### Added
+- Google Cloud Storage is a supported blobstore backend
+
+### Changed
+- Improved documentation to include the new BOSH CLI
+
+## [25.9.0] - 2017-05-23
+
+### Fixed
+- Address inconsistent stream error: stream ID 1; PROTOCOL_ERROR errors in CPI calls by updating to Go 1.8.1
+CI:
+
+### Changed
+- Tests use proper custom backend
+- Add publish light-stemcell 3421 jobs
+
+## [25.8.0] - 2017-05-16
+
+### Changed
+
+- Tags no longer become labels on GCP
+- Support XPN VPC Networks via the `xpn_host_project_id` cloud property
+- Support for customizing user agent strings
+- Publish CentOS Lite 3363.x, 3312.x, Ubuntu Alpha Lite stemcells
+- Docs: update ubuntu image for bosh-bastion
+- Docs: simplify grabbing project ID
+- Docs: add backend_service docs for internal load balancers
+
 ## [25.7.1] - 2017-03-07
 
 ### Fixed
@@ -138,6 +168,10 @@ this file. This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[25.10.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.9.0...v25.10.0
+[25.9.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.8.0...v25.9.0
+[25.8.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.7.1...v25.8.0
+[25.7.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.7.0...v25.7.1
 [25.7.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.2...v25.7.0
 [25.6.2]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.1...v25.6.2
 [25.6.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.6.0...v25.6.1

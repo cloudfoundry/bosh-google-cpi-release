@@ -9,7 +9,7 @@ inputs:
   - name: bosh-cpi-release
   - name: bosh-release
   - name: stemcell
-  - name: bosh-init
+  - name: bosh-cli
 outputs:
   - name: deployment
 run:
@@ -20,6 +20,7 @@ params:
   google_region:                  replace-me
   google_zone:                    replace-me
   google_json_key_data:           replace-me
+  google_test_bucket_name:        replace-me
   google_network:                 replace-me
   google_subnetwork:              replace-me
   google_subnetwork_range:        replace-me
