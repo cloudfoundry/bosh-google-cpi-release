@@ -156,7 +156,6 @@ shared:
     - task: publish-stemcell-and-checksum
       file: bosh-cpi-src/ci/stemcell/light/tasks/publish-stemcell-and-checksum.yml
       params:
-        BOSHIO_TOKEN: {{google_boshio_checksum_token}}
         AWS_ACCESS_KEY_ID: {{google_light_stemcells_access_key_id}}
         AWS_SECRET_ACCESS_KEY: {{google_light_stemcells_secret_access_key}}
         AWS_DEFAULT_REGION: {{google_light_stemcells_region}}
