@@ -15,7 +15,7 @@ func (s GoogleSubnetworkService) Find(projectId, id, region string) (Subnetwork,
 	}
 
 	s.logger.Debug(googleSubnetworkServiceLogTag, "Finding Google Subnetwork '%s' in region '%s' in project '%s'", id, region, projectId)
-	subnetworkItem, err := s.computeService.Subnetworks.Get(s.projcetService.Find(projectId), util.ResourceSplitter(region), id).Do()
+	subnetworkItem, err := s.computeService.Subnetworks.Get(s.projectService.Find(projectId), util.ResourceSplitter(region), id).Do()
 	if err != nil {
 		return Subnetwork{}, err
 	}
