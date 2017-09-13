@@ -11,18 +11,18 @@ import (
 const googleSubnetworkServiceLogTag = "GoogleSubnetworkService"
 
 type GoogleSubnetworkService struct {
-	projcetService project.Service
+	projectService project.Service
 	computeService *compute.Service
 	logger         boshlog.Logger
 }
 
 func NewGoogleSubnetworkService(
-	projcetService project.Service,
+	projectService project.Service,
 	computeService *compute.Service,
 	logger boshlog.Logger,
 ) GoogleSubnetworkService {
 	return GoogleSubnetworkService{
-		projcetService: projcetService,
+		projectService: projectService,
 		computeService: computeService,
 		logger:         logger,
 	}
