@@ -9,7 +9,7 @@ inputs:
   - name: bosh-cpi-release
   - name: bosh-release
   - name: stemcell
-  - name: bosh-init
+  - name: bosh-cli
 outputs:
   - name: deployment
 run:

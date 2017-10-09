@@ -28,11 +28,13 @@ cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 manifest_filename="director-manifest.yml"
+manifest_state_filename="manifest-state.json"
 
 echo "Setting up artifacts..."
 cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
 cp ./bosh-release/*.tgz ${deployment_dir}/bosh-release.tgz
 cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
+cp ./bosh-cli/bosh-cli-* ${deployment_dir}/bosh && chmod +x ${deployment_dir}/bosh
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
@@ -60,6 +62,7 @@ openssl rsa -in ${private_key} -pubout > ${public_key}
 
 # Export prefixed variables so they are accessible
 echo "Populating environment with BOSH_ prefixed vars"
+export BOSH_CONFIG=${deployment_dir}/.boshconfig
 export BOSH_director_username=$director_username
 export BOSH_director_password=$director_password
 export BOSH_cpi_release_name=$cpi_release_name
@@ -280,42 +283,35 @@ EOF
 
 pushd ${deployment_dir}
   function finish {
-    cp director-manifest-state.json manifest-state.json
     echo "Final state of director deployment:"
     echo "=========================================="
-    cat manifest-state.json
+    cat ${manifest_state_filename}
     echo "=========================================="
 
     cp -r $HOME/.bosh ./
   }
   trap finish ERR
 
-  echo "Fetching bosh-cli V2"
-  curl -Ls \
-    https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.28-linux-amd64 \
-    -o bosh2
-  chmod +x bosh2
-
-  echo "Using bosh2 version..."
-  ./bosh2 --version
+  echo "Using bosh version..."
+  ./bosh --version
 
   echo "Generating certificates"
   certs=certs.yml
-  ./bosh2 interpolate ${cert_template} -v internal_ip=${director_ip} --vars-store ${certs}
+  ./bosh interpolate ${cert_template} -v internal_ip=${director_ip} --vars-store ${certs}
 
   echo "Deploying BOSH Director..."
-  ./bosh2 create-env ${manifest_filename} --vars-store ${certs} --vars-env=BOSH
+  ./bosh create-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${certs} --vars-env=BOSH
 
   echo "Logging into BOSH Director"
   # We need to fetch and specify the CA certificate as bosh-cli V2
   # strictly validates certificate with no insecure option.
-  ./bosh2 interpolate certs.yml --path /director_ssl/ca > ca_cert.pem
-  ./bosh2 alias-env micro-google --environment ${director_ip} --ca-cert ca_cert.pem
+  ./bosh interpolate certs.yml --path /director_ssl/ca > ca_cert.pem
+  ./bosh alias-env micro-google --environment ${director_ip} --ca-cert ca_cert.pem
 
   # We have to export these to get non-interactive login
   export BOSH_CLIENT=$BOSH_director_username
   export BOSH_CLIENT_SECRET=$BOSH_director_password
-  ./bosh2 login -e micro-google
+  ./bosh login -e micro-google
 
   trap - ERR
   finish
