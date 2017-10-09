@@ -116,6 +116,15 @@ The following instructions offer the fastest path to getting BOSH up and running
    cd bosh-google-cpi-release/docs/bosh
    ```
 
+1. Initialize the Terraform cloud provider
+```
+   docker run -i -t \
+     -e "GOOGLE_CREDENTIALS=${GOOGLE_CREDENTIALS}" \
+     -v `pwd`:/$(basename `pwd`) \
+     -w /$(basename `pwd`) \
+     hashicorp/terraform:light init
+```
+
 1. View the Terraform execution plan to see the resources that will be created:
 
    ```
