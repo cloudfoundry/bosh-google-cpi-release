@@ -43,8 +43,9 @@ provider "google" {
 }
 
 resource "google_compute_network" "bosh" {
-  name       = "${var.prefix}bosh"
-  project    = "${var.network_project_id}"
+  name                    = "${var.prefix}bosh"
+  project                 = "${var.network_project_id}"
+  auto_create_subnetworks = "false"
 }
 
 resource "google_compute_route" "nat-primary" {

@@ -113,17 +113,9 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		return "", bosherr.WrapError(err, "Creating VM")
 	}
 
-	var bs instance.BackendService
-	if bsString, ok := cloudProps.BackendService.(string); ok {
-		bs = instance.BackendService{Name: bsString, Scheme: "EXTERNAL"}
-	} else {
-		if bsMap, ok := cloudProps.BackendService.(map[string]interface{}); ok {
-			bs = instance.BackendService{Name: bsMap["name"].(string), Scheme: bsMap["scheme"].(string)}
-		} else if bsMap, ok := cloudProps.BackendService.(map[string]string); ok {
-			bs = instance.BackendService{Name: bsMap["name"], Scheme: bsMap["scheme"]}
-		} else if cloudProps.BackendService != nil {
-			return "", bosherr.Errorf("Error parsing BackendService %v, type is %T", cloudProps.BackendService, cloudProps.BackendService)
-		}
+	bs, err := parseBackendService(cloudProps.BackendService)
+	if err != nil {
+		return "", bosherr.WrapErrorf(err, "Parsing BackendService %#v", cloudProps.BackendService)
 	}
 
 	// Parse VM properties
@@ -169,6 +161,52 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	}
 
 	return VMCID(vm), nil
+}
+
+func extract(src map[string]interface{}, key string) string {
+	if src[key] != nil {
+		if val, ok := src[key].(string); ok {
+			return val
+		}
+	}
+	return ""
+}
+
+const defaultScheme = "EXTERNAL"
+
+func parseBackendService(backendService interface{}) (instance.BackendService, error) {
+	if backendService == nil {
+		return instance.BackendService{}, nil
+	}
+
+	// backend_service: <name>
+	if bs, ok := backendService.(string); ok {
+		return instance.BackendService{Name: bs, Scheme: defaultScheme}, nil
+	}
+
+	//  backend_service:
+	//    name: <name>
+	//    scheme: <EXTERNAL|INTERNAL> (optional)
+	bs := instance.BackendService{}
+	if bsMap, ok := backendService.(map[string]string); ok {
+		bs.Name = bsMap["name"]
+		bs.Scheme = bsMap["scheme"]
+	} else if bsMap, ok := backendService.(map[string]interface{}); ok {
+		bs.Name = extract(bsMap, "name")
+		bs.Scheme = extract(bsMap, "scheme")
+	} else if backendService != nil {
+		return bs, bosherr.Errorf("unexpected type %T", backendService)
+	}
+
+	if bs.Name == "" {
+		return bs, bosherr.Error("expected key: name")
+	}
+
+	if bs.Scheme == "" {
+		bs.Scheme = defaultScheme
+	}
+
+	return bs, nil
 }
 
 func (cv CreateVM) findZone(zoneName string, disks []DiskCID) (string, error) {

@@ -103,38 +103,38 @@ The BOSH Google Compute Engine CPI supports these [BOSH Networks Types](http://b
 
 These options are specified under `cloud_properties` at the [networks](http://bosh.io/docs/networks.html) section of a BOSH deployment manifest and are only valid for `manual` or `dynamic` networks:
 
-| Option                | Required | Type          | Description
-|:----------------------|:--------:|:------------- |:-----------
-| network_name          | N        | String        | The name of the [Google Compute Engine Network](https://cloud.google.com/compute/docs/networking#networks) the CPI will use when creating the instance (if not set, by default it will use the `default` network)
-| xpn_host_project_id   | N        | String        | The [project id](https://support.google.com/cloud/answer/6158840?hl=en) that owns the network resource to support [Shared VPC Networks (XPN)](https://cloud.google.com/compute/docs/xpn/) (if not set, it will default to the project hosting the compute resources)
-| subnetwork_name       | N        | String        | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance (if the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field is required)
-| ephemeral_external_ip | N        | Boolean       | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default). Can be overridden in resource_pools.
-| ip_forwarding         | N        | Boolean       | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default). Can be overridden in resource_pools.
-| tags                  | N        | Array&lt;String&gt; | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags. Will be merged with tags in resource_pools.
+| Option                  | Required | Type                | Example            | Description
+|:----------------------  |:--------:|:-------------       |:-------------      |:-----------
+| `network_name`          | N        | String              | `cf`               | The name of the [Google Compute Engine Network](https://cloud.google.com/compute/docs/networking#networks) the CPI will use when creating the instance (if not set, by default it will use the `default` network)
+| `xpn_host_project_id`   | N        | String              | `my-other-project` | The [project id](https://support.google.com/cloud/answer/6158840?hl=en) that owns the network resource to support [Shared VPC Networks (XPN)](https://cloud.google.com/compute/docs/xpn/) (if not set, it will default to the project hosting the compute resources)
+| `subnetwork_name`       | N        | String              | `cf-east`          | The name of the [Google Compute Engine Subnet Network](https://cloud.google.com/compute/docs/networking#subnet_network) the CPI will use when creating the instance. If the network is in legacy mode, do not provide this property. If the network is in auto subnet mode, providing the subnetwork is optional. If the network is in custom subnet mode, then this field is required.
+| `ephemeral_external_ip` | N        | Boolean             | `false`            | If instances must have an [ephemeral external IP](https://cloud.google.com/compute/docs/instances-and-network#externaladdresses) (`false` by default). Can be overridden in resource_pools.
+| `ip_forwarding`         | N        | Boolean             | `false`            | If instances must have [IP forwarding](https://cloud.google.com/compute/docs/networking#canipforward) enabled (`false` by default). Can be overridden in resource_pools.
+| `tags`                  | N        | Array&lt;String&gt; | `["foo","bar"]`    | A list of [tags](https://cloud.google.com/compute/docs/instances/managing-instances#tags) to apply to the instances, useful if you want to apply firewall or routes rules based on tags. Will be merged with tags in resource_pools.
 
 ### BOSH Resource pool options
 
 These options are specified under `cloud_properties` at the [resource_pools](http://bosh.io/docs/deployment-basics.html#resource-pools) section of a BOSH deployment manifest:
 
-| Option              | Required | Type          | Description
-|:--------------------|:--------:|:------------- |:-----------
-| machine_type        | Y        | String        | The name of the [Google Compute Engine Machine Type](https://cloud.google.com/compute/docs/machine-types) the CPI will use when creating the instance (required if not using `cpu` and `ram`)
-| cpu                 | Y        | Integer       | Number of vCPUs ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
-| ram                 | Y        | Integer       | Amount of memory ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
-| zone                | N        | String        | The name of the [Google Compute Engine Zone](https://cloud.google.com/compute/docs/zones) where the instance must be created
-| root_disk_size_gb   | N        | Integer       | The size (in Gb) of the instance root disk (default is `10Gb`)
-| root_disk_type      | N        | String        | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
-| automatic_restart   | N        | Boolean       | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
-| on_host_maintenance | N        | String        | [Instance behavior](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
-| preemptible         | N        | Boolean       | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default)
-| service_account     | N        | String        | The full service account address (e.g., service-account-name@project-name.iam.gserviceaccount.com) of the service account to launch the VM with. If a value is provided, `service_scopes` will default to `https://www.googleapis.com/auth/cloud-platform` unless it is explicitly set. See [service account permissions](https://cloud.google.com/compute/docs/access/service-accounts#service_account_permissions) for more details. To use the default service account, leave this field empty and specify `service_scopes`.
-| service_scopes      | N        | Array&lt;String&gt; | Optional. If this value is specified and `service_account` is empty, `default` will be used for `service_account`. This value supports both short (e.g., `cloud-platform`) and fully-qualified (e.g., `https://www.googleapis.com/auth/cloud-platform` formats. See [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for more details.
-| target_pool         | N        | String        | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
-| backend_service     | N        | String OR Map&lt;String,String&gt;       | The name of the [Google Compute Engine Backend Service](https://cloud.google.com/compute/docs/load-balancing/http/backend-service) the instances should be added to. The backend service must already be configured with an [Instance Group](https://cloud.google.com/compute/docs/instance-groups/#unmanaged_instance_groups) in the same zone as this instance. To set up [Internal Load Balancing](https://cloud.google.com/compute/docs/load-balancing/internal/) use a map and set `scheme` to `INTERNAL` and `name` to the name of the backend service.
-| ephemeral_external_ip | N        | Boolean       | Overrides the equivalent option in the networks section
-| ip_forwarding         | N        | Boolean       | Overrides the equivalent option in the networks section
-| tags                  | N        | Array&lt;String&gt; | Merged with tags from the networks section
-| labels                  | N        | Map&lt;String,String&gt; | A dictionary of (key,value) labels applied to the VM
+| Option                  | Required | Type                                     | Example                                                                        | Description
+|:------------------------|:--------:|:-------------                            |:-------------                                                                  |:-----------
+| `machine_type`          | Y        | String                                   | `n1-standard-1`                                                                | The name of the [Google Compute Engine Machine Type](https://cloud.google.com/compute/docs/machine-types) the CPI will use when creating the instance (required if not using `cpu` and `ram`)
+| `cpu`                   | Y        | Integer                                  | `2`                                                                            | Number of vCPUs ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
+| `ram`                   | Y        | Integer                                  | `2048`                                                                         | Amount of memory ([Google Compute Engine Custom Machine Types](https://cloud.google.com/custom-machine-types/)) the CPI will use when creating the instance (required if not using `machine_type`)
+| `zone`                  | N        | String                                   | `us-west1-a`                                                                   | The name of the [Google Compute Engine Zone](https://cloud.google.com/compute/docs/zones) where the instance must be created
+| `root_disk_size_gb`     | N        | Integer                                  | `10`                                                                           | The size (in Gb) of the instance root disk (default is `10Gb`)
+| `root_disk_type`        | N        | String                                   | `pd-standard`                                                                  | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
+| `automatic_restart`     | N        | Boolean                                  | `false`                                                                        | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
+| `on_host_maintenance`   | N        | String                                   | `MIGRATE`                                                                      | [Instance behavior](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
+| `preemptible`           | N        | Boolean                                  | `false`                                                                        | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default)
+| `service_account`       | N        | String                                   | `service-account-name@project-name.iam.gserviceaccount.com`                    | The full service account address of the service account to launch the VM with. If a value is provided, `service_scopes` will default to `https://www.googleapis.com/auth/cloud-platform` unless it is explicitly set. See [service account permissions](https://cloud.google.com/compute/docs/access/service-accounts#service_account_permissions) for more details. To use the default service account, leave this field empty and specify `service_scopes`.
+| `service_scopes`        | N        | Array&lt;String&gt;                      | `cloud-platform`                                                               | If this value is specified and `service_account` is empty, `default` will be used for `service_account`. This value supports both short (e.g., `cloud-platform`) and fully-qualified (e.g., `https://www.googleapis.com/auth/cloud-platform` formats. See [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for more details.
+| `target_pool`           | N        | String                                   | `cf-router`                                                                    | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
+| `backend_service`       | N        | String OR Map&lt;String,String&gt;       | `cf-router` (external), `{name: "cf-internal", scheme: "INTERNAL"} (internal)` | The name of the [Google Compute Engine Backend Service](https://cloud.google.com/compute/docs/load-balancing/http/backend-service) the instances should be added to. The backend service must already be configured with an [Instance Group](https://cloud.google.com/compute/docs/instance-groups/#unmanaged_instance_groups) in the same zone as this instance. To set up [Internal Load Balancing](https://cloud.google.com/compute/docs/load-balancing/internal/) use a map and set `scheme` to `INTERNAL` and `name` to the name of the backend service.
+| `ephemeral_external_ip` | N        | Boolean                                  | `false`                                                                        | Overrides the equivalent option in the networks section
+| `ip_forwarding`         | N        | Boolean                                  | `false`                                                                        | Overrides the equivalent option in the networks section
+| `tags`                  | N        | Array&lt;String&gt;                      | `["foo","bar"]`                                                                | Merged with tags from the networks section
+| `labels`                | N        | Map&lt;String,String&gt;                 | `{"foo":"bar"}`                                                                | A dictionary of (key,value) labels applied to the VM
 
 ### BOSH Persistent Disks options
 
@@ -148,12 +148,12 @@ These options are specified under `cloud_properties` at the [disk_pools](http://
 
 This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with dynamic networking:
 
-```
+```yaml
 ---
 name: example
 director_uuid: 38ce80c3-e9e9-4aac-ba61-97c676631b91
 
-...
+# ...
 
 networks:
   - name: private
@@ -173,7 +173,6 @@ networks:
   - name: public
     type: vip
     cloud_properties: {}
-...
 
 resource_pools:
   - name: vms
@@ -191,22 +190,20 @@ resource_pools:
       service_scopes:
         - compute.readonly
         - devstorage.read_write
-...
+
 
 disk_pools:
   - name: disks
     disk_size: 32_768
     cloud_properties:
       type: pd-ssd
-...
-
 ```
 
 ## Deployment Manifest Example - Manual Networking
 
 This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with manual networking. This assumes you've created a networked named `custom-network` and a subnetwork named `custom-subnetwork` with a CIDR of 10.0.0.0/24:
 
-```
+```yaml
 ---
 name: example
 director_uuid: 38ce80c3-e9e9-4aac-ba61-97c676631b91

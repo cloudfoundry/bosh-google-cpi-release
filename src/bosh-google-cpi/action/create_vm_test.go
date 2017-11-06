@@ -171,6 +171,38 @@ var _ = Describe("CreateVM", func() {
 			}
 		})
 
+		Context("when BackendService is set as a hash", func() {
+			var backendService map[string]string
+			BeforeEach(func() {
+				backendService = make(map[string]string)
+				backendService["name"] = "foobar"
+				expectedVMProps.BackendService = instance.BackendService{Name: "foobar", Scheme: "EXTERNAL"}
+
+				cloudProps.BackendService = backendService
+			})
+
+			It("defaults to external", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+			})
+
+			It("supports internal", func() {
+				backendService["scheme"] = "INTERNAL"
+				expectedVMProps.BackendService = instance.BackendService{Name: "foobar", Scheme: "INTERNAL"}
+
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+			})
+
+			It("requires name", func() {
+				delete(backendService, "name")
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+
 		It("creates the vm", func() {
 			vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 			Expect(err).NotTo(HaveOccurred())
