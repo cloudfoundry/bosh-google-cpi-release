@@ -45,7 +45,7 @@ provider "google" {
 resource "google_compute_subnetwork" "cf-compilation-subnet-1" {
   name          = "${var.prefix}cf-compilation-${var.region_compilation}"
   region        = "${var.region_compilation}"
-  ip_cidr_range = "10.200.0.0/16"
+  ip_cidr_range = "10.120.0.0/16"
   network       = "https://www.googleapis.com/compute/v1/projects/${var.network_project_id}/global/networks/${var.network}"
   project       = "${var.network_project_id}"
 }

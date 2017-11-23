@@ -114,8 +114,8 @@ networks:
   - name: compilation
     type: manual
     subnets:
-    - range: 10.200.0.0/16
-      gateway: 10.200.0.1
+    - range: 10.120.0.0/16
+      gateway: 10.120.0.1
       cloud_properties:
         zone: <%= google_zone_compilation%>
         region: <%= google_region_compilation%>
