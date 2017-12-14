@@ -308,6 +308,12 @@ var _ = Describe("ConcreteFactory", func() {
 		Expect(action).To(Equal(NewPing()))
 	})
 
+	It("info", func() {
+		action, err := factory.Create("info")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(action).To(Equal(NewInfo()))
+	})
+
 	It("when action is current_vm_id returns an error because this CPI does not implement the method", func() {
 		action, err := factory.Create("current_vm_id")
 		Expect(err).To(HaveOccurred())

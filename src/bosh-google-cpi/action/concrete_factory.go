@@ -186,6 +186,7 @@ func NewConcreteFactory(
 			"get_disks":          NewGetDisks(vmService),
 
 			// Others:
+			"info": NewInfo(),
 			"ping": NewPing(),
 
 			// Not implemented:
