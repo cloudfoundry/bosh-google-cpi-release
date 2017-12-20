@@ -8,7 +8,7 @@ type Info struct{}
 
 func NewInfo() Info { return Info{} }
 
-func (p Info) Run() (InfoResult, error) {
+func (Info) Run() (InfoResult, error) {
 	return InfoResult{
 		StemcellFormats: []string{
 			"google-light",
