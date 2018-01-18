@@ -137,3 +137,10 @@ properties:
     description: "Registry Client Key (PEM format)"
   registry.client.tls.cacert:
     description: "Registry Client Root CA certificates (PEM format)"
+
+  env.http_proxy:
+    description: Http proxy to connect to cloud API's
+  env.https_proxy:
+    description: Https proxy to connect to cloud API's
+  env.no_proxy:
+    description: No proxy environment variable

@@ -7,6 +7,21 @@ PACKAGES_DIR=${BOSH_PACKAGES_DIR:-/var/vcap/packages}
 JOBS_DIR=${BOSH_JOBS_DIR:-/var/vcap/jobs}
 LOGS_DIR=/var/vcap/sys/log/google_cpi
 
+<% if_p('env.http_proxy') do |http_proxy| %>
+export HTTP_PROXY="<%= http_proxy %>"
+export http_proxy="<%= http_proxy %>"
+<% end %>
+
+<% if_p('env.https_proxy') do |https_proxy| %>
+export HTTPS_PROXY="<%= https_proxy %>"
+export https_proxy="<%= https_proxy %>"
+<% end %>
+
+<% if_p('env.no_proxy') do |no_proxy| %>
+export NO_PROXY="<%= no_proxy %>"
+export no_proxy="<%= no_proxy %>"
+<% end %>
+
 # Invoke CPI
 cmd="${PACKAGES_DIR}/bosh-google-cpi/bin/cpi -configFile=${JOBS_DIR}/google_cpi/config/cpi.json"
 
