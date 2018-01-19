@@ -91,6 +91,12 @@ bosh version
 echo "Targeting BOSH director..."
 bosh -n target ${BAT_DIRECTOR}
 
+echo "Setting up BOSH v2..."
+export BOSH_ENVIRONMENT="${director_ip}"
+export BOSH_CLIENT="${director_username}"
+export BOSH_CLIENT_SECRET="${director_password}"
+export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
+
 echo "Creating ${bat_manifest_filename}..."
 cat > ${bat_manifest_filename} <<EOF
 ---
@@ -225,11 +231,6 @@ properties:
             - ${google_firewall_external}
 EOF
 
-
-export BOSH_ENVIRONMENT="${google_address_director}"
-export BOSH_CLIENT="${director_username}"
-export BOSH_CLIENT_SECRET="${director_password}"
-export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
 
 pushd bats
   echo "Installing gems..."
