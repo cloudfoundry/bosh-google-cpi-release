@@ -218,7 +218,6 @@ EOF
 
 pushd bats
   echo "Installing gems..."
-  ./write_gemfile
   bundle install
 
   echo "Running BOSH Acceptance Tests..."
