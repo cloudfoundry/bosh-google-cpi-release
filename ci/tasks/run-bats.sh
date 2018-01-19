@@ -50,6 +50,10 @@ export BAT_VCAP_PASSWORD="${bat_vcap_password}"
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
 export BAT_VCAP_PRIVATE_KEY=${private_key}
+# TODO(jrjohnson): add this to the image
+curl -o /usr/bin/bosh2 https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.28-linux-amd64
+chmod +x /usr/bin/bosh2
+export BAT_BOSH_CLI=/usr/bin/bosh2
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
