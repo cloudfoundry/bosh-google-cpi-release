@@ -29,5 +29,4 @@ params:
   google_address_static_available_range_bats: replace-me
   base_os:                                    replace-me
   stemcell_name:                              replace-me
-  bat_vcap_password:                          replace-me
   private_key_data:                           replace-me

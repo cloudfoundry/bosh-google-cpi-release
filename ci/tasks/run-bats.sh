@@ -22,11 +22,7 @@ check_param google_address_static_pair_bats
 check_param google_address_static_available_range_bats
 check_param base_os
 check_param stemcell_name
-check_param bat_vcap_password
 check_param private_key_data
-check_param director_username
-check_param director_password
-
 
 # Initialize deployment artifacts
 deployment_dir="${PWD}"
@@ -35,9 +31,7 @@ creds_file="${creds_dir}/creds.yml"
 cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
-manifest_filename="director-manifest.yml"
-bat_manifest_filename="${deployment_dir}/${base_os}-bats-manifest.yml"
-bat_config_filename="${deployment_dir}/${base_os}-bats-config.yml"
+bat_config_filename="${deployment_dir}/bat.yml"
 
 echo "Setting up artifacts..."
 echo "${private_key_data}" > ${private_key}
@@ -50,14 +44,10 @@ echo "${private_key_data}" > ${private_key}
 
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
-export BAT_VCAP_PASSWORD="${bat_vcap_password}"
+export BAT_BOSH_CLI=/usr/bin/bosh2
+export BAT_DNS_HOST=${director_ip}
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
-export BAT_VCAP_PRIVATE_KEY=${private_key}
-# TODO(jrjohnson): add this to the image
-curl -o /usr/bin/bosh2 https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.28-linux-amd64
-chmod +x /usr/bin/bosh2
-export BAT_BOSH_CLI=/usr/bin/bosh2
 export BAT_PRIVATE_KEY=${private_key}
 
 echo "Creating google json key..."
@@ -86,125 +76,21 @@ eval $(ssh-agent)
 ssh-add ${private_key}
 
 echo "Using BOSH CLI version..."
-bosh version
-
-echo "Targeting BOSH director..."
-bosh -n target ${BAT_DIRECTOR}
+${BAT_BOSH_CLI} --version
 
 echo "Setting up BOSH v2..."
 export BOSH_ENVIRONMENT="${director_ip}"
-export BOSH_CLIENT="${director_username}"
-export BOSH_CLIENT_SECRET="${director_password}"
+export BOSH_CLIENT="admin"
+export BOSH_CLIENT_SECRET="=$(${BAT_BOSH_CLI} int ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
 
-echo "Creating ${bat_manifest_filename}..."
-cat > ${bat_manifest_filename} <<EOF
----
-name: <%= properties.name || "bat" %>
-director_uuid: <%= properties.uuid %>
-
-releases:
-  - name: bat
-    version: <%= properties.release || "latest" %>
-
-compilation:
-  workers: <%= properties.compilation_workers || 2 %>
-  network: default
-  reuse_compilation_vms: true
-  cloud_properties:
-    machine_type: <%= properties.machine_type || "n1-standard-2" %>
-    root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
-    root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-    zone: <%= properties.zone %>
-
-update:
-  canaries: <%= properties.canaries || 1 %>
-  canary_watch_time: 3000-90000
-  update_watch_time: 3000-90000
-  max_in_flight: <%= properties.max_in_flight || 1 %>
-
-networks:
-  <% properties.networks.each do |network| %>
-  - name: <%= network.name %>
-    type: <%= network.type %>
-    subnets:
-      <% network.subnets.each do |subnet| %>
-      - range: <%= subnet.range %>
-        static: [<%= subnet.static %>]
-        gateway: <%= subnet.gateway %>
-        dns: <%= p('dns').inspect %>
-        cloud_properties:
-          network_name: <%= subnet.cloud_properties.network_name %>
-          subnetwork_name: <%= subnet.cloud_properties.subnetwork_name %>
-          ephemeral_external_ip: <%= subnet.cloud_properties.ephemeral_external_ip || false %>
-          tags: <%= subnet.cloud_properties.tags || [] %>
-      <% end %>
-  <% end %>
-  - name: static
-    type: vip
-
-resource_pools:
-  - name: common
-    network: default
-    stemcell:
-      name: <%= properties.stemcell.name %>
-      version: "<%= properties.stemcell.version %>"
-    cloud_properties:
-      machine_type: <%= properties.machine_type || "n1-standard-2" %>
-      root_disk_size_gb: <%= properties.root_disk_size_gb || 20 %>
-      root_disk_type: <%= properties.root_disk_type || "pd-standard" %>
-      zone: <%= properties.zone %>
-    <% if properties.password %>
-    env:
-      bosh:
-        password: <%= properties.password %>
-    <% end %>
-
-jobs:
-  - name: <%= properties.job || "batlight" %>
-    templates: <% (properties.templates || ["batlight"]).each do |template| %>
-    - name: <%= template %>
-    <% end %>
-    instances: <%= properties.instances %>
-    resource_pool: common
-    <% if properties.persistent_disk %>
-    persistent_disk: <%= properties.persistent_disk %>
-    <% end %>
-    networks:
-    <% properties.job_networks.each_with_index do |network, i| %>
-      - name: <%= network.name %>
-        <% if i == 0 %>
-        default: [dns, gateway]
-        static_ips:
-        <% properties.instances.times do |i| %>
-          - <%= properties.static_ips[i] %>
-        <% end %>
-        <% end %>
-    <% end %>
-    <% if properties.use_vip %>
-      - name: static
-        static_ips:
-          - <%= properties.vip %>
-    <% end %>
-
-properties:
-  batlight:
-    <% if properties.batlight.fail %>
-    fail: <%= properties.batlight.fail %>
-    <% end %>
-    <% if properties.batlight.missing %>
-    missing: <%= properties.batlight.missing %>
-    <% end %>
-    <% if properties.batlight.drain_type %>
-    drain_type: <%= properties.batlight.drain_type %>
-    <% end %>
-EOF
+echo "Testing connection to director"
+${BAT_BOSH_CLI} env
 
 echo "Creating ${bat_config_filename}..."
 cat > ${bat_config_filename} <<EOF
 ---
 cpi: google
-manifest_template_path: ${bat_manifest_filename}
 properties:
   uuid: $(bosh status --uuid)
   stemcell:
@@ -231,11 +117,11 @@ properties:
             - ${google_firewall_external}
 EOF
 
-
 pushd bats
   echo "Installing gems..."
   bundle install
 
   echo "Running BOSH Acceptance Tests..."
-  bundle exec rspec --tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip spec
+  # Disable Unsupported by google cpi (multiple_manual_networks) and deprecated specs
+  bundle exec rspec --tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration spec
 popd

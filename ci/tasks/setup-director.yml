@@ -7,7 +7,7 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: bosh-cpi-release
-  - name: bosh-release
+  - name: bosh-deployment
   - name: stemcell
   - name: bosh-cli
 outputs:
@@ -32,5 +32,3 @@ params:
   google_address_static_director: replace-me
   private_key_user:               replace-me
   private_key_data:               replace-me
-  director_username:              replace-me
-  director_password:              replace-me
