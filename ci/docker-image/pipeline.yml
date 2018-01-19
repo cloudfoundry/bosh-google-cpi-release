@@ -1,0 +1,25 @@
+---
+- name: build-docker-image
+  public: true
+  serial: true
+  plan:
+  - get: bosh-cpi-src
+    trigger: true
+  - put: docker-image
+    params:
+      build: bosh-cpi-src/ci/docker-image/bosh-google-cpi-boshrelease
+
+resources:
+  - name: bosh-cpi-src
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      branch: {{source_branch}}
+
+  - name: docker-image
+    type: docker-image
+    source:
+      email:      {{docker_hub_email}}
+      username:   {{docker_hub_username}}
+      password:   {{docker_hub_password}}
+      repository: {{docker_hub_repo}}

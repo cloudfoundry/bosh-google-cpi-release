@@ -1,5 +1,5 @@
-FROM ubuntu:15.04
-MAINTAINER Evan Brown <evanbrown@google.com>
+FROM ubuntu:16.04
+MAINTAINER Jeff Johnson <jrjohnson@google.com>
 
 # Update base image
 ENV LANG en_US.UTF-8
@@ -41,7 +41,6 @@ RUN mkdir /tmp/ruby-install && \
     sudo make install && \
     rm -rf /tmp/ruby-install
 
-
 # Set default ruby
 RUN ruby-install ruby 2.1.2 && \
     cp /etc/profile.d/chruby.sh /etc/profile.d/chruby-with-ruby-2.1.2.sh && \
@@ -49,6 +48,10 @@ RUN ruby-install ruby 2.1.2 && \
 
 # Install Bundler and BOSH CLI
 RUN /bin/bash -l -c "gem install bundler bosh_cli --no-ri --no-rdoc"
+
+# Install BOSH v2
+RUN curl -o /usr/bin/bosh2 https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.48-linux-amd64 && \
+    chmod +x /usr/bin/bosh2
 
 # Install AWS CLI (used to upload stemcell)
 RUN pip install awscli
