@@ -11,6 +11,9 @@ RUN apt-get install -y mysql-client libmysqlclient-dev; apt-get clean
 RUN apt-get install -y libpq-dev; apt-get clean
 RUN apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
 
+# Install useful tools for development
+RUN apt-get install -y vim; apt-get clean
+
 # Install Golang
 ENV GOLANG_VERSION 1.8.1
 RUN curl -sSL https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
