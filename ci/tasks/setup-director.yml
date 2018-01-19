@@ -12,6 +12,7 @@ inputs:
   - name: bosh-cli
 outputs:
   - name: deployment
+  - name: director-creds
 run:
   path: bosh-cpi-src/ci/tasks/setup-director.sh
 params:

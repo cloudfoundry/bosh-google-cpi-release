@@ -8,6 +8,7 @@ inputs:
   - name: bosh-cpi-src
   - name: stemcell
   - name: bats
+  - name: director-creds
 run:
   path: bosh-cpi-src/ci/tasks/run-bats.sh
 params:

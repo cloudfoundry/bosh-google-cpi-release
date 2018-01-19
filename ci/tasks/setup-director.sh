@@ -24,6 +24,8 @@ check_param director_password
 check_param director_username
 
 deployment_dir="${PWD}/deployment"
+creds_dir="${PWD}/director-creds"
+creds_file="${creds_dir}/creds.yml"
 cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
@@ -277,9 +279,9 @@ misc:
 
 EOF
 
-cert_template=certs.yml.tpl
-echo "Creating ${cert_template}..."
-cat > "${deployment_dir}/${cert_template}"<<EOF
+creds_template=creds.yml.tpl
+echo "Creating ${creds_template}..."
+cat > "${deployment_dir}/${creds_template}"<<EOF
 variables:
 - name: default_ca
   type: certificate
@@ -336,23 +338,22 @@ pushd ${deployment_dir}
   ./bosh --version
 
   echo "Generating certificates"
-  certs=certs.yml
-  ./bosh interpolate ${cert_template} -v internal_ip=${director_ip} --vars-store ${certs}
+  ./bosh interpolate ${creds_template} -v internal_ip=${director_ip} --vars-store ${creds_file}
 
   echo "Deploying BOSH Director..."
-  ./bosh create-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${certs} --vars-env=BOSH
+  ./bosh create-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${creds_file} --vars-env=BOSH
 
   echo "Logging into BOSH Director"
   # We need to fetch and specify the CA certificate as bosh-cli V2
   # strictly validates certificate with no insecure option.
-  ./bosh interpolate certs.yml --path /director_ssl/ca > ca_cert.pem
+  ./bosh interpolate ${creds_file} --path /director_ssl/ca > ca_cert.pem
   ./bosh alias-env micro-google --environment ${director_ip} --ca-cert ca_cert.pem
 
   # We have to export these to get non-interactive login
   export BOSH_CLIENT=$BOSH_director_username
   export BOSH_CLIENT_SECRET=$BOSH_director_password
   ./bosh login -e micro-google
-
+  
   trap - ERR
   finish
 popd

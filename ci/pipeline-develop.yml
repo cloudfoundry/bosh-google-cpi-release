@@ -168,6 +168,8 @@ jobs:
               private_key_data:               {{private_key_data}}
               director_username:              {{director_username}}
               director_password:              {{director_password}}
+      - put: director-creds
+        params: {file: director-creds/creds.yml}
 
   - name: run-bats
     serial: true
@@ -176,6 +178,7 @@ jobs:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: true, passed: [deploy-ubuntu],                  get: director-creds, resource: director-creds}
         - {trigger: false,                                          get: bats}
 
       - task: run-bats
@@ -201,6 +204,8 @@ jobs:
             stemcell_name:                              bosh-google-kvm-ubuntu-trusty-go_agent
             bat_vcap_password:                          {{bat_vcap_password}}
             private_key_data:                           {{private_key_data}}
+            director_username:                          {{director_username}}
+            director_password:                          {{director_password}}
 
   - name: run-int
     serial_groups: [run-int]
@@ -235,7 +240,7 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: develop
+      branch: {{cpi_source_branch}}
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml
@@ -253,6 +258,13 @@ resources:
       json_key: {{google_json_key_data}}
       bucket:   {{google_releases_bucket_name}}
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
+
+  - name: director-creds
+    type: gcs-resource
+    source:
+      json_key:         {{google_json_key_data}}
+      bucket:           {{google_state_bucket_name}}
+      versioned_file:   creds.yml
 
   - name: version-semver
     type: semver

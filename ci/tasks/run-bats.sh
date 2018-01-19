@@ -24,10 +24,14 @@ check_param base_os
 check_param stemcell_name
 check_param bat_vcap_password
 check_param private_key_data
+check_param director_username
+check_param director_password
 
 
 # Initialize deployment artifacts
 deployment_dir="${PWD}"
+creds_dir="${PWD}/director-creds"
+creds_file="${creds_dir}/creds.yml"
 cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
@@ -54,6 +58,7 @@ export BAT_VCAP_PRIVATE_KEY=${private_key}
 curl -o /usr/bin/bosh2 https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.28-linux-amd64
 chmod +x /usr/bin/bosh2
 export BAT_BOSH_CLI=/usr/bin/bosh2
+export BAT_PRIVATE_KEY=${private_key}
 
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
@@ -219,6 +224,12 @@ properties:
             - ${google_firewall_internal}
             - ${google_firewall_external}
 EOF
+
+
+export BOSH_ENVIRONMENT="${google_address_director}"
+export BOSH_CLIENT="${director_username}"
+export BOSH_CLIENT_SECRET="${director_password}"
+export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
 
 pushd bats
   echo "Installing gems..."
