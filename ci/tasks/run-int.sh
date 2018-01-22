@@ -6,6 +6,7 @@ source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
+check_param google_address_static_int
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
@@ -32,7 +33,7 @@ export ILB_INSTANCE_GROUP=${google_region_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
-export SERVICE_ACCOUNT=${google_service_account}@${google_project}.iam.gserviceaccount.com
+export SERVICE_ACCOUNT=${google_service_account}
 export CPI_ASYNC_DELETE=true
 
 echo "Creating google json key..."
