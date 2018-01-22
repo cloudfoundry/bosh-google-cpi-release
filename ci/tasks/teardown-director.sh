@@ -5,6 +5,7 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
+creds_file="${PWD}/director-creds/creds.yml"
 deployment_dir="${PWD}/deployment"
 google_json_key=${deployment_dir}/google_key.json
 manifest_filename="director-manifest.yml"
@@ -26,6 +27,7 @@ pushd ${deployment_dir}
       --vars-store=${creds_file} \
       -o bosh-deployment/gcp/cpi.yml \
       -o bosh-deployment/gcp/gcs-blobstore.yml \
+      -o bosh-deployment/external-ip-not-recommended.yml \
       -o ops_local_cpi.yml \
       -o ops_local_stemcell.yml \
       -o ops_add_vcap.yml \
@@ -33,6 +35,7 @@ pushd ${deployment_dir}
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
       -v internal_ip=${google_address_static_director} \
+      -v external_ip=${director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \

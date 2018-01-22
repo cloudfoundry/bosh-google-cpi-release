@@ -13,8 +13,7 @@ check_param private_key_data
 check_param google_json_key_data
 check_param google_address_static_director
 
-creds_dir="${PWD}/director-creds"
-creds_file="${creds_dir}/creds.yml"
+creds_file="${PWD}/director-creds/creds.yml"
 cpi_release_name=bosh-google-cpi
 manifest_filename="director-manifest.yml"
 manifest_state_filename="manifest-state.json"
@@ -120,6 +119,7 @@ pushd ${deployment_dir}
       --vars-store=${creds_file} \
       -o bosh-deployment/gcp/cpi.yml \
       -o bosh-deployment/gcp/gcs-blobstore.yml \
+      -o bosh-deployment/external-ip-not-recommended.yml \
       -o ops_local_cpi.yml \
       -o ops_local_stemcell.yml \
       -o ops_add_vcap.yml \
@@ -127,6 +127,7 @@ pushd ${deployment_dir}
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
       -v internal_ip=${google_address_static_director} \
+      -v external_ip=${director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \
