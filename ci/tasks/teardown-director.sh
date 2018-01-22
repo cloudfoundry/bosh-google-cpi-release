@@ -18,23 +18,28 @@ cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
 # Export prefixed variables so they are accessible
 echo "Populating environment with BOSH_ prefixed vars"
 export BOSH_CONFIG=${deployment_dir}/.boshconfig
-export BOSH_director_username=$director_username
-export BOSH_director_password=$director_password
-export BOSH_cpi_release_name=$cpi_release_name
-export BOSH_google_zone=$google_zone
-export BOSH_google_project=$google_project
-export BOSH_google_address_static_director=$google_address_static_director
-export BOSH_director_ip=$director_ip
-export BOSH_google_test_bucket_name=$google_test_bucket_name
-export BOSH_google_network=$google_network
-export BOSH_google_subnetwork_gw=$google_subnetwork_gw
-export BOSH_google_subnetwork=$google_subnetwork
-export BOSH_google_subnetwork_range=$google_subnetwork_range
-export BOSH_google_firewall_internal=$google_firewall_internal
-export BOSH_google_firewall_external=$google_firewall_external
-export BOSH_google_json_key_data=$google_json_key_data
 
 pushd ${deployment_dir}
   echo "Destroying BOSH Director..."
-  ./bosh delete-env ${manifest_filename} --state ${manifest_state_filename} --vars-store ${certs} --vars-env=BOSH
+  ./bosh delete-env bosh-deployment/bosh.yml \
+      --state=${manifest_state_filename} \
+      --vars-store=${creds_file} \
+      -o bosh-deployment/gcp/cpi.yml \
+      -o bosh-deployment/gcp/gcs-blobstore.yml \
+      -o ops_local_cpi.yml \
+      -o ops_local_stemcell.yml \
+      -o ops_add_vcap.yml \
+      -v director_name=micro-google \
+      -v internal_cidr=${google_subnetwork_range} \
+      -v internal_gw=${google_subnetwork_gw} \
+      -v internal_ip=${google_address_static_director} \
+      --var-file gcp_credentials_json=${google_json_key} \
+      -v project_id=${google_project} \
+      -v zone=${google_region} \
+      -v "tags=[${google_firewall_internal}, ${google_firewall_external}]" \
+      -v network=${google_network} \
+      -v subnetwork=${google_subnetwork} \
+      -v bucket_name=${google_test_bucket_name} \
+     --var-file director_gcs_credentials_json=${google_json_key} \
+     --var-file agent_gcs_credentials_json=${google_json_key}
 popd
