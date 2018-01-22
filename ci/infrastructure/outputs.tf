@@ -48,7 +48,7 @@ output "google_target_pool" {
 
 output "google_address_director_ip" {
   value = "${google_compute_address.director.address}"
-
+}
 
 output "google_address_bats_ip" {
   value = "${google_compute_address.bats.address}"
