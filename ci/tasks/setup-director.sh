@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ue
 
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
@@ -138,8 +138,8 @@ pushd ${deployment_dir}
   echo "Smoke testing connection to BOSH Director"
   export BOSH_ENVIRONMENT="${google_address_director_ip}"
   export BOSH_CLIENT="admin"
-  export BOSH_CLIENT_SECRET="=$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
-  export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
+  export BOSH_CLIENT_SECRET="=$(${BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
+  export BOSH_CA_CERT="$(${BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
   ${BOSH_CLI} env
 
   trap - ERR
