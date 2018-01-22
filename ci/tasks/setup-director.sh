@@ -65,7 +65,7 @@ cat > "${deployment_dir}/ops_local_cpi.yml" <<EOF
 - type: replace
   path: /releases/name=${cpi_release_name}?
   value:
-  - name: ${cpi_release_name}
+    name: ${cpi_release_name}
     url: file://${deployment_dir}/${cpi_release_name}.tgz
 EOF
 
