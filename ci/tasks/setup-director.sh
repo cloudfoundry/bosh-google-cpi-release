@@ -63,10 +63,10 @@ echo "Creating ops files..."
 cat > "${deployment_dir}/ops_local_cpi.yml" <<EOF
 ---
 - type: replace
-  path: /releases/name=bosh-google-cpi?
+  path: /releases/name=${cpi_release_name}?
   value:
   - name: ${cpi_release_name}
-    url: file://${cpi_release_name}.tgz
+    url: file://${deployment_dir}/${cpi_release_name}.tgz
 EOF
 
 # Use locally sourced stemcell
@@ -75,7 +75,7 @@ cat > "${deployment_dir}/ops_local_stemcell.yml" <<EOF
 - type: replace
   path: /resource_pools/name=vms/stemcell?
   value:
-    url: ${deployment_dir}/stemcell.tgz
+    url: file://${deployment_dir}/stemcell.tgz
 EOF
 
 # Allow user vcap to SSH into director
