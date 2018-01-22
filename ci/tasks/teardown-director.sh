@@ -27,7 +27,6 @@ pushd ${deployment_dir}
   ./bosh delete-env bosh-deployment/bosh.yml \
       --state=${manifest_state_filename} \
       --vars-store=${creds_file} \
-      -o bosh-deployment/gcp/cpi.yml \
       -o bosh-deployment/gcp/gcs-blobstore.yml \
       -o bosh-deployment/external-ip-not-recommended.yml \
       -o ops_local_cpi.yml \
