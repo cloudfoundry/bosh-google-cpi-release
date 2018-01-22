@@ -10,7 +10,9 @@ deployment_dir="${PWD}/deployment"
 google_json_key=${deployment_dir}/google_key.json
 manifest_filename="director-manifest.yml"
 manifest_state_filename="manifest-state.json"
-certs=certs.yml
+infrastructure_metadata="${PWD}/infrastructure/metadata"
+
+read_infrastructure
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
