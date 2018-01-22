@@ -74,7 +74,7 @@ echo "Using BOSH CLI version..."
 ${BAT_BOSH_CLI} --version
 
 echo "Setting up BOSH v2..."
-export BOSH_ENVIRONMENT="${director_ip}"
+export BOSH_ENVIRONMENT="${google_address_director_ip}"
 export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="=$(${BAT_BOSH_CLI} int ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
