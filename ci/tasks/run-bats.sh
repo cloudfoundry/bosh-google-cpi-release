@@ -5,18 +5,9 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param google_project
-check_param google_region
-check_param google_zone
 check_param google_json_key_data
-check_param google_network
-check_param google_subnetwork
 check_param google_subnetwork_range
 check_param google_subnetwork_gw
-check_param google_firewall_internal
-check_param google_firewall_external
-check_param google_address_director_ip
-check_param google_address_bats
 check_param google_address_static_bats
 check_param google_address_static_pair_bats
 check_param google_address_static_available_range_bats
@@ -32,6 +23,9 @@ cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 bat_config_filename="${deployment_dir}/bat.yml"
+infrastructure_metadata="${PWD}/infrastructure/metadata"
+
+read_infrastructure
 
 echo "Setting up artifacts..."
 echo "${private_key_data}" > ${private_key}
@@ -87,7 +81,6 @@ cat > ${bat_config_filename} <<EOF
 ---
 cpi: google
 properties:
-  uuid: $(bosh status --uuid)
   stemcell:
     name: ${stemcell_name}
     version: latest
