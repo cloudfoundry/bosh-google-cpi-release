@@ -129,7 +129,7 @@ pushd ${deployment_dir}
       -v internal_ip=${google_address_static_director} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
-      -v zone=${google_region} \
+      -v zone=${google_zone} \
       -v "tags=[${google_firewall_internal}, ${google_firewall_external}]" \
       -v network=${google_network} \
       -v subnetwork=${google_subnetwork} \
