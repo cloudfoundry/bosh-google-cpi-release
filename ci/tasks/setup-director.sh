@@ -138,7 +138,7 @@ pushd ${deployment_dir}
   echo "Smoke testing connection to BOSH Director"
   export BOSH_ENVIRONMENT="${google_address_director_ip}"
   export BOSH_CLIENT="admin"
-  export BOSH_CLIENT_SECRET="=$(${BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
+  export BOSH_CLIENT_SECRET="$(${BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
   export BOSH_CA_CERT="$(${BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
   ${BOSH_CLI} env
   ${BOSH_CLI} login
