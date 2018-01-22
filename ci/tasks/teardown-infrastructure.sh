@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
@@ -31,4 +29,3 @@ gcloud compute instances list --format json | jq -r --arg network ${google_netwo
 done
 
 wait
-set -e
