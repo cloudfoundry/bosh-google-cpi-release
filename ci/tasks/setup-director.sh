@@ -10,34 +10,19 @@ check_param google_subnetwork_range
 check_param google_subnetwork_gw
 check_param private_key_user
 check_param private_key_data
+check_param google_json_key_data
 
-deployment_dir="${PWD}/deployment"
 creds_dir="${PWD}/director-creds"
 creds_file="${creds_dir}/creds.yml"
 cpi_release_name=bosh-google-cpi
-google_json_key=${deployment_dir}/google_key.json
-private_key=${deployment_dir}/private_key.pem
 manifest_filename="director-manifest.yml"
 manifest_state_filename="manifest-state.json"
 infrastructure_metadata="${PWD}/infrastructure/metadata"
+deployment_dir="${PWD}/deployment"
+google_json_key=${deployment_dir}/google_key.json
+private_key=${deployment_dir}/private_key.pem
 
-echo "Reading infrastructure values..."
-export google_project=$(cat ${infrastructure_metadata} | jq -r .google_project)
-export google_region=$(cat ${infrastructure_metadata} | jq -r .google_region)
-export google_zone=$(cat ${infrastructure_metadata} | jq -r .google_zone)
-export google_json_key_data=$(cat ${infrastructure_metadata} | jq -r .google_json_key_data)
-export google_auto_network=$(cat ${infrastructure_metadata} | jq -r .google_auto_network)
-export google_network=$(cat ${infrastructure_metadata} | jq -r .google_network)
-export google_subnetwork=$(cat ${infrastructure_metadata} | jq -r .google_subnetwork)
-export google_firewall_internal=$(cat ${infrastructure_metadata} | jq -r .google_firewall_internal)
-export google_firewall_external=$(cat ${infrastructure_metadata} | jq -r .google_firewall_external)
-export google_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_backend_service)
-export google_region_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_region_backend_service)
-export google_target_pool=$(cat ${infrastructure_metadata} | jq -r .google_target_pool)
-export google_address_director_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_director_ubuntu)
-export google_address_bats_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_ubuntu)
-export google_address_int_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_int_ubuntu)
-export google_service_account=$(cat ${infrastructure_metadata} | jq -r .google_service_account)
+read_infrastructure
 
 echo "Setting up artifacts..."
 cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz

@@ -10,6 +10,7 @@ inputs:
   - name: bosh-deployment
   - name: stemcell
   - name: bosh-cli
+  - name: infrastructure
 outputs:
   - name: deployment
   - name: director-creds
@@ -21,3 +22,4 @@ params:
   google_subnetwork_gw:           replace-me
   private_key_user:               replace-me
   private_key_data:               replace-me
+  google_json_key_data:           replace-me

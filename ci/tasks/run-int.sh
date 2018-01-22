@@ -5,21 +5,13 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param google_project
-check_param google_region
-check_param google_zone
 check_param google_json_key_data
-check_param google_network
-check_param google_subnetwork
-check_param google_target_pool
-check_param google_backend_service
-check_param google_region_backend_service
-check_param google_address_static_int
-check_param google_address_int
-check_param google_service_account
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
+infrastructure_metadata="${PWD}/infrastructure/metadata"
+
+read_infrastructure
 
 # Stemcell stuff
 export STEMCELL_VERSION=`cat stemcell/version`
