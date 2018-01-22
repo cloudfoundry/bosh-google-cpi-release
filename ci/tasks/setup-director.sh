@@ -80,6 +80,7 @@ EOF
 
 # Allow user vcap to SSH into director
 cat > "${deployment_dir}/ops_add_vcap.yml" <<EOF
+---
 - type: replace
   path: /releases/name=os-conf?
   value:
