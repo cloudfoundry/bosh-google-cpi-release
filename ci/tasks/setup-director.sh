@@ -135,13 +135,12 @@ pushd ${deployment_dir}
      --var-file director_gcs_credentials_json=${google_json_key} \
      --var-file agent_gcs_credentials_json=${google_json_key}
 
-  echo "Logging into BOSH Director"
-  ${BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca > ca_cert.pem
-  ${BOSH_CLI} alias-env micro-google --environment ${director_ip} --ca-cert ca_cert.pem
-
-  export BOSH_CLIENT=admin
-  export BOSH_CLIENT_SECRET=$(${BOSH_CLI} int ${creds_file} --path /admin_password)
-  ${BOSH_CLI} login -e micro-google
+  echo "Smoke testing connection to BOSH Director"
+  export BOSH_ENVIRONMENT="${google_address_director_ip}"
+  export BOSH_CLIENT="admin"
+  export BOSH_CLIENT_SECRET="=$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
+  export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
+  ${BOSH_CLI} env
 
   trap - ERR
   finish
