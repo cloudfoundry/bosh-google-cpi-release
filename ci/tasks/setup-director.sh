@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ue
+set -e
 
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
