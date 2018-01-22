@@ -70,11 +70,12 @@ ${BAT_BOSH_CLI} --version
 echo "Setting up BOSH v2..."
 export BOSH_ENVIRONMENT="${google_address_director_ip}"
 export BOSH_CLIENT="admin"
-export BOSH_CLIENT_SECRET="=$(${BAT_BOSH_CLI} int ${creds_file} --path /admin_password)"
+export BOSH_CLIENT_SECRET="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(${BAT_BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
 
 echo "Testing connection to director"
 ${BAT_BOSH_CLI} env
+${BAT_BOSH_CLI} login
 
 echo "Creating ${bat_config_filename}..."
 cat > ${bat_config_filename} <<EOF

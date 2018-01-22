@@ -141,6 +141,7 @@ pushd ${deployment_dir}
   export BOSH_CLIENT_SECRET="=$(${BOSH_CLI} interpolate ${creds_file} --path /admin_password)"
   export BOSH_CA_CERT="$(${BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca)"
   ${BOSH_CLI} env
+  ${BOSH_CLI} login
 
   trap - ERR
   finish
