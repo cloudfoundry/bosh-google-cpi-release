@@ -69,8 +69,8 @@ function read_infrastructure {
   export google_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_backend_service)
   export google_region_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_region_backend_service)
   export google_target_pool=$(cat ${infrastructure_metadata} | jq -r .google_target_pool)
-  export google_address_director_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_director_ubuntu)
-  export google_address_bats_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_ubuntu)
-  export google_address_int_ubuntu=$(cat ${infrastructure_metadata} | jq -r .google_address_int_ubuntu)
+  export google_address_director=$(cat ${infrastructure_metadata} | jq -r .google_address_director)
+  export google_address_bats=$(cat ${infrastructure_metadata} | jq -r .google_address_bats)
+  export google_address_int=$(cat ${infrastructure_metadata} | jq -r .google_address_int)
   export google_service_account=$(cat ${infrastructure_metadata} | jq -r .google_service_account)
 }

@@ -17,9 +17,9 @@ check_param google_network
 check_param google_subnetwork
 check_param google_firewall_internal
 check_param google_firewall_external
-check_param google_address_director_ubuntu
-check_param google_address_bats_ubuntu
-check_param google_address_int_ubuntu
+check_param google_address_director
+check_param google_address_bats
+check_param google_address_int
 check_param google_service_account
 
 echo "Creating google json key..."
@@ -50,9 +50,9 @@ gcloud -q compute firewall-rules delete ${google_firewall_internal}
 gcloud -q compute networks subnets delete ${google_subnetwork}
 gcloud -q compute networks delete ${google_network}
 gcloud -q compute networks delete ${google_auto_network}
-gcloud -q compute addresses delete ${google_address_director_ubuntu}
-gcloud -q compute addresses delete ${google_address_bats_ubuntu}
-gcloud -q compute addresses delete ${google_address_int_ubuntu}
+gcloud -q compute addresses delete ${google_address_director}
+gcloud -q compute addresses delete ${google_address_bats}
+gcloud -q compute addresses delete ${google_address_int}
 gcloud -q compute target-pools delete ${google_target_pool}
 gcloud -q compute backend-services delete ${google_backend_service}
 gcloud -q compute http-health-checks delete ${google_backend_service}

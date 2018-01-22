@@ -46,15 +46,15 @@ output "google_target_pool" {
   value = "${google_compute_target_pool.regional.name}"
 }
 
-output "google_address_director_ubuntu" {
+output "google_address_director" {
   value = "${google_compute_address.director.name}"
 }
 
-output "google_address_bats_ubuntu" {
+output "google_address_bats" {
   value = "${google_compute_address.bats.name}"
 }
 
-output "google_address_int_ubuntu" {
+output "google_address_int" {
   value = "${google_compute_address.int.name}"
 }
 

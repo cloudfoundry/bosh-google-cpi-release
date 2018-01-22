@@ -36,11 +36,11 @@ google_firewall_internal: google-cpi-ci-firewall-internal
 # Name of firewall for external access
 google_firewall_external: google-cpi-ci-firewall-external
 # Name of an external IP address used in integration tests
-google_address_int_ubuntu: google-cpi-ci-ip-int-ubuntu
+google_address_int: google-cpi-ci-ip-int-ubuntu
 # Name of an external IP address used in BATS tests
-google_address_bats_ubuntu: google-cpi-ci-ip-bats-ubuntu
+google_address_bats: google-cpi-ci-ip-bats-ubuntu
 # Name of an external IP address used to create a director
-google_address_director_ubuntu: google-cpi-ci-ip-director-ubuntu
+google_address_director: google-cpi-ci-ip-director-ubuntu
 # Name of a network target pool
 google_target_pool: google-cpi-ci-target-pool
 # Name of a backend service
@@ -57,15 +57,15 @@ google_subnetwork_gw: 10.0.0.1
 # All of the following IP addresses must be within {{google_subnetwork}}'s CIDR
 # and be unique.
 # Three comma-delimited IP address in {{google_subnetwork}}
-google_address_static_int_ubuntu: 10.0.0.100,10.0.0.101,10.0.0.102
+google_address_static_int: 10.0.0.100,10.0.0.101,10.0.0.102
 # A private IP address in {{google_subnetwork}}
-google_address_static_director_ubuntu: 10.0.0.6
+google_address_static_director: 10.0.0.6
 # A private IP address in {{google_subnetwork}}
-google_address_static_bats_ubuntu: 10.0.0.20
+google_address_static_bats: 10.0.0.20
 # Two comma-delimited IP address in {{google_subnetwork}}
-google_address_static_pair_bats_ubuntu: 10.0.0.20,10.0.0.21
-# Hyphen-delimited range that contains {{google_address_static_pair_bats_ubuntu}} and {{google_address_static_bats_ubuntu}}
-google_address_static_bats_available_range_ubuntu: 10.0.0.20-10.0.0.30
+google_address_static_pair_bats: 10.0.0.20,10.0.0.21
+# Hyphen-delimited range that contains {{google_address_static_pair_bats}} and {{google_address_static_bats}}
+google_address_static_bats_available_range: 10.0.0.20-10.0.0.30
 
 # SSH and auth information
 private_key_user: vcap

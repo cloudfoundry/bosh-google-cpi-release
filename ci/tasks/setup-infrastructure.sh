@@ -14,12 +14,12 @@ check_param google_subnetwork
 check_param google_subnetwork_range
 check_param google_firewall_internal
 check_param google_firewall_external
-check_param google_address_director_ubuntu
-check_param google_address_bats_ubuntu
+check_param google_address_director
+check_param google_address_bats
+check_param google_address_int
 check_param google_target_pool
 check_param google_backend_service 
 check_param google_region_backend_service
-check_param google_address_int_ubuntu
 check_param google_service_account
 
 echo "Creating google json key..."
@@ -34,9 +34,9 @@ gcloud config set compute/zone ${google_zone}
 
 echo "Setting up google infrastructure..."
 gcloud -q iam service-accounts create ${google_service_account}
-gcloud -q compute addresses create ${google_address_director_ubuntu} --region ${google_region}
-gcloud -q compute addresses create ${google_address_bats_ubuntu} --region ${google_region}
-gcloud -q compute addresses create ${google_address_int_ubuntu} --region ${google_region}
+gcloud -q compute addresses create ${google_address_director} --region ${google_region}
+gcloud -q compute addresses create ${google_address_bats} --region ${google_region}
+gcloud -q compute addresses create ${google_address_int} --region ${google_region}
 gcloud -q compute networks create ${google_auto_network}
 gcloud -q compute networks create ${google_network} --mode custom
 gcloud -q compute networks subnets create ${google_subnetwork} --network=${google_network} --range=${google_subnetwork_range}
