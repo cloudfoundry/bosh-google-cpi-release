@@ -4,9 +4,11 @@ source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
-
-infrastructure_metadata="${PWD}/infrastructure/metadata"
-read_infrastructure
+check_param google_project
+check_param google_region
+check_param google_zone
+check_param google_auto_network
+check_param google_network
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
