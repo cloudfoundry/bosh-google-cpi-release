@@ -134,7 +134,8 @@ pushd ${deployment_dir}
       -v network=${google_network} \
       -v subnetwork=${google_subnetwork} \
       -v bucket_name=${google_test_bucket_name} \
-     --var-file director_gcs_credentials_json=${google_json_key}
+     --var-file director_gcs_credentials_json=${google_json_key} \
+     --var-file agent_gcs_credentials_json=${google_json_key}
 
   echo "Logging into BOSH Director"
   ${BOSH_CLI} interpolate --path /director_ssl/ca > ca_cert.pem
