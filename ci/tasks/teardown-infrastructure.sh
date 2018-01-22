@@ -22,12 +22,10 @@ gcloud config set compute/zone ${google_zone}
 
 gcloud compute instances list --format json | jq -r --arg network ${google_auto_network} '.[] | select(.networkInterfaces[].network==$network) | "\(.name) --zone \(.zone)"' | while read instance; do
   echo "Deleting orphan instance ${instance}..."
-  gcloud -q compute instances delete ${instance} --delete-disks all &
+  gcloud -q compute instances delete ${instance} --delete-disks all
 done
 
 gcloud compute instances list --format json | jq -r --arg network ${google_network} '.[] | select(.networkInterfaces[].network==$network) | "\(.name) --zone \(.zone)"' | while read instance; do
   echo "Deleting orphan instance ${instance}..."
-  gcloud -q compute instances delete ${instance} --delete-disks all &
+  gcloud -q compute instances delete ${instance} --delete-disks all
 done
-
-wait
