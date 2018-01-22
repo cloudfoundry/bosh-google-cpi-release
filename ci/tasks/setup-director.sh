@@ -136,7 +136,7 @@ pushd ${deployment_dir}
      --var-file agent_gcs_credentials_json=${google_json_key}
 
   echo "Logging into BOSH Director"
-  ${BOSH_CLI} interpolate --path /director_ssl/ca > ca_cert.pem
+  ${BOSH_CLI} interpolate ${creds_file} --path /director_ssl/ca > ca_cert.pem
   ${BOSH_CLI} alias-env micro-google --environment ${director_ip} --ca-cert ca_cert.pem
 
   export BOSH_CLIENT=admin
