@@ -11,6 +11,7 @@ check_param google_subnetwork_gw
 check_param private_key_user
 check_param private_key_data
 check_param google_json_key_data
+check_param google_address_static_director
 
 creds_dir="${PWD}/director-creds"
 creds_file="${creds_dir}/creds.yml"
@@ -75,7 +76,6 @@ cat > "${deployment_dir}/ops_local_stemcell.yml" <<EOF
   path: /resource_pools/name=vms/stemcell?
   value:
     url: ${deployment_dir}/stemcell.tgz
-end
 EOF
 
 # Allow user vcap to SSH into director
@@ -114,11 +114,8 @@ pushd ${deployment_dir}
   echo "Using bosh version..."
   ${BOSH_CLI} --version
 
-  echo "Generating certificates"
-  ${BOSH_CLI} interpolate ${creds_template} -v internal_ip=${director_ip} --vars-store ${creds_file}
-
   echo "Deploying BOSH Director..."
-  ${BOSH_CLI} create-env create-env bosh-deployment/bosh.yml \
+  ${BOSH_CLI} create-env bosh-deployment/bosh.yml \
       --state=${manifest_state_filename} \
       --vars-store=${creds_file} \
       -o bosh-deployment/gcp/cpi.yml \
@@ -133,7 +130,7 @@ pushd ${deployment_dir}
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_region} \
-      -v tags=["${google_firewall_internal}", "${google_firewall_external}"] \
+      -v "tags=[${google_firewall_internal}, ${google_firewall_external}]" \
       -v network=${google_network} \
       -v subnetwork=${google_subnetwork} \
       -v bucket_name=${google_test_bucket_name} \
