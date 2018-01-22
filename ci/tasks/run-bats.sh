@@ -15,7 +15,7 @@ check_param google_subnetwork_range
 check_param google_subnetwork_gw
 check_param google_firewall_internal
 check_param google_firewall_external
-check_param google_address_director
+check_param google_address_director_ip
 check_param google_address_bats
 check_param google_address_static_bats
 check_param google_address_static_pair_bats
@@ -45,7 +45,7 @@ echo "${private_key_data}" > ${private_key}
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
 export BAT_BOSH_CLI=/usr/bin/bosh2
-export BAT_DNS_HOST=${director_ip}
+export BAT_DNS_HOST=${google_address_director_ip}
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
 export BAT_PRIVATE_KEY=${private_key}
@@ -61,13 +61,8 @@ gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
-echo "Looking for director IP..."
-director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq -r '.address')
-export BAT_DIRECTOR=${director_ip}
-export BAT_DNS_HOST=${director_ip}
-
-echo "Looking for bats IP..."
-bats_ip=$(gcloud compute addresses describe ${google_address_bats} --format json | jq -r '.address')
+export BAT_DIRECTOR=${google_address_director_ip}
+export BAT_DNS_HOST=${google_address_director_ip}
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
@@ -97,7 +92,7 @@ properties:
     name: ${stemcell_name}
     version: latest
   instances: 1
-  vip: ${bats_ip}
+  vip: ${google_address_bats_ip}
   zone: ${google_zone}
   static_ips: [${google_address_static_pair_bats}]
   networks:

@@ -35,7 +35,7 @@ pushd ${deployment_dir}
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
       -v internal_ip=${google_address_static_director} \
-      -v external_ip=${director_ip} \
+      -v external_ip=${google_address_director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \

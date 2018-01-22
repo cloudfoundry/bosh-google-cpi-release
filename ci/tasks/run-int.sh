@@ -34,6 +34,7 @@ export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 export SERVICE_ACCOUNT=${google_service_account}
+export EXTERNAL_STATIC_IP=${google_address_int_ip}
 export CPI_ASYNC_DELETE=true
 
 echo "Creating google json key..."
@@ -46,14 +47,6 @@ gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application
 gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
-
-# Find external IP
-echo "Looking for external IP..."
-external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
-export EXTERNAL_STATIC_IP=${external_ip}
-
-# Export zone
-export ZONE=${google_zone}
 
 # Setup Go and run tests
 export GOPATH=${PWD}/bosh-cpi-src

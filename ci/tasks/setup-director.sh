@@ -42,9 +42,6 @@ gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
-echo "Looking for director IP..."
-director_ip=$(gcloud compute addresses describe ${google_address_director} --format json | jq -r '.address')
-
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
 chmod go-r ${private_key}
@@ -127,7 +124,7 @@ pushd ${deployment_dir}
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
       -v internal_ip=${google_address_static_director} \
-      -v external_ip=${director_ip} \
+      -v external_ip=${google_address_director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \

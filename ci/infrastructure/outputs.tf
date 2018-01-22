@@ -46,16 +46,16 @@ output "google_target_pool" {
   value = "${google_compute_target_pool.regional.name}"
 }
 
-output "google_address_director" {
-  value = "${google_compute_address.director.name}"
+output "google_address_director_ip" {
+  value = "${google_compute_address.director.address}"
+
+
+output "google_address_bats_ip" {
+  value = "${google_compute_address.bats.address}"
 }
 
-output "google_address_bats" {
-  value = "${google_compute_address.bats.name}"
-}
-
-output "google_address_int" {
-  value = "${google_compute_address.int.name}"
+output "google_address_int_ip" {
+  value = "${google_compute_address.int.address}"
 }
 
 output "google_service_account" {
