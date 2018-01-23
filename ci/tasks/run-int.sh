@@ -5,21 +5,14 @@ set -e
 source bosh-cpi-src/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
-check_param google_project
-check_param google_region
-check_param google_zone
 check_param google_json_key_data
-check_param google_network
-check_param google_subnetwork
-check_param google_target_pool
-check_param google_backend_service
-check_param google_region_backend_service
 check_param google_address_static_int
-check_param google_address_int
-check_param google_service_account
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
+infrastructure_metadata="${PWD}/infrastructure/metadata"
+
+read_infrastructure
 
 # Stemcell stuff
 export STEMCELL_VERSION=`cat stemcell/version`
@@ -40,7 +33,8 @@ export ILB_INSTANCE_GROUP=${google_region_backend_service}
 export ZONE=${google_zone}
 export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
-export SERVICE_ACCOUNT=${google_service_account}@${google_project}.iam.gserviceaccount.com
+export SERVICE_ACCOUNT=${google_service_account}
+export EXTERNAL_STATIC_IP=${google_address_int_ip}
 export CPI_ASYNC_DELETE=true
 
 echo "Creating google json key..."
@@ -53,14 +47,6 @@ gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application
 gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
-
-# Find external IP
-echo "Looking for external IP..."
-external_ip=$(gcloud compute addresses describe ${google_address_int} --format json | jq -r '.address')
-export EXTERNAL_STATIC_IP=${external_ip}
-
-# Export zone
-export ZONE=${google_zone}
 
 # Setup Go and run tests
 export GOPATH=${PWD}/bosh-cpi-src
