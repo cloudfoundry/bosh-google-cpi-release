@@ -20,6 +20,9 @@ get-deps:
 	go get github.com/onsi/ginkgo/ginkgo
 	go get github.com/onsi/gomega
 
+stemcell.tgz:
+	curl https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz -o stemcell.tgz
+
 # Cleans up directory and source code with gofmt
 clean:
 	go clean ./...
@@ -67,9 +70,7 @@ testint: check-proj get-deps clean fmt
     ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
-configint: check-proj
-    curl https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz -o stemcell.tgz
-
+configint: stemcell.tgz check-proj
 	cd test_infrastructure; terraform init; terraform apply -auto-approve \
 	  -var 'google_project=$(GOOGLE_PROJECT)' \
 	  -var 'google_region=us-central1' \
