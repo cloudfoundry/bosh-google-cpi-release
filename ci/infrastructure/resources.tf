@@ -137,6 +137,7 @@ resource "google_compute_instance" "hack" {
 
   network_interface = {
     subnetwork = "${google_compute_subnetwork.subnetwork.self_link}"
+    address    = "10.0.0.254"
   }
 
   zone = "${var.google_zone}"
