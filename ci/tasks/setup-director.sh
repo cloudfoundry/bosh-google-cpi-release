@@ -121,6 +121,7 @@ pushd ${deployment_dir}
       -o ops_local_cpi.yml \
       -o ops_local_stemcell.yml \
       -o ops_add_vcap.yml \
+      -v dns_recursor_ip=169.254.169.254 \
       -v director_name=micro-google \
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
