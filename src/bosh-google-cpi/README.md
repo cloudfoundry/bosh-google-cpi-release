@@ -5,7 +5,7 @@ This is an external [BOSH CPI](http://bosh.io/docs/bosh-components.html#cpi) for
 ## Usage
 
 ### Deployment
-This is the implemention of the CPI, and is part of the [BOSH Google CPI release](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release) repository. See the README at the root of this repository for instructions on deploying the release with this CPI.
+This is the implementation of the CPI, and is part of the [BOSH Google CPI release](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release) repository. See the README at the root of this repository for instructions on deploying the release with this CPI.
 
 ### Installation
 
