@@ -38,12 +38,6 @@ resource "google_compute_subnetwork" "subnetwork" {
   network       = "${google_compute_network.manual.self_link}"
 }
 
-resource "google_compute_subnetwork" "subnetwork_hack" {
-  name          = "${var.prefix}-hack"
-  ip_cidr_range = "10.100.0.0/24"
-  network       = "${google_compute_network.manual.self_link}"
-}
-
 resource "google_compute_firewall" "internal" {
   name        = "${var.prefix}-int"
   description = "BOSH CI Internal Traffic"
@@ -142,7 +136,7 @@ resource "google_compute_instance" "hack" {
   name         = "${var.prefix}-hack"
 
   network_interface = {
-    subnetwork = "${google_compute_subnetwork.subnetwork_hack.self_link}"
+    subnetwork = "${google_compute_subnetwork.subnetwork.self_link}"
   }
 
   zone = "${var.google_zone}"
