@@ -117,6 +117,7 @@ pushd ${deployment_dir}
       -o bosh-deployment/gcp/cpi.yml \
       -o bosh-deployment/gcp/gcs-blobstore.yml \
       -o bosh-deployment/external-ip-not-recommended.yml \
+      -o bosh-deployment/misc/powerdns.yml \
       -o ops_local_cpi.yml \
       -o ops_local_stemcell.yml \
       -o ops_add_vcap.yml \
