@@ -84,4 +84,8 @@ builds:
     version: c1587f9ea8574bde30e0aa22f1a07ad59d580772
     sha1: 0edabb2c49d48f694139eb10a771816516f31d78
     blobstore_id: 7694b199-51f2-4314-98d6-67bbb4276607
+  cdb94605d43766738c3a9696e860339a16e769a5:
+    version: cdb94605d43766738c3a9696e860339a16e769a5
+    sha1: a30e01ecb0f04f4ed59f0eaaa58a6ad48d434526
+    blobstore_id: a91cfdbe-b1d1-49fb-84c9-28a39e978261
 format-version: '2'
