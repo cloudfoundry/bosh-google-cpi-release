@@ -23,30 +23,10 @@ google_json_key_data: |
 # The following configuration values are names of resources that will be
 # automatically created and destroyed in the pipeline. They must not conflict
 # with existing resources in {{google_project}}
-# Name of a service account that will be used in integration tests
-google_service_account: google-cpi-ci-service-account
 # Name of an auto-configured network in {{google_project}}
 google_auto_network: google-cpi-ci-auto-network
 # Name of a manually-configured network in {{google_project}}
 google_network: google-cpi-ci-network
-# Name of a manually-configured subnetwork in {{google_network}}
-google_subnetwork: google-cpi-ci-subnetwork
-# Name of firewall for internal access
-google_firewall_internal: google-cpi-ci-firewall-internal
-# Name of firewall for external access
-google_firewall_external: google-cpi-ci-firewall-external
-# Name of an external IP address used in integration tests
-google_address_int: google-cpi-ci-ip-int-ubuntu
-# Name of an external IP address used in BATS tests
-google_address_bats: google-cpi-ci-ip-bats-ubuntu
-# Name of an external IP address used to create a director
-google_address_director: google-cpi-ci-ip-director-ubuntu
-# Name of a network target pool
-google_target_pool: google-cpi-ci-target-pool
-# Name of a backend service
-google_backend_service: google-cpi-ci-backend-service
-# Name of a region backend service
-google_region_backend_service: google-cpi-ci-regional-backend-service
 
 # Networking configuration
 # The CIDR range of {{google_subnetwork}}
@@ -72,9 +52,3 @@ private_key_user: vcap
 private_key_data: |
   # Contents of a private key whose public key component is set as a project-wide SSH
   # key in {{google_project}}
-bat_vcap_password: # A password to use for bats
-
-# Do not change
-director_username: admin
-director_password: admin
-
