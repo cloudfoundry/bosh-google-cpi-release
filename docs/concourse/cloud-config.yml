@@ -52,8 +52,8 @@ networks:
     type: manual
     subnets:
     - az: z1
-      range: 10.150.0.0/24
-      gateway: 10.150.0.1
+      range: 10.120.0.0/24
+      gateway: 10.120.0.1
       cloud_properties:
         network_name: concourse
         subnetwork_name: concourse-public-<%=region %>-1
@@ -62,8 +62,8 @@ networks:
           - concourse-public
           - concourse-internal
     - az: z2
-      range: 10.160.0.0/24
-      gateway: 10.160.0.1
+      range: 10.110.0.0/24
+      gateway: 10.110.0.1
       cloud_properties:
         network_name: concourse
         subnetwork_name: concourse-public-<%=region %>-2
