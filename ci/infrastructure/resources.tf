@@ -73,6 +73,10 @@ resource "google_compute_firewall" "external" {
     protocol = "udp"
     ports    = ["53"]
   }
+
+  allow {
+    protocol = "icmp"
+  }
 }
 
 # Target Pool
