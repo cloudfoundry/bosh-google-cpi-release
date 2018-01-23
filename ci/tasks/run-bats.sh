@@ -56,7 +56,7 @@ gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
 export BAT_DIRECTOR=${google_address_director_ip}
-export BAT_DNS_HOST=${google_address_director_ip}
+export BAT_DNS_HOST=${google_address_static_director}
 
 echo "Creating private key..."
 echo "${private_key_data}" > ${private_key}
