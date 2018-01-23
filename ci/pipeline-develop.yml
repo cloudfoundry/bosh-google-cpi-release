@@ -15,10 +15,8 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
-# DO NOT CHECK IN
-#      - task: unit-tests
-#        file: bosh-cpi-src/ci/tasks/unit-tests.yml
-# DO NOT CHECK IN
+      - task: unit-tests
+        file: bosh-cpi-src/ci/tasks/unit-tests.yml
 
   - name: build-candidate
     serial: true
@@ -146,6 +144,9 @@ jobs:
 
       - task: run-int
         file: bosh-cpi-src/ci/tasks/run-int.yml
+        params:
+          google_json_key_data:      {{google_json_key_data}}
+          google_address_static_int: {{google_address_static_int}}
 
 resources:
   - name: bosh-cpi-src-in
