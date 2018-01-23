@@ -8,24 +8,12 @@ inputs:
   - name: bosh-cpi-src
   - name: bosh-cli
   - name: deployment
+  - name: infrastructure
+  - name: director-creds
 run:
   path: bosh-cpi-src/ci/tasks/teardown-director.sh
 params:
   BOSH_INIT_LOG_LEVEL: warn
-  google_project:                 replace-me
-  google_region:                  replace-me
-  google_zone:                    replace-me
   google_json_key_data:           replace-me
-  google_test_bucket_name:        replace-me
-  google_network:                 replace-me
-  google_subnetwork:              replace-me
-  google_subnetwork_range:        replace-me
-  google_subnetwork_gw:           replace-me
-  google_firewall_internal:       replace-me
-  google_firewall_external:       replace-me
-  google_address_director:        replace-me
-  google_address_static_director: replace-me
   private_key_user:               replace-me
   private_key_data:               replace-me
-  director_username:              replace-me
-  director_password:              replace-me
