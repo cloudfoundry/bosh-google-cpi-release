@@ -1,8 +1,6 @@
 package action
 
 import (
-	"strings"
-
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
@@ -25,26 +23,21 @@ const (
 )
 
 const (
-	NoCPUErr       = "CPU must be greater than 0"
-	RamPerCPUErr   = "RAM per CPU must be at least 922 MB"
-	RamMultipleErr = "RAM must be specified as a multiple of 256 MB"
+	NoCPUErr = "CPU must be greater than 0"
 )
 
 func (CalculateVMCloudProperties) Run(desired DesiredVMSpec) (VMCloudProperties, error) {
-	var errs []string
 	if desired.CPU <= 0 {
-		errs = append(errs, NoCPUErr)
-	}
-	minRam := float64(desired.CPU) * float64(minMemoryPerCPU)
-	if float64(desired.RAM) < minRam {
-		errs = append(errs, RamPerCPUErr)
-	}
-	if desired.RAM%memoryGranularity != 0 {
-		errs = append(errs, RamMultipleErr)
+		return VMCloudProperties{}, bosherr.Error(NoCPUErr)
 	}
 
-	if len(errs) != 0 {
-		return VMCloudProperties{}, bosherr.Errorf("invalid desired instance specification: %s", strings.Join(errs, ", "))
+	minRam := int(float64(desired.CPU) * float64(minMemoryPerCPU))
+	if desired.RAM < minRam {
+		desired.RAM = minRam
+	}
+	remainder := desired.RAM % memoryGranularity
+	if remainder != 0 {
+		desired.RAM += memoryGranularity - remainder
 	}
 
 	return VMCloudProperties{

@@ -17,6 +17,11 @@ var _ = Describe("CalculateVMCloudProperties", func() {
 		subject = NewCalculateVMCloudProperties()
 	})
 
+	It("failed if no CPU is specified", func() {
+		_, err := subject.Run(DesiredVMSpec{CPU: 0, RAM: 1024, EphemeralDiskSize: 1024})
+		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring(NoCPUErr))
+	})
 	DescribeTable("valid machine specification return matching specs", func(cpu, ram, disk int) {
 		res, err := subject.Run(DesiredVMSpec{CPU: cpu, RAM: ram, EphemeralDiskSize: disk})
 		Expect(err).NotTo(HaveOccurred())
@@ -31,20 +36,16 @@ var _ = Describe("CalculateVMCloudProperties", func() {
 		Entry("2 core, 2048 memory, 1024 disk", 2, 2048, 1024),
 		Entry("4 core, 6144 memory, 1024 disk", 4, 6144, 1024),
 	)
-	DescribeTable("invalid machine specification returns error", func(cpu, ram, disk int, errs []string) {
-		_, err := subject.Run(DesiredVMSpec{CPU: cpu, RAM: ram, EphemeralDiskSize: disk})
-		Expect(err).To(HaveOccurred())
+	DescribeTable("memory is rounded up to the nearest valid value if necessary", func(cpu, ram, roundedRam int) {
+		res, err := subject.Run(DesiredVMSpec{CPU: cpu, RAM: ram, EphemeralDiskSize: 1024})
+		Expect(err).NotTo(HaveOccurred())
 
-		for _, expected := range errs {
-			Expect(err.Error()).To(ContainSubstring(expected))
-		}
+		Expect(res.RAM).To(Equal(roundedRam))
 	},
-		Entry("no cores", 0, 1024, 1024, []string{NoCPUErr}),
-		Entry("no memory", 1, 0, 1024, []string{RamPerCPUErr}),
-		Entry("bad memory multiple", 1, 922, 1024, []string{RamMultipleErr}),
-		Entry("too little memory, bad multiple", 2, 1843, 1024, []string{RamPerCPUErr, RamMultipleErr}),
+		Entry("1 core, no memory", 1, 0, 1024),
+		Entry("1 core, under memory", 1, 922, 1024),
+		Entry("2 cores, under memory", 2, 1024, 2048),
+		Entry("16 cores, over memory", 16, 16128, 16128),
+		Entry("16 cores, under memory", 16, 1, 14848),
 	)
-	Context("valid machine specifications", func() {
-
-	})
 })
