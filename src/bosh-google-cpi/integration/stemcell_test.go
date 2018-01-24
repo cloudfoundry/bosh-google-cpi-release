@@ -34,5 +34,18 @@ var _ = Describe("Stemcell", func() {
 		Expect(response.Error).To(BeNil())
 		Expect(response.Result).To(BeNil())
 	})
+
+	It("quietly ignores missing stemcells", func() {
+		By("deleting the stemcell")
+		request := `{
+         "method": "delete_stemcell",
+         "arguments": ["stemcell-ab5f5573-62d5-4f72-6620-3ab8f1aed3cf"]
+		}`
+
+		response, err := execCPI(request)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(response.Error).To(BeNil())
+		Expect(response.Result).To(BeNil())
+	})
 	//TODO: Add heavy stemcell test
 })
