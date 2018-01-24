@@ -188,6 +188,7 @@ func NewConcreteFactory(
 			// Others:
 			"info": NewInfo(),
 			"ping": NewPing(),
+			"calculate_vm_cloud_properties": NewCalculateVMCloudProperties(),
 
 			// Not implemented:
 			// current_vm_id

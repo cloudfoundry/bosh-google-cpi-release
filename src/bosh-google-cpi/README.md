@@ -25,40 +25,34 @@ Create a configuration file:
 
 ```
 {
-  "google": {
-    "project": "my-gce-project",
-    "json_key": "{\"private_key_id\": \"...\"}",
-    "default_root_disk_size_gb": 20,
-    "default_root_disk_type": ""
-  },
-  "actions": {
-    "agent": {
-      "mbus": "https://mbus:mbus@0.0.0.0:6868",
-      "ntp": [
-        "169.254.169.254"
-      ],
-      "blobstore": {
-        "type": "local",
-        "options": {}
-      }
-    },
-    "registry": {
-      "protocol": "http",
-      "host": "127.0.0.1",
-      "port": 25777,
-      "username": "admin",
-      "password": "admin",
-      "tls": {
-        "_comment": "TLS options only apply when using HTTPS protocol",
-        "insecure_skip_verify": true,
-        "certfile": "/path/to/public.pem",
-        "keyfile": "/path/to/private.pem",
-        "cacertfile": "/path/to/ca.pem"
+  "cloud": {
+    "plugin": "google",
+    "properties": {
+      "google": {
+        "project": "my-gce-project",
+        "json_key": "{\"private_key_id\": \"...\"}",
+        "default_root_disk_size_gb": 20,
+        "default_root_disk_type": ""
+      },
+      "agent": {
+        "mbus": "https:\/\/mbus:mbus@0.0.0.0:6868",
+        "ntp": [
+          "169.254.169.254"
+        ],
+        "blobstore": {
+          "provider": "local",
+          "options": {
+          }
+        }
+      },
+      "registry": {
+        "use_gce_metadata": true
       }
     }
   }
 }
 ```
+
 
 | Option                                    | Required   | Type          | Description
 |:------------------------------------------|:----------:|:------------- |:-----------
