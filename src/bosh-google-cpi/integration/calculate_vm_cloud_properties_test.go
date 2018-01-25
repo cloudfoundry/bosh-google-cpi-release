@@ -7,7 +7,7 @@ import (
 
 var _ = Describe("Misc", func() {
 	Describe("calculate_vm_cloud_properties", func() {
-		FIt("provides a basic match", func() {
+		It("provides a basic match", func() {
 			result := assertSucceedsWithResult(`{
 				"method": "calculate_vm_cloud_properties",
 				"arguments": [{"cpu":1,"ram":1024,"ephemeral_disk_size":1024}]
