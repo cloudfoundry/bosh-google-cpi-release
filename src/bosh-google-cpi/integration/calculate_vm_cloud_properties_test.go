@@ -15,7 +15,7 @@ var _ = Describe("Misc", func() {
 
 			Expect(result).To(HaveKey("cpu"))
 			Expect(result).To(HaveKey("ram"))
-			Expect(result).To(HaveKey("root_disk_size_db"))
+			Expect(result).To(HaveKey("root_disk_size_gb"))
 		})
 	})
 })
