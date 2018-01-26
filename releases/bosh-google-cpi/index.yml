@@ -78,4 +78,6 @@ builds:
     version: 25.10.0
   59fd594a-6c59-4cb2-9a39-7a731d61bd49:
     version: 26.0.0
+  607f33a3-3982-456f-82d9-6699032fcb6c:
+    version: 27.0.0
 format-version: '2'
