@@ -84,9 +84,11 @@ resource "google_compute_instance" "bosh-bastion" {
 
   tags = ["bosh-bastion", "bosh-internal"]
 
-  disk {
+  boot_disk {
+    initialize_params {
     image = "ubuntu-1404-trusty-v20160627"
   }
+ }
 
   network_interface {
     subnetwork = "${google_compute_subnetwork.bosh-subnet-1.name}"
