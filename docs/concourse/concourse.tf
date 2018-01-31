@@ -1,12 +1,12 @@
 resource "google_compute_subnetwork" "concourse-public-subnet-1" {
   name          = "concourse-public-${var.region}-1"
-  ip_cidr_range = "10.150.0.0/16"
+  ip_cidr_range = "10.120.0.0/16"
   network       = "${google_compute_network.network.self_link}"
 }
 
 resource "google_compute_subnetwork" "concourse-public-subnet-2" {
   name          = "concourse-public-${var.region}-2"
-  ip_cidr_range = "10.160.0.0/16"
+  ip_cidr_range = "10.110.0.0/16"
   network       = "${google_compute_network.network.self_link}"
 }
 
