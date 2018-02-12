@@ -84,8 +84,10 @@ resource "google_compute_instance" "bosh-bastion" {
 
   tags = ["bosh-bastion", "bosh-internal"]
 
-  disk {
-    image = "ubuntu-1404-trusty-v20160627"
+  boot_disk {
+   initialize_params {
+     image = "ubuntu-1404-trusty-v20180122"
+   }
   }
 
   network_interface {
