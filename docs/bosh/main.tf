@@ -1,7 +1,6 @@
-// Easier maintenance for updating GCE image string
 variable "latest_ubuntu" {
     type = "string"
-    default = "ubuntu-1404-trusty-v20170505"
+    default = "ubuntu-1404-trusty-v20180122"
 }
 
 variable "project_id" {
