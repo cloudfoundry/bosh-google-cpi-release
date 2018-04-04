@@ -16,7 +16,7 @@ get-deps:
 	# Simplify cross-compiling
 	go install bosh-google-cpi/vendor/github.com/mitchellh/gox
 
-	# Ginkgo and omega test tools
+	# Ginkgo test runner
 	go install bosh-google-cpi/vendor/github.com/onsi/ginkgo/ginkgo
 
 stemcell.tgz:
