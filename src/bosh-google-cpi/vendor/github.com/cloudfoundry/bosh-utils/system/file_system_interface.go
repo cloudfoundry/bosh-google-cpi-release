@@ -6,10 +6,12 @@ import (
 	"path/filepath"
 )
 
-//File is a subset of os.File
+// File is a subset of os.File
 type File interface {
 	io.ReadWriteCloser
 	ReadAt([]byte, int64) (int, error)
+	WriteAt([]byte, int64) (int, error)
+	Seek(int64, int) (int64, error)
 	Stat() (os.FileInfo, error)
 	Name() string
 }
@@ -30,12 +32,17 @@ type FileSystem interface {
 
 	WriteFileString(path, content string) error
 	WriteFile(path string, content []byte) error
-	ConvergeFileContents(path string, content []byte) (written bool, err error)
+	WriteFileQuietly(path string, content []byte) error
+	ConvergeFileContents(path string, content []byte, opts ...ConvergeFileContentsOpts) (written bool, err error)
 
 	ReadFileString(path string) (content string, err error)
 	ReadFile(path string) (content []byte, err error)
+	ReadFileWithOpts(path string, opts ReadOpts) (content []byte, err error)
 
 	FileExists(path string) bool
+	Stat(path string) (os.FileInfo, error)
+	StatWithOpts(path string, opts StatOpts) (os.FileInfo, error)
+	Lstat(path string) (os.FileInfo, error)
 
 	Rename(oldPath, newPath string) error
 
@@ -43,7 +50,16 @@ type FileSystem interface {
 	// Symlink call will remove file at newPath if one exists
 	// to make newPath a symlink to the file at oldPath.
 	Symlink(oldPath, newPath string) error
-	ReadLink(symlinkPath string) (targetPath string, err error)
+
+	// deprecated - The fake_file_system version of this method behaves differently
+	// 				than the os_file_system.  It doesn't traverse all intermediate directories
+	// 				of symlinkPath and only attempts to follow the specific file.
+	//              This method used to be called ReadLink(path) (string,error),
+	//              which was misleading. This method errors when the target exists,
+	//			    unlike the os.Readlink method (lower case l). This method should
+	//              probably just go away.
+	ReadAndFollowLink(symlinkPath string) (targetPath string, err error)
+	Readlink(symlinkPath string) (targetPath string, err error)
 
 	CopyFile(srcPath, dstPath string) error
 	CopyDir(srcPath, dstPath string) error
@@ -54,5 +70,6 @@ type FileSystem interface {
 	ChangeTempRoot(path string) error
 
 	Glob(pattern string) (matches []string, err error)
+	RecursiveGlob(pattern string) (matches []string, err error)
 	Walk(root string, walkFunc filepath.WalkFunc) error
 }
