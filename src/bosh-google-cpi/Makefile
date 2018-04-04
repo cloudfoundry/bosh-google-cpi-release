@@ -11,14 +11,13 @@ build-all:
 # Prepration for tests
 get-deps:
 	# Go lint tool
-	go get github.com/golang/lint/golint
+	go install bosh-google-cpi/vendor/github.com/golang/lint/golint
 
 	# Simplify cross-compiling
-	go get github.com/mitchellh/gox
+	go install bosh-google-cpi/vendor/github.com/mitchellh/gox
 
 	# Ginkgo and omega test tools
-	go get github.com/onsi/ginkgo/ginkgo
-	go get github.com/onsi/gomega
+	go install bosh-google-cpi/vendor/github.com/onsi/ginkgo/ginkgo
 
 stemcell.tgz:
 	curl https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz -o stemcell.tgz

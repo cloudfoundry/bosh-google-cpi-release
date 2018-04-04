@@ -14,9 +14,27 @@
   revision = "67f99ed9a1c4eab0f7b7db3a7cdcb8e019710d61"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/golang/lint"
+  packages = ["golint"]
+  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
+
+[[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "99511271042a09d1e01baea8781caa5210fec66e"
+
+[[projects]]
+  name = "github.com/mitchellh/gox"
+  packages = ["."]
+  revision = "c9740af9c6574448fd48eb30a71f964014c7a837"
+  version = "v0.4.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/iochan"
+  packages = ["."]
+  revision = "87b45ffd0e9581375c491fef3d32130bb15c5bd7"
 
 [[projects]]
   branch = "master"
@@ -29,6 +47,14 @@
   packages = [
     ".",
     "config",
+    "extensions/table",
+    "ginkgo",
+    "ginkgo/convert",
+    "ginkgo/interrupthandler",
+    "ginkgo/nodot",
+    "ginkgo/testrunner",
+    "ginkgo/testsuite",
+    "ginkgo/watch",
     "internal/codelocation",
     "internal/containernode",
     "internal/failer",
@@ -50,6 +76,8 @@
   packages = [
     ".",
     "format",
+    "gstruct",
+    "gstruct/errors",
     "internal/assertion",
     "internal/asyncassertion",
     "internal/oraclematcher",
@@ -61,13 +89,23 @@
     "matchers/support/goraph/util",
     "types"
   ]
-  revision = "7ce781ea776b2fd506491011353bded2e40c8467"
+  revision = "003f63b7f4cff3fc95357005358af2de0f5fe152"
+  version = "v1.3.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/lint"
+  packages = ["."]
+  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
 
 [[projects]]
   name = "golang.org/x/net"
   packages = [
     "context",
-    "context/ctxhttp"
+    "context/ctxhttp",
+    "html",
+    "html/atom",
+    "html/charset"
   ]
   revision = "35b06af0720201bc2f326773a80767387544f8c4"
 
@@ -81,6 +119,41 @@
     "jwt"
   ]
   revision = "045497edb6234273d67dbc25da3f2ddbc4c4cacf"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "encoding",
+    "encoding/charmap",
+    "encoding/htmlindex",
+    "encoding/internal",
+    "encoding/internal/identifier",
+    "encoding/japanese",
+    "encoding/korean",
+    "encoding/simplifiedchinese",
+    "encoding/traditionalchinese",
+    "encoding/unicode",
+    "internal/gen",
+    "internal/tag",
+    "internal/utf8internal",
+    "language",
+    "runes",
+    "transform",
+    "unicode/cldr"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/tools"
+  packages = [
+    "go/ast/astutil",
+    "go/gcexportdata",
+    "go/gcimporter15",
+    "go/types/typeutil"
+  ]
+  revision = "ac136b6c2db7c4d43955e4bc7174db36dc0539c0"
 
 [[projects]]
   name = "google.golang.org/api"
@@ -118,9 +191,15 @@
   ]
   revision = "83ee71d0fec26977bad1662134fa1e8c91268025"
 
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ce00b2f23201b8d6f28c965f447f4653febfbd5ed1e529f0548f579bbf57ed32"
+  inputs-digest = "f5dc676a2b2219cf9e0b680b35925ba4eedb908baa81b387ff73c738b588a7c0"
   solver-name = "gps-cdcl"
   solver-version = 1
