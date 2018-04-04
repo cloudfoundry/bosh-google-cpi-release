@@ -2,6 +2,19 @@
 
 
 [[projects]]
+  name = "github.com/bmatcuk/doublestar"
+  packages = ["."]
+  revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
+  version = "v1.0.9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/charlievieth/fs"
+  packages = ["."]
+  revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
+
+[[projects]]
+  branch = "master"
   name = "github.com/cloudfoundry/bosh-utils"
   packages = [
     "errors",
@@ -11,7 +24,7 @@
     "uuid",
     "uuid/fakes"
   ]
-  revision = "67f99ed9a1c4eab0f7b7db3a7cdcb8e019710d61"
+  revision = "f4c293340f7527c63b0679a8eb6d4c25a70b31ef"
 
 [[projects]]
   branch = "master"
