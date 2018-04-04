@@ -13,6 +13,12 @@ type Command struct {
 
 	WorkingDir string
 
+	// On Linux when enabled inherits process group
+	KeepAttached bool
+
+	// Don't echo stdout/stderr
+	Quiet bool
+
 	Stdin io.Reader
 
 	// Full stdout and stderr will be captured to memory
@@ -51,6 +57,8 @@ type CmdRunner interface {
 	RunComplexCommandAsync(cmd Command) (Process, error)
 
 	RunCommand(cmdName string, args ...string) (stdout, stderr string, exitStatus int, err error)
+
+	RunCommandQuietly(cmdName string, args ...string) (stdout, stderr string, exitStatus int, err error)
 
 	RunCommandWithInput(input, cmdName string, args ...string) (stdout, stderr string, exitStatus int, err error)
 
