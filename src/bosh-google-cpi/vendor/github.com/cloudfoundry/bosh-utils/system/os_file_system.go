@@ -2,17 +2,17 @@ package system
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"errors"
 
+	"github.com/bmatcuk/doublestar"
+	fsWrapper "github.com/charlievieth/fs"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 )
@@ -34,34 +34,26 @@ func NewOsFileSystemWithStrictTempRoot(logger boshlog.Logger) FileSystem {
 
 func (fs *osFileSystem) HomeDir(username string) (string, error) {
 	fs.logger.Debug(fs.logTag, "Getting HomeDir for %s", username)
-
-	homeDir, err := fs.runCommand(fmt.Sprintf("echo ~%s", username))
+	dir, err := fs.homeDir(username)
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Shelling out to get user '%s' home directory", username)
+		return "", err
 	}
-
-	if strings.HasPrefix(homeDir, "~") {
-		return "", bosherr.Errorf("Failed to get user '%s' home directory", username)
-	}
-
-	fs.logger.Debug(fs.logTag, "HomeDir is %s", homeDir)
-	return homeDir, nil
+	fs.logger.Debug(fs.logTag, "HomeDir is %s", dir)
+	return dir, nil
 }
 
 func (fs *osFileSystem) ExpandPath(path string) (string, error) {
 	fs.logger.Debug(fs.logTag, "Expanding path for '%s'", path)
 
-	var err error
-	if strings.IndexRune(path, '~') == 0 {
-		currentUserHome, err := fs.HomeDir("")
+	if strings.HasPrefix(path, "~") {
+		home, err := fs.currentHomeDir()
 		if err != nil {
 			return "", bosherr.WrapError(err, "Getting current user home dir")
 		}
-
-		path = filepath.Clean(strings.Replace(path, "~", currentUserHome, 1))
+		path = filepath.Join(home, path[1:])
 	}
 
-	path, err = filepath.Abs(path)
+	path, err := filepath.Abs(path)
 	if err != nil {
 		return "", bosherr.WrapError(err, "Getting absolute path")
 	}
@@ -70,70 +62,80 @@ func (fs *osFileSystem) ExpandPath(path string) (string, error) {
 }
 
 func (fs *osFileSystem) MkdirAll(path string, perm os.FileMode) (err error) {
-	fs.logger.Debug(fs.logTag, "Making dir %s with perm %d", path, perm)
-	return os.MkdirAll(path, perm)
+	fs.logger.Debug(fs.logTag, "Making dir %s with perm %#o", path, perm)
+	return fsWrapper.MkdirAll(path, perm)
 }
 
 func (fs *osFileSystem) Chown(path, username string) error {
 	fs.logger.Debug(fs.logTag, "Chown %s to user %s", path, username)
-
-	uid, err := fs.runCommand(fmt.Sprintf("id -u %s", username))
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Getting user id for '%s'", username)
-	}
-
-	uidAsInt, err := strconv.Atoi(uid)
-	if err != nil {
-		return bosherr.WrapError(err, "Converting UID to integer")
-	}
-
-	gid, err := fs.runCommand(fmt.Sprintf("id -g %s", username))
-	if err != nil {
-		return bosherr.WrapErrorf(err, "Getting group id for '%s'", username)
-	}
-
-	gidAsInt, err := strconv.Atoi(gid)
-	if err != nil {
-		return bosherr.WrapError(err, "Converting GID to integer")
-	}
-
-	err = os.Chown(path, uidAsInt, gidAsInt)
-	if err != nil {
-		return bosherr.WrapError(err, "Doing Chown")
-	}
-
-	return nil
+	return fs.chown(path, username)
 }
 
 func (fs *osFileSystem) Chmod(path string, perm os.FileMode) (err error) {
 	fs.logger.Debug(fs.logTag, "Chmod %s to %d", path, perm)
-	return os.Chmod(path, perm)
+	return fsWrapper.Chmod(path, perm)
+}
+
+func (fs *osFileSystem) openFile(path string, flag int, perm os.FileMode) (*os.File, error) {
+	return fsWrapper.OpenFile(path, flag, perm)
 }
 
 func (fs *osFileSystem) OpenFile(path string, flag int, perm os.FileMode) (File, error) {
-	return os.OpenFile(path, flag, perm)
+	return fs.openFile(path, flag, perm)
+}
+
+type StatOpts struct {
+	Quiet bool
+}
+
+func (fs *osFileSystem) StatWithOpts(path string, opts StatOpts) (os.FileInfo, error) {
+	if !opts.Quiet {
+		fs.logger.Debug(fs.logTag, "Stat '%s'", path)
+	}
+	return fsWrapper.Stat(path)
+}
+
+func (fs *osFileSystem) Stat(path string) (os.FileInfo, error) {
+	return fs.StatWithOpts(path, StatOpts{})
+}
+
+func (fs *osFileSystem) Lstat(path string) (os.FileInfo, error) {
+	fs.logger.Debug(fs.logTag, "Lstat '%s'", path)
+	return fsWrapper.Lstat(path)
 }
 
 func (fs *osFileSystem) WriteFileString(path, content string) (err error) {
 	return fs.WriteFile(path, []byte(content))
 }
 
+func (fs *osFileSystem) WriteFileQuietly(path string, content []byte) error {
+	return fs.writeFileHelper(path, content, false)
+}
+
 func (fs *osFileSystem) WriteFile(path string, content []byte) error {
-	fs.logger.Debug(fs.logTag, "Writing %s", path)
+	return fs.writeFileHelper(path, content, true)
+}
+
+func (fs *osFileSystem) writeFileHelper(path string, content []byte, logDebug bool) error {
+	if logDebug {
+		fs.logger.Debug(fs.logTag, "Writing %s", path)
+	}
 
 	err := fs.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
 		return bosherr.WrapError(err, "Creating dir to write file")
 	}
 
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	file, err := fs.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating file %s", path)
 	}
 
 	defer file.Close()
 
-	fs.logger.DebugWithDetails(fs.logTag, "Write content", content)
+	if logDebug {
+		fs.logger.DebugWithDetails(fs.logTag, "Write content", content)
+	}
 
 	_, err = file.Write(content)
 	if err != nil {
@@ -143,32 +145,52 @@ func (fs *osFileSystem) WriteFile(path string, content []byte) error {
 	return nil
 }
 
-func (fs *osFileSystem) ConvergeFileContents(path string, content []byte) (bool, error) {
-	if fs.filesAreIdentical(content, path) {
+type ConvergeFileContentsOpts struct {
+	DryRun bool
+}
+
+func (fs *osFileSystem) ConvergeFileContents(path string, content []byte, opts ...ConvergeFileContentsOpts) (bool, error) {
+	actuallyConverge := true
+
+	if len(opts) > 0 {
+		actuallyConverge = !opts[0].DryRun
+	}
+
+	fi, err := fs.Stat(path)
+	if err != nil || fi.Size() != int64(len(content)) {
+		if actuallyConverge {
+			return true, fs.WriteFile(path, content)
+		}
+		return true, nil
+	}
+
+	file, err := fs.openFile(path, os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		return true, bosherr.WrapErrorf(err, "Creating file %s", path)
+	}
+	defer file.Close()
+
+	src, err := ioutil.ReadAll(file)
+	if err != nil {
+		return true, bosherr.WrapErrorf(err, "Reading file %s", path)
+	}
+
+	if bytes.Equal(src, content) {
 		fs.logger.Debug(fs.logTag, "Skipping writing %s because contents are identical", path)
 		return false, nil
 	}
 
-	fs.logger.Debug(fs.logTag, "File %s will be overwritten", path)
-
-	err := fs.MkdirAll(filepath.Dir(path), os.ModePerm)
-	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Making dir for file %s", path)
-	}
-
-	file, err := os.Create(path)
-	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Creating file %s", path)
-	}
-
-	defer file.Close()
-
-	_, err = file.Write(content)
-	if err != nil {
-		return true, bosherr.WrapErrorf(err, "Writing content to file %s", path)
+	if actuallyConverge {
+		fs.logger.Debug(fs.logTag, "File %s will be overwritten", path)
+		file.Close()
+		return true, fs.WriteFile(path, content)
 	}
 
 	return true, nil
+}
+
+type ReadOpts struct {
+	Quiet bool
 }
 
 func (fs *osFileSystem) ReadFileString(path string) (content string, err error) {
@@ -181,10 +203,12 @@ func (fs *osFileSystem) ReadFileString(path string) (content string, err error) 
 	return
 }
 
-func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
-	fs.logger.Debug(fs.logTag, "Reading file %s", path)
+func (fs *osFileSystem) ReadFileWithOpts(path string, opts ReadOpts) (content []byte, err error) {
+	if !opts.Quiet {
+		fs.logger.Debug(fs.logTag, "Reading file %s", path)
+	}
 
-	file, err := os.Open(path)
+	file, err := fs.OpenFile(path, os.O_RDONLY, 0)
 	if err != nil {
 		err = bosherr.WrapErrorf(err, "Opening file %s", path)
 		return
@@ -192,22 +216,26 @@ func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
 
 	defer file.Close()
 
-	bytes, err := ioutil.ReadAll(file)
+	content, err = ioutil.ReadAll(file)
 	if err != nil {
 		err = bosherr.WrapErrorf(err, "Reading file content %s", path)
 		return
 	}
 
-	content = bytes
-
-	fs.logger.DebugWithDetails(fs.logTag, "Read content", content)
+	if !opts.Quiet {
+		fs.logger.DebugWithDetails(fs.logTag, "Read content", content)
+	}
 	return
+}
+
+func (fs *osFileSystem) ReadFile(path string) (content []byte, err error) {
+	return fs.ReadFileWithOpts(path, ReadOpts{})
 }
 
 func (fs *osFileSystem) FileExists(path string) bool {
 	fs.logger.Debug(fs.logTag, "Checking if file exists %s", path)
 
-	_, err := os.Stat(path)
+	_, err := fs.Stat(path)
 	if err != nil {
 		return !os.IsNotExist(err)
 	}
@@ -218,50 +246,59 @@ func (fs *osFileSystem) Rename(oldPath, newPath string) (err error) {
 	fs.logger.Debug(fs.logTag, "Renaming %s to %s", oldPath, newPath)
 
 	fs.RemoveAll(newPath)
-	return os.Rename(oldPath, newPath)
+	return fsWrapper.Rename(oldPath, newPath)
 }
 
 func (fs *osFileSystem) Symlink(oldPath, newPath string) error {
 	fs.logger.Debug(fs.logTag, "Symlinking oldPath %s with newPath %s", oldPath, newPath)
 
-	if fi, err := os.Lstat(newPath); err == nil {
+	source, target, err := fs.symlinkPaths(oldPath, newPath)
+	if err != nil {
+		bosherr.WrapErrorf(err, "Getting absolute paths for target and path links: %s %s", oldPath, newPath)
+	}
+	if fi, err := fs.Lstat(target); err == nil {
 		if fi.Mode()&os.ModeSymlink != 0 {
 			// Symlink
-			new, err := os.Readlink(newPath)
+			new, err := fs.Readlink(target)
 			if err != nil {
-				return bosherr.WrapErrorf(err, "Reading link for %s", newPath)
+				return bosherr.WrapErrorf(err, "Reading link for %s", target)
 			}
-			if filepath.Clean(oldPath) == filepath.Clean(new) {
+			if filepath.Clean(source) == filepath.Clean(new) {
 				return nil
 			}
 		}
-		if err := os.Remove(newPath); err != nil {
-			return bosherr.WrapErrorf(err, "Removing new path at %s", newPath)
+		if err := fs.RemoveAll(target); err != nil {
+			return bosherr.WrapErrorf(err, "Removing new path at %s", target)
 		}
 	}
-	containingDir := filepath.Dir(newPath)
+
+	containingDir := filepath.Dir(target)
 	if !fs.FileExists(containingDir) {
 		fs.MkdirAll(containingDir, os.FileMode(0700))
 	}
 
-	return os.Symlink(oldPath, newPath)
+	return fsWrapper.Symlink(source, target)
 }
 
-func (fs *osFileSystem) ReadLink(symlinkPath string) (targetPath string, err error) {
-	targetPath, err = filepath.EvalSymlinks(symlinkPath)
-	return
+func (fs *osFileSystem) ReadAndFollowLink(symlinkPath string) (targetPath string, err error) {
+	return filepath.EvalSymlinks(symlinkPath)
+}
+
+func (fs *osFileSystem) Readlink(symlinkPath string) (targetPath string, err error) {
+	return fsWrapper.Readlink(symlinkPath)
 }
 
 func (fs *osFileSystem) CopyFile(srcPath, dstPath string) error {
 	fs.logger.Debug(fs.logTag, "Copying file '%s' to '%s'", srcPath, dstPath)
-	srcFile, err := os.Open(srcPath)
+
+	srcFile, err := fs.OpenFile(srcPath, os.O_RDONLY, 0)
 	if err != nil {
 		return bosherr.WrapError(err, "Opening source path")
 	}
 
 	defer srcFile.Close()
 
-	dstFile, err := os.Create(dstPath)
+	dstFile, err := fs.OpenFile(dstPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return bosherr.WrapError(err, "Creating destination file")
 	}
@@ -279,13 +316,13 @@ func (fs *osFileSystem) CopyFile(srcPath, dstPath string) error {
 func (fs *osFileSystem) CopyDir(srcPath, dstPath string) error {
 	fs.logger.Debug(fs.logTag, "Copying dir '%s' to '%s'", srcPath, dstPath)
 
-	sourceInfo, err := os.Stat(srcPath)
+	sourceInfo, err := fs.Stat(srcPath)
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Reading dir stats for '%s'", srcPath)
 	}
 
 	// create destination dir with same permissions as source dir
-	err = os.MkdirAll(dstPath, sourceInfo.Mode())
+	err = fs.MkdirAll(dstPath, sourceInfo.Mode())
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Making destination dir '%s'", dstPath)
 	}
@@ -316,13 +353,13 @@ func (fs *osFileSystem) CopyDir(srcPath, dstPath string) error {
 }
 
 func (fs *osFileSystem) listDirContents(dirPath string) ([]os.FileInfo, error) {
-	directory, err := os.Open(dirPath)
+	file, err := fs.openFile(dirPath, os.O_RDONLY, 0)
 	if err != nil {
-		return nil, bosherr.WrapErrorf(err, "Openning dir '%s' for reading", dirPath)
+		return nil, bosherr.WrapErrorf(err, "Opening dir '%s' for reading", dirPath)
 	}
-	defer directory.Close()
+	defer file.Close()
 
-	files, err := directory.Readdir(-1)
+	files, err := file.Readdir(-1)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Reading dir '%s' contents", dirPath)
 	}
@@ -346,18 +383,18 @@ func (fs *osFileSystem) TempDir(prefix string) (path string, err error) {
 	return ioutil.TempDir(fs.tempRoot, prefix)
 }
 
-func (f *osFileSystem) ChangeTempRoot(tempRootPath string) error {
-	err := f.MkdirAll(tempRootPath, os.ModePerm)
+func (fs *osFileSystem) ChangeTempRoot(tempRootPath string) error {
+	err := fs.MkdirAll(tempRootPath, os.ModePerm)
 	if err != nil {
 		return err
 	}
-	f.tempRoot = tempRootPath
+	fs.tempRoot = tempRootPath
 	return nil
 }
 
 func (fs *osFileSystem) RemoveAll(fileOrDir string) (err error) {
 	fs.logger.Debug(fs.logTag, "Remove all %s", fileOrDir)
-	err = os.RemoveAll(fileOrDir)
+	err = fsWrapper.RemoveAll(fileOrDir)
 	return
 }
 
@@ -366,22 +403,13 @@ func (fs *osFileSystem) Glob(pattern string) (matches []string, err error) {
 	return filepath.Glob(pattern)
 }
 
-func (fs *osFileSystem) Walk(root string, walkFunc filepath.WalkFunc) error {
-	return filepath.Walk(root, walkFunc)
+func (fs *osFileSystem) RecursiveGlob(pattern string) (matches []string, err error) {
+	fs.logger.Debug(fs.logTag, "RecursiveGlob '%s'", pattern)
+	return doublestar.Glob(pattern)
 }
 
-func (fs *osFileSystem) filesAreIdentical(newContent []byte, filePath string) bool {
-	existingStat, err := os.Stat(filePath)
-	if err != nil || int64(len(newContent)) != existingStat.Size() {
-		return false
-	}
-
-	existingContent, err := fs.ReadFile(filePath)
-	if err != nil {
-		return false
-	}
-
-	return bytes.Compare(newContent, existingContent) == 0
+func (fs *osFileSystem) Walk(root string, walkFunc filepath.WalkFunc) error {
+	return filepath.Walk(root, walkFunc)
 }
 
 func (fs *osFileSystem) runCommand(cmd string) (string, error) {

@@ -3,6 +3,7 @@ package client
 import (
 	"net/http"
 	"os"
+	"time"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -22,6 +23,10 @@ const (
 	// Metadata Host needs to be IP address, rather than FQDN, in case the system
 	// is set up to use public DNS servers, which would not resolve correctly.
 	metadataHost = "169.254.169.254"
+
+	// Configuration for retrier.
+	retries         = 12
+	firstRetrySleep = 50 * time.Millisecond
 )
 
 type GoogleClient struct {
@@ -69,8 +74,10 @@ func NewGoogleClient(
 
 	// Custom RoundTripper for retries
 	computeRetrier := &RetryTransport{
-		Base:       computeClient.Transport,
-		MaxRetries: 3,
+		Base:            computeClient.Transport,
+		MaxRetries:      retries,
+		FirstRetrySleep: firstRetrySleep,
+		logger:          logger,
 	}
 	computeClient.Transport = computeRetrier
 	computeService, err := compute.New(computeClient)
@@ -87,8 +94,10 @@ func NewGoogleClient(
 
 	// Custom RoundTripper for retries
 	storageRetrier := &RetryTransport{
-		Base:       storageClient.Transport,
-		MaxRetries: 3,
+		Base:            storageClient.Transport,
+		MaxRetries:      retries,
+		FirstRetrySleep: firstRetrySleep,
+		logger:          logger,
 	}
 	storageClient.Transport = storageRetrier
 	storageService, err := storage.New(storageClient)

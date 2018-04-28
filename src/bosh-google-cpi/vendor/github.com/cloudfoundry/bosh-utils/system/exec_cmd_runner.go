@@ -1,9 +1,9 @@
 package system
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -18,7 +18,7 @@ func NewExecCmdRunner(logger boshlog.Logger) CmdRunner {
 }
 
 func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, error) {
-	process := NewExecProcess(r.buildComplexCommand(cmd), r.logger)
+	process := NewExecProcess(r.buildComplexCommand(cmd), cmd.KeepAttached, cmd.Quiet, r.logger)
 
 	err := process.Start()
 	if err != nil {
@@ -31,7 +31,7 @@ func (r execCmdRunner) RunComplexCommand(cmd Command) (string, string, int, erro
 }
 
 func (r execCmdRunner) RunComplexCommandAsync(cmd Command) (Process, error) {
-	process := NewExecProcess(r.buildComplexCommand(cmd), r.logger)
+	process := NewExecProcess(r.buildComplexCommand(cmd), cmd.KeepAttached, cmd.Quiet, r.logger)
 
 	err := process.Start()
 	if err != nil {
@@ -42,16 +42,11 @@ func (r execCmdRunner) RunComplexCommandAsync(cmd Command) (Process, error) {
 }
 
 func (r execCmdRunner) RunCommand(cmdName string, args ...string) (string, string, int, error) {
-	process := NewExecProcess(exec.Command(cmdName, args...), r.logger)
+	return r.RunComplexCommand(Command{Name: cmdName, Args: args})
+}
 
-	err := process.Start()
-	if err != nil {
-		return "", "", -1, err
-	}
-
-	result := <-process.Wait()
-
-	return result.Stdout, result.Stderr, result.ExitStatus, result.Error
+func (r execCmdRunner) RunCommandQuietly(cmdName string, args ...string) (string, string, int, error) {
+	return r.RunComplexCommand(Command{Name: cmdName, Args: args, Quiet: true})
 }
 
 func (r execCmdRunner) RunCommandWithInput(input, cmdName string, args ...string) (string, string, int, error) {
@@ -69,7 +64,7 @@ func (r execCmdRunner) CommandExists(cmdName string) bool {
 }
 
 func (r execCmdRunner) buildComplexCommand(cmd Command) *exec.Cmd {
-	execCmd := exec.Command(cmd.Name, cmd.Args...)
+	execCmd := newExecCmd(cmd.Name, cmd.Args...)
 
 	if cmd.Stdin != nil {
 		execCmd.Stdin = cmd.Stdin
@@ -85,16 +80,15 @@ func (r execCmdRunner) buildComplexCommand(cmd Command) *exec.Cmd {
 
 	execCmd.Dir = cmd.WorkingDir
 
-	env := []string{}
-
+	var env []string
 	if !cmd.UseIsolatedEnv {
 		env = os.Environ()
 	}
-
-	for name, value := range cmd.Env {
-		env = append(env, fmt.Sprintf("%s=%s", name, value))
+	if cmd.UseIsolatedEnv && runtime.GOOS == "windows" {
+		panic("UseIsolatedEnv is not supported on Windows")
 	}
-	execCmd.Env = env
+
+	execCmd.Env = mergeEnv(env, cmd.Env)
 
 	return execCmd
 }

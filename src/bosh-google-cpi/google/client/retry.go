@@ -6,6 +6,13 @@ import (
 	"net"
 	"net/http"
 	"time"
+
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+)
+
+const (
+	defaultFirstRetrySleep = 50 * time.Millisecond
+	retryLogTag            = "RetryTransport"
 )
 
 // A function that will modify the request before it is made
@@ -13,8 +20,10 @@ type RequestModifier func(req *http.Request)
 
 type RetryTransport struct {
 	MaxRetries      int
+	FirstRetrySleep time.Duration
 	Base            http.RoundTripper
 	RequestModifier RequestModifier
+	logger          boshlog.Logger
 }
 
 func (rt *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -22,6 +31,10 @@ func (rt *RetryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error) {
+	if rt.FirstRetrySleep == 0 {
+		rt.FirstRetrySleep = defaultFirstRetrySleep
+	}
+
 	var body []byte
 
 	if rt.RequestModifier != nil {
@@ -43,7 +56,9 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 		resp, err = rt.Base.RoundTrip(req)
 
 		sleep := func() {
-			time.Sleep(200 * time.Millisecond << uint64(try*2))
+			d := rt.FirstRetrySleep << uint64(try)
+			rt.logger.Info(retryLogTag, "Retrying request (%d/%d) after %s", try, rt.MaxRetries, d)
+			time.Sleep(d)
 		}
 
 		// Retry on net.Error
