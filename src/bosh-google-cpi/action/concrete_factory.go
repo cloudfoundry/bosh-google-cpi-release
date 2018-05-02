@@ -1,6 +1,8 @@
 package action
 
 import (
+	
+	"encoding/json"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
@@ -25,40 +27,62 @@ import (
 )
 
 type ConcreteFactory struct {
-	availableActions map[string]Action
+	uuidGen boshuuid.Generator
+	cfg config.Config
+	logger boshlog.Logger
 }
 
 func NewConcreteFactory(
-	googleClient client.GoogleClient,
 	uuidGen boshuuid.Generator,
 	cfg config.Config,
 	logger boshlog.Logger,
 ) ConcreteFactory {
+	return ConcreteFactory{uuidGen,
+	cfg,
+	logger}
+}
+
+func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Action, error) {
+	ctxBytes, err := json.Marshal(ctx)
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Remarshaling")
+	}
+
+	err = json.Unmarshal(ctxBytes, &f.cfg.Cloud.Properties.Google)
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Unmarshaling into google props")
+	}
+
+	googleClient, err := client.NewGoogleClient(f.cfg.Cloud.Properties.Google, f.logger)
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Building goog client")
+	}
+
 	operationService := operation.NewGoogleOperationService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		googleClient.ComputeBetaService(),
-		logger,
+		f.logger,
 	)
 
 	addressService := address.NewGoogleAddressService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	diskService := disk.NewGoogleDiskService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
-		uuidGen,
-		logger,
+		f.uuidGen,
+		f.logger,
 	)
 
 	diskTypeService := disktype.NewGoogleDiskTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	imageService := image.NewGoogleImageService(
@@ -66,21 +90,21 @@ func NewConcreteFactory(
 		googleClient.ComputeService(),
 		googleClient.StorageService(),
 		operationService,
-		uuidGen,
-		logger,
+		f.uuidGen,
+		f.logger,
 	)
 
 	backendServiceService := backendservice.NewGoogleBackendServiceService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
-		logger,
+		f.logger,
 	)
 
 	machineTypeService := machinetype.NewGoogleMachineTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	projectService := project.NewGoogleProjectService(
@@ -90,44 +114,44 @@ func NewConcreteFactory(
 	networkService := network.NewGoogleNetworkService(
 		projectService,
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	// Choose the correct registry.Client based on the
 	// value of ClientOptions.UseGCEMetadata
 	var registryClient registry.Client
-	switch cfg.Cloud.Properties.Registry.UseGCEMetadata {
+	switch f.cfg.Cloud.Properties.Registry.UseGCEMetadata {
 	case true:
 		registryClient = registry.NewMetadataClient(
 			googleClient,
-			cfg.Cloud.Properties.Registry,
-			logger,
+			f.cfg.Cloud.Properties.Registry,
+			f.logger,
 		)
 	default:
 		registryClient = registry.NewHTTPClient(
-			cfg.Cloud.Properties.Registry,
-			logger,
+			f.cfg.Cloud.Properties.Registry,
+			f.logger,
 		)
 	}
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
-		uuidGen,
-		logger,
+		f.uuidGen,
+		f.logger,
 	)
 
 	subnetworkService := subnetwork.NewGoogleSubnetworkService(
 		projectService,
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	targetPoolService := targetpool.NewGoogleTargetPoolService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		operationService,
-		logger,
+		f.logger,
 	)
 
 	vmService := instance.NewGoogleInstanceService(
@@ -140,12 +164,11 @@ func NewConcreteFactory(
 		operationService,
 		subnetworkService,
 		targetPoolService,
-		uuidGen,
-		logger,
+		f.uuidGen,
+		f.logger,
 	)
 
-	return ConcreteFactory{
-		availableActions: map[string]Action{
+	actions := map[string]Action{
 			// Disk management
 			"create_disk": NewCreateDisk(
 				diskService,
@@ -173,8 +196,8 @@ func NewConcreteFactory(
 				imageService,
 				machineTypeService,
 				registryClient,
-				cfg.Cloud.Properties.Registry,
-				cfg.Cloud.Properties.Agent,
+				f.cfg.Cloud.Properties.Registry,
+				f.cfg.Cloud.Properties.Agent,
 				googleClient.DefaultRootDiskSizeGb(),
 				googleClient.DefaultRootDiskType(),
 			),
@@ -192,12 +215,9 @@ func NewConcreteFactory(
 
 			// Not implemented:
 			// current_vm_id
-		},
-	}
-}
+		}
 
-func (f ConcreteFactory) Create(method string) (Action, error) {
-	action, found := f.availableActions[method]
+	action, found := actions[method]
 	if !found {
 		return nil, bosherr.Errorf("Could not create action with method %s", method)
 	}

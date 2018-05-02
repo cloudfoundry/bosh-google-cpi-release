@@ -20,7 +20,7 @@ type Request struct {
 	Method    string        `json:"method"`
 	Arguments []interface{} `json:"arguments"`
 
-	// context key is ignored
+	Context map[string]interface{} `json:"context"`
 }
 
 type Response struct {
@@ -80,7 +80,7 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 		return c.buildCpiError("Must provide arguments key")
 	}
 
-	action, err := c.actionFactory.Create(req.Method)
+	action, err := c.actionFactory.Create(req.Method, req.Context)
 	if err != nil {
 		return c.buildNotImplementedError()
 	}
