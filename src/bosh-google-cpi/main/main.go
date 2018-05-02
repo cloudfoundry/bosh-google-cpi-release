@@ -17,7 +17,7 @@ import (
 	"bosh-google-cpi/api/transport"
 	"bosh-google-cpi/config"
 
-	"bosh-google-cpi/google/client"
+	// "bosh-google-cpi/google/client"
 )
 
 const mainLogTag = "main"
@@ -76,13 +76,7 @@ func buildDispatcher(
 	cmdRunner boshsys.CmdRunner,
 	uuidGen boshuuid.Generator,
 ) (dispatcher.Dispatcher, error) {
-	googleClient, err := client.NewGoogleClient(cfg.Cloud.Properties.Google, logger)
-	if err != nil {
-		return nil, err
-	}
-
 	actionFactory := action.NewConcreteFactory(
-		googleClient,
 		uuidGen,
 		cfg,
 		logger,
