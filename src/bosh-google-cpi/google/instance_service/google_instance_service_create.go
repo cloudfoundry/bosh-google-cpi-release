@@ -135,7 +135,7 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 
 	var metadataItems []*compute.MetadataItems
 	userDataValue := string(ud)
-	metadataItem := &compute.MetadataItems{Key: userDataKey, Value: userDataValue}
+	metadataItem := &compute.MetadataItems{Key: userDataKey, Value: &userDataValue}
 	metadataItems = append(metadataItems, metadataItem)
 	metadata := &compute.Metadata{Items: metadataItems}
 
@@ -199,7 +199,7 @@ func (i GoogleInstanceService) createSchedulingParams(
 	}
 
 	scheduling := &compute.Scheduling{
-		AutomaticRestart:  automaticRestart,
+		AutomaticRestart:  &automaticRestart,
 		OnHostMaintenance: onHostMaintenance,
 		Preemptible:       preemptible,
 	}
