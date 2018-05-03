@@ -5,6 +5,7 @@ import (
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	computebeta "google.golang.org/api/compute/v0.beta"
 )
@@ -25,7 +26,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 
 	// Grab the original metadata items
 	for _, item := range metadata.Items {
-		metadataMap[item.Key] = item.Value
+		metadataMap[item.Key] = *item.Value
 	}
 
 	// TODO(evanbrown): Is it possible to update metadata, labels, and tags
@@ -40,7 +41,7 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	var metadataItems []*computebeta.MetadataItems
 	for key, value := range metadataMap {
 		mValue := value
-		metadataItems = append(metadataItems, &computebeta.MetadataItems{Key: key, Value: mValue})
+		metadataItems = append(metadataItems, &computebeta.MetadataItems{Key: key, Value: &mValue})
 	}
 	metadata.Items = metadataItems
 

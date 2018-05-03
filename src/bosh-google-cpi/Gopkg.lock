@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "cloud.google.com/go"
+  packages = ["compute/metadata"]
+  revision = "29f476ffa9c4cd4fd14336b6043090ac1ad76733"
+  version = "v0.21.0"
+
+[[projects]]
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
   revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
@@ -24,18 +30,19 @@
     "uuid",
     "uuid/fakes"
   ]
-  revision = "f4c293340f7527c63b0679a8eb6d4c25a70b31ef"
+  revision = "2c869a1a0ccef38c01c41d833db6eb02a23bd6e6"
 
 [[projects]]
   branch = "master"
   name = "github.com/golang/lint"
   packages = ["golint"]
-  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
+  revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
 
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "99511271042a09d1e01baea8781caa5210fec66e"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/mitchellh/gox"
@@ -74,15 +81,19 @@
     "internal/leafnodes",
     "internal/remote",
     "internal/spec",
+    "internal/spec_iterator",
     "internal/specrunner",
     "internal/suite",
     "internal/testingtproxy",
     "internal/writer",
     "reporters",
     "reporters/stenographer",
+    "reporters/stenographer/support/go-colorable",
+    "reporters/stenographer/support/go-isatty",
     "types"
   ]
-  revision = "c3a655f9b37a2207fa39721b078b3173ee9218d6"
+  revision = "9eda700730cba42af70d53180f9dcce9266bc2bc"
+  version = "v1.4.0"
 
 [[projects]]
   name = "github.com/onsi/gomega"
@@ -109,9 +120,10 @@
   branch = "master"
   name = "golang.org/x/lint"
   packages = ["."]
-  revision = "85993ffd0a6cd043291f3f63d45d656d97b165bd"
+  revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -120,9 +132,10 @@
     "html/atom",
     "html/charset"
   ]
-  revision = "35b06af0720201bc2f326773a80767387544f8c4"
+  revision = "640f4622ab692b87c2f3a94265e6f579fe38263d"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -131,7 +144,13 @@
     "jws",
     "jwt"
   ]
-  revision = "045497edb6234273d67dbc25da3f2ddbc4c4cacf"
+  revision = "cdc340f7c179dbbfa4afd43b7614e8fcadde4269"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "78d5f264b493f125018180c204871ecf58a2dce1"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -163,12 +182,13 @@
   packages = [
     "go/ast/astutil",
     "go/gcexportdata",
-    "go/gcimporter15",
+    "go/internal/gcimporter",
     "go/types/typeutil"
   ]
-  revision = "ac136b6c2db7c4d43955e4bc7174db36dc0539c0"
+  revision = "f4ce24f1d8feacab63a0476fc8bee0de7f9dc291"
 
 [[projects]]
+  branch = "master"
   name = "google.golang.org/api"
   packages = [
     "compute/v0.beta",
@@ -178,7 +198,7 @@
     "googleapi/internal/uritemplates",
     "storage/v1"
   ]
-  revision = "55146ba61254fdb1c26d65ff3c04bc1611ad73fb"
+  revision = "ce90db2c36a2cb8c9c06779ed8bb96f92ea6e3b8"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -194,15 +214,8 @@
     "internal/urlfetch",
     "urlfetch"
   ]
-  revision = "12d5545dc1cfa6047a286d5e853841b6471f4c19"
-
-[[projects]]
-  name = "google.golang.org/cloud"
-  packages = [
-    "compute/metadata",
-    "internal"
-  ]
-  revision = "83ee71d0fec26977bad1662134fa1e8c91268025"
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
