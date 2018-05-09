@@ -191,7 +191,7 @@ var _ = Describe("VM", func() {
 					"zone": "%v",
 					"guest_accelerators": [
 						{
-							"accelerator_type": "https://www.googleapis.com/compute/v1/projects/cf-kubo-dev/zones/us-central1-a/acceleratorTypes/nvidia-tesla-k80",
+							"accelerator_type": "nvidia-tesla-k80",
 							"accelerator_count": 1
 						}
 					],
@@ -212,7 +212,8 @@ var _ = Describe("VM", func() {
 		vmCID = assertSucceedsWithResult(request).(string)
 		fmt.Println(vmCID)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
-			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal("https://www.googleapis.com/compute/v1/projects/cf-kubo-dev/zones/us-central1-a/acceleratorTypes/nvidia-tesla-k80"))
+			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-k80", googleProject, zone)
+			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal(expectedAcceleratorTypeLink))
 		})
 	})
 

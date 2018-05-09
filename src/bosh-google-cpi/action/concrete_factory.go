@@ -21,6 +21,7 @@ import (
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
 
+	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
 
@@ -78,6 +79,12 @@ func NewConcreteFactory(
 	)
 
 	machineTypeService := machinetype.NewGoogleMachineTypeService(
+		googleClient.Project(),
+		googleClient.ComputeService(),
+		logger,
+	)
+
+	acceleratorTypeService := acceleratortype.NewGoogleAcceleratorTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
 		logger,
@@ -172,6 +179,7 @@ func NewConcreteFactory(
 				diskTypeService,
 				imageService,
 				machineTypeService,
+				acceleratorTypeService,
 				registryClient,
 				cfg.Cloud.Properties.Registry,
 				cfg.Cloud.Properties.Agent,

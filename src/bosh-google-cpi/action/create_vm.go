@@ -14,20 +14,22 @@ import (
 	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/util"
 
+	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
 
 type CreateVM struct {
-	vmService             instance.Service
-	diskService           disk.Service
-	diskTypeService       disktype.Service
-	imageService          image.Service
-	machineTypeService    machinetype.Service
-	registryClient        registry.Client
-	registryOptions       registry.ClientOptions
-	agentOptions          registry.AgentOptions
-	defaultRootDiskSizeGb int
-	defaultRootDiskType   string
+	vmService              instance.Service
+	diskService            disk.Service
+	diskTypeService        disktype.Service
+	imageService           image.Service
+	machineTypeService     machinetype.Service
+	acceleratorTypeService acceleratortype.Service
+	registryClient         registry.Client
+	registryOptions        registry.ClientOptions
+	agentOptions           registry.AgentOptions
+	defaultRootDiskSizeGb  int
+	defaultRootDiskType    string
 }
 
 func NewCreateVM(
@@ -36,6 +38,7 @@ func NewCreateVM(
 	diskTypeService disktype.Service,
 	imageService image.Service,
 	machineTypeService machinetype.Service,
+	acceleratorTypeService acceleratortype.Service,
 	registryClient registry.Client,
 	registryOptions registry.ClientOptions,
 	agentOptions registry.AgentOptions,
@@ -43,16 +46,17 @@ func NewCreateVM(
 	defaultRootDiskType string,
 ) CreateVM {
 	return CreateVM{
-		vmService:             vmService,
-		diskService:           diskService,
-		diskTypeService:       diskTypeService,
-		imageService:          imageService,
-		machineTypeService:    machineTypeService,
-		registryClient:        registryClient,
-		registryOptions:       registryOptions,
-		agentOptions:          agentOptions,
-		defaultRootDiskSizeGb: defaultRootDiskSizeGb,
-		defaultRootDiskType:   defaultRootDiskType,
+		vmService:              vmService,
+		diskService:            diskService,
+		diskTypeService:        diskTypeService,
+		imageService:           imageService,
+		machineTypeService:     machineTypeService,
+		acceleratorTypeService: acceleratorTypeService,
+		registryClient:         registryClient,
+		registryOptions:        registryOptions,
+		agentOptions:           agentOptions,
+		defaultRootDiskSizeGb:  defaultRootDiskSizeGb,
+		defaultRootDiskType:    defaultRootDiskType,
 	}
 }
 
@@ -77,6 +81,12 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Find the root Disk Type
 	rootDiskTypeLink, err := cv.findRootDiskTypeLink(cloudProps.RootDiskType, zone)
+	if err != nil {
+		return "", err
+	}
+
+	// Find Accelerator Type
+	acceleratorTypeLinks, err := cv.findAcceleratorTypeLinks(cloudProps.Accelerators, zone)
 	if err != nil {
 		return "", err
 	}
@@ -135,7 +145,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		BackendService:    bs,
 		Tags:              cloudProps.Tags,
 		Labels:            cloudProps.Labels,
-		Accelerators:      cloudProps.Accelerators,
+		Accelerators:      acceleratorTypeLinks,
 	}
 
 	// Create VM
@@ -311,4 +321,28 @@ func (cv CreateVM) findRootDiskTypeLink(diskTypeName string, zone string) (strin
 	}
 
 	return "", nil
+}
+func (cv CreateVM) findAcceleratorTypeLinks(accelerators []instance.Accelerator, zone string) ([]instance.Accelerator, error) {
+	if len(accelerators) == 0 {
+		return nil, nil
+	}
+
+	acceleratorLinkTypes := []instance.Accelerator{}
+
+	for _, acc := range accelerators {
+		acceleratorType, found, err := cv.acceleratorTypeService.Find(acc.AcceleratorType, zone)
+		if err != nil {
+			return nil, bosherr.WrapError(err, "Creating vm")
+		}
+		if !found {
+			return nil, bosherr.WrapErrorf(err, "Creating vm: Accelerator Type '%s' does not exists", acc.AcceleratorType)
+		}
+		updatedAcc := instance.Accelerator{
+			AcceleratorType: acceleratorType.SelfLink,
+			Count:           acc.Count,
+		}
+		acceleratorLinkTypes = append(acceleratorLinkTypes, updatedAcc)
+	}
+
+	return acceleratorLinkTypes, nil
 }

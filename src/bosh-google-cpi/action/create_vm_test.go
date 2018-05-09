@@ -1,29 +1,27 @@
 package action_test
 
 import (
+	. "bosh-google-cpi/action"
+	"bosh-google-cpi/api"
+	acceleratortypefakes "bosh-google-cpi/google/accelerator_type_service/fakes"
+	"bosh-google-cpi/google/disk_service"
+	diskfakes "bosh-google-cpi/google/disk_service/fakes"
+	"bosh-google-cpi/google/disk_type_service"
+	disktypefakes "bosh-google-cpi/google/disk_type_service/fakes"
+	"bosh-google-cpi/google/image_service"
+	imagefakes "bosh-google-cpi/google/image_service/fakes"
+	"bosh-google-cpi/google/instance_service"
+	instancefakes "bosh-google-cpi/google/instance_service/fakes"
+	"bosh-google-cpi/google/machine_type_service"
+	machinetypefakes "bosh-google-cpi/google/machine_type_service/fakes"
+	"bosh-google-cpi/registry"
 	"errors"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "bosh-google-cpi/action"
-
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	disktypefakes "bosh-google-cpi/google/disk_type_service/fakes"
-	imagefakes "bosh-google-cpi/google/image_service/fakes"
-	instancefakes "bosh-google-cpi/google/instance_service/fakes"
-	machinetypefakes "bosh-google-cpi/google/machine_type_service/fakes"
-
 	registryfakes "bosh-google-cpi/registry/fakes"
 
-	"bosh-google-cpi/api"
-	"bosh-google-cpi/google/disk_service"
-	"bosh-google-cpi/google/disk_type_service"
-	"bosh-google-cpi/google/image_service"
-	"bosh-google-cpi/google/instance_service"
-	"bosh-google-cpi/google/machine_type_service"
-
-	"bosh-google-cpi/registry"
+	"bosh-google-cpi/google/accelerator_type_service"
 )
 
 var _ = Describe("CreateVM", func() {
@@ -42,12 +40,13 @@ var _ = Describe("CreateVM", func() {
 		expectedInstanceNetworks instance.Networks
 		expectedAgentSettings    registry.AgentSettings
 
-		vmService          *instancefakes.FakeInstanceService
-		diskService        *diskfakes.FakeDiskService
-		diskTypeService    *disktypefakes.FakeDiskTypeService
-		machineTypeService *machinetypefakes.FakeMachineTypeService
-		imageService       *imagefakes.FakeImageService
-		registryClient     *registryfakes.FakeClient
+		vmService              *instancefakes.FakeInstanceService
+		diskService            *diskfakes.FakeDiskService
+		diskTypeService        *disktypefakes.FakeDiskTypeService
+		machineTypeService     *machinetypefakes.FakeMachineTypeService
+		imageService           *imagefakes.FakeImageService
+		registryClient         *registryfakes.FakeClient
+		acceleratorTypeService *acceleratortypefakes.FakeAcceleratorTypeService
 
 		createVM CreateVM
 	)
@@ -57,6 +56,7 @@ var _ = Describe("CreateVM", func() {
 		diskService = &diskfakes.FakeDiskService{}
 		diskTypeService = &disktypefakes.FakeDiskTypeService{}
 		machineTypeService = &machinetypefakes.FakeMachineTypeService{}
+		acceleratorTypeService = &acceleratortypefakes.FakeAcceleratorTypeService{}
 		imageService = &imagefakes.FakeImageService{}
 		registryClient = &registryfakes.FakeClient{}
 		registryOptions = registry.ClientOptions{
@@ -80,6 +80,7 @@ var _ = Describe("CreateVM", func() {
 			diskTypeService,
 			imageService,
 			machineTypeService,
+			acceleratorTypeService,
 			registryClient,
 			registryOptions,
 			agentOptions,
@@ -210,6 +211,7 @@ var _ = Describe("CreateVM", func() {
 			Expect(imageService.FindCalled).To(BeTrue())
 			Expect(machineTypeService.FindCalled).To(BeTrue())
 			Expect(machineTypeService.CustomLinkCalled).To(BeFalse())
+			Expect(acceleratorTypeService.FindCalled).To(BeFalse())
 			Expect(diskTypeService.FindCalled).To(BeFalse())
 			Expect(vmService.CreateCalled).To(BeTrue())
 			Expect(vmService.CleanUpCalled).To(BeFalse())
@@ -453,6 +455,7 @@ var _ = Describe("CreateVM", func() {
 					diskTypeService,
 					imageService,
 					machineTypeService,
+					acceleratorTypeService,
 					registryClient,
 					registryOptions,
 					agentOptions,
@@ -515,6 +518,7 @@ var _ = Describe("CreateVM", func() {
 					diskTypeService,
 					imageService,
 					machineTypeService,
+					acceleratorTypeService,
 					registryClient,
 					registryOptions,
 					agentOptions,
@@ -622,21 +626,60 @@ var _ = Describe("CreateVM", func() {
 
 		Context("when accelerator is set", func() {
 			BeforeEach(func() {
-
+				acceleratorTypeService.FindFound = true
+				acceleratorTypeService.FindAcceleratorType = acceleratortype.AcceleratorType{SelfLink: "fake-accelerator-type-self-link"}
 				acc := instance.Accelerator{
 					AcceleratorType: "fake-accelerator-type",
 					Count:           1,
 				}
+				expectedAcc := instance.Accelerator{
+					AcceleratorType: "fake-accelerator-type-self-link",
+					Count:           1,
+				}
 				cloudProps.Accelerators = []instance.Accelerator{acc}
-				expectedVMProps.Accelerators = []instance.Accelerator{acc}
+				expectedVMProps.Accelerators = []instance.Accelerator{expectedAcc}
 				expectedVMProps.OnHostMaintenance = "TERMINATE"
 			})
 
 			It("creates the vm with the accelerator", func() {
 				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
+				Expect(acceleratorTypeService.FindCalled).To(BeTrue())
 				Expect(vmService.CreateCalled).To(BeTrue())
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+
+			})
+
+			It("returns an error if acceleratorTypeService find call returns an error", func() {
+				acceleratorTypeService.FindErr = errors.New("fake-accelerator-type-service-error")
+
+				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("fake-accelerator-type-service-error"))
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(acceleratorTypeService.FindCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeFalse())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(registryClient.UpdateCalled).To(BeFalse())
+			})
+
+			It("returns an error if accelerator type is not found", func() {
+				acceleratorTypeService.FindFound = false
+
+				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Accelerator Type 'fake-accelerator-type' does not exists"))
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(acceleratorTypeService.FindCalled).To(BeTrue())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeFalse())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(registryClient.UpdateCalled).To(BeFalse())
 			})
 		})
 
