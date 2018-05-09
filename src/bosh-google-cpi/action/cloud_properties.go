@@ -40,24 +40,25 @@ type StemcellCloudProperties struct {
 }
 
 type VMCloudProperties struct {
-	Zone                string           `json:"zone,omitempty"`
-	Name                string           `json:"name,omitempty"`
-	MachineType         string           `json:"machine_type,omitempty"`
-	CPU                 int              `json:"cpu,omitempty"`
-	RAM                 int              `json:"ram,omitempty"`
-	RootDiskSizeGb      int              `json:"root_disk_size_gb,omitempty"`
-	RootDiskType        string           `json:"root_disk_type,omitempty"`
-	AutomaticRestart    bool             `json:"automatic_restart,omitempty"`
-	OnHostMaintenance   string           `json:"on_host_maintenance,omitempty"`
-	Preemptible         bool             `json:"preemptible,omitempty"`
-	ServiceAccount      VMServiceAccount `json:"service_account,omitempty"`
-	ServiceScopes       VMServiceScopes  `json:"service_scopes,omitempty"`
-	TargetPool          string           `json:"target_pool,omitempty"`
-	BackendService      interface{}      `json:"backend_service,omitempty"`
-	Tags                instance.Tags    `json:"tags,omitempty"`
-	Labels              instance.Labels  `json:"labels,omitempty"`
-	EphemeralExternalIP *bool            `json:"ephemeral_external_ip,omitempty"`
-	IPForwarding        *bool            `json:"ip_forwarding,omitempty"`
+	Zone                string                 `json:"zone,omitempty"`
+	Name                string                 `json:"name,omitempty"`
+	MachineType         string                 `json:"machine_type,omitempty"`
+	CPU                 int                    `json:"cpu,omitempty"`
+	RAM                 int                    `json:"ram,omitempty"`
+	RootDiskSizeGb      int                    `json:"root_disk_size_gb,omitempty"`
+	RootDiskType        string                 `json:"root_disk_type,omitempty"`
+	AutomaticRestart    bool                   `json:"automatic_restart,omitempty"`
+	OnHostMaintenance   string                 `json:"on_host_maintenance,omitempty"`
+	Preemptible         bool                   `json:"preemptible,omitempty"`
+	ServiceAccount      VMServiceAccount       `json:"service_account,omitempty"`
+	ServiceScopes       VMServiceScopes        `json:"service_scopes,omitempty"`
+	TargetPool          string                 `json:"target_pool,omitempty"`
+	BackendService      interface{}            `json:"backend_service,omitempty"`
+	Tags                instance.Tags          `json:"tags,omitempty"`
+	Labels              instance.Labels        `json:"labels,omitempty"`
+	EphemeralExternalIP *bool                  `json:"ephemeral_external_ip,omitempty"`
+	IPForwarding        *bool                  `json:"ip_forwarding,omitempty"`
+	Accelerators        []instance.Accelerator `json:"guest_accelerators,omitempty"`
 }
 
 func (n VMCloudProperties) Validate() error {

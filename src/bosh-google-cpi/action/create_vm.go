@@ -135,6 +135,7 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 		BackendService:    bs,
 		Tags:              cloudProps.Tags,
 		Labels:            cloudProps.Labels,
+		Accelerators:      cloudProps.Accelerators,
 	}
 
 	// Create VM

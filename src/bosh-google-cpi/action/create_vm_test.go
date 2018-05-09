@@ -620,6 +620,26 @@ var _ = Describe("CreateVM", func() {
 			})
 		})
 
+		Context("when accelerator is set", func() {
+			BeforeEach(func() {
+
+				acc := instance.Accelerator{
+					AcceleratorType: "fake-accelerator-type",
+					Count:           1,
+				}
+				cloudProps.Accelerators = []instance.Accelerator{acc}
+				expectedVMProps.Accelerators = []instance.Accelerator{acc}
+				expectedVMProps.OnHostMaintenance = "TERMINATE"
+			})
+
+			It("creates the vm with the accelerator", func() {
+				_, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+			})
+		})
+
 		Context("when DiskCIDs is set", func() {
 			BeforeEach(func() {
 				diskService.FindFound = true
