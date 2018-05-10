@@ -51,6 +51,6 @@ type BackendService struct {
 	Scheme string
 }
 type Accelerator struct {
-	AcceleratorType string `json:"accelerator_type,omitempty"`
-	Count           int64  `json:"accelerator_count,omitempty"`
+	AcceleratorType string
+	Count           int64
 }

@@ -628,7 +628,7 @@ var _ = Describe("CreateVM", func() {
 			BeforeEach(func() {
 				acceleratorTypeService.FindFound = true
 				acceleratorTypeService.FindAcceleratorType = acceleratortype.AcceleratorType{SelfLink: "fake-accelerator-type-self-link"}
-				acc := instance.Accelerator{
+				acc := Accelerator{
 					AcceleratorType: "fake-accelerator-type",
 					Count:           1,
 				}
@@ -636,7 +636,7 @@ var _ = Describe("CreateVM", func() {
 					AcceleratorType: "fake-accelerator-type-self-link",
 					Count:           1,
 				}
-				cloudProps.Accelerators = []instance.Accelerator{acc}
+				cloudProps.Accelerators = []Accelerator{acc}
 				expectedVMProps.Accelerators = []instance.Accelerator{expectedAcc}
 				expectedVMProps.OnHostMaintenance = "TERMINATE"
 			})

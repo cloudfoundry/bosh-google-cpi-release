@@ -322,7 +322,7 @@ func (cv CreateVM) findRootDiskTypeLink(diskTypeName string, zone string) (strin
 
 	return "", nil
 }
-func (cv CreateVM) findAcceleratorTypeLinks(accelerators []instance.Accelerator, zone string) ([]instance.Accelerator, error) {
+func (cv CreateVM) findAcceleratorTypeLinks(accelerators []Accelerator, zone string) ([]instance.Accelerator, error) {
 	if len(accelerators) == 0 {
 		return nil, nil
 	}
