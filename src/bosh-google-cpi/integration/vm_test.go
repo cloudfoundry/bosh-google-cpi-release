@@ -178,6 +178,44 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
+	It("can create a VM with an accelerator", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+		"method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+					"zone": "%v",
+					"accelerators": [
+						{
+							"type": "nvidia-tesla-k80",
+							"count": 1
+						}
+					],
+					"on_host_maintenance": "TERMINATE"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-k80", googleProject, zone)
+			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal(expectedAcceleratorTypeLink))
+		})
+	})
+
 	It("can create a VM with overlapping VM and network tags and VM properties that override network properties", func() {
 		By("creating a VM")
 		var vmCID string

@@ -27,6 +27,7 @@ import (
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
 
+	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
 
@@ -54,20 +55,21 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	var (
-		operationService      operation.GoogleOperationService
-		addressService        address.Service
-		diskService           disk.Service
-		diskTypeService       disktype.Service
-		imageService          image.Service
-		instanceGroupService  instancegroup.Service
-		backendServiceService backendservice.Service
-		machineTypeService    machinetype.Service
-		networkService        network.Service
-		snapshotService       snapshot.Service
-		subnetworkService     subnetwork.Service
-		registryClient        registry.Client
-		targetPoolService     targetpool.Service
-		vmService             instance.Service
+		operationService       operation.GoogleOperationService
+		addressService         address.Service
+		diskService            disk.Service
+		diskTypeService        disktype.Service
+		imageService           image.Service
+		instanceGroupService   instancegroup.Service
+		backendServiceService  backendservice.Service
+		machineTypeService     machinetype.Service
+		acceleratorTypeService acceleratortype.Service
+		networkService         network.Service
+		snapshotService        snapshot.Service
+		subnetworkService      subnetwork.Service
+		registryClient         registry.Client
+		targetPoolService      targetpool.Service
+		vmService              instance.Service
 	)
 
 	BeforeEach(func() {
@@ -135,6 +137,12 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		machineTypeService = machinetype.NewGoogleMachineTypeService(
+			googleClient.Project(),
+			googleClient.ComputeService(),
+			logger,
+		)
+
+		acceleratorTypeService = acceleratortype.NewGoogleAcceleratorTypeService(
 			googleClient.Project(),
 			googleClient.ComputeService(),
 			logger,
@@ -258,6 +266,7 @@ var _ = Describe("ConcreteFactory", func() {
 			diskTypeService,
 			imageService,
 			machineTypeService,
+			acceleratorTypeService,
 			registryClient,
 			cfg.Cloud.Properties.Registry,
 			cfg.Cloud.Properties.Agent,

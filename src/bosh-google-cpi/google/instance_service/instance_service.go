@@ -40,6 +40,7 @@ type Properties struct {
 	BackendService    BackendService
 	Tags              Tags
 	Labels            Labels
+	Accelerators      []Accelerator
 }
 
 type ServiceScopes []string
@@ -48,4 +49,8 @@ type ServiceAccount string
 type BackendService struct {
 	Name   string
 	Scheme string
+}
+type Accelerator struct {
+	AcceleratorType string
+	Count           int64
 }
