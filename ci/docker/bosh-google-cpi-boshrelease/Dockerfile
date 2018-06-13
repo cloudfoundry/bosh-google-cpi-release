@@ -1,21 +1,20 @@
-FROM ubuntu:15.04
+FROM ubuntu:16.04
 MAINTAINER Evan Brown <evanbrown@google.com>
 
 # Update base image
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-RUN locale-gen en_US.UTF-8; dpkg-reconfigure locales
-RUN apt-get update; apt-get -y upgrade; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install locales apt-utils
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y upgrade; apt-get clean
 
 # Install dependencies
-RUN apt-get -y install build-essential git-core curl wget jq sudo; apt-get clean
-RUN apt-get install -y sqlite3 libsqlite3-dev; apt-get clean
-RUN apt-get install -y mysql-client libmysqlclient-dev; apt-get clean
-RUN apt-get install -y libpq-dev; apt-get clean
-RUN apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install build-essential git-core curl wget jq sudo; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 libsqlite3-dev; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-client libmysqlclient-dev; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libpq-dev; apt-get clean
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
 
 # Install Golang
-ENV GOLANG_VERSION 1.8.1
+ENV GOLANG_VERSION 1.9.1
 RUN curl -sSL https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
 ENV GOROOT /usr/local/go
 ENV PATH $PATH:$GOROOT/bin
