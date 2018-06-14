@@ -183,8 +183,6 @@ func extract(src map[string]interface{}, key string) string {
 	return ""
 }
 
-const defaultScheme = "EXTERNAL"
-
 func parseBackendService(backendService interface{}) (instance.BackendService, error) {
 	if backendService == nil {
 		return instance.BackendService{}, nil
@@ -192,7 +190,7 @@ func parseBackendService(backendService interface{}) (instance.BackendService, e
 
 	// backend_service: <name>
 	if bs, ok := backendService.(string); ok {
-		return instance.BackendService{Name: bs, Scheme: defaultScheme}, nil
+		return instance.BackendService{Name: bs}, nil
 	}
 
 	//  backend_service:
@@ -201,20 +199,14 @@ func parseBackendService(backendService interface{}) (instance.BackendService, e
 	bs := instance.BackendService{}
 	if bsMap, ok := backendService.(map[string]string); ok {
 		bs.Name = bsMap["name"]
-		bs.Scheme = bsMap["scheme"]
 	} else if bsMap, ok := backendService.(map[string]interface{}); ok {
 		bs.Name = extract(bsMap, "name")
-		bs.Scheme = extract(bsMap, "scheme")
 	} else if backendService != nil {
 		return bs, bosherr.Errorf("unexpected type %T", backendService)
 	}
 
 	if bs.Name == "" {
 		return bs, bosherr.Error("expected key: name")
-	}
-
-	if bs.Scheme == "" {
-		bs.Scheme = defaultScheme
 	}
 
 	return bs, nil

@@ -153,3 +153,30 @@ resource "google_compute_region_backend_service" "region_backend_service" {
     group = "${google_compute_instance_group.region_backend_service.self_link}"
   }
 }
+
+
+resource "google_compute_backend_service" "collision_backend_service" {
+  health_checks = ["${google_compute_http_health_check.backend_service.self_link}"]
+  name          = "${var.prefix}"
+  port_name     = "http"
+  timeout_sec   = "30"
+
+  backend {
+    group           = "${google_compute_instance_group.backend_service.self_link}"
+    balancing_mode  = "UTILIZATION"
+    capacity_scaler = "1"
+    max_utilization = "0.8"
+  }
+}
+
+resource "google_compute_region_backend_service" "collision_region_backend_service" {
+  name          = "${var.prefix}"
+  health_checks = ["${google_compute_health_check.region_backend_service.self_link}"]
+  region        = "${var.google_region}"
+  protocol      = "TCP"
+  timeout_sec   = "30"
+
+  backend {
+    group = "${google_compute_instance_group.region_backend_service.self_link}"
+  }
+}

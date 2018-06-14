@@ -323,7 +323,7 @@ func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, targ
 }
 
 func (i GoogleInstanceService) addToBackendService(instanceSelfLink string, backendService BackendService) error {
-	if err := i.backendServiceService.AddInstance(backendService.Name, backendService.Scheme, instanceSelfLink); err != nil {
+	if err := i.backendServiceService.AddInstance(backendService.Name, instanceSelfLink); err != nil {
 		return err
 	}
 
