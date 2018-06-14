@@ -750,7 +750,7 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("executes the VM lifecycle with a backend service", func() {
+	FIt("executes the VM lifecycle with a backend service", func() {
 		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
 			instances := make([]string, len(ig.Items))
 			for _, i := range ig.Items {
@@ -802,7 +802,7 @@ var _ = Describe("VM", func() {
 		Expect(justInstances(ig)).ToNot(ContainElement(ContainSubstring(vmCID)))
 	})
 
-	It("executes the VM lifecycle with a region backend service", func() {
+	FIt("executes the VM lifecycle with a region backend service", func() {
 		justInstances := func(ig *compute.InstanceGroupsListInstances) []string {
 			instances := make([]string, len(ig.Items))
 			for _, i := range ig.Items {
