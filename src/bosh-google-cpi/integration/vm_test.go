@@ -214,6 +214,91 @@ var _ = Describe("VM", func() {
 			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-k80", googleProject, zone)
 			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal(expectedAcceleratorTypeLink))
 		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+		"method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+					"zone": "%v",
+					"on_host_maintenance": "TERMINATE"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, "us-central1-a", networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			unexpectedCpuPlatform := "Intel Sandy Bridge"
+			Expect(instance.MinCpuPlatform).ToNot(Equal(unexpectedCpuPlatform))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can create a VM in europe-west1-b and not get a Sandy Bridge CPU", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+		"method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				   "machine_type": "n1-standard-1",
+					"zone": "%v",
+					"on_host_maintenance": "TERMINATE"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, "europe-west1-b", networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			unexpectedCpuPlatform := "Intel Sandy Bridge"
+			Expect(instance.MinCpuPlatform).ToNot(Equal(unexpectedCpuPlatform))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
 	})
 
 	It("can create a VM with overlapping VM and network tags and VM properties that override network properties", func() {
