@@ -1,7 +1,6 @@
 package action
 
 import (
-	
 	"encoding/json"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -29,8 +28,8 @@ import (
 
 type ConcreteFactory struct {
 	uuidGen boshuuid.Generator
-	cfg config.Config
-	logger boshlog.Logger
+	cfg     config.Config
+	logger  boshlog.Logger
 }
 
 func NewConcreteFactory(
@@ -39,8 +38,8 @@ func NewConcreteFactory(
 	logger boshlog.Logger,
 ) ConcreteFactory {
 	return ConcreteFactory{uuidGen,
-	cfg,
-	logger}
+		cfg,
+		logger}
 }
 
 func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Action, error) {
@@ -111,7 +110,7 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 	acceleratorTypeService := acceleratortype.NewGoogleAcceleratorTypeService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
-		logger,
+		f.logger,
 	)
 
 	projectService := project.NewGoogleProjectService(
@@ -176,54 +175,54 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 	)
 
 	actions := map[string]Action{
-			// Disk management
-			"create_disk": NewCreateDisk(
-				diskService,
-				diskTypeService,
-				vmService,
-			),
-			"delete_disk": NewDeleteDisk(diskService),
-			"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
-			"detach_disk": NewDetachDisk(vmService, registryClient),
-			"has_disk":    NewHasDisk(diskService),
+		// Disk management
+		"create_disk": NewCreateDisk(
+			diskService,
+			diskTypeService,
+			vmService,
+		),
+		"delete_disk": NewDeleteDisk(diskService),
+		"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
+		"detach_disk": NewDetachDisk(vmService, registryClient),
+		"has_disk":    NewHasDisk(diskService),
 
-			// Snapshot management
-			"snapshot_disk":   NewSnapshotDisk(snapshotService, diskService),
-			"delete_snapshot": NewDeleteSnapshot(snapshotService),
+		// Snapshot management
+		"snapshot_disk":   NewSnapshotDisk(snapshotService, diskService),
+		"delete_snapshot": NewDeleteSnapshot(snapshotService),
 
-			// Stemcell management
-			"create_stemcell": NewCreateStemcell(imageService),
-			"delete_stemcell": NewDeleteStemcell(imageService),
+		// Stemcell management
+		"create_stemcell": NewCreateStemcell(imageService),
+		"delete_stemcell": NewDeleteStemcell(imageService),
 
-			// VM management
-			"create_vm": NewCreateVM(
-				vmService,
-				diskService,
-				diskTypeService,
-				imageService,
-				machineTypeService,
-				acceleratorTypeService,
-				registryClient,
-				f.cfg.Cloud.Properties.Registry,
-				f.cfg.Cloud.Properties.Agent,
-				googleClient.DefaultRootDiskSizeGb(),
-				googleClient.DefaultRootDiskType(),
-			),
-			"configure_networks": NewConfigureNetworks(vmService, registryClient),
-			"delete_vm":          NewDeleteVM(vmService, registryClient),
-			"reboot_vm":          NewRebootVM(vmService),
-			"set_vm_metadata":    NewSetVMMetadata(vmService),
-			"has_vm":             NewHasVM(vmService),
-			"get_disks":          NewGetDisks(vmService),
+		// VM management
+		"create_vm": NewCreateVM(
+			vmService,
+			diskService,
+			diskTypeService,
+			imageService,
+			machineTypeService,
+			acceleratorTypeService,
+			registryClient,
+			f.cfg.Cloud.Properties.Registry,
+			f.cfg.Cloud.Properties.Agent,
+			googleClient.DefaultRootDiskSizeGb(),
+			googleClient.DefaultRootDiskType(),
+		),
+		"configure_networks": NewConfigureNetworks(vmService, registryClient),
+		"delete_vm":          NewDeleteVM(vmService, registryClient),
+		"reboot_vm":          NewRebootVM(vmService),
+		"set_vm_metadata":    NewSetVMMetadata(vmService),
+		"has_vm":             NewHasVM(vmService),
+		"get_disks":          NewGetDisks(vmService),
 
-			// Others:
-			"info": NewInfo(),
-			"ping": NewPing(),
-			"calculate_vm_cloud_properties": NewCalculateVMCloudProperties(),
+		// Others:
+		"info": NewInfo(),
+		"ping": NewPing(),
+		"calculate_vm_cloud_properties": NewCalculateVMCloudProperties(),
 
-			// Not implemented:
-			// current_vm_id
-		}
+		// Not implemented:
+		// current_vm_id
+	}
 
 	action, found := actions[method]
 	if !found {

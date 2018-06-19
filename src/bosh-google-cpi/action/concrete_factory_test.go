@@ -73,12 +73,11 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	BeforeEach(func() {
-		googleClient = clientfakes.NewFakeGoogleClient()
+		//googleClient = clientfakes.NewFakeGoogleClient()
 		uuidGen = &fakeuuid.FakeGenerator{}
 		logger = boshlog.NewLogger(boshlog.LevelNone)
 
 		factory = NewConcreteFactory(
-			googleClient,
 			uuidGen,
 			cfg,
 			logger,
