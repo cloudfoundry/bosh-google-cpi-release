@@ -130,7 +130,11 @@ func (i GoogleBackendServiceService) find(id, region string) (BackendService, bo
 		var backendService *compute.BackendService
 		for _, scopedList := range aggregatedBackendServices.Items {
 			for _, bs := range scopedList.BackendServices {
-				if bs.Name == id && (bs.Region == "" || strings.Contains(bs.Region, region)) {
+				bsRegion := ""
+				if bs.Region != "" {
+					bsRegion = util.RegionFromURL(bs.Region)
+				}
+				if bs.Name == id && (bsRegion == "" || bsRegion == region) {
 					// Ensure there doesn't exist a collision in names between global/regional backend services
 					if backendService != nil {
 						return BackendService{},
