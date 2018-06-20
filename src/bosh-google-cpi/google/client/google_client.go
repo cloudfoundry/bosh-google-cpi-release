@@ -30,7 +30,7 @@ const (
 )
 
 type GoogleClient struct {
-	config          config.Config
+	Config          config.Config
 	computeService  *compute.Service
 	computeServiceB *computebeta.Service
 	storageService  *storage.Service
@@ -107,7 +107,7 @@ func NewGoogleClient(
 	storageService.UserAgent = userAgent
 
 	return GoogleClient{
-		config:          config,
+		Config:          config,
 		computeService:  computeService,
 		computeServiceB: computeServiceB,
 		storageService:  storageService,
@@ -116,15 +116,15 @@ func NewGoogleClient(
 }
 
 func (c GoogleClient) Project() string {
-	return c.config.Project
+	return c.Config.Project
 }
 
 func (c GoogleClient) DefaultRootDiskSizeGb() int {
-	return c.config.DefaultRootDiskSizeGb
+	return c.Config.DefaultRootDiskSizeGb
 }
 
 func (c GoogleClient) DefaultRootDiskType() string {
-	return c.config.DefaultRootDiskType
+	return c.Config.DefaultRootDiskType
 }
 
 func (c GoogleClient) ComputeService() *compute.Service {

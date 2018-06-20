@@ -1,5 +1,5 @@
 package action
 
 type Factory interface {
-	Create(method string) (Action, error)
+	Create(method string, ctx map[string]interface{}) (Action, error)
 }
