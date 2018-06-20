@@ -36,6 +36,7 @@ var _ = Describe("ConcreteFactory", func() {
 		uuidGen      *fakeuuid.FakeGenerator
 		googleClient client.GoogleClient
 		logger       boshlog.Logger
+		ctx          map[string]interface{}
 
 		cfg = config.Config{
 			Cloud: config.Cloud{
@@ -73,9 +74,17 @@ var _ = Describe("ConcreteFactory", func() {
 	)
 
 	BeforeEach(func() {
-		//googleClient = clientfakes.NewFakeGoogleClient()
+		GoogleClientFunc = clientfakes.NewFakeGoogleClient
 		uuidGen = &fakeuuid.FakeGenerator{}
 		logger = boshlog.NewLogger(boshlog.LevelNone)
+
+		ctx = map[string]interface{}{
+			"project":                   "fake-project",
+			"user_agent_prefix":         "fake-user-agent-prefix",
+			"json_key":                  "{}",
+			"default_root_disk_size_gb": 10,
+			"default_root_disk_type":    "fake-root-disk-type",
+		}
 
 		factory = NewConcreteFactory(
 			uuidGen,
@@ -86,20 +95,20 @@ var _ = Describe("ConcreteFactory", func() {
 
 	BeforeEach(func() {
 		operationService = operation.NewGoogleOperationService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			googleClient.ComputeBetaService(),
 			logger,
 		)
 
 		addressService = address.NewGoogleAddressService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			logger,
 		)
 
 		diskService = disk.NewGoogleDiskService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
@@ -107,13 +116,13 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		diskTypeService = disktype.NewGoogleDiskTypeService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			logger,
 		)
 
 		imageService = image.NewGoogleImageService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			googleClient.StorageService(),
 			operationService,
@@ -122,33 +131,33 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		backendServiceService = backendservice.NewGoogleBackendServiceService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
 
 		instanceGroupService = instancegroup.NewGoogleInstanceGroupService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
 
 		machineTypeService = machinetype.NewGoogleMachineTypeService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			logger,
 		)
 
 		acceleratorTypeService = acceleratortype.NewGoogleAcceleratorTypeService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			logger,
 		)
 
 		projectService := project.NewGoogleProjectService(
-			googleClient.Project(),
+			ctx["project"].(string),
 		)
 
 		networkService = network.NewGoogleNetworkService(
@@ -163,7 +172,7 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		snapshotService = snapshot.NewGoogleSnapshotService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
 			uuidGen,
@@ -177,14 +186,14 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		targetPoolService = targetpool.NewGoogleTargetPoolService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
 			logger,
 		)
 
 		vmService = instance.NewGoogleInstanceService(
-			googleClient.Project(),
+			ctx["project"].(string),
 			googleClient.ComputeService(),
 			googleClient.ComputeBetaService(),
 			addressService,
@@ -199,13 +208,13 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("returns error if action cannot be created", func() {
-		action, err := factory.Create("fake-unknown-action")
+		action, err := factory.Create("fake-unknown-action", ctx)
 		Expect(err).To(HaveOccurred())
 		Expect(action).To(BeNil())
 	})
 
 	It("create_disk", func() {
-		action, err := factory.Create("create_disk")
+		action, err := factory.Create("create_disk", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateDisk(
 			diskService,
@@ -215,49 +224,49 @@ var _ = Describe("ConcreteFactory", func() {
 	})
 
 	It("delete_disk", func() {
-		action, err := factory.Create("delete_disk")
+		action, err := factory.Create("delete_disk", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteDisk(diskService)))
 	})
 
 	It("attach_disk", func() {
-		action, err := factory.Create("attach_disk")
+		action, err := factory.Create("attach_disk", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewAttachDisk(diskService, vmService, registryClient)))
 	})
 
 	It("detach_disk", func() {
-		action, err := factory.Create("detach_disk")
+		action, err := factory.Create("detach_disk", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDetachDisk(vmService, registryClient)))
 	})
 
 	It("snapshot_disk", func() {
-		action, err := factory.Create("snapshot_disk")
+		action, err := factory.Create("snapshot_disk", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewSnapshotDisk(snapshotService, diskService)))
 	})
 
 	It("delete_snapshot", func() {
-		action, err := factory.Create("delete_snapshot")
+		action, err := factory.Create("delete_snapshot", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteSnapshot(snapshotService)))
 	})
 
 	It("create_stemcell", func() {
-		action, err := factory.Create("create_stemcell")
+		action, err := factory.Create("create_stemcell", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateStemcell(imageService)))
 	})
 
 	It("delete_stemcell", func() {
-		action, err := factory.Create("delete_stemcell")
+		action, err := factory.Create("delete_stemcell", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteStemcell(imageService)))
 	})
 
 	It("create_vm", func() {
-		action, err := factory.Create("create_vm")
+		action, err := factory.Create("create_vm", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewCreateVM(
 			vmService,
@@ -269,67 +278,67 @@ var _ = Describe("ConcreteFactory", func() {
 			registryClient,
 			cfg.Cloud.Properties.Registry,
 			cfg.Cloud.Properties.Agent,
-			googleClient.DefaultRootDiskSizeGb(),
-			googleClient.DefaultRootDiskType(),
+			ctx["default_root_disk_size_gb"].(int),
+			ctx["default_root_disk_type"].(string),
 		)))
 	})
 
 	It("configure_networks", func() {
-		action, err := factory.Create("configure_networks")
+		action, err := factory.Create("configure_networks", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewConfigureNetworks(vmService, registryClient)))
 	})
 
 	It("delete_vm", func() {
-		action, err := factory.Create("delete_vm")
+		action, err := factory.Create("delete_vm", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewDeleteVM(vmService, registryClient)))
 	})
 
 	It("reboot_vm", func() {
-		action, err := factory.Create("reboot_vm")
+		action, err := factory.Create("reboot_vm", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewRebootVM(vmService)))
 	})
 
 	It("set_vm_metadata", func() {
-		action, err := factory.Create("set_vm_metadata")
+		action, err := factory.Create("set_vm_metadata", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewSetVMMetadata(vmService)))
 	})
 
 	It("has_vm", func() {
-		action, err := factory.Create("has_vm")
+		action, err := factory.Create("has_vm", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewHasVM(vmService)))
 	})
 
 	It("get_disks", func() {
-		action, err := factory.Create("get_disks")
+		action, err := factory.Create("get_disks", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewGetDisks(vmService)))
 	})
 
 	It("ping", func() {
-		action, err := factory.Create("ping")
+		action, err := factory.Create("ping", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewPing()))
 	})
 
 	It("info", func() {
-		action, err := factory.Create("info")
+		action, err := factory.Create("info", ctx)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(action).To(Equal(NewInfo()))
 	})
 
 	It("when action is current_vm_id returns an error because this CPI does not implement the method", func() {
-		action, err := factory.Create("current_vm_id")
+		action, err := factory.Create("current_vm_id", ctx)
 		Expect(err).To(HaveOccurred())
 		Expect(action).To(BeNil())
 	})
 
 	It("when action is wrong returns an error because it is not an official CPI method", func() {
-		action, err := factory.Create("wrong")
+		action, err := factory.Create("wrong", ctx)
 		Expect(err).To(HaveOccurred())
 		Expect(action).To(BeNil())
 	})

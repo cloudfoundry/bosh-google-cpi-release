@@ -19,7 +19,7 @@ func NewFakeFactory() *FakeFactory {
 	}
 }
 
-func (f *FakeFactory) Create(method string) (bgcaction.Action, error) {
+func (f *FakeFactory) Create(method string, ctx map[string]interface{}) (bgcaction.Action, error) {
 	if err := f.registeredActionErrs[method]; err != nil {
 		return nil, err
 	}

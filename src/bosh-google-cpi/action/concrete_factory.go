@@ -2,6 +2,8 @@ package action
 
 import (
 	"encoding/json"
+
+	bogcconfig "bosh-google-cpi/google/config"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
@@ -25,6 +27,8 @@ import (
 	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
+
+var GoogleClientFunc func(bogcconfig.Config, boshlog.Logger) (client.GoogleClient, error) = client.NewGoogleClient
 
 type ConcreteFactory struct {
 	uuidGen boshuuid.Generator
@@ -53,7 +57,7 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		return nil, bosherr.WrapErrorf(err, "Unmarshaling into google props")
 	}
 
-	googleClient, err := client.NewGoogleClient(f.cfg.Cloud.Properties.Google, f.logger)
+	googleClient, err := GoogleClientFunc(f.cfg.Cloud.Properties.Google, f.logger)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Building goog client")
 	}
