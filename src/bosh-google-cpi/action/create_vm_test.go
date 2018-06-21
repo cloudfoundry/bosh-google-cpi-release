@@ -140,7 +140,7 @@ var _ = Describe("CreateVM", func() {
 				OnHostMaintenance: "TERMINATE",
 				Preemptible:       true,
 				ServiceScopes:     []string{},
-				BackendService:    instance.BackendService{Name: "fake-backend-service", Scheme: "EXTERNAL"},
+				BackendService:    instance.BackendService{Name: "fake-backend-service"},
 			}
 
 			expectedInstanceNetworks = networks.AsInstanceServiceNetworks()
@@ -177,7 +177,7 @@ var _ = Describe("CreateVM", func() {
 			BeforeEach(func() {
 				backendService = make(map[string]string)
 				backendService["name"] = "foobar"
-				expectedVMProps.BackendService = instance.BackendService{Name: "foobar", Scheme: "EXTERNAL"}
+				expectedVMProps.BackendService = instance.BackendService{Name: "foobar"}
 
 				cloudProps.BackendService = backendService
 			})
@@ -190,7 +190,7 @@ var _ = Describe("CreateVM", func() {
 
 			It("supports internal", func() {
 				backendService["scheme"] = "INTERNAL"
-				expectedVMProps.BackendService = instance.BackendService{Name: "foobar", Scheme: "INTERNAL"}
+				expectedVMProps.BackendService = instance.BackendService{Name: "foobar"}
 
 				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())

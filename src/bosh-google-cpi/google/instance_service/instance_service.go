@@ -47,8 +47,7 @@ type ServiceScopes []string
 type ServiceAccount string
 
 type BackendService struct {
-	Name   string
-	Scheme string
+	Name string
 }
 type Accelerator struct {
 	AcceleratorType string

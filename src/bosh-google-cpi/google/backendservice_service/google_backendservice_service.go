@@ -44,19 +44,13 @@ func NewGoogleBackendServiceService(
 // have more than one backend/instance group associated with it. In that case,
 // the instance will be added to each backend/instance group that is in the
 // same zone as the instance.
-func (i GoogleBackendServiceService) AddInstance(id, scheme, vmLink string) error {
+func (i GoogleBackendServiceService) AddInstance(id, vmLink string) error {
 	zone := util.ZoneFromURL(vmLink)
 	if zone == "" {
 		return bosherr.Errorf("Could not find VM zone in %q", vmLink)
 	}
 	i.logger.Debug(googleBackendServiceServiceLogTag, "Adding instance %q to all backends for Backend Service %q in zone %q", vmLink, id, zone)
-
-	region := ""
-	if scheme == "INTERNAL" {
-		region = util.RegionFromZone(zone)
-	} else if scheme != "EXTERNAL" {
-		return bosherr.Errorf("Invalid BackendService load balancing scheme %q", scheme)
-	}
+	region := util.RegionFromZone(zone)
 	backendService, found, err := i.find(id, region)
 	if err != nil {
 		return err
@@ -128,26 +122,43 @@ func (i GoogleBackendServiceService) RemoveInstance(vmLink string) error {
 // while trying to find the Backend Service.
 func (i GoogleBackendServiceService) find(id, region string) (BackendService, bool, error) {
 	i.logger.Debug(googleBackendServiceServiceLogTag, "Finding Google Backend Service %q", id)
-	var backendServiceItem *compute.BackendService
-	var err error
-	if region == "" {
-		backendServiceItem, err = i.computeService.BackendServices.Get(i.project, id).Do()
-	} else {
-		backendServiceItem, err = i.computeService.RegionBackendServices.Get(i.project, region, id).Do()
-	}
-	if err != nil {
-		if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
-			return BackendService{}, false, nil
+
+	// Search for a matching backend service amongst an aggregated list containing both global and regional items
+	aggregatedBackendServices, err := i.computeService.BackendServices.AggregatedList(i.project).Do()
+	// TODO(craigatgoogle): Employ server-side name filtering once the API filter bug is fixed, https://b.corp.google.com/issues/80238913
+	if err == nil {
+		var backendService *compute.BackendService
+		for _, scopedList := range aggregatedBackendServices.Items {
+			for _, bs := range scopedList.BackendServices {
+				bsRegion := ""
+				if bs.Region != "" {
+					bsRegion = util.RegionFromURL(bs.Region)
+				}
+				if bs.Name == id && (bsRegion == "" || bsRegion == region) {
+					// Ensure there doesn't exist a collision in names between global/regional backend services
+					if backendService != nil {
+						return BackendService{},
+							false,
+							bosherr.Errorf("Failed to find Google Backend Service %q, given ambiguous name.", id)
+					}
+					backendService = bs
+				}
+			}
 		}
-		return BackendService{}, false, bosherr.WrapErrorf(err, "Failed to find Google Backend Service %q", id)
+
+		if backendService != nil {
+			return BackendService{
+				Name:     backendService.Name,
+				SelfLink: backendService.SelfLink,
+				Backends: FromComputeBackends(backendService.Backends),
+			}, true, nil
+		}
 	}
 
-	backendService := BackendService{
-		Name:     backendServiceItem.Name,
-		SelfLink: backendServiceItem.SelfLink,
-		Backends: FromComputeBackends(backendServiceItem.Backends),
+	if gerr, ok := err.(*googleapi.Error); ok && gerr.Code == 404 {
+		return BackendService{}, false, nil
 	}
-	return backendService, true, nil
+	return BackendService{}, false, bosherr.WrapErrorf(err, "Failed to find Google Backend Service %q", id)
 }
 
 // FindByInstance returns all Backend Services that an instance in a zone
