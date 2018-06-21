@@ -157,7 +157,7 @@ resource "google_compute_region_backend_service" "region_backend_service" {
 
 resource "google_compute_backend_service" "collision_backend_service" {
   health_checks = ["${google_compute_http_health_check.backend_service.self_link}"]
-  name          = "${var.prefix}"
+  name          = "${var.prefix}-collision"
   port_name     = "http"
   timeout_sec   = "30"
 
@@ -170,7 +170,7 @@ resource "google_compute_backend_service" "collision_backend_service" {
 }
 
 resource "google_compute_region_backend_service" "collision_region_backend_service" {
-  name          = "${var.prefix}"
+  name          = "${var.prefix}-collision"
   health_checks = ["${google_compute_health_check.region_backend_service.self_link}"]
   region        = "${var.google_region}"
   protocol      = "TCP"
