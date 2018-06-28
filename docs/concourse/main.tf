@@ -30,6 +30,7 @@ provider "google" {
 
 resource "google_compute_network" "network" {
   name       = "${var.name}"
+  auto_create_subnetworks = "false"
 }
 
 // Subnet for the BOSH director
