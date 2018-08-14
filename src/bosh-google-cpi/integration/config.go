@@ -14,7 +14,6 @@ import (
 	boshdisp "bosh-google-cpi/api/dispatcher"
 	"bosh-google-cpi/api/transport"
 	boshcfg "bosh-google-cpi/config"
-	"bosh-google-cpi/google/client"
 
 	boshlogger "github.com/cloudfoundry/bosh-utils/logger"
 	"github.com/cloudfoundry/bosh-utils/uuid"
@@ -30,20 +29,22 @@ var (
 	serviceAccount   = envRequired("SERVICE_ACCOUNT")
 
 	// Configurable defaults
-	stemcellFile         = envOrDefault("STEMCELL_FILE", "")
-	stemcellVersion      = envOrDefault("STEMCELL_VERSION", "")
-	networkName          = envOrDefault("NETWORK_NAME", "cfintegration")
-	customNetworkName    = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
-	customSubnetworkName = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
-	ipAddrs              = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
-	targetPool           = envOrDefault("TARGET_POOL", "cfintegration")
-	backendService       = envOrDefault("BACKEND_SERVICE", "cfintegration")
-	regionBackendService = envOrDefault("REGION_BACKEND_SERVICE", "region-cfintegration")
-	instanceGroup        = envOrDefault("BACKEND_SERVICE", "cfintegration")
-	ilbInstanceGroup     = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
-	zone                 = envOrDefault("ZONE", "us-central1-a")
-	region               = envOrDefault("REGION", "us-central1")
-	imageURL             = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
+	stemcellFile                  = envOrDefault("STEMCELL_FILE", "")
+	stemcellVersion               = envOrDefault("STEMCELL_VERSION", "")
+	networkName                   = envOrDefault("NETWORK_NAME", "cfintegration")
+	customNetworkName             = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
+	customSubnetworkName          = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
+	ipAddrs                       = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
+	targetPool                    = envOrDefault("TARGET_POOL", "cfintegration")
+	backendService                = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	regionBackendService          = envOrDefault("REGION_BACKEND_SERVICE", "cfintegration-r")
+	collisionBackendService       = envOrDefault("COLLISION_BACKEND_SERVICE", "cfintegration-collision")
+	collisionRegionBackendService = envOrDefault("COLLISION_REGION_BACKEND_SERVICE", "cfintegration-collision")
+	instanceGroup                 = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	ilbInstanceGroup              = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
+	zone                          = envOrDefault("ZONE", "us-central1-a")
+	region                        = envOrDefault("REGION", "us-central1")
+	imageURL                      = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
 
 	// Channel that will be used to retrieve IPs to use
 	ips chan string
@@ -87,22 +88,41 @@ func execCPI(request string) (boshdisp.Response, error) {
 	var cfg boshcfg.Config
 	var in, out, errOut, errOutLog bytes.Buffer
 	var boshResponse boshdisp.Response
-	var googleClient client.GoogleClient
 
 	if cfg, err = boshcfg.NewConfigFromString(cfgContent); err != nil {
 		return boshResponse, err
 	}
 
+	// We're going to convert the Google config to a map[string]interface{}
+	googCfg, err := json.Marshal(cfg.Cloud.Properties.Google)
+	if err != nil {
+		return boshResponse, err
+	}
+	var ctx map[string]interface{}
+	if err = json.Unmarshal(googCfg, &ctx); err != nil {
+		return boshResponse, err
+	}
+
+	// Unmarshal the reqest string to a struct
+	var req boshdisp.Request
+	if err = json.Unmarshal([]byte(request), &req); err != nil {
+		return boshResponse, err
+	}
+	req.Context = ctx
+
+	// Marshal the modified request back to string
+	requestByte, err := json.Marshal(req)
+	if err != nil {
+		return boshResponse, err
+	}
+	request = string(requestByte)
+
 	multiWriter := io.MultiWriter(&errOut, &errOutLog)
 	logger := boshlogger.NewWriterLogger(boshlogger.LevelDebug, multiWriter)
 	multiLogger := boshapi.MultiLogger{Logger: logger, LogBuff: &errOutLog}
 	uuidGen := uuid.NewGenerator()
-	if googleClient, err = client.NewGoogleClient(cfg.Cloud.Properties.Google, multiLogger); err != nil {
-		return boshResponse, err
-	}
 
 	actionFactory := action.NewConcreteFactory(
-		googleClient,
 		uuidGen,
 		cfg,
 		multiLogger,
