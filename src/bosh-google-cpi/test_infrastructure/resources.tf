@@ -128,7 +128,7 @@ resource "google_compute_instance_group" "region_backend_service" {
 resource "google_compute_instance" "hack" {
   boot_disk = {
     initialize_params {
-      image = "debian-cloud/debian-8"
+      image = "debian-cloud/debian-9"
     }
   }
 
