@@ -2,6 +2,27 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [28.0.0] - 2018-08-16
+
+### Added
+- Support for scheme agnostic backend services.
+- Made it possible to inject a Google client when testing.
+- Implement a Find Service for accelerator types.
+- Implements creation of VM with accelerator.
+- Support for Accelerator in Cloud Properties.
+- Support for CPI Config.
+
+### Changed
+- Use Debian 9 in test infrastructure.
+- Avoid Sandy Bridge CPUs.
+- Use Go 1.9.
+- Update types to pointer where is needed.
+
+### Fixed
+- Fixes for integration tests modifying the CPI request to
+include context necessary for the 'cpi-config'-enabled CPI.
+- Fixes for unit tests.
+
 ## [25.10.0] - 2017-08-17
 
 ### Added
