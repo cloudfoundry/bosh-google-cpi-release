@@ -191,7 +191,7 @@ var _ = Describe("VM", func() {
 					"zone": "%v",
 					"accelerators": [
 						{
-							"type": "nvidia-tesla-k80",
+							"type": "nvidia-tesla-p100",
 							"count": 1
 						}
 					],
