@@ -82,4 +82,6 @@ builds:
     version: 27.0.0
   db0c322d-808e-4772-88f6-2470eda32988:
     version: 27.0.1
+  0fa99132-638a-4539-aaff-e2ec1895cdb3:
+    version: 28.0.0
 format-version: '2'
