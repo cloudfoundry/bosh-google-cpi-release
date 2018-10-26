@@ -49,6 +49,11 @@ RUN ruby-install ruby 2.1.2 && \
 # Install Bundler and BOSH CLI
 RUN /bin/bash -l -c "gem install bundler bosh_cli --no-ri --no-rdoc"
 
+# Install Bosh2
+RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.48-linux-amd64
+RUN chmod +x bosh-cli-*
+RUN mv bosh-cli-* /usr/bin/bosh2
+
 # Install AWS CLI (used to upload stemcell)
 RUN pip install awscli
 
