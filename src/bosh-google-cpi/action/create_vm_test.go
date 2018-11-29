@@ -16,6 +16,7 @@ import (
 	machinetypefakes "bosh-google-cpi/google/machine_type_service/fakes"
 	"bosh-google-cpi/registry"
 	"errors"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -114,7 +115,7 @@ var _ = Describe("CreateVM", func() {
 
 			networks = Networks{
 				"fake-network-name": &Network{
-					Type:    "dynamic",
+					Type:    "manual",
 					IP:      "fake-network-ip",
 					Gateway: "fake-network-gateway",
 					Netmask: "fake-network-netmask",
@@ -157,7 +158,7 @@ var _ = Describe("CreateVM", func() {
 				Mbus: "http://fake-mbus",
 				Networks: registry.NetworksSettings{
 					"fake-network-name": registry.NetworkSettings{
-						Type:    "dynamic",
+						Type:    "manual",
 						IP:      "fake-network-ip",
 						Gateway: "fake-network-gateway",
 						Netmask: "fake-network-netmask",
@@ -754,6 +755,20 @@ var _ = Describe("CreateVM", func() {
 					Expect(vmService.CleanUpCalled).To(BeFalse())
 					Expect(registryClient.UpdateCalled).To(BeFalse())
 				})
+			})
+		})
+
+		Context("when network is of type 'dynamic'", func() {
+			BeforeEach(func() {
+				networks["fake-network-name"].Type = "dynamic"
+				expectedInstanceNetworks.Network().Type = "dynamic"
+				expectedInstanceNetworks.Network().IP = ""
+			})
+
+			It("clear out the ip part of the network settings", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 			})
 		})
 	})

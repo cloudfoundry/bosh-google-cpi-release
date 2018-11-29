@@ -17,7 +17,6 @@ import (
 	"bosh-google-cpi/google/disk_service"
 	"bosh-google-cpi/google/disk_type_service"
 	"bosh-google-cpi/google/image_service"
-	"bosh-google-cpi/google/instance_group_service"
 	"bosh-google-cpi/google/instance_service"
 	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/google/network_service"
@@ -61,7 +60,6 @@ var _ = Describe("ConcreteFactory", func() {
 		diskService            disk.Service
 		diskTypeService        disktype.Service
 		imageService           image.Service
-		instanceGroupService   instancegroup.Service
 		backendServiceService  backendservice.Service
 		machineTypeService     machinetype.Service
 		acceleratorTypeService acceleratortype.Service
@@ -131,13 +129,6 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 
 		backendServiceService = backendservice.NewGoogleBackendServiceService(
-			ctx["project"].(string),
-			googleClient.ComputeService(),
-			operationService,
-			logger,
-		)
-
-		instanceGroupService = instancegroup.NewGoogleInstanceGroupService(
 			ctx["project"].(string),
 			googleClient.ComputeService(),
 			operationService,
