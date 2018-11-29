@@ -191,7 +191,7 @@ var _ = Describe("VM", func() {
 					"zone": "%v",
 					"accelerators": [
 						{
-							"type": "nvidia-tesla-k80",
+							"type": "nvidia-tesla-p100",
 							"count": 1
 						}
 					],
@@ -211,7 +211,7 @@ var _ = Describe("VM", func() {
 			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
-			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-k80", googleProject, zone)
+			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-p100", googleProject, zone)
 			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal(expectedAcceleratorTypeLink))
 		})
 
