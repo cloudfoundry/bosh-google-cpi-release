@@ -763,6 +763,8 @@ var _ = Describe("CreateVM", func() {
 				networks["fake-network-name"].Type = "dynamic"
 				expectedInstanceNetworks.Network().Type = "dynamic"
 				expectedInstanceNetworks.Network().IP = ""
+				diskService.FindFound = true
+				disks = []DiskCID{"fake-disk-1"}
 			})
 
 			It("clear out the ip part of the network settings", func() {
