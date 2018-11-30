@@ -5,4 +5,5 @@ type Disk struct {
 	SelfLink string
 	Status   string
 	Zone     string
+	Users    []string
 }

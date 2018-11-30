@@ -26,6 +26,7 @@ func (d GoogleDiskService) Find(id string, zone string) (Disk, bool, error) {
 					SelfLink: diskItem.SelfLink,
 					Status:   diskItem.Status,
 					Zone:     diskItem.Zone,
+					Users:    diskItem.Users,
 				}
 				return disk, true, nil
 			}

@@ -37,6 +37,9 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	if !found {
 		return nil, api.NewDiskNotFoundError(string(diskCID), false)
 	}
+	if len(disk.Users) > 0 {
+		return nil, api.NewDiskAlreadyAttachedError(string(diskCID), disk.Users, false)
+	}
 
 	// Atach the Disk to the VM
 	deviceName, devicePath, err := ad.vmService.AttachDisk(string(vmCID), disk.SelfLink)
