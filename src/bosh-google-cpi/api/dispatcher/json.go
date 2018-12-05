@@ -92,6 +92,7 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 
 	resp := Response{
 		Result: result,
+		Log:    c.logger.LogBuff.String(),
 	}
 
 	c.logger.DebugWithDetails(jsonLogTag, "Deserialized response", resp)
@@ -108,6 +109,7 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 
 func (c JSON) buildCloudError(err error) []byte {
 	respErr := Response{
+		Log:   c.logger.LogBuff.String(),
 		Error: &ResponseError{},
 	}
 
@@ -137,6 +139,7 @@ func (c JSON) buildCloudError(err error) []byte {
 
 func (c JSON) buildCpiError(message string) []byte {
 	respErr := Response{
+		Log: c.logger.LogBuff.String(),
 		Error: &ResponseError{
 			Type:    jsonCpiErrorType,
 			Message: message,
@@ -155,6 +158,7 @@ func (c JSON) buildCpiError(message string) []byte {
 
 func (c JSON) buildNotImplementedError() []byte {
 	respErr := Response{
+		Log: c.logger.LogBuff.String(),
 		Error: &ResponseError{
 			Type:    jsonNotImplementedErrorType,
 			Message: "Must call implemented method",
