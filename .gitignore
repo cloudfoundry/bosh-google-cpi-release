@@ -1,3 +1,5 @@
+.envrc
+credentials.sh
 config/dev.yml
 config/private.yml
 releases/*.tgz
