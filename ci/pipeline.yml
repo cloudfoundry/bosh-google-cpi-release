@@ -18,9 +18,9 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
       - task: unit-tests
-        file: bosh-cpi-src/ci/tasks/unit-tests.yml
+        file: ci/ci/tasks/unit-tests.yml
 
   - name: build-candidate
     serial: true
@@ -28,13 +28,13 @@ jobs:
       - aggregate:
         - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
         - {trigger: false,                     get: version-semver, params: {bump: patch}}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
 
       - put: version-semver
         params: {file: version-semver/number}
 
       - task: build-release
-        file: bosh-cpi-src/ci/tasks/build-candidate.yml
+        file: ci/ci/tasks/build-candidate.yml
 
       - put: bosh-cpi-dev-artifacts
         params: {file: candidate/*.tgz}
@@ -47,11 +47,11 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
       - aggregate: &teardown_step
         - task: teardown-infrastructure
-          file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+          file: ci/ci/tasks/teardown-infrastructure.yml
           params:
             google_auto_network: {{google_auto_network}}
             google_json_key_data: {{google_json_key_data}}
@@ -72,7 +72,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
       - aggregate: *teardown_step
       - put: infrastructure
         params:
@@ -88,7 +88,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
@@ -96,7 +96,7 @@ jobs:
         - {trigger: false,                                                  get: bosh-deployment}
 
       - task: setup-director
-        file: bosh-cpi-src/ci/tasks/setup-director.yml
+        file: ci/ci/tasks/setup-director.yml
         params:
           google_test_bucket_name:        {{google_test_bucket_name}}
           google_subnetwork_range:        {{google_subnetwork_range}}
@@ -106,7 +106,7 @@ jobs:
           private_key_data:               {{private_key_data}}
         on_failure:
           task: teardown-director
-          file: bosh-cpi-src/ci/tasks/teardown-director.yml
+          file: ci/ci/tasks/teardown-director.yml
           params:
             google_test_bucket_name:        {{google_test_bucket_name}}
             google_subnetwork_range:        {{google_subnetwork_range}}
@@ -123,14 +123,14 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [deploy-ubuntu],                  get: director-creds, resource: director-creds}
         - {trigger: true, passed: [deploy-ubuntu],                  get: infrastructure, resource: infrastructure}
         - {trigger: false,                                          get: bats}
       - task: run-bats
-        file: bosh-cpi-src/ci/tasks/run-bats.yml
+        file: ci/ci/tasks/run-bats.yml
         params:
           google_subnetwork_range:                    {{google_subnetwork_range}}
           google_subnetwork_gw:                       {{google_subnetwork_gw}}
@@ -146,12 +146,12 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [setup-infrastructure],                  get: infrastructure, resource: infrastructure}
 
       - task: run-int
-        file: bosh-cpi-src/ci/tasks/run-int.yml
+        file: ci/ci/tasks/run-int.yml
         params:
           google_json_key_data:      {{google_json_key_data}}
 
@@ -160,13 +160,13 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: major}}
       
       - task: promote
-        file: bosh-cpi-src/ci/tasks/promote-candidate.yml
+        file: ci/ci/tasks/promote-candidate.yml
         params:
           release_blobs_access_key: {{release_blobs_access_key}}
           release_blobs_secret_key: {{release_blobs_secret_key}}
@@ -192,13 +192,13 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
       
       - task: promote
-        file: bosh-cpi-src/ci/tasks/promote-candidate.yml
+        file: ci/ci/tasks/promote-candidate.yml
         params:
           release_blobs_access_key: {{release_blobs_access_key}}
           release_blobs_secret_key: {{release_blobs_secret_key}}
@@ -224,13 +224,13 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, get: ci, resource: ci}
+        - {get: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
       
       - task: promote
-        file: bosh-cpi-src/ci/tasks/promote-candidate.yml
+        file: ci/ci/tasks/promote-candidate.yml
         params:
           release_blobs_access_key: {{release_blobs_access_key}}
           release_blobs_secret_key: {{release_blobs_secret_key}}
