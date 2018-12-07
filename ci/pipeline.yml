@@ -135,7 +135,7 @@ jobs:
           google_address_static_pair_bats:            {{google_address_static_pair_bats}}
           google_json_key_data:                       {{google_json_key_data}}
           base_os:                                    Ubuntu
-          stemcell_name:                              bosh-google-kvm-ubuntu-trusty-go_agent
+          stemcell_name:                              bosh-google-kvm-ubuntu-xenial-go_agent
           private_key_data:                           {{private_key_data}}
 
   - name: run-int
@@ -342,7 +342,7 @@ resources:
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      name: bosh-google-kvm-ubuntu-xenial-go_agent
       force_regular: true
       tarball: true
 
