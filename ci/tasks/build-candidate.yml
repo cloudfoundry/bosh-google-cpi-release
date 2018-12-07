@@ -6,8 +6,9 @@ image_resource:
     repository: boshcpi/gce-cpi-release
 inputs:
   - name: bosh-cpi-src
+  - name: ci
   - name: version-semver
 outputs:
   - name: candidate
 run:
-  path: bosh-cpi-src/ci/tasks/build-candidate.sh
+  path: ci/ci/tasks/build-candidate.sh

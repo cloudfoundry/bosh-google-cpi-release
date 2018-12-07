@@ -7,7 +7,7 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
 run:
-  path: bosh-cpi-src/ci/tasks/setup-infrastructure.sh
+  path: ci/ci/tasks/setup-infrastructure.sh
 params:
   google_project:                 replace-me
   google_region:                  replace-me

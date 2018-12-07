@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source bosh-cpi-src/ci/tasks/utils.sh
+source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data

@@ -15,7 +15,7 @@ outputs:
   - name: deployment
   - name: director-creds
 run:
-  path: bosh-cpi-src/ci/tasks/setup-director.sh
+  path: ci/ci/tasks/setup-director.sh
 params:
   BOSH_INIT_LOG_LEVEL:            warn
   google_subnetwork_range:        replace-me

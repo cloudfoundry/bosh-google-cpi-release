@@ -7,6 +7,6 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
 run:
-  path: bosh-cpi-src/ci/tasks/teardown-infrastructure.sh
+  path: ci/ci/tasks/teardown-infrastructure.sh
 params:
   google_json_key_data:           replace-me

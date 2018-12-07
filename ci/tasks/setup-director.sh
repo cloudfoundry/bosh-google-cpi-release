@@ -2,7 +2,7 @@
 
 set -e
 
-source bosh-cpi-src/ci/tasks/utils.sh
+source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_test_bucket_name
@@ -124,8 +124,8 @@ pushd ${deployment_dir}
       -v director_name=micro-google \
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
-      -v internal_ip=${google_address_static_director} \
-      -v external_ip=${google_address_director_internal_ip} \
+      -v internal_ip=${google_address_director_internal_ip} \
+      -v external_ip=${google_address_director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \

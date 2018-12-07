@@ -70,6 +70,7 @@ function read_infrastructure {
   export google_region_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_region_backend_service)
   export google_target_pool=$(cat ${infrastructure_metadata} | jq -r .google_target_pool)
   export google_address_director_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_director_ip)
+  export google_address_director_internal_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_director_internal_ip)
   export google_address_bats_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_ip)
   export google_address_int_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_int_ip)
   export google_service_account=$(cat ${infrastructure_metadata} | jq -r .google_service_account)

@@ -2,7 +2,7 @@
 
 set -e
 
-source bosh-cpi-src/ci/tasks/utils.sh
+source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 cpi_release_name="bosh-google-cpi"

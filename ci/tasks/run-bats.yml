@@ -11,7 +11,7 @@ inputs:
   - name: director-creds
   - name: infrastructure
 run:
-  path: bosh-cpi-src/ci/tasks/run-bats.sh
+  path: ci/ci/tasks/run-bats.sh
 params:
   google_json_key_data:                       replace-me
   google_subnetwork_range:                    replace-me

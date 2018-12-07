@@ -18,6 +18,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
       - task: unit-tests
         file: bosh-cpi-src/ci/tasks/unit-tests.yml
 
@@ -27,6 +28,7 @@ jobs:
       - aggregate:
         - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
         - {trigger: false,                     get: version-semver, params: {bump: patch}}
+        - {trigger: false, get: ci, resource: ci}
 
       - put: version-semver
         params: {file: version-semver/number}
@@ -45,6 +47,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
       - aggregate: &teardown_step
         - task: teardown-infrastructure
@@ -69,6 +72,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
       - aggregate: *teardown_step
       - put: infrastructure
         params:
@@ -84,6 +88,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
@@ -96,7 +101,6 @@ jobs:
           google_test_bucket_name:        {{google_test_bucket_name}}
           google_subnetwork_range:        {{google_subnetwork_range}}
           google_subnetwork_gw:           {{google_subnetwork_gw}}
-          google_address_static_director: {{google_address_static_director}}
           google_json_key_data:           {{google_json_key_data}}
           private_key_user:               {{private_key_user}}
           private_key_data:               {{private_key_data}}
@@ -107,7 +111,6 @@ jobs:
             google_test_bucket_name:        {{google_test_bucket_name}}
             google_subnetwork_range:        {{google_subnetwork_range}}
             google_subnetwork_gw:           {{google_subnetwork_gw}}
-            google_address_static_director: {{google_address_static_director}}
             google_json_key_data:           {{google_json_key_data}}
             private_key_user:               {{private_key_user}}
             private_key_data:               {{private_key_data}}
@@ -120,6 +123,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [deploy-ubuntu],                  get: director-creds, resource: director-creds}
@@ -131,7 +135,6 @@ jobs:
           google_subnetwork_range:                    {{google_subnetwork_range}}
           google_subnetwork_gw:                       {{google_subnetwork_gw}}
           google_address_static_available_range_bats: {{google_address_static_bats_available_range}}
-          google_address_static_bats:                 {{google_address_static_bats}}
           google_address_static_pair_bats:            {{google_address_static_pair_bats}}
           google_json_key_data:                       {{google_json_key_data}}
           base_os:                                    Ubuntu
@@ -143,6 +146,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [setup-infrastructure],                  get: infrastructure, resource: infrastructure}
 
@@ -150,14 +154,13 @@ jobs:
         file: bosh-cpi-src/ci/tasks/run-int.yml
         params:
           google_json_key_data:      {{google_json_key_data}}
-          google_address_static_int: {{google_address_static_int}}
-
 
   - name: promote-candidate-major
     serial: true
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: major}}
@@ -189,6 +192,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
@@ -220,6 +224,7 @@ jobs:
     plan:
       - aggregate:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
+        - {trigger: false, get: ci, resource: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
         - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
@@ -249,6 +254,14 @@ jobs:
 
 
 resources:
+  - name: ci
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
+      branch: master
+      paths:
+        - ci/*
+
   - name: bosh-cpi-src-in
     type: git
     source:
@@ -257,6 +270,7 @@ resources:
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml
+        - ci/*
 
   - name: bosh-cpi-src-out
     type: git

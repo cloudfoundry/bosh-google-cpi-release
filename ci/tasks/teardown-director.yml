@@ -11,7 +11,7 @@ inputs:
   - name: infrastructure
   - name: director-creds
 run:
-  path: bosh-cpi-src/ci/tasks/teardown-director.sh
+  path: ci/ci/tasks/teardown-director.sh
 params:
   BOSH_INIT_LOG_LEVEL: warn
   google_json_key_data:           replace-me

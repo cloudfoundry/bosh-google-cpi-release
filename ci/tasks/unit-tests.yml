@@ -7,4 +7,4 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
 run:
-  path: bosh-cpi-src/ci/tasks/unit-tests.sh
+  path: ci/ci/tasks/unit-tests.sh

@@ -12,7 +12,7 @@ inputs:
 outputs:
   - name: promoted
 run:
-  path: bosh-cpi-src/ci/tasks/promote-candidate.sh
+  path: ci/ci/tasks/promote-candidate.sh
 params:
   release_blobs_access_key: replace-me
   release_blobs_secret_key: replace-me

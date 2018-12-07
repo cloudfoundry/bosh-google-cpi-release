@@ -6,10 +6,11 @@ image_resource:
     repository: boshcpi/gce-cpi-release
 inputs:
   - name: bosh-cpi-src
+  - name: ci
   - name: dummy-boshrelease
   - name: deployment
 run:
-  path: bosh-cpi-src/ci/tasks/deploy-dummy.sh
+  path: ci/ci/tasks/deploy-dummy.sh
 params:
   google_project:           replace-me
   google_region:            replace-me
