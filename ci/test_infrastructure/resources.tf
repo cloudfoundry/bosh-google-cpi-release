@@ -17,7 +17,6 @@ resource "google_compute_address" "director" {
 resource "google_compute_address" "director_internal" {
   name         = "${var.prefix}-dir-internal"
   address_type = "INTERNAL"
-  network      = "${google_compute_network.manual.self_link}"
   subnetwork   = "${google_compute_subnetwork.subnetwork.self_link}"
 }
 
@@ -32,7 +31,6 @@ resource "google_compute_address" "int" {
 resource "google_compute_address" "int_internal" {
   name         = "${var.prefix}-int-internal"
   address_type = "INTERNAL"
-  network      = "${google_compute_network.manual.self_link}"
   subnetwork   = "${google_compute_subnetwork.subnetwork.self_link}"
 }
 
