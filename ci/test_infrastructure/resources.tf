@@ -133,26 +133,9 @@ resource "google_compute_health_check" "region_backend_service" {
 resource "google_compute_instance_group" "region_backend_service" {
   name      = "${var.prefix}-r"
   zone      = "${var.google_zone}"
-  instances = ["${google_compute_instance.hack.self_link}"]
+  network       = "${google_compute_network.manual.self_link}"
 }
 
-// HACK to work around: googleapi: Error 400: Invalid value for field 'resource.backends[0].group': 'https://www.googleapis.com/compute/v1/projects/pivotal-cloudfoundry/zones/us-west1-a/instanceGroups/ci-bosh-deployment-r'. Instance group must have a network to be attached to a backend service. Add an instance to give the instance group a network., invalid
-resource "google_compute_instance" "hack" {
-  boot_disk = {
-    initialize_params {
-      image = "debian-cloud/debian-9"
-    }
-  }
-
-  machine_type = "f1-micro"
-  name         = "${var.prefix}-hack"
-
-  network_interface = {
-    subnetwork = "${google_compute_subnetwork.subnetwork.self_link}"
-  }
-
-  zone = "${var.google_zone}"
-}
 
 resource "google_compute_region_backend_service" "region_backend_service" {
   name          = "${var.prefix}-r"
