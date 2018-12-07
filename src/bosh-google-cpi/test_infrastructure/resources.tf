@@ -14,6 +14,13 @@ resource "google_compute_address" "director" {
   name = "${var.prefix}-dir"
 }
 
+resource "google_compute_address" "director_internal" {
+  name         = "${var.prefix}-dir-internal"
+  address_type = "INTERNAL"
+  network      = "${google_compute_network.manual.self_link}"
+  subnetwork   = "${google_compute_subnetwork.manual.self_link}"
+}
+
 resource "google_compute_address" "bats" {
   name = "${var.prefix}-bats"
 }

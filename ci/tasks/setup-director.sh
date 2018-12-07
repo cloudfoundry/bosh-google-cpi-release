@@ -11,7 +11,6 @@ check_param google_subnetwork_gw
 check_param private_key_user
 check_param private_key_data
 check_param google_json_key_data
-check_param google_address_static_director
 
 creds_file="${PWD}/director-creds/creds.yml"
 cpi_release_name=bosh-google-cpi
@@ -126,7 +125,7 @@ pushd ${deployment_dir}
       -v internal_cidr=${google_subnetwork_range} \
       -v internal_gw=${google_subnetwork_gw} \
       -v internal_ip=${google_address_static_director} \
-      -v external_ip=${google_address_director_ip} \
+      -v external_ip=${google_address_director_internal_ip} \
       --var-file gcp_credentials_json=${google_json_key} \
       -v project_id=${google_project} \
       -v zone=${google_zone} \

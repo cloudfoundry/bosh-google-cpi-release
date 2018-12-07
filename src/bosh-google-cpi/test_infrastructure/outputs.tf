@@ -50,6 +50,10 @@ output "google_address_director_ip" {
   value = "${google_compute_address.director.address}"
 }
 
+output "google_address_director_internal_ip" {
+  value = "${google_compute_address.director_internal.address}"
+}
+
 output "google_address_bats_ip" {
   value = "${google_compute_address.bats.address}"
 }
