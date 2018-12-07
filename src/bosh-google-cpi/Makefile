@@ -53,24 +53,24 @@ testint: check-proj get-deps clean fmt
 	STEMCELL_FILE=$(PWD)/stemcell.tgz \
 	STEMCELL_VERSION='3468.20' \
 	GOOGLE_PROJECT=$(GOOGLE_PROJECT) \
-	NETWORK_NAME=$(shell cd test_infrastructure && terraform output google_auto_network) \
-	CUSTOM_NETWORK_NAME=$(shell cd test_infrastructure && terraform output google_network) \
-	CUSTOM_SUBNETWORK_NAME=$(shell cd test_infrastructure && terraform output google_subnetwork) \
+	NETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_auto_network) \
+	CUSTOM_NETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_network) \
+	CUSTOM_SUBNETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_subnetwork) \
 	PRIVATE_IP=10.0.0.100,10.0.0.101,10.0.0.102 \
-	TARGET_POOL=$(shell cd test_infrastructure && terraform output google_target_pool) \
-	BACKEND_SERVICE=$(shell cd test_infrastructure && terraform output google_backend_service) \
-	REGION_BACKEND_SERVICE=$(shell cd test_infrastructure && terraform output google_region_backend_service) \
-	ILB_INSTANCE_GROUP=$(shell cd test_infrastructure && terraform output google_region_backend_service) \
-	ZONE=$(shell cd test_infrastructure && terraform output google_zone) \
-	REGION=$(shell cd test_infrastructure && terraform output google_region) \
-	GOOGLE_PROJECT=$(shell cd test_infrastructure && terraform output google_project) \
-	SERVICE_ACCOUNT=$(shell cd test_infrastructure && terraform output google_service_account) \
-	EXTERNAL_STATIC_IP=$(shell cd test_infrastructure && terraform output google_address_int_ip) \
+	TARGET_POOL=$(shell cd ../../ci/test_infrastructure && terraform output google_target_pool) \
+	BACKEND_SERVICE=$(shell cd ../../ci/test_infrastructure && terraform output google_backend_service) \
+	REGION_BACKEND_SERVICE=$(shell cd ../../ci/test_infrastructure && terraform output google_region_backend_service) \
+	ILB_INSTANCE_GROUP=$(shell cd ../../ci/test_infrastructure && terraform output google_region_backend_service) \
+	ZONE=$(shell cd ../../ci/test_infrastructure && terraform output google_zone) \
+	REGION=$(shell cd ../../ci/test_infrastructure && terraform output google_region) \
+	GOOGLE_PROJECT=$(shell cd ../../ci/test_infrastructure && terraform output google_project) \
+	SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
+	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
     ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
 configint: stemcell.tgz check-proj
-	cd test_infrastructure; terraform init; terraform apply -auto-approve \
+	cd ../../ci/test_infrastructure; terraform init; terraform apply -auto-approve \
 	  -var 'google_project=$(GOOGLE_PROJECT)' \
 	  -var 'google_region=us-central1' \
 	  -var 'google_zone=us-central1-a' \
@@ -86,7 +86,7 @@ configint: stemcell.tgz check-proj
 cleanint: check-proj
 	rm -f stemcell.tgz
 
-	cd test_infrastructure; terraform init; terraform destroy -force \
+	cd ../../ci/test_infrastructure; terraform init; terraform destroy -force \
 	  -var 'google_project=$(GOOGLE_PROJECT)' \
 	  -var 'google_region=us-central1' \
 	  -var 'google_zone=us-central1-a' \
