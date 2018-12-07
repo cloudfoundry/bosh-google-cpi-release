@@ -6,7 +6,6 @@ source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
-check_param google_address_static_int
 
 # Initialize deployment artifacts
 google_json_key=google_key.json
@@ -25,7 +24,7 @@ popd
 export NETWORK_NAME=${google_auto_network}
 export CUSTOM_NETWORK_NAME=${google_network}
 export CUSTOM_SUBNETWORK_NAME=${google_subnetwork}
-export PRIVATE_IP=${google_address_static_int}
+export PRIVATE_IP=${google_address_int_internal_ip}
 export TARGET_POOL=${google_target_pool}
 export BACKEND_SERVICE=${google_backend_service}
 export REGION_BACKEND_SERVICE=${google_region_backend_service}

@@ -62,6 +62,10 @@ output "google_address_int_ip" {
   value = "${google_compute_address.int.address}"
 }
 
+output "google_address_int_internal_ip" {
+  value = "${google_compute_address.int_internal.address}"
+}
+
 output "google_service_account" {
   value = "${google_service_account.service_account.email}"
 }

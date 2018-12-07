@@ -8,7 +8,6 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 check_param google_json_key_data
 check_param google_subnetwork_range
 check_param google_subnetwork_gw
-check_param google_address_static_bats
 check_param google_address_static_pair_bats
 check_param google_address_static_available_range_bats
 check_param base_os
@@ -91,7 +90,7 @@ properties:
   static_ips: [${google_address_static_pair_bats}]
   networks:
     - name: default
-      static_ip: ${google_address_static_bats}
+      static_ip: ${google_address_bats_ip}
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
