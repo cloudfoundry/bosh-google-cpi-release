@@ -62,7 +62,7 @@ jobs:
       - put: infrastructure
         params:
           env_name: {{cpi_source_branch}}
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
       - aggregate: *teardown_step
@@ -77,10 +77,10 @@ jobs:
       - put: infrastructure
         params:
           env_name: {{cpi_source_branch}}
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          terraform_source: ci/ci/test_infrastructure
           action: destroy
         get_params:
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          terraform_source: ci/ci/test_infrastructure
           action: destroy
 
   - name: deploy-ubuntu
