@@ -67,7 +67,7 @@ output "google_address_int_ip" {
 }
 
 output "google_address_int_internal_ip" {
-  value = "${google_compute_address.int_internal.address}"
+  value = "${join(",",google_compute_address.int_internal.*.address)}"
 }
 
 output "google_service_account" {

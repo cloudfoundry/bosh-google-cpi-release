@@ -29,6 +29,7 @@ resource "google_compute_address" "int" {
 }
 
 resource "google_compute_address" "int_internal" {
+  count        = 3
   name         = "${var.prefix}-int-internal"
   address_type = "INTERNAL"
   subnetwork   = "${google_compute_subnetwork.subnetwork.self_link}"
