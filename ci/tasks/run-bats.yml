@@ -16,7 +16,6 @@ run:
 params:
   google_json_key_data:                       replace-me
   google_subnetwork_range:                    replace-me
-  google_subnetwork_gw:                       replace-me
   google_address_static_pair_bats:            replace-me
   google_address_static_available_range_bats: replace-me
   base_os:                                    replace-me

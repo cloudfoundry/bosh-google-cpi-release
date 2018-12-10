@@ -7,7 +7,6 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_test_bucket_name
 check_param google_subnetwork_range
-check_param google_subnetwork_gw
 check_param private_key_user
 check_param private_key_data
 check_param google_json_key_data
@@ -123,7 +122,7 @@ pushd ${deployment_dir}
       -v dns_recursor_ip=169.254.169.254 \
       -v director_name=micro-google \
       -v internal_cidr=${google_subnetwork_range} \
-      -v internal_gw=${google_subnetwork_gw} \
+      -v internal_gw=${google_subnetwork_gateway} \
       -v internal_ip=${google_address_director_internal_ip} \
       -v external_ip=${google_address_director_ip} \
       --var-file gcp_credentials_json=${google_json_key} \

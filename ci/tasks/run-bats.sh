@@ -7,7 +7,6 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
 check_param google_subnetwork_range
-check_param google_subnetwork_gw
 check_param google_address_static_pair_bats
 check_param google_address_static_available_range_bats
 check_param base_os
@@ -94,7 +93,7 @@ properties:
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
-        gateway: ${google_subnetwork_gw}
+        gateway: ${google_subnetwork_gateway}
         static: ${google_address_static_available_range_bats}
         cloud_properties:
           network_name: ${google_network}

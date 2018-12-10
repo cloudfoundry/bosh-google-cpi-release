@@ -64,6 +64,7 @@ function read_infrastructure {
   export google_auto_network=$(cat ${infrastructure_metadata} | jq -r .google_auto_network)
   export google_network=$(cat ${infrastructure_metadata} | jq -r .google_network)
   export google_subnetwork=$(cat ${infrastructure_metadata} | jq -r .google_subnetwork)
+  export google_subnetwork_gateway=$(cat ${infrastructure_metadata} | jq -r .google_subnetwork_gateway)
   export google_firewall_internal=$(cat ${infrastructure_metadata} | jq -r .google_firewall_internal)
   export google_firewall_external=$(cat ${infrastructure_metadata} | jq -r .google_firewall_external)
   export google_backend_service=$(cat ${infrastructure_metadata} | jq -r .google_backend_service)

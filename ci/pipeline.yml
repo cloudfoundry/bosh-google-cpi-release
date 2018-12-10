@@ -100,7 +100,6 @@ jobs:
         params:
           google_test_bucket_name:        {{google_test_bucket_name}}
           google_subnetwork_range:        {{google_subnetwork_range}}
-          google_subnetwork_gw:           {{google_subnetwork_gw}}
           google_json_key_data:           {{google_json_key_data}}
           private_key_user:               {{private_key_user}}
           private_key_data:               {{private_key_data}}
@@ -110,7 +109,6 @@ jobs:
           params:
             google_test_bucket_name:        {{google_test_bucket_name}}
             google_subnetwork_range:        {{google_subnetwork_range}}
-            google_subnetwork_gw:           {{google_subnetwork_gw}}
             google_json_key_data:           {{google_json_key_data}}
             private_key_user:               {{private_key_user}}
             private_key_data:               {{private_key_data}}
@@ -133,7 +131,6 @@ jobs:
         file: ci/ci/tasks/run-bats.yml
         params:
           google_subnetwork_range:                    {{google_subnetwork_range}}
-          google_subnetwork_gw:                       {{google_subnetwork_gw}}
           google_address_static_available_range_bats: {{google_address_static_bats_available_range}}
           google_address_static_pair_bats:            {{google_address_static_pair_bats}}
           google_json_key_data:                       {{google_json_key_data}}
@@ -379,8 +376,6 @@ resources:
         google_firewall_internal: {{google_firewall_internal}}
         google_firewall_external: {{google_firewall_external}}
         prefix:                   {{cpi_source_branch}}
-        google_auto_network:      {{google_auto_network}}
-        google_network:           {{google_network}}
 
 resource_types:
 - name: gcs-resource

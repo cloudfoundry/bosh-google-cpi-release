@@ -20,7 +20,6 @@ run:
 params:
   BOSH_INIT_LOG_LEVEL:            warn
   google_subnetwork_range:        replace-me
-  google_subnetwork_gw:           replace-me
   private_key_user:               replace-me
   private_key_data:               replace-me
   google_json_key_data:           replace-me

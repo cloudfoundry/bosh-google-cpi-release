@@ -26,6 +26,10 @@ output "google_subnetwork" {
   value = "${google_compute_subnetwork.subnetwork.name}"
 }
 
+output "google_subnetwork_gateway" {
+  value = "${google_compute_subnetwork.subnetwork.gateway_address}"
+}
+
 output "google_firewall_internal" {
   value = "${var.google_firewall_internal}"
 }
