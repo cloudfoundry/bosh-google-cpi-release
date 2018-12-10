@@ -35,13 +35,6 @@ resource "google_compute_address" "int_internal" {
   subnetwork   = "${google_compute_subnetwork.subnetwork.self_link}"
 }
 
-resource "google_compute_address" "bats_internal" {
-  count        = 2
-  name         = "${var.prefix}-bats-internal-${count.index}"
-  address_type = "INTERNAL"
-  subnetwork   = "${google_compute_subnetwork.subnetwork.self_link}"
-}
-
 resource "google_compute_network" "auto" {
    name                    = "${var.google_auto_network}"
   auto_create_subnetworks = true

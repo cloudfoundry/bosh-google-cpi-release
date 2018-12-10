@@ -131,7 +131,6 @@ jobs:
         file: ci/ci/tasks/run-bats.yml
         params:
           google_subnetwork_range:                    {{google_subnetwork_range}}
-          google_address_static_available_range_bats: {{google_address_static_bats_available_range}}
           google_json_key_data:                       {{google_json_key_data}}
           base_os:                                    Ubuntu
           stemcell_name:                              bosh-google-kvm-ubuntu-xenial-go_agent

@@ -62,12 +62,15 @@ output "google_address_bats_ip" {
   value = "${google_compute_address.bats.address}"
 }
 
+output "google_address_bats_internal_ip_static_range" {
+  value = "${cidrhost(var.google_subnetwork_range, '20')}-${cidrhost(var.google_subnetwork_range, '30')}"
+}
 output "google_address_bats_internal_ip_pair" {
-  value = "${join(",",google_compute_address.bats_internal.*.address)}"
+  value = "${cidrhost(var.google_subnetwork_range, '20')},${cidrhost(var.google_subnetwork_range, '21')}"
 }
 
 output "google_address_bats_internal_ip" {
-  value = "${google_compute_address.bats_internal.0.address}"
+  value = "${cidrhost(var.google_subnetwork_range, '20')}"
 }
 
 output "google_address_int_ip" {

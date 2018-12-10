@@ -93,7 +93,7 @@ properties:
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gateway}
-        static: ${google_address_static_available_range_bats}
+        static: ${google_address_bats_internal_ip_static_range}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}

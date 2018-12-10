@@ -75,6 +75,8 @@ function read_infrastructure {
   export google_address_bats_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_ip)
   export google_address_bats_internal_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_internal_ip)
   export google_address_bats_internal_ip_pair=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_internal_ip_pair)
+  export google_address_bats_internal_ip_static_range=$(cat ${infrastructure_metadata} | jq -r .google_address_bats_internal_ip_static_range)
+
   export google_address_int_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_int_ip)
   export google_address_int_internal_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_int_internal_ip)
   export google_service_account=$(cat ${infrastructure_metadata} | jq -r .google_service_account)
