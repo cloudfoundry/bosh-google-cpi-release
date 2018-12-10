@@ -7,7 +7,6 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
 check_param google_subnetwork_range
-check_param google_address_static_pair_bats
 check_param google_address_static_available_range_bats
 check_param base_os
 check_param stemcell_name
@@ -86,7 +85,7 @@ properties:
   instances: 1
   vip: ${google_address_bats_ip}
   zone: ${google_zone}
-  static_ips: [${google_address_static_pair_bats}]
+  static_ips: [${google_address_bats_internal_ip_pair}]
   networks:
     - name: default
       static_ip: ${google_address_bats_internal_ip}
@@ -94,7 +93,7 @@ properties:
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gateway}
-        static: ${google_address_bats_internal_ip_pair}
+        static: ${google_address_static_available_range_bats}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}
