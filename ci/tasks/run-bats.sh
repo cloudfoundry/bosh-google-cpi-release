@@ -89,12 +89,12 @@ properties:
   static_ips: [${google_address_static_pair_bats}]
   networks:
     - name: default
-      static_ip: ${google_address_bats_ip}
+      static_ip: ${google_address_bats_internal_ip}
       type: manual
       subnets:
       - range: ${google_subnetwork_range}
         gateway: ${google_subnetwork_gateway}
-        static: ${google_address_static_available_range_bats}
+        static: ${google_address_bats_internal_ip_pair}
         cloud_properties:
           network_name: ${google_network}
           subnetwork_name: ${google_subnetwork}

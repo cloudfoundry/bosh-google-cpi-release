@@ -62,6 +62,14 @@ output "google_address_bats_ip" {
   value = "${google_compute_address.bats.address}"
 }
 
+output "google_address_bats_internal_ip_pair" {
+  value = "${join(",",google_compute_address.bats_internal.*.address)}"
+}
+
+output "google_address_bats_internal_ip" {
+  value = "${google_compute_address.bats_internal.0.address}"
+}
+
 output "google_address_int_ip" {
   value = "${google_compute_address.int.address}"
 }
