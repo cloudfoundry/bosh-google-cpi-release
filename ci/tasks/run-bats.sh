@@ -7,7 +7,6 @@ source /etc/profile.d/chruby-with-ruby-2.1.2.sh
 
 check_param google_json_key_data
 check_param google_subnetwork_range
-check_param google_address_static_available_range_bats
 check_param base_os
 check_param stemcell_name
 check_param private_key_data
