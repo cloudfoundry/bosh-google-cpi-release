@@ -345,7 +345,7 @@ resources:
   - name: bats
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      uri: https://github.com/evandbrown/bosh-acceptance-tests.git
       branch: master
 
   - name: google-ubuntu-stemcell
