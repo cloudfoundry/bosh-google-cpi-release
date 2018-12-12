@@ -109,5 +109,5 @@ pushd bats
 
   echo "Running BOSH Acceptance Tests..."
   # Disable Unsupported by google cpi (multiple_manual_networks) and deprecated specs
-  bundle exec rspec --tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration spec
+  bundle exec rspec --tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration --tag ~dns spec
 popd
