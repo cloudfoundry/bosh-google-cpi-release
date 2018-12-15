@@ -36,12 +36,12 @@ resource "google_compute_address" "int_internal" {
 }
 
 resource "google_compute_network" "auto" {
-   name                    = "${var.google_auto_network}"
-  auto_create_subnetworks = true
+   name                    = "${var.prefix}-auto"
+   auto_create_subnetworks = true
 }
 
 resource "google_compute_network" "manual" {
-  name                    = "${var.google_network}"
+  name                    = "${var.prefix}-manual"
   auto_create_subnetworks = false
 }
 
