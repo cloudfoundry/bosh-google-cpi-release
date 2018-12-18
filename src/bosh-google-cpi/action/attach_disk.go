@@ -40,40 +40,36 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 		return nil, api.NewDiskNotFoundError(string(diskCID), false)
 	}
 
-	// If the persistent disk is already attached to the VM, only attempt the
-	// BOSH agent attachment.
-	if diskAttachedToVM(vmCID, disk.Users) {
-		return nil, nil
+	// If this disk isn't already attached to this VM at the IAAS level, do that now
+	if !diskAttachedToVM(vmCID, disk.Users) {
+		_, err := ad.gceAttach(vmCID, diskCID, disk.SelfLink)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// If this disk is attached to another VM, attaching here will fail so return
-	// a useful error before trying.
-	if len(disk.Users) > 0 {
-		return nil, api.NewDiskAlreadyAttachedError(string(diskCID), disk.Users, false)
-	}
-
-	err, deviceName, devicePath := ad.gceAttach(vmCID, diskCID, disk.SelfLink)
+	// The disk may now be configured by the BOSH agent
+	dev, err := ad.vmService.DiskDetail(string(vmCID), disk.SelfLink)
 	if err != nil {
-		return nil, err
+		return nil, bosherr.WrapErrorf(err, "Retrieving disk detail before BOSH agent attach")
 	}
-
-	err = ad.agentAttach(vmCID, diskCID, deviceName, devicePath)
+	err = ad.agentAttach(vmCID, diskCID, dev)
 	return nil, err
 }
 
-func (ad AttachDisk) gceAttach(vmCID VMCID, diskCID DiskCID, diskSelfLink string) (error, string, string) {
+func (ad AttachDisk) gceAttach(vmCID VMCID, diskCID DiskCID, diskSelfLink string) (*instance.DiskAttachmentDetail, error) {
 	// Atach the Disk to the VM
-	deviceName, devicePath, err := ad.vmService.AttachDisk(string(vmCID), diskSelfLink)
+	dev, err := ad.vmService.AttachDisk(string(vmCID), diskSelfLink)
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
-			return err, deviceName, devicePath
+			return nil, err
 		}
-		return bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID), deviceName, devicePath
+		return nil, bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}
-	return nil, deviceName, devicePath
+	return dev, nil
 }
 
-func (ad AttachDisk) agentAttach(vmCID VMCID, diskCID DiskCID, deviceName string, devicePath string) error {
+func (ad AttachDisk) agentAttach(vmCID VMCID, diskCID DiskCID, dev *instance.DiskAttachmentDetail) error {
 	// Read VM agent settings
 	agentSettings, err := ad.registryClient.Fetch(string(vmCID))
 	if err != nil {
@@ -81,7 +77,7 @@ func (ad AttachDisk) agentAttach(vmCID VMCID, diskCID DiskCID, deviceName string
 	}
 
 	// Update VM agent settings
-	newAgentSettings := agentSettings.AttachPersistentDisk(string(diskCID), deviceName, devicePath)
+	newAgentSettings := agentSettings.AttachPersistentDisk(string(diskCID), dev.Name, dev.Path)
 	if err = ad.registryClient.Update(string(vmCID), newAgentSettings); err != nil {
 		return bosherr.WrapErrorf(err, "Attaching disk '%s' to vm '%s'", diskCID, vmCID)
 	}

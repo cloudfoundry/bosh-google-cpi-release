@@ -86,19 +86,3 @@ func NewDiskNotFoundError(diskID string, canRetry bool) DiskNotFoundError {
 func (e DiskNotFoundError) Type() string   { return "Bosh::Clouds::DiskNotFound" }
 func (e DiskNotFoundError) Error() string  { return fmt.Sprintf("Disk '%s' not found", e.diskID) }
 func (e DiskNotFoundError) CanRetry() bool { return e.canRetry }
-
-type DiskAlreadyAttachedError struct {
-	diskID   string
-	users    []string
-	canRetry bool
-}
-
-func NewDiskAlreadyAttachedError(diskID string, users []string, canRetry bool) DiskAlreadyAttachedError {
-	return DiskAlreadyAttachedError{diskID: diskID, users: users, canRetry: canRetry}
-}
-
-func (e DiskAlreadyAttachedError) Type() string { return "Bosh::Clouds::DiskAlreadyAttached" }
-func (e DiskAlreadyAttachedError) Error() string {
-	return fmt.Sprintf("Disk '%s' is already attached to '%s'", e.diskID, e.users)
-}
-func (e DiskAlreadyAttachedError) CanRetry() bool { return e.canRetry }

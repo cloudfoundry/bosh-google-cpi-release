@@ -36,6 +36,8 @@ type FakeInstanceService struct {
 	DetachDiskCalled bool
 	DetachDiskErr    error
 
+	DiskDetailCalled bool
+
 	FindCalled   bool
 	FindFound    bool
 	FindInstance *compute.Instance
@@ -60,9 +62,17 @@ func (i *FakeInstanceService) AddAccessConfig(id string, zone string, networkInt
 	return i.AddAccessConfigErr
 }
 
-func (i *FakeInstanceService) AttachDisk(id string, diskLink string) (string, string, error) {
+func (i *FakeInstanceService) AttachDisk(id string, diskLink string) (*instance.DiskAttachmentDetail, error) {
 	i.AttachDiskCalled = true
-	return i.AttachDiskDeviceName, i.AttachDiskDevicePath, i.AttachDiskErr
+	return i.DiskDetail(id, diskLink)
+}
+
+func (i *FakeInstanceService) DiskDetail(vmID string, diskLink string) (*instance.DiskAttachmentDetail, error) {
+	i.DiskDetailCalled = true
+	return &instance.DiskAttachmentDetail{
+		Name: i.AttachDiskDeviceName,
+		Path: i.AttachDiskDevicePath,
+	}, i.AttachDiskErr
 }
 
 func (i *FakeInstanceService) AttachedDisks(id string) (instance.AttachedDisks, error) {

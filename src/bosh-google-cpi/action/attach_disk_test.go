@@ -130,20 +130,9 @@ var _ = Describe("AttachDisk", func() {
 
 		It("returns if disk is attached to the same VM", func() {
 			diskService.FindDisk = disk.Disk{Name: "fake-disk-1", Users: []string{"fake-vm-id"}}
-			vmService.AttachDiskErr = errors.New("fake-vm-service-error")
 
 			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
 			Expect(err).To(Not(HaveOccurred()))
 		})
-
-		It("returns an error if disk is attached to any other VM", func() {
-			diskService.FindDisk = disk.Disk{Name: "fake-disk-1", Users: []string{"fake-user-2"}}
-			vmService.AttachDiskErr = errors.New("fake-vm-service-error")
-
-			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
-			Expect(err).To(HaveOccurred())
-			Expect(err.Error()).To(ContainSubstring("is already attached"))
-		})
-
 	})
 })
