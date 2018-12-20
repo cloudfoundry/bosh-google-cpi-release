@@ -127,5 +127,12 @@ var _ = Describe("AttachDisk", func() {
 			Expect(registryClient.FetchCalled).To(BeTrue())
 			Expect(registryClient.UpdateCalled).To(BeTrue())
 		})
+
+		It("returns if disk is attached to the same VM", func() {
+			diskService.FindDisk = disk.Disk{Name: "fake-disk-1", Users: []string{"fake-vm-id"}}
+
+			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
+			Expect(err).To(Not(HaveOccurred()))
+		})
 	})
 })
