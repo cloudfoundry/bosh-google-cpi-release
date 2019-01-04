@@ -2,6 +2,15 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [29.0.0] - 2019-01-04
+
+### Fixed
+- VM IP address is cleared when dynamic network is used
+
+### Added
+- Logs are returned in response to BOSH, making them viewable in task log
+- If a disk is already attached to a VM, it will only be attached via the BOSH agent
+
 ## [28.0.1] - 2018-10-02
 
 ### Fixed
@@ -194,6 +203,7 @@ CI:
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[29.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.1...v29.0.0
 [28.0.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.0...v28.0.1
 [25.10.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.9.0...v25.10.0
 [25.9.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.8.0...v25.9.0
