@@ -86,4 +86,6 @@ builds:
     version: 28.0.0
   805b7e8f-81de-49eb-9396-27a6d614cfed:
     version: 28.0.1
+  9b953e11-edde-4ab5-bb18-2daef89b70e8:
+    version: 29.0.0
 format-version: '2'
