@@ -220,8 +220,8 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		"get_disks":          NewGetDisks(vmService),
 
 		// Others:
-		"info": NewInfo(),
-		"ping": NewPing(),
+		"info":                          NewInfo(),
+		"ping":                          NewPing(),
 		"calculate_vm_cloud_properties": NewCalculateVMCloudProperties(),
 
 		// Not implemented:

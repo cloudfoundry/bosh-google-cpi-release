@@ -6,8 +6,9 @@ import (
 
 type Service interface {
 	AddAccessConfig(id string, zone string, networkInterface string, accessConfig *compute.AccessConfig) error
-	AttachDisk(id string, diskLink string) (string, string, error)
+	AttachDisk(id string, diskLink string) (*DiskAttachmentDetail, error)
 	AttachedDisks(id string) (AttachedDisks, error)
+	DiskDetail(vmID string, diskLink string) (*DiskAttachmentDetail, error)
 	CleanUp(id string)
 	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error)
 	Delete(id string) error
@@ -52,4 +53,8 @@ type BackendService struct {
 type Accelerator struct {
 	AcceleratorType string
 	Count           int64
+}
+type DiskAttachmentDetail struct {
+	Name string
+	Path string
 }

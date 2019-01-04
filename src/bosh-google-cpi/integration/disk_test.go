@@ -66,6 +66,13 @@ var _ = Describe("Disk", func() {
 		disks := toStringArray(assertSucceedsWithResult(request).([]interface{}))
 		Expect(disks).To(ContainElement(diskCID))
 
+		By("attaching the disk again without failing")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
 		By("detaching and deleting a disk")
 		request = fmt.Sprintf(`{
 			  "method": "detach_disk",

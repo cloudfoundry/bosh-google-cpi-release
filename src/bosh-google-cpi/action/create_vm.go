@@ -106,6 +106,9 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	if cloudProps.EphemeralExternalIP != nil {
 		vmNetworks.Network().EphemeralExternalIP = *cloudProps.EphemeralExternalIP
 	}
+	if vmNetworks.Network().Type == "dynamic" {
+		vmNetworks.Network().IP = ""
+	}
 
 	// Extract any tags from env.bosh.groups
 	if boshenv, ok := env["bosh"]; ok {
