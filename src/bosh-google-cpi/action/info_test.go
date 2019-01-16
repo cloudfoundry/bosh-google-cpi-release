@@ -15,16 +15,16 @@ var _ = Describe("Info", func() {
 	})
 
 	Describe("Run", func() {
+		var response InfoResult
+
+		BeforeEach(func() {
+			var err error
+
+			response, err = subject.Run()
+			Expect(err).NotTo(HaveOccurred())
+		})
+
 		Context("stemcell_formats", func() {
-			var response InfoResult
-
-			BeforeEach(func() {
-				var err error
-
-				response, err = subject.Run()
-				Expect(err).NotTo(HaveOccurred())
-			})
-
 			It("supports google-light", func() {
 				Expect(response.StemcellFormats).To(ContainElement("google-light"))
 			})
@@ -33,5 +33,12 @@ var _ = Describe("Info", func() {
 				Expect(response.StemcellFormats).To(ContainElement("google-rawdisk"))
 			})
 		})
+
+		Context("api_version", func() {
+			It("returns the latest api_version", func() {
+				Expect(response.ApiVersion).To(Equal(1))
+			})
+		})
+
 	})
 })

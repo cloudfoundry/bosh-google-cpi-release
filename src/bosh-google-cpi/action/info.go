@@ -2,6 +2,7 @@ package action
 
 type InfoResult struct {
 	StemcellFormats []string `json:"stemcell_formats"`
+	ApiVersion int `json:"api_version,omitempty"`
 }
 
 type Info struct{}
@@ -14,5 +15,6 @@ func (Info) Run() (InfoResult, error) {
 			"google-light",
 			"google-rawdisk",
 		},
+		ApiVersion: 1,
 	}, nil
 }
