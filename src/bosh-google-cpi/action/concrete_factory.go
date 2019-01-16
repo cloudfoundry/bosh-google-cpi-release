@@ -127,22 +127,12 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		f.logger,
 	)
 
-	// Choose the correct registry.Client based on the
-	// value of ClientOptions.UseGCEMetadata
-	var registryClient registry.Client
-	switch f.cfg.Cloud.Properties.Registry.UseGCEMetadata {
-	case true:
-		registryClient = registry.NewMetadataClient(
-			googleClient,
-			f.cfg.Cloud.Properties.Registry,
-			f.logger,
-		)
-	default:
-		registryClient = registry.NewHTTPClient(
-			f.cfg.Cloud.Properties.Registry,
-			f.logger,
-		)
-	}
+	registryClient := registry.NewMetadataClient(
+		googleClient,
+		f.cfg.Cloud.Properties.Registry,
+		f.logger,
+	)
+
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),

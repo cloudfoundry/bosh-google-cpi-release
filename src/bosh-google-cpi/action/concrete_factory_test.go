@@ -1,6 +1,7 @@
 package action_test
 
 import (
+	"encoding/json"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	fakeuuid "github.com/cloudfoundry/bosh-utils/uuid/fakes"
 	. "github.com/onsi/ginkgo"
@@ -84,6 +85,13 @@ var _ = Describe("ConcreteFactory", func() {
 			"default_root_disk_type":    "fake-root-disk-type",
 		}
 
+		ctxBytes, err := json.Marshal(ctx)
+		Expect(err).ToNot(HaveOccurred())
+		err = json.Unmarshal(ctxBytes, &cfg.Cloud.Properties.Google)
+		Expect(err).ToNot(HaveOccurred())
+
+		googleClient, _ = GoogleClientFunc(cfg.Cloud.Properties.Google, logger)
+
 		factory = NewConcreteFactory(
 			uuidGen,
 			cfg,
@@ -157,7 +165,8 @@ var _ = Describe("ConcreteFactory", func() {
 			logger,
 		)
 
-		registryClient = registry.NewHTTPClient(
+		registryClient = registry.NewMetadataClient(
+			googleClient,
 			cfg.Cloud.Properties.Registry,
 			logger,
 		)
