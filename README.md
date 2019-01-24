@@ -12,12 +12,13 @@ Stemcells are available on bosh.io: [http://bosh.io/stemcells/bosh-google-kvm-ub
 If you are not familiar with [BOSH](http://bosh.io/) and its terminology please take a look at the [BOSH documentation](http://bosh.io/docs).
 
 ### Deploy a BOSH Director on Google Cloud Platform
-Complete instructions for deploying a BOSH Director are available in the [docs/bosh/README.md](docs/bosh/README.md) file.
+[BOSH Bootloader](https://github.com/cloudfoundry/bosh-bootloader) is the recommended way to deploy a BOSH director on GCP. Detailed instructions are available [here](https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-gcp.md).
 
 ### Deploy other software
-After you have followed the instructions for deploying a BOSH director in [docs/bosh/README.md](docs/bosh/README.md), you may deploy releases like CloudFoundry by following the links below:
+After you have followed the instructions for deploying a BOSH director in [docs/bosh/README.md](docs/bosh/README.md), you may deploy releases like Cloud Foundry or Concourse by following the links below:
 
 * [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/cloudfoundry)
+* [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/concourse)
 
 ## Developing
 Contributions to the CPI are welcome. Unit and integration tests for any new features are encouraged.
