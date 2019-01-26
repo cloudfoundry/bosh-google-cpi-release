@@ -49,13 +49,13 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 			return
 		}
 	}
-
+	var sleep func()
 	for try := 0; try <= rt.MaxRetries; try++ {
 		r := bytes.NewReader(body)
 		req.Body = ioutil.NopCloser(r)
 		resp, err = rt.Base.RoundTrip(req)
 
-		sleep := func() {
+		sleep = func() {
 			d := rt.FirstRetrySleep << uint64(try)
 			rt.logger.Info(retryLogTag, "Retrying request (%d/%d) after %s", try, rt.MaxRetries, d)
 			time.Sleep(d)
@@ -64,12 +64,15 @@ func (rt *RetryTransport) try(req *http.Request) (resp *http.Response, err error
 		// Retry on net.Error
 		switch err.(type) {
 		case net.Error:
-			if !err.(net.Error).Temporary() {
-				return
+			if err.(net.Error).Temporary() || err.(net.Error).Timeout() {
+				rt.logger.Info(retryLogTag, "net.Error is retryable: %s", err.Error())
+				sleep()
+				continue
 			}
-			sleep()
-			continue
+			rt.logger.Info(retryLogTag, "net.Error was not retryable: %s", err.Error())
+			return
 		case error:
+			rt.logger.Info(retryLogTag, "Error was not retryable: %s", err.Error())
 			return
 		}
 
