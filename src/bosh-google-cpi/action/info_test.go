@@ -36,7 +36,7 @@ var _ = Describe("Info", func() {
 
 		Context("api_version", func() {
 			It("returns the latest api_version", func() {
-				Expect(response.ApiVersion).To(Equal(1))
+				Expect(response.ApiVersion).To(Equal(2))
 			})
 		})
 

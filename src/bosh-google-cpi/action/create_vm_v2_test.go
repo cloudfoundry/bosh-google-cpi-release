@@ -28,7 +28,7 @@ import (
 var _ = Describe("CreateVM", func() {
 	var (
 		err                      error
-		vmCID                    VMCID
+		results                  interface{}
 		networks                 Networks
 		cloudProps               VMCloudProperties
 		disks                    []DiskCID
@@ -49,7 +49,7 @@ var _ = Describe("CreateVM", func() {
 		registryClient         *registryfakes.FakeClient
 		acceleratorTypeService *acceleratortypefakes.FakeAcceleratorTypeService
 
-		createVM CreateVM
+		createVM CreateVMV2
 	)
 
 	BeforeEach(func() {
@@ -75,7 +75,10 @@ var _ = Describe("CreateVM", func() {
 		}
 		defaultRootDiskSizeGb = 0
 		defaultRootDiskType = ""
-		createVM = NewCreateVM(
+	})
+
+	JustBeforeEach(func() {
+		createVM = NewCreateVMV2(
 			vmService,
 			diskService,
 			diskTypeService,
@@ -172,7 +175,6 @@ var _ = Describe("CreateVM", func() {
 				},
 			}
 		})
-
 		Context("when BackendService is set as a hash", func() {
 			var backendService map[string]string
 			BeforeEach(func() {
@@ -184,7 +186,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("defaults to external", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 			})
@@ -193,21 +195,22 @@ var _ = Describe("CreateVM", func() {
 				backendService["scheme"] = "INTERNAL"
 				expectedVMProps.BackendService = instance.BackendService{Name: "foobar"}
 
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 			})
 
 			It("requires name", func() {
 				delete(backendService, "name")
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).To(HaveOccurred())
 			})
 		})
 
 		It("creates the vm", func() {
-			vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+			results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 			Expect(err).NotTo(HaveOccurred())
+
 			Expect(diskService.FindCalled).To(BeFalse())
 			Expect(imageService.FindCalled).To(BeTrue())
 			Expect(machineTypeService.FindCalled).To(BeTrue())
@@ -218,7 +221,7 @@ var _ = Describe("CreateVM", func() {
 			Expect(vmService.CleanUpCalled).To(BeFalse())
 			Expect(registryClient.UpdateCalled).To(BeTrue())
 			Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-			Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+			Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 			Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 			Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 			Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -335,7 +338,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 			})
@@ -351,7 +354,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm with a default service account and single scope", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 			})
@@ -368,7 +371,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err := createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -379,7 +382,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -450,23 +453,10 @@ var _ = Describe("CreateVM", func() {
 			BeforeEach(func() {
 				defaultRootDiskSizeGb = 20
 				expectedVMProps.RootDiskSizeGb = 20
-				createVM = NewCreateVM(
-					vmService,
-					diskService,
-					diskTypeService,
-					imageService,
-					machineTypeService,
-					acceleratorTypeService,
-					registryClient,
-					registryOptions,
-					agentOptions,
-					defaultRootDiskSizeGb,
-					defaultRootDiskType,
-				)
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -476,7 +466,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -490,7 +480,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -500,7 +490,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -513,23 +503,10 @@ var _ = Describe("CreateVM", func() {
 				defaultRootDiskType = "fake-default-root-disk-type"
 				diskTypeService.FindDiskType = disktype.DiskType{SelfLink: "fake-default-root-disk-type-self-link"}
 				expectedVMProps.RootDiskType = "fake-default-root-disk-type-self-link"
-				createVM = NewCreateVM(
-					vmService,
-					diskService,
-					diskTypeService,
-					imageService,
-					machineTypeService,
-					acceleratorTypeService,
-					registryClient,
-					registryOptions,
-					agentOptions,
-					defaultRootDiskSizeGb,
-					defaultRootDiskType,
-				)
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -539,7 +516,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -554,7 +531,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm with the right properties", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -564,7 +541,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -608,7 +585,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm at the right zone", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeFalse())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -618,7 +595,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -692,7 +669,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("creates the vm at the right zone", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(diskService.FindCalled).To(BeTrue())
 				Expect(imageService.FindCalled).To(BeTrue())
@@ -702,7 +679,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(vmService.CleanUpCalled).To(BeFalse())
 				Expect(registryClient.UpdateCalled).To(BeTrue())
 				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
-				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(results).To(Equal([]interface{}{VMCID("fake-vm-id"), networks}))
 				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
@@ -768,7 +745,7 @@ var _ = Describe("CreateVM", func() {
 			})
 
 			It("clear out the ip part of the network settings", func() {
-				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				results, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
 			})

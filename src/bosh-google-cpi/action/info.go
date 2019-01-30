@@ -1,8 +1,10 @@
 package action
 
+import "bosh-google-cpi/constant"
+
 type InfoResult struct {
 	StemcellFormats []string `json:"stemcell_formats"`
-	ApiVersion int `json:"api_version,omitempty"`
+	ApiVersion      int      `json:"api_version,omitempty"`
 }
 
 type Info struct{}
@@ -15,6 +17,6 @@ func (Info) Run() (InfoResult, error) {
 			"google-light",
 			"google-rawdisk",
 		},
-		ApiVersion: 1,
+		ApiVersion: constant.MaxSupportedAPIVersion,
 	}, nil
 }

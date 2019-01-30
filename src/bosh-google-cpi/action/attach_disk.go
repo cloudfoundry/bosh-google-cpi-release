@@ -12,25 +12,65 @@ import (
 	"bosh-google-cpi/registry"
 )
 
-type AttachDisk struct {
+type attachDiskBase struct {
 	diskService    disk.Service
 	vmService      instance.Service
 	registryClient registry.Client
 }
 
-func NewAttachDisk(
+type AttachDiskV1 struct {
+	attachDiskBase
+}
+
+type AttachDiskV2 struct {
+	attachDiskBase
+}
+
+func NewAttachDiskV1(
 	diskService disk.Service,
 	vmService instance.Service,
 	registryClient registry.Client,
-) AttachDisk {
-	return AttachDisk{
-		diskService:    diskService,
-		vmService:      vmService,
-		registryClient: registryClient,
+) AttachDiskV1 {
+	return AttachDiskV1{
+		attachDiskBase{
+			diskService:    diskService,
+			vmService:      vmService,
+			registryClient: registryClient,
+		},
 	}
 }
 
-func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
+func NewAttachDiskV2(
+	diskService disk.Service,
+	vmService instance.Service,
+	registryClient registry.Client,
+) AttachDiskV2 {
+	return AttachDiskV2{
+		attachDiskBase{
+			diskService:    diskService,
+			vmService:      vmService,
+			registryClient: registryClient,
+		},
+	}
+}
+
+func (ad1 AttachDiskV1) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
+	_, err := ad1.attachDiskBase.Run(vmCID, diskCID)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
+func (ad2 AttachDiskV2) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
+	diskPath, err := ad2.attachDiskBase.Run(vmCID, diskCID)
+	if err != nil {
+		return nil, err
+	}
+	return diskPath, nil
+}
+
+func (ad attachDiskBase) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 	// Find the disk
 	disk, found, err := ad.diskService.Find(string(diskCID), "")
 	if err != nil {
@@ -54,10 +94,11 @@ func (ad AttachDisk) Run(vmCID VMCID, diskCID DiskCID) (interface{}, error) {
 		return nil, bosherr.WrapErrorf(err, "Retrieving disk detail before BOSH agent attach")
 	}
 	err = ad.agentAttach(vmCID, diskCID, dev)
-	return nil, err
+
+	return dev.Path, err
 }
 
-func (ad AttachDisk) gceAttach(vmCID VMCID, diskCID DiskCID, diskSelfLink string) (*instance.DiskAttachmentDetail, error) {
+func (ad attachDiskBase) gceAttach(vmCID VMCID, diskCID DiskCID, diskSelfLink string) (*instance.DiskAttachmentDetail, error) {
 	// Atach the Disk to the VM
 	dev, err := ad.vmService.AttachDisk(string(vmCID), diskSelfLink)
 	if err != nil {
@@ -69,7 +110,7 @@ func (ad AttachDisk) gceAttach(vmCID VMCID, diskCID DiskCID, diskSelfLink string
 	return dev, nil
 }
 
-func (ad AttachDisk) agentAttach(vmCID VMCID, diskCID DiskCID, dev *instance.DiskAttachmentDetail) error {
+func (ad attachDiskBase) agentAttach(vmCID VMCID, diskCID DiskCID, dev *instance.DiskAttachmentDetail) error {
 	// Read VM agent settings
 	agentSettings, err := ad.registryClient.Fetch(string(vmCID))
 	if err != nil {

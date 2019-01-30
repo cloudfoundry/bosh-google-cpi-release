@@ -2,9 +2,11 @@ package action_test
 
 import (
 	"encoding/json"
+	"fmt"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	fakeuuid "github.com/cloudfoundry/bosh-utils/uuid/fakes"
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
@@ -97,9 +99,7 @@ var _ = Describe("ConcreteFactory", func() {
 			cfg,
 			logger,
 		)
-	})
 
-	BeforeEach(func() {
 		operationService = operation.NewGoogleOperationService(
 			ctx["project"].(string),
 			googleClient.ComputeService(),
@@ -207,139 +207,177 @@ var _ = Describe("ConcreteFactory", func() {
 		)
 	})
 
-	It("returns error if action cannot be created", func() {
-		action, err := factory.Create("fake-unknown-action", ctx)
-		Expect(err).To(HaveOccurred())
-		Expect(action).To(BeNil())
-	})
+	apiVersions := []int{1, 2}
+	for _, val := range apiVersions {
+		apiVersion := val
 
-	It("create_disk", func() {
-		action, err := factory.Create("create_disk", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateDisk(
-			diskService,
-			diskTypeService,
-			vmService,
-		)))
-	})
+		Context(fmt.Sprintf("Api Version %d", apiVersion), func() {
 
-	It("delete_disk", func() {
-		action, err := factory.Create("delete_disk", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteDisk(diskService)))
-	})
+			It("returns error if action cannot be created", func() {
+				action, err := factory.Create("fake-unknown-action", ctx, apiVersion)
+				Expect(err).To(HaveOccurred())
+				Expect(action).To(BeNil())
+			})
 
-	It("attach_disk", func() {
-		action, err := factory.Create("attach_disk", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewAttachDisk(diskService, vmService, registryClient)))
-	})
+			It("create_disk", func() {
+				action, err := factory.Create("create_disk", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewCreateDisk(
+					diskService,
+					diskTypeService,
+					vmService,
+				)))
+			})
 
-	It("detach_disk", func() {
-		action, err := factory.Create("detach_disk", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDetachDisk(vmService, registryClient)))
-	})
+			It("delete_disk", func() {
+				action, err := factory.Create("delete_disk", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewDeleteDisk(diskService)))
+			})
 
-	It("snapshot_disk", func() {
-		action, err := factory.Create("snapshot_disk", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewSnapshotDisk(snapshotService, diskService)))
-	})
+			It("detach_disk", func() {
+				action, err := factory.Create("detach_disk", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewDetachDisk(vmService, registryClient)))
+			})
 
-	It("delete_snapshot", func() {
-		action, err := factory.Create("delete_snapshot", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteSnapshot(snapshotService)))
-	})
+			It("snapshot_disk", func() {
+				action, err := factory.Create("snapshot_disk", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewSnapshotDisk(snapshotService, diskService)))
+			})
 
-	It("create_stemcell", func() {
-		action, err := factory.Create("create_stemcell", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateStemcell(imageService)))
-	})
+			It("delete_snapshot", func() {
+				action, err := factory.Create("delete_snapshot", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewDeleteSnapshot(snapshotService)))
+			})
 
-	It("delete_stemcell", func() {
-		action, err := factory.Create("delete_stemcell", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteStemcell(imageService)))
-	})
+			It("create_stemcell", func() {
+				action, err := factory.Create("create_stemcell", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewCreateStemcell(imageService)))
+			})
 
-	It("create_vm", func() {
-		action, err := factory.Create("create_vm", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewCreateVM(
-			vmService,
-			diskService,
-			diskTypeService,
-			imageService,
-			machineTypeService,
-			acceleratorTypeService,
-			registryClient,
-			cfg.Cloud.Properties.Registry,
-			cfg.Cloud.Properties.Agent,
-			ctx["default_root_disk_size_gb"].(int),
-			ctx["default_root_disk_type"].(string),
-		)))
-	})
+			It("delete_stemcell", func() {
+				action, err := factory.Create("delete_stemcell", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewDeleteStemcell(imageService)))
+			})
 
-	It("configure_networks", func() {
-		action, err := factory.Create("configure_networks", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewConfigureNetworks(vmService, registryClient)))
-	})
+			It("configure_networks", func() {
+				action, err := factory.Create("configure_networks", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewConfigureNetworks(vmService, registryClient)))
+			})
 
-	It("delete_vm", func() {
-		action, err := factory.Create("delete_vm", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewDeleteVM(vmService, registryClient)))
-	})
+			It("delete_vm", func() {
+				action, err := factory.Create("delete_vm", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewDeleteVM(vmService, registryClient)))
+			})
 
-	It("reboot_vm", func() {
-		action, err := factory.Create("reboot_vm", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewRebootVM(vmService)))
-	})
+			It("reboot_vm", func() {
+				action, err := factory.Create("reboot_vm", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewRebootVM(vmService)))
+			})
 
-	It("set_vm_metadata", func() {
-		action, err := factory.Create("set_vm_metadata", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewSetVMMetadata(vmService)))
-	})
+			It("set_vm_metadata", func() {
+				action, err := factory.Create("set_vm_metadata", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewSetVMMetadata(vmService)))
+			})
 
-	It("has_vm", func() {
-		action, err := factory.Create("has_vm", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewHasVM(vmService)))
-	})
+			It("has_vm", func() {
+				action, err := factory.Create("has_vm", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewHasVM(vmService)))
+			})
 
-	It("get_disks", func() {
-		action, err := factory.Create("get_disks", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewGetDisks(vmService)))
-	})
+			It("get_disks", func() {
+				action, err := factory.Create("get_disks", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewGetDisks(vmService)))
+			})
 
-	It("ping", func() {
-		action, err := factory.Create("ping", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewPing()))
-	})
+			It("ping", func() {
+				action, err := factory.Create("ping", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewPing()))
+			})
 
-	It("info", func() {
-		action, err := factory.Create("info", ctx)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(action).To(Equal(NewInfo()))
-	})
+			It("info", func() {
+				action, err := factory.Create("info", ctx, apiVersion)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(action).To(Equal(NewInfo()))
+			})
 
-	It("when action is current_vm_id returns an error because this CPI does not implement the method", func() {
-		action, err := factory.Create("current_vm_id", ctx)
-		Expect(err).To(HaveOccurred())
-		Expect(action).To(BeNil())
-	})
+			It("when action is current_vm_id returns an error because this CPI does not implement the method", func() {
+				action, err := factory.Create("current_vm_id", ctx, apiVersion)
+				Expect(err).To(HaveOccurred())
+				Expect(action).To(BeNil())
+			})
 
-	It("when action is wrong returns an error because it is not an official CPI method", func() {
-		action, err := factory.Create("wrong", ctx)
-		Expect(err).To(HaveOccurred())
-		Expect(action).To(BeNil())
-	})
+			It("when action is wrong returns an error because it is not an official CPI method", func() {
+				action, err := factory.Create("wrong", ctx, apiVersion)
+				Expect(err).To(HaveOccurred())
+				Expect(action).To(BeNil())
+			})
+		})
+	}
+
+	DescribeTable("attach_disk",
+		func(apiVersion int, f func() interface{}) {
+			action, err := factory.Create("attach_disk", ctx, apiVersion)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(action).To(Equal(f()))
+		},
+		Entry("apiVersion 1", 1, func() interface{} { return NewAttachDiskV1(diskService, vmService, registryClient) }),
+		Entry("apiVersion 2", 2, func() interface{} { return NewAttachDiskV2(diskService, vmService, registryClient) }),
+	)
+
+	DescribeTable("create_vm",
+		func(apiVersion int, f func() interface{}) {
+			action, err := factory.Create("create_vm", ctx, apiVersion)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(action).To(Equal(f()))
+		},
+
+		Entry("apiVersion 1", 1,
+			func() interface{} {
+				return NewCreateVMV1(
+					vmService,
+					diskService,
+					diskTypeService,
+					imageService,
+					machineTypeService,
+					acceleratorTypeService,
+					registryClient,
+					cfg.Cloud.Properties.Registry,
+					cfg.Cloud.Properties.Agent,
+					ctx["default_root_disk_size_gb"].(int),
+					ctx["default_root_disk_type"].(string),
+				)
+			},
+		),
+
+		Entry("apiVersion 2", 2,
+			func() interface{} {
+				return NewCreateVMV2(
+					vmService,
+					diskService,
+					diskTypeService,
+					imageService,
+					machineTypeService,
+					acceleratorTypeService,
+					registryClient,
+					cfg.Cloud.Properties.Registry,
+					cfg.Cloud.Properties.Agent,
+					ctx["default_root_disk_size_gb"].(int),
+					ctx["default_root_disk_type"].(string),
+				)
+			},
+		),
+	)
 })

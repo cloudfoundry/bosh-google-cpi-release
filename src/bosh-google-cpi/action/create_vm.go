@@ -18,7 +18,7 @@ import (
 	"bosh-google-cpi/registry"
 )
 
-type CreateVM struct {
+type createVMBase struct {
 	vmService              instance.Service
 	diskService            disk.Service
 	diskTypeService        disktype.Service
@@ -32,7 +32,15 @@ type CreateVM struct {
 	defaultRootDiskType    string
 }
 
-func NewCreateVM(
+type CreateVMV1 struct {
+	createVMBase
+}
+
+type CreateVMV2 struct {
+	createVMBase
+}
+
+func NewCreateVMV1(
 	vmService instance.Service,
 	diskService disk.Service,
 	diskTypeService disktype.Service,
@@ -44,57 +52,107 @@ func NewCreateVM(
 	agentOptions registry.AgentOptions,
 	defaultRootDiskSizeGb int,
 	defaultRootDiskType string,
-) CreateVM {
-	return CreateVM{
-		vmService:              vmService,
-		diskService:            diskService,
-		diskTypeService:        diskTypeService,
-		imageService:           imageService,
-		machineTypeService:     machineTypeService,
-		acceleratorTypeService: acceleratorTypeService,
-		registryClient:         registryClient,
-		registryOptions:        registryOptions,
-		agentOptions:           agentOptions,
-		defaultRootDiskSizeGb:  defaultRootDiskSizeGb,
-		defaultRootDiskType:    defaultRootDiskType,
+) CreateVMV1 {
+	return CreateVMV1{
+		createVMBase{
+			vmService:              vmService,
+			diskService:            diskService,
+			diskTypeService:        diskTypeService,
+			imageService:           imageService,
+			machineTypeService:     machineTypeService,
+			acceleratorTypeService: acceleratorTypeService,
+			registryClient:         registryClient,
+			registryOptions:        registryOptions,
+			agentOptions:           agentOptions,
+			defaultRootDiskSizeGb:  defaultRootDiskSizeGb,
+			defaultRootDiskType:    defaultRootDiskType,
+		},
 	}
 }
 
-func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMCloudProperties, networks Networks, disks []DiskCID, env Environment) (VMCID, error) {
+func NewCreateVMV2(
+	vmService instance.Service,
+	diskService disk.Service,
+	diskTypeService disktype.Service,
+	imageService image.Service,
+	machineTypeService machinetype.Service,
+	acceleratorTypeService acceleratortype.Service,
+	registryClient registry.Client,
+	registryOptions registry.ClientOptions,
+	agentOptions registry.AgentOptions,
+	defaultRootDiskSizeGb int,
+	defaultRootDiskType string,
+) CreateVMV2 {
+	return CreateVMV2{
+		createVMBase{
+			vmService:              vmService,
+			diskService:            diskService,
+			diskTypeService:        diskTypeService,
+			imageService:           imageService,
+			machineTypeService:     machineTypeService,
+			acceleratorTypeService: acceleratorTypeService,
+			registryClient:         registryClient,
+			registryOptions:        registryOptions,
+			agentOptions:           agentOptions,
+			defaultRootDiskSizeGb:  defaultRootDiskSizeGb,
+			defaultRootDiskType:    defaultRootDiskType,
+		},
+	}
+}
+
+func (cv1 CreateVMV1) Run(agentID string, stemcellCID StemcellCID, cloudProps VMCloudProperties, networks Networks, disks []DiskCID, env Environment) (interface{}, error) {
+	vmCid, _, err := cv1.createVMBase.Run(agentID, stemcellCID, cloudProps, networks, disks, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return vmCid, nil
+}
+
+func (cv2 CreateVMV2) Run(agentID string, stemcellCID StemcellCID, cloudProps VMCloudProperties, networks Networks, disks []DiskCID, env Environment) (interface{}, error) {
+	vmCid, networks, err := cv2.createVMBase.Run(agentID, stemcellCID, cloudProps, networks, disks, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return []interface{}{vmCid, networks}, nil
+}
+
+func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps VMCloudProperties, networks Networks, disks []DiskCID, env Environment) (VMCID, Networks, error) {
 	// Find zone
 	zone, err := cv.findZone(cloudProps.Zone, disks)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Find stemcell
 	stemcellLink, err := cv.findStemcellLink(string(stemcellCID))
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Find machine type
 	machineTypeLink, err := cv.findMachineTypeLink(cloudProps, zone)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Find the root Disk Type
 	rootDiskTypeLink, err := cv.findRootDiskTypeLink(cloudProps.RootDiskType, zone)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Find Accelerator Type
 	acceleratorTypeLinks, err := cv.findAcceleratorTypeLinks(cloudProps.Accelerators, zone)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	// Parse networks
 	vmNetworks := networks.AsInstanceServiceNetworks()
 	if err = vmNetworks.Validate(); err != nil {
-		return "", bosherr.WrapError(err, "Creating VM")
+		return "", nil, bosherr.WrapError(err, "Creating VM")
 	}
 
 	// Certain properties defined in the Networks section of a manifest can be
@@ -123,12 +181,12 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 
 	// Validate VM tags and labels
 	if err = cloudProps.Validate(); err != nil {
-		return "", bosherr.WrapError(err, "Creating VM")
+		return "", nil, bosherr.WrapError(err, "Creating VM")
 	}
 
 	bs, err := parseBackendService(cloudProps.BackendService)
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Parsing BackendService %#v", cloudProps.BackendService)
+		return "", nil, bosherr.WrapErrorf(err, "Parsing BackendService %#v", cloudProps.BackendService)
 	}
 
 	// Parse VM properties
@@ -155,9 +213,9 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	vm, err := cv.vmService.Create(vmProps, vmNetworks, cv.registryOptions.EndpointWithCredentials())
 	if err != nil {
 		if _, ok := err.(api.CloudError); ok {
-			return "", err
+			return "", nil, err
 		}
-		return "", bosherr.WrapError(err, "Creating VM")
+		return "", nil, bosherr.WrapError(err, "Creating VM")
 	}
 
 	// If any of the below code fails, we must delete the created vm
@@ -171,10 +229,10 @@ func (cv CreateVM) Run(agentID string, stemcellCID StemcellCID, cloudProps VMClo
 	agentNetworks := networks.AsRegistryNetworks()
 	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
 	if err = cv.registryClient.Update(vm, agentSettings); err != nil {
-		return "", bosherr.WrapErrorf(err, "Creating VM")
+		return "", nil, bosherr.WrapErrorf(err, "Creating VM")
 	}
 
-	return VMCID(vm), nil
+	return VMCID(vm), networks, nil
 }
 
 func extract(src map[string]interface{}, key string) string {
@@ -215,7 +273,7 @@ func parseBackendService(backendService interface{}) (instance.BackendService, e
 	return bs, nil
 }
 
-func (cv CreateVM) findZone(zoneName string, disks []DiskCID) (string, error) {
+func (cv createVMBase) findZone(zoneName string, disks []DiskCID) (string, error) {
 	zones := make(map[string]struct{})
 	if zoneName != "" {
 		zones[zoneName] = struct{}{}
@@ -247,7 +305,7 @@ func isGcpImageURL(s string) bool {
 	return strings.HasPrefix(s, "https://www.googleapis.com/compute/v1/projects/")
 }
 
-func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {
+func (cv createVMBase) findStemcellLink(stemcellID string) (string, error) {
 	if isGcpImageURL(stemcellID) {
 		return stemcellID, nil
 	}
@@ -262,7 +320,7 @@ func (cv CreateVM) findStemcellLink(stemcellID string) (string, error) {
 	return stemcell.SelfLink, nil
 }
 
-func (cv CreateVM) findMachineTypeLink(cloudProps VMCloudProperties, zone string) (string, error) {
+func (cv createVMBase) findMachineTypeLink(cloudProps VMCloudProperties, zone string) (string, error) {
 	machineTypeLink := ""
 	if cloudProps.MachineType != "" {
 		if cloudProps.CPU != 0 || cloudProps.RAM != 0 {
@@ -288,7 +346,7 @@ func (cv CreateVM) findMachineTypeLink(cloudProps VMCloudProperties, zone string
 	return machineTypeLink, nil
 }
 
-func (cv CreateVM) findRootDiskSizeGb(rootDiskSizeGb int) int {
+func (cv createVMBase) findRootDiskSizeGb(rootDiskSizeGb int) int {
 	diskSizeGb := cv.defaultRootDiskSizeGb
 	if rootDiskSizeGb > 0 {
 		diskSizeGb = rootDiskSizeGb
@@ -297,7 +355,7 @@ func (cv CreateVM) findRootDiskSizeGb(rootDiskSizeGb int) int {
 	return diskSizeGb
 }
 
-func (cv CreateVM) findRootDiskTypeLink(diskTypeName string, zone string) (string, error) {
+func (cv createVMBase) findRootDiskTypeLink(diskTypeName string, zone string) (string, error) {
 	diskType := cv.defaultRootDiskType
 	if diskTypeName != "" {
 		diskType = diskTypeName
@@ -317,7 +375,7 @@ func (cv CreateVM) findRootDiskTypeLink(diskTypeName string, zone string) (strin
 
 	return "", nil
 }
-func (cv CreateVM) findAcceleratorTypeLinks(accelerators []Accelerator, zone string) ([]instance.Accelerator, error) {
+func (cv createVMBase) findAcceleratorTypeLinks(accelerators []Accelerator, zone string) ([]instance.Accelerator, error) {
 	if len(accelerators) == 0 {
 		return nil, nil
 	}

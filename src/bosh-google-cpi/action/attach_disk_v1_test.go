@@ -28,14 +28,17 @@ var _ = Describe("AttachDisk", func() {
 		vmService      *instancefakes.FakeInstanceService
 		registryClient *registryfakes.FakeClient
 
-		attachDisk AttachDisk
+		attachDisk AttachDiskV1
 	)
 
 	BeforeEach(func() {
 		diskService = &diskfakes.FakeDiskService{}
 		vmService = &instancefakes.FakeInstanceService{}
 		registryClient = &registryfakes.FakeClient{}
-		attachDisk = NewAttachDisk(diskService, vmService, registryClient)
+	})
+
+	JustBeforeEach(func() {
+		attachDisk = NewAttachDiskV1(diskService, vmService, registryClient)
 	})
 
 	Describe("Run", func() {
@@ -59,13 +62,14 @@ var _ = Describe("AttachDisk", func() {
 		})
 
 		It("attaches the disk", func() {
-			_, err = attachDisk.Run("fake-vm-id", "fake-disk-id")
+			response, err := attachDisk.Run("fake-vm-id", "fake-disk-id")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(diskService.FindCalled).To(BeTrue())
 			Expect(vmService.AttachDiskCalled).To(BeTrue())
 			Expect(registryClient.FetchCalled).To(BeTrue())
 			Expect(registryClient.UpdateCalled).To(BeTrue())
 			Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+			Expect(response).To(BeNil())
 		})
 
 		It("returns an error if diskService find call returns an error", func() {
