@@ -2,25 +2,32 @@
 
 
 [[projects]]
+  digest = "1:f8ad8a53fa865a70efbe215b0ca34735523f50ea39e0efde319ab6fc80089b44"
   name = "cloud.google.com/go"
   packages = ["compute/metadata"]
+  pruneopts = "NUT"
   revision = "29f476ffa9c4cd4fd14336b6043090ac1ad76733"
   version = "v0.21.0"
 
 [[projects]]
+  digest = "1:69b95d47eef70cba62af2aa3d33bd5f9ffe9fa0be66d79d79150c38796c6eac1"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "b3608229437ba4dc33dae64d56a79a2a73f1f6b2"
   version = "v1.0.9"
 
 [[projects]]
   branch = "master"
+  digest = "1:58927c45bfdcd6550e5f1ab008eeeb6951474a232afa1dc690583f26c5f92cbd"
   name = "github.com/charlievieth/fs"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "7dc373669fa10ddf827c37c595dee30a2f001be9"
 
 [[projects]]
   branch = "master"
+  digest = "1:c6395a32c3c144cb12350d53ea4031ffbbd763ed85b4d810baa6a80d203b8064"
   name = "github.com/cloudfoundry/bosh-utils"
   packages = [
     "errors",
@@ -28,41 +35,53 @@
     "system",
     "system/fakes",
     "uuid",
-    "uuid/fakes"
+    "uuid/fakes",
   ]
+  pruneopts = "NUT"
   revision = "2c869a1a0ccef38c01c41d833db6eb02a23bd6e6"
 
 [[projects]]
   branch = "master"
+  digest = "1:4ee452f8994700dcab9e816aef1cb9eb2317218734c6ccf5135746e6c19f3dce"
   name = "github.com/golang/lint"
   packages = ["golint"]
+  pruneopts = "NUT"
   revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
 
 [[projects]]
+  digest = "1:15042ad3498153684d09f393bbaec6b216c8eec6d61f63dff711de7d64ed8861"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "NUT"
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:214cf4d48614654572111af9f0c87860584da6821fe0cfe536ec96688d20fb7e"
   name = "github.com/mitchellh/gox"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "c9740af9c6574448fd48eb30a71f964014c7a837"
   version = "v0.4.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:bd418de31f64429ae8cb5d02676fc9de2557fd19077f4fb55a2577187c7fbbe7"
   name = "github.com/mitchellh/iochan"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "87b45ffd0e9581375c491fef3d32130bb15c5bd7"
 
 [[projects]]
   branch = "master"
+  digest = "1:16bbae9910129be5a18b951eabacd54414d3faea094dfab92bb3c84884d46b11"
   name = "github.com/nu7hatch/gouuid"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 
 [[projects]]
+  digest = "1:831e7951ac89dbdbddac0e1a92e2af9bc4ffe7982117d0624e9a06e2ad12cbb4"
   name = "github.com/onsi/ginkgo"
   packages = [
     ".",
@@ -90,12 +109,14 @@
     "reporters/stenographer",
     "reporters/stenographer/support/go-colorable",
     "reporters/stenographer/support/go-isatty",
-    "types"
+    "types",
   ]
+  pruneopts = "NUT"
   revision = "9eda700730cba42af70d53180f9dcce9266bc2bc"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:2818b181473a181ae7b727cb5e505ca0e8e5b696b6929c050262820c6152d63b"
   name = "github.com/onsi/gomega"
   packages = [
     ".",
@@ -111,48 +132,66 @@
     "matchers/support/goraph/edge",
     "matchers/support/goraph/node",
     "matchers/support/goraph/util",
-    "types"
+    "types",
   ]
+  pruneopts = "NUT"
   revision = "003f63b7f4cff3fc95357005358af2de0f5fe152"
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:14715f705ff5dfe0ffd6571d7d201dd8e921030f8070321a79380d8ca4ec1a24"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
+
+[[projects]]
   branch = "master"
+  digest = "1:e560ae4a227f691fafb7989d7ca2d768c85db681f29f664f635e95a8c50dced4"
   name = "golang.org/x/lint"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "470b6b0bb3005eda157f0275e2e4895055396a81"
 
 [[projects]]
   branch = "master"
+  digest = "1:bb356c3f64d39a60de553f7d90315f7408403f848db047883070f54ea4700775"
   name = "golang.org/x/net"
   packages = [
     "context",
     "context/ctxhttp",
     "html",
     "html/atom",
-    "html/charset"
+    "html/charset",
   ]
+  pruneopts = "NUT"
   revision = "640f4622ab692b87c2f3a94265e6f579fe38263d"
 
 [[projects]]
   branch = "master"
+  digest = "1:46bd4e66bfce5e77f08fc2e8dcacc3676e679241ce83d9c150ff0397d686dd44"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "google",
     "internal",
     "jws",
-    "jwt"
+    "jwt",
   ]
+  pruneopts = "NUT"
   revision = "cdc340f7c179dbbfa4afd43b7614e8fcadde4269"
 
 [[projects]]
   branch = "master"
+  digest = "1:5f25f6acbe91e1fbedecd14d42c655fabb58a9365d1618446e683f0162bb3374"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "NUT"
   revision = "78d5f264b493f125018180c204871ecf58a2dce1"
 
 [[projects]]
+  digest = "1:7c61a813b250ba8bb02bebb0382e6c3d00e04da2b577dc58985b86312fb89ffd"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -171,24 +210,28 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = "NUT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:ad6333dc0f44e28fc7eeaab8d99d992531b899add9c330ca85293b0e850efef7"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
     "go/gcexportdata",
     "go/internal/gcimporter",
-    "go/types/typeutil"
+    "go/types/typeutil",
   ]
+  pruneopts = "NUT"
   revision = "f4ce24f1d8feacab63a0476fc8bee0de7f9dc291"
 
 [[projects]]
   branch = "master"
+  digest = "1:3d48df5012a19b19a2b473a08bafdb8832f63ef1c40c39cab26a548aacc16b28"
   name = "google.golang.org/api"
   packages = [
     "compute/v0.beta",
@@ -196,11 +239,13 @@
     "gensupport",
     "googleapi",
     "googleapi/internal/uritemplates",
-    "storage/v1"
+    "storage/v1",
   ]
+  pruneopts = "NUT"
   revision = "ce90db2c36a2cb8c9c06779ed8bb96f92ea6e3b8"
 
 [[projects]]
+  digest = "1:7206d98ec77c90c72ec2c405181a1dcf86965803b6dbc4f98ceab7a5047c37a9"
   name = "google.golang.org/appengine"
   packages = [
     ".",
@@ -212,20 +257,45 @@
     "internal/modules",
     "internal/remote_api",
     "internal/urlfetch",
-    "urlfetch"
+    "urlfetch",
   ]
+  pruneopts = "NUT"
   revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:7c95b35057a0ff2e19f707173cc1a947fa43a6eb5c4d300d196ece0334046082"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f5dc676a2b2219cf9e0b680b35925ba4eedb908baa81b387ff73c738b588a7c0"
+  input-imports = [
+    "github.com/cloudfoundry/bosh-utils/errors",
+    "github.com/cloudfoundry/bosh-utils/logger",
+    "github.com/cloudfoundry/bosh-utils/system",
+    "github.com/cloudfoundry/bosh-utils/system/fakes",
+    "github.com/cloudfoundry/bosh-utils/uuid",
+    "github.com/cloudfoundry/bosh-utils/uuid/fakes",
+    "github.com/golang/lint/golint",
+    "github.com/mitchellh/gox",
+    "github.com/onsi/ginkgo",
+    "github.com/onsi/ginkgo/extensions/table",
+    "github.com/onsi/ginkgo/ginkgo",
+    "github.com/onsi/gomega",
+    "github.com/onsi/gomega/gstruct",
+    "github.com/pkg/errors",
+    "golang.org/x/net/context",
+    "golang.org/x/oauth2",
+    "golang.org/x/oauth2/google",
+    "google.golang.org/api/compute/v0.beta",
+    "google.golang.org/api/compute/v1",
+    "google.golang.org/api/googleapi",
+    "google.golang.org/api/storage/v1",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

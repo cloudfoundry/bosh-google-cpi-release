@@ -44,7 +44,7 @@ var (
 	ilbInstanceGroup              = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
 	zone                          = envOrDefault("ZONE", "us-central1-a")
 	region                        = envOrDefault("REGION", "us-central1")
-	imageURL                      = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
+	imageURL                      = envOrDefault("IMAGE_URL", "https://s3.amazonaws.com/bosh-core-stemcells/google/bosh-stemcell-170.23-google-kvm-ubuntu-xenial-go_agent.tgz")
 
 	// Channel that will be used to retrieve IPs to use
 	ips chan string

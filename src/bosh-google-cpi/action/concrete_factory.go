@@ -174,6 +174,7 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		operationService,
 		subnetworkService,
 		targetPoolService,
+		diskTypeService,
 		f.uuidGen,
 		f.logger,
 	)

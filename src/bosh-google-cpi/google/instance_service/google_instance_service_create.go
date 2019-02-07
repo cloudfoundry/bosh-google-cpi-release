@@ -3,6 +3,7 @@ package instance
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
@@ -27,10 +28,10 @@ var minCpuPlatform = map[string]string{
 	"europe-west1-b": "Intel Broadwell",
 }
 
-func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error) {
+func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error, *compute.AttachedDisk) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
+		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name"), nil
 	}
 
 	instanceName := vmProps.Name
@@ -41,11 +42,11 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskType)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, networks)
 	if err != nil {
-		return "", err
+		return "", err, nil
 	}
 	networkInterfacesParams, err := i.createNetworkInterfacesParams(networks, vmProps.Zone)
 	if err != nil {
-		return "", err
+		return "", err, nil
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
@@ -56,6 +57,21 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	tags.Items = allTags.Unique()
 
 	acceleratorParams := i.createAcceleratorParams(vmProps.Accelerators)
+
+	var ssdDisk *compute.AttachedDisk
+
+	if vmProps.EphemeralDiskType == "local-ssd" {
+		ssdDisk, err = i.createLocalSSDParams(vmProps.Zone)
+		if err != nil {
+			return "", err, nil
+		}
+
+		diskParams = append(diskParams, ssdDisk)
+
+		s := "#!/bin/bash\n\ndate > /tmp/whatisthedate\nuptime > /tmp/whatistheuptime\n"
+		item := &compute.MetadataItems{Key: "startup-script", Value: &s}
+		metadataParams.Items = append(metadataParams.Items, item)
+	}
 
 	vm := &compute.Instance{
 		Name:              instanceName,
@@ -78,20 +94,20 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
-		return "", api.NewVMCreationFailedError(err.Error(), true)
+		return "", api.NewVMCreationFailedError(err.Error(), true), nil
 	}
 
 	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		i.CleanUp(vm.Name)
-		return "", api.NewVMCreationFailedError(err.Error(), true)
+		return "", api.NewVMCreationFailedError(err.Error(), true), nil
 	}
 
 	if vmProps.TargetPool != "" {
 		if err := i.addToTargetPool(operation.TargetLink, vmProps.TargetPool); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %v", err)
 			i.CleanUp(vm.Name)
-			return "", api.NewVMCreationFailedError(err.Error(), true)
+			return "", api.NewVMCreationFailedError(err.Error(), true), nil
 		}
 	}
 
@@ -99,11 +115,11 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		if err := i.addToBackendService(operation.TargetLink, vmProps.BackendService); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Backend Service: %v", err)
 			i.CleanUp(vm.Name)
-			return "", api.NewVMCreationFailedError(err.Error(), true)
+			return "", api.NewVMCreationFailedError(err.Error(), true), nil
 		}
 	}
 
-	return vm.Name, nil
+	return vm.Name, nil, ssdDisk
 }
 
 func (i GoogleInstanceService) CleanUp(id string) {
@@ -133,6 +149,35 @@ func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, d
 	disks = append(disks, disk)
 
 	return disks
+}
+
+func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.AttachedDisk, error) {
+	diskType, b, e := i.diskTypeService.Find("local-ssd", zone)
+
+	if e != nil {
+		return nil, e
+	}
+
+	if !b {
+		return nil, errors.New("disk not found")
+	}
+
+	disk := &compute.AttachedDisk{
+		AutoDelete: true,
+		Boot:       false,
+		InitializeParams: &compute.AttachedDiskInitializeParams{
+			DiskType: diskType.SelfLink,
+		},
+		Interface: "NVME",
+		Index:     1,
+		Type:      "SCRATCH",
+	}
+
+	if e != nil {
+		return nil, e
+	}
+
+	return disk, nil
 }
 
 func (i GoogleInstanceService) createAcceleratorParams(accelerators []Accelerator) []*compute.AcceleratorConfig {

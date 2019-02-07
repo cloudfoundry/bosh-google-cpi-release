@@ -10,7 +10,7 @@ type Service interface {
 	AttachedDisks(id string) (AttachedDisks, error)
 	DiskDetail(vmID string, diskLink string) (*DiskAttachmentDetail, error)
 	CleanUp(id string)
-	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error)
+	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error, *compute.AttachedDisk)
 	Delete(id string) error
 	DeleteAccessConfig(id string, zone string, networkInterface string, accessConfig string) error
 	DetachDisk(id string, diskID string) error
@@ -42,6 +42,7 @@ type Properties struct {
 	Tags              Tags
 	Labels            Labels
 	Accelerators      []Accelerator
+	EphemeralDiskType string
 }
 
 type ServiceScopes []string

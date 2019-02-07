@@ -23,7 +23,7 @@ func TestIntegration(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	// Clean any straggler VMs
+	//Clean any straggler VMs
 	cleanVMs()
 
 	request := fmt.Sprintf(`{
@@ -42,10 +42,10 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	for _, addr := range ipAddrs {
 		ips <- addr
 	}
-
+	return nil
 	return []byte(stemcell)
 }, func(data []byte) {
-	// Ensure stemcell was initialized
+	//Ensure stemcell was initialized
 	existingStemcell = string(data)
 	Expect(existingStemcell).ToNot(BeEmpty())
 
@@ -63,18 +63,18 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	Expect(err).To(BeNil())
 })
 
-var _ = SynchronizedAfterSuite(func() {}, func() {
-	cleanVMs()
-	request := fmt.Sprintf(`{
-			  "method": "delete_stemcell",
-			  "arguments": ["%v"]
-			}`, existingStemcell)
-
-	response, err := execCPI(request)
-	Expect(err).ToNot(HaveOccurred())
-	Expect(response.Error).To(BeNil())
-	Expect(response.Result).To(BeNil())
-})
+//var _ = SynchronizedAfterSuite(func() {}, func() {
+//	//cleanVMs()
+//	request := fmt.Sprintf(`{
+//			  "method": "delete_stemcell",
+//			  "arguments": ["%v"]
+//			}`, existingStemcell)
+//
+//	response, err := execCPI(request)
+//	Expect(err).ToNot(HaveOccurred())
+//	Expect(response.Error).To(BeNil())
+//	Expect(response.Result).To(BeNil())
+//})
 
 func cleanVMs() {
 	// Initialize a compute API client

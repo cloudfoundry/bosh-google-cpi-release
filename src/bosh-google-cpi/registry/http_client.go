@@ -63,13 +63,14 @@ func (c HTTPClient) Delete(instanceID string) error {
 // Fetch gets the agent settings for a given instance ID.
 func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.options.EndpointWithCredentials(), instanceID)
-	c.logger.Debug(httpClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Info(httpClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Creating GET request for registry endpoint '%s'", endpoint)
 	}
 
+	fmt.Println(request)
 	httpResponse, err := c.doRequest(request)
 	if err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Fetching agent settings from registry endpoint '%s'", endpoint)
@@ -96,7 +97,7 @@ func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	}
 
-	c.logger.Debug(httpClientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
+	c.logger.Info(httpClientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	return agentSettings, nil
 }
 
@@ -115,6 +116,8 @@ func (c HTTPClient) Update(instanceID string, agentSettings AgentSettings) error
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating PUT request for registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 	}
+
+	fmt.Println("DIT IS DE HTTP UPDATE")
 
 	httpResponse, err := c.doRequest(request)
 	if err != nil {
