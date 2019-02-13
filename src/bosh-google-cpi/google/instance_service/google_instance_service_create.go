@@ -67,10 +67,6 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		}
 
 		diskParams = append(diskParams, ssdDisk)
-
-		s := "#!/bin/bash\n\ndate > /tmp/whatisthedate\nuptime > /tmp/whatistheuptime\n"
-		item := &compute.MetadataItems{Key: "startup-script", Value: &s}
-		metadataParams.Items = append(metadataParams.Items, item)
 	}
 
 	vm := &compute.Instance{

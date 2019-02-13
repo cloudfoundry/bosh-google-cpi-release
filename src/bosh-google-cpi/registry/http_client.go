@@ -70,7 +70,6 @@ func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Creating GET request for registry endpoint '%s'", endpoint)
 	}
 
-	fmt.Println(request)
 	httpResponse, err := c.doRequest(request)
 	if err != nil {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Fetching agent settings from registry endpoint '%s'", endpoint)
@@ -116,8 +115,6 @@ func (c HTTPClient) Update(instanceID string, agentSettings AgentSettings) error
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Creating PUT request for registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 	}
-
-	fmt.Println("DIT IS DE HTTP UPDATE")
 
 	httpResponse, err := c.doRequest(request)
 	if err != nil {

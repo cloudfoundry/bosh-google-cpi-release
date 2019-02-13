@@ -101,13 +101,8 @@ func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) e
 	}
 	currentMetadata.items[c.options.GCEMetadataKey] = string(settingsJSON)
 
-	fmt.Println("DIT IS DE METADATAUPDATE")
-	fmt.Println(currentMetadata)
-
 	computedMetadata := currentMetadata.computeMetadata()
 
-	fmt.Println("COMPUTED_METADATA")
-	fmt.Println(computedMetadata)
 	c.logger.Debug(metadataClientLogTag, "Updating instance metadata to: %#v", computedMetadata)
 	op, err := c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, computedMetadata).Do()
 	if err != nil {
@@ -142,7 +137,6 @@ func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 				metadata.items[item.Key] = *item.Value
 			}
 			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#v", instanceID, metadata))
-			fmt.Println(metadata)
 			return metadata, nil
 		}
 	}

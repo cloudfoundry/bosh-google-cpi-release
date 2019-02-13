@@ -75,9 +75,6 @@ var _ = FDescribe("VM", func() {
 			}`, existingStemcell, zone, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
-		fmt.Println("VMCID")
-		fmt.Println(vmCID)
-
 		By("locating the VM")
 		request = fmt.Sprintf(`{
 			  "method": "has_vm",
