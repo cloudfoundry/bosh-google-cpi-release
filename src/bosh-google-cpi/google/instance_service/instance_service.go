@@ -10,7 +10,7 @@ type Service interface {
 	AttachedDisks(id string) (AttachedDisks, error)
 	DiskDetail(vmID string, diskLink string) (*DiskAttachmentDetail, error)
 	CleanUp(id string)
-	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error, *compute.AttachedDisk)
+	Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error)
 	Delete(id string) error
 	DeleteAccessConfig(id string, zone string, networkInterface string, accessConfig string) error
 	DetachDisk(id string, diskID string) error
