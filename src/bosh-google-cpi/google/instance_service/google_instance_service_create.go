@@ -28,10 +28,10 @@ var minCpuPlatform = map[string]string{
 	"europe-west1-b": "Intel Broadwell",
 }
 
-func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error, *compute.AttachedDisk) {
+func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
-		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name"), nil
+		return "", bosherr.WrapErrorf(err, "Generating random Google Instance name")
 	}
 
 	instanceName := vmProps.Name
@@ -42,11 +42,11 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	diskParams := i.createDiskParams(vmProps.Stemcell, vmProps.RootDiskSizeGb, vmProps.RootDiskType)
 	metadataParams, err := i.createMatadataParams(instanceName, registryEndpoint, networks)
 	if err != nil {
-		return "", err, nil
+		return "", err
 	}
 	networkInterfacesParams, err := i.createNetworkInterfacesParams(networks, vmProps.Zone)
 	if err != nil {
-		return "", err, nil
+		return "", err
 	}
 	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
@@ -63,7 +63,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if vmProps.EphemeralDiskType == "local-ssd" {
 		ssdDisk, err = i.createLocalSSDParams(vmProps.Zone)
 		if err != nil {
-			return "", err, nil
+			return "", err
 		}
 
 		diskParams = append(diskParams, ssdDisk)
@@ -90,20 +90,20 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
-		return "", api.NewVMCreationFailedError(err.Error(), true), nil
+		return "", api.NewVMCreationFailedError(err.Error(), true)
 	}
 
 	if operation, err = i.operationService.Waiter(operation, vmProps.Zone, ""); err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)
 		i.CleanUp(vm.Name)
-		return "", api.NewVMCreationFailedError(err.Error(), true), nil
+		return "", api.NewVMCreationFailedError(err.Error(), true)
 	}
 
 	if vmProps.TargetPool != "" {
 		if err := i.addToTargetPool(operation.TargetLink, vmProps.TargetPool); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Target Pool: %v", err)
 			i.CleanUp(vm.Name)
-			return "", api.NewVMCreationFailedError(err.Error(), true), nil
+			return "", api.NewVMCreationFailedError(err.Error(), true)
 		}
 	}
 
@@ -111,11 +111,11 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		if err := i.addToBackendService(operation.TargetLink, vmProps.BackendService); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Backend Service: %v", err)
 			i.CleanUp(vm.Name)
-			return "", api.NewVMCreationFailedError(err.Error(), true), nil
+			return "", api.NewVMCreationFailedError(err.Error(), true)
 		}
 	}
 
-	return vm.Name, nil, ssdDisk
+	return vm.Name, nil
 }
 
 func (i GoogleInstanceService) CleanUp(id string) {

@@ -101,16 +101,14 @@ func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) e
 	}
 	currentMetadata.items[c.options.GCEMetadataKey] = string(settingsJSON)
 
-	computedMetadata := currentMetadata.computeMetadata()
-
-	c.logger.Debug(metadataClientLogTag, "Updating instance metadata to: %#v", computedMetadata)
-	op, err := c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, computedMetadata).Do()
+	c.logger.Debug(metadataClientLogTag, "Updating instance metadata to: %#v", currentMetadata.computeMetadata())
+	op, err := c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, currentMetadata.computeMetadata()).Do()
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, computedMetadata)
+		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
 	}
 	_, err = c.wait(op)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, computedMetadata)
+		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
 	}
 	return nil
 }

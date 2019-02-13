@@ -116,7 +116,6 @@ func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSet
 		Disks: DisksSettings{
 			System:     defaultSystemDisk,
 			Persistent: map[string]PersistentSettings{},
-			Ephemeral:  "",
 		},
 		Blobstore: BlobstoreSettings{
 			Provider: agentOptions.Blobstore.Provider,
