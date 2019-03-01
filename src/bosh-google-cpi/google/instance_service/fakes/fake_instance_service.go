@@ -85,12 +85,12 @@ func (i *FakeInstanceService) CleanUp(id string) {
 	return
 }
 
-func (i *FakeInstanceService) Create(vmProps *instance.Properties, networks instance.Networks, registryEndpoint string) (string, error, *compute.AttachedDisk) {
+func (i *FakeInstanceService) Create(vmProps *instance.Properties, networks instance.Networks, registryEndpoint string) (string, error) {
 	i.CreateCalled = true
 	i.CreateVMProps = vmProps
 	i.CreateNetworks = networks
 	i.CreateRegistryEndpoint = registryEndpoint
-	return i.CreateID, i.CreateErr, nil
+	return i.CreateID, i.CreateErr
 }
 
 func (i *FakeInstanceService) Delete(id string) error {
