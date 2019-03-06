@@ -38,7 +38,7 @@ func NewHTTPClient(
 // Delete deletes the instance settings for a given instance ID.
 func (c HTTPClient) Delete(instanceID string) error {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.options.EndpointWithCredentials(), instanceID)
-	c.logger.Info(httpClientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Debug(httpClientLogTag, "Deleting agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("DELETE", endpoint, nil)
 	if err != nil {
@@ -63,7 +63,7 @@ func (c HTTPClient) Delete(instanceID string) error {
 // Fetch gets the agent settings for a given instance ID.
 func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 	endpoint := fmt.Sprintf("%s/instances/%s/settings", c.options.EndpointWithCredentials(), instanceID)
-	c.logger.Info(httpClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
+	c.logger.Debug(httpClientLogTag, "Fetching agent settings from registry endpoint '%s'", endpoint)
 
 	request, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c HTTPClient) Fetch(instanceID string) (AgentSettings, error) {
 		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	}
 
-	c.logger.Info(httpClientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
+	c.logger.Debug(httpClientLogTag, "Received agent settings from registry endpoint '%s', contents: '%s'", endpoint, httpBody)
 	return agentSettings, nil
 }
 
@@ -127,7 +127,7 @@ func (c HTTPClient) Update(instanceID string, agentSettings AgentSettings) error
 		return bosherr.Errorf("Received status code '%d' when updating registry endpoint '%s' with agent settings: '%s'", httpResponse.StatusCode, endpoint, settingsJSON)
 	}
 
-	c.logger.Info(httpClientLogTag, "Updated registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
+	c.logger.Debug(httpClientLogTag, "Updated registry endpoint '%s' with agent settings '%s'", endpoint, settingsJSON)
 	return nil
 }
 
