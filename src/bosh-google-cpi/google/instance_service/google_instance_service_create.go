@@ -149,11 +149,9 @@ func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, d
 
 func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.AttachedDisk, error) {
 	diskType, b, e := i.diskTypeService.Find("local-ssd", zone)
-
 	if e != nil {
 		return nil, e
 	}
-
 	if !b {
 		return nil, errors.New("disk not found")
 	}
@@ -167,10 +165,6 @@ func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.Attac
 		Interface: "NVME",
 		Index:     1,
 		Type:      "SCRATCH",
-	}
-
-	if e != nil {
-		return nil, e
 	}
 
 	return disk, nil
