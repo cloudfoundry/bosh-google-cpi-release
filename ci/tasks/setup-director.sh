@@ -3,7 +3,7 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.1.2.sh
+source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param google_test_bucket_name
 check_param google_subnetwork_range
@@ -11,28 +11,22 @@ check_param private_key_user
 check_param private_key_data
 check_param google_json_key_data
 
-creds_file="${PWD}/director-creds/creds.yml"
+creds_file="${PWD}/director-creds/${cpi_source_branch}-creds.yml"
+state_file="${PWD}/director-state/${cpi_source_branch}-manifest-state.json"
 cpi_release_name=bosh-google-cpi
-manifest_filename="director-manifest.yml"
-manifest_state_filename="manifest-state.json"
 infrastructure_metadata="${PWD}/infrastructure/metadata"
 deployment_dir="${PWD}/deployment"
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem
 
-read_infrastructure
-
-echo "Setting up artifacts..."
-cp ./bosh-cpi-release/*.tgz ${deployment_dir}/${cpi_release_name}.tgz
-cp ./stemcell/*.tgz ${deployment_dir}/stemcell.tgz
-cp ./bosh-cli/bosh-cli-* ${deployment_dir}/bosh && chmod +x ${deployment_dir}/bosh
-export BOSH_CLI=${deployment_dir}/bosh
-cp -r ./bosh-deployment ${deployment_dir}
-
 echo "Creating google json key..."
 echo "${google_json_key_data}" > ${google_json_key}
 mkdir -p $HOME/.config/gcloud/
 cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
+
+read_infrastructure
+
+export BOSH_CLI=${deployment_dir}/bosh
 
 echo "Configuring google account..."
 gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application_default_credentials.json
@@ -98,7 +92,7 @@ pushd ${deployment_dir}
   function finish {
     echo "Final state of director deployment:"
     echo "=========================================="
-    cat ${manifest_state_filename}
+    cat ${state_file}
     echo "=========================================="
 
     cp -r $HOME/.bosh ./
@@ -110,7 +104,7 @@ pushd ${deployment_dir}
 
   echo "Deploying BOSH Director..."
   ${BOSH_CLI} create-env bosh-deployment/bosh.yml \
-      --state=${manifest_state_filename} \
+      --state=${state_file} \
       --vars-store=${creds_file} \
       -o bosh-deployment/gcp/cpi.yml \
       -o bosh-deployment/gcp/gcs-blobstore.yml \

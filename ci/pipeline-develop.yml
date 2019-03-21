@@ -15,8 +15,9 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {get: ci}
       - task: unit-tests
-        file: bosh-cpi-src/ci/tasks/unit-tests.yml
+        file: ci/ci/tasks/unit-tests.yml
 
   - name: build-candidate
     serial: true
@@ -24,12 +25,12 @@ jobs:
       - aggregate:
         - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
         - {trigger: false,                     get: version-semver, params: {bump: patch}}
-
+        - {get: ci}
       - put: version-semver
         params: {file: version-semver/number}
 
       - task: build-release
-        file: bosh-cpi-src/ci/tasks/build-candidate.yml
+        file: ci/ci/tasks/build-candidate.yml
 
       - put: bosh-cpi-dev-artifacts
         params: {file: candidate/*.tgz}
@@ -43,20 +44,21 @@ jobs:
       - aggregate:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
+        - {get: ci}
       - aggregate: &teardown_step
         - task: teardown-infrastructure
-          file: bosh-cpi-src/ci/tasks/teardown-infrastructure.yml
+          file: ci/ci/tasks/teardown-infrastructure.yml
           params:
-            google_auto_network: {{google_auto_network}}
-            google_json_key_data: {{google_json_key_data}}
-            google_network: {{google_network}}
-            google_project: {{google_project}}
-            google_region: {{google_region}}
-            google_zone: {{google_zone}}
+            google_auto_network: ((google_auto_network))
+            google_json_key_data: ((google_json_key_data))
+            google_network: ((google_network))
+            google_project: ((google_project))
+            google_region: ((google_region))
+            google_zone: ((google_zone))
       - put: infrastructure
         params:
-          env_name: {{cpi_source_branch}}
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          env_name: ((cpi_source_branch))
+          terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
       - aggregate: *teardown_step
@@ -65,15 +67,39 @@ jobs:
     serial_groups: [run-bats, run-int]
     plan:
       - aggregate:
-        - {trigger: true, passed: [run-bats, run-int], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true,  passed: [run-bats, run-int],   get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: false, passed: [run-bats],            get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: false, passed: [run-bats],            get: director-creds, resource: director-creds}
+        - {trigger: false, passed: [deploy-ubuntu],       get: director-state, resource: director-state}
+        - {trigger: false, passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
+        - {trigger: false, passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: false,                                get: bosh-cli}
+        - {trigger: false,                                get: bosh-deployment}
+        - {get: ci}
       - aggregate: *teardown_step
+      - task: setup-deployment
+        file: ci/ci/tasks/setup-deployment.yml
+      - task: teardown-director
+        file: ci/ci/tasks/teardown-director.yml
+        params:
+          google_project:                 ((google_project))
+          google_region:                  ((google_region))
+          google_zone:                    ((google_zone))
+          cpi_source_branch:              ((cpi_source_branch))
+          google_test_bucket_name:        ((google_test_bucket_name))
+          google_subnetwork_range:        ((google_subnetwork_range))
+          google_subnetwork_gw:           ((google_subnetwork_gw))
+          google_address_static_director: ((google_address_static_director))
+          google_json_key_data:           ((google_json_key_data))
+          private_key_user:               ((private_key_user))
+          private_key_data:               ((private_key_data))
       - put: infrastructure
         params:
-          env_name: {{cpi_source_branch}}
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          env_name: ((cpi_source_branch))
+          terraform_source: ci/ci/test_infrastructure
           action: destroy
         get_params:
-          terraform_source: bosh-cpi-src/src/bosh-google-cpi/test_infrastructure
+          terraform_source: ci/ci/test_infrastructure
           action: destroy
 
   - name: deploy-ubuntu
@@ -81,35 +107,47 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true,  passed: [build-candidate],                       get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
+        - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                                  get: bosh-cli}
         - {trigger: false,                                                  get: bosh-deployment}
-
+        - {get: ci}
+      - task: setup-deployment
+        file: ci/ci/tasks/setup-deployment.yml
       - task: setup-director
-        file: bosh-cpi-src/ci/tasks/setup-director.yml
+        file: ci/ci/tasks/setup-director.yml
         params:
-          google_test_bucket_name:        {{google_test_bucket_name}}
-          google_subnetwork_range:        {{google_subnetwork_range}}
-          google_subnetwork_gw:           {{google_subnetwork_gw}}
-          google_address_static_director: {{google_address_static_director}}
-          google_json_key_data:           {{google_json_key_data}}
-          private_key_user:               {{private_key_user}}
-          private_key_data:               {{private_key_data}}
+          cpi_source_branch:              ((cpi_source_branch))
+          google_project:                 ((google_project))
+          google_region:                  ((google_region))
+          google_zone:                    ((google_zone))
+          google_test_bucket_name:        ((google_test_bucket_name))
+          google_subnetwork_range:        ((google_subnetwork_range))
+          google_subnetwork_gw:           ((google_subnetwork_gw))
+          google_address_static_director: ((google_address_static_director))
+          google_json_key_data:           ((google_json_key_data))
+          private_key_user:               ((private_key_user))
+          private_key_data:               ((private_key_data))
         on_failure:
           task: teardown-director
-          file: bosh-cpi-src/ci/tasks/teardown-director.yml
+          file: ci/ci/tasks/teardown-director.yml
           params:
-            google_test_bucket_name:        {{google_test_bucket_name}}
-            google_subnetwork_range:        {{google_subnetwork_range}}
-            google_subnetwork_gw:           {{google_subnetwork_gw}}
-            google_address_static_director: {{google_address_static_director}}
-            google_json_key_data:           {{google_json_key_data}}
-            private_key_user:               {{private_key_user}}
-            private_key_data:               {{private_key_data}}
+            google_project:                 ((google_project))
+            google_region:                  ((google_region))
+            google_zone:                    ((google_zone))
+            cpi_source_branch:              ((cpi_source_branch))
+            google_test_bucket_name:        ((google_test_bucket_name))
+            google_subnetwork_range:        ((google_subnetwork_range))
+            google_subnetwork_gw:           ((google_subnetwork_gw))
+            google_address_static_director: ((google_address_static_director))
+            google_json_key_data:           ((google_json_key_data))
+            private_key_user:               ((private_key_user))
+            private_key_data:               ((private_key_data))
       - put: director-creds
-        params: {file: director-creds/creds.yml}
+        params: {file: director-creds/((cpi_source_branch))-creds.yml}
+      - put: director-state
+        params: {file: director-state/((cpi_source_branch))-manifest-state.json}
 
   - name: run-bats
     serial: true
@@ -117,77 +155,46 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [deploy-ubuntu],                  get: director-creds, resource: director-creds}
         - {trigger: true, passed: [deploy-ubuntu],                  get: infrastructure, resource: infrastructure}
         - {trigger: false,                                          get: bats}
+        - {get: ci}
       - task: run-bats
-        file: bosh-cpi-src/ci/tasks/run-bats.yml
+        file: ci/ci/tasks/run-bats.yml
         params:
-          google_subnetwork_range:                    {{google_subnetwork_range}}
-          google_subnetwork_gw:                       {{google_subnetwork_gw}}
-          google_address_static_available_range_bats: {{google_address_static_bats_available_range}}
-          google_address_static_bats:                 {{google_address_static_bats}}
-          google_address_static_pair_bats:            {{google_address_static_pair_bats}}
-          google_json_key_data:                       {{google_json_key_data}}
+          cpi_source_branch:                          ((cpi_source_branch))
+          google_subnetwork_range:                    ((google_subnetwork_range))
+          google_subnetwork_gw:                       ((google_subnetwork_gw))
+          google_address_static_available_range_bats: ((google_address_static_bats_available_range))
+          google_address_static_bats:                 ((google_address_static_bats))
+          google_address_static_pair_bats:            ((google_address_static_pair_bats))
+          google_json_key_data:                       ((google_json_key_data))
           base_os:                                    Ubuntu
-          stemcell_name:                              bosh-google-kvm-ubuntu-trusty-go_agent
-          private_key_data:                           {{private_key_data}}
+          stemcell_name:                              bosh-google-kvm-ubuntu-xenial-go_agent
+          private_key_data:                           ((private_key_data))
 
   - name: run-int
     serial_groups: [run-int]
     plan:
       - aggregate:
-        - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [build-candidate],                       get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [setup-infrastructure],                  get: infrastructure, resource: infrastructure}
-
+        - {get: ci}
       - task: run-int
-        file: bosh-cpi-src/ci/tasks/run-int.yml
+        file: ci/ci/tasks/run-int.yml
         params:
-          google_json_key_data:      {{google_json_key_data}}
-          google_address_static_int: {{google_address_static_int}}
+          google_json_key_data:      ((google_json_key_data))
+          google_address_static_int: ((google_address_static_int))
 
 resources:
-  - name: bosh-cpi-src-in
+  - name: bats
     type: git
     source:
-      uri: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release.git
-      branch: {{cpi_source_branch}}
-      ignore_paths:
-        - .final_builds/**/*.yml
-        - releases/**/*.yml
-
-  - name: bosh-cpi-dev-artifacts
-    type: gcs-resource
-    source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
-
-  - name: bosh-cpi-dev-artifacts-sha1
-    type: gcs-resource
-    source:
-      json_key: {{google_json_key_data}}
-      bucket:   {{google_releases_bucket_name}}
-      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
-
-  - name: director-creds
-    type: gcs-resource
-    source:
-      json_key:         {{google_json_key_data}}
-      bucket:           {{google_state_bucket_name}}
-      versioned_file:   creds.yml
-
-  - name: version-semver
-    type: semver
-    source:
-      key:               current-version
-      bucket:            {{version_semver_bucket_name}}
-      access_key_id:     {{version_semver_access_key}}
-      secret_access_key: {{version_semver_secret_key}}
-      region:            {{version_semver_region}}
-      endpoint:          storage.googleapis.com
+      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
+      branch: master
 
   - name: bosh-cli
     type: s3
@@ -196,22 +203,62 @@ resources:
       bucket: bosh-cli-artifacts
       region_name: us-east-1
 
+  - name: bosh-cpi-dev-artifacts
+    type: gcs-resource
+    source:
+      json_key: ((google_json_key_data))
+      bucket:   ((google_releases_bucket_name))
+      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
+
+  - name: bosh-cpi-dev-artifacts-sha1
+    type: gcs-resource
+    source:
+      json_key: ((google_json_key_data))
+      bucket:   ((google_releases_bucket_name))
+      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
+
+  - name: bosh-cpi-src-in
+    type: git
+    source:
+      branch: ((cpi_source_branch))
+      ignore_paths:
+        - .final_builds/**/*.yml
+        - releases/**/*.yml
+        - ci/*
+      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+
   - name: bosh-deployment
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-deployment.git
       branch: master
 
-  - name: bats
+  - name: ci
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh-acceptance-tests.git
-      branch: master
+      branch: ((cpi_source_branch))
+      paths:
+        - ci/*
+      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+
+  - name: director-creds
+    type: gcs-resource
+    source:
+      json_key:         ((google_json_key_data))
+      bucket:           ((google_state_bucket_name))
+      versioned_file:   ((cpi_source_branch))-creds.yml
+
+  - name: director-state
+    type: gcs-resource
+    source:
+      json_key:         ((google_json_key_data))
+      bucket:           ((google_state_bucket_name))
+      versioned_file:   ((cpi_source_branch))-manifest-state.json
 
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-google-kvm-ubuntu-trusty-go_agent
+      name: bosh-google-kvm-ubuntu-xenial-go_agent
       force_regular: true
       tarball: true
 
@@ -219,23 +266,33 @@ resources:
     type: terraform
     source:
       storage:
-        bucket:            {{google_state_bucket_name}}
-        bucket_path:       terraform-{{cpi_source_branch}}
-        access_key_id:     {{google_state_access_key}}
-        secret_access_key: {{google_state_secret_key}}
-        region:            {{google_state_region}}
+        bucket:            ((google_state_bucket_name))
+        bucket_path:       terraform-((cpi_source_branch))
+        access_key_id:     ((google_state_access_key))
+        secret_access_key: ((google_state_secret_key))
+        region:            ((google_state_region))
         endpoint:          storage.googleapis.com
       vars:
-        google_project:           {{google_project}}
-        google_region:            {{google_region}}
-        google_zone:              {{google_zone}}
-        google_json_key_data:     {{google_json_key_data}}
-        google_subnetwork_range:  {{google_subnetwork_range}}
-        google_firewall_internal: {{google_firewall_internal}}
-        google_firewall_external: {{google_firewall_external}}
-        prefix:                   {{cpi_source_branch}}
-        google_auto_network:      {{google_auto_network}}
-        google_network:           {{google_network}}
+        google_project:           ((google_project))
+        google_region:            ((google_region))
+        google_zone:              ((google_zone))
+        google_json_key_data:     ((google_json_key_data))
+        google_subnetwork_range:  ((google_subnetwork_range))
+        google_firewall_internal: ((google_firewall_internal))
+        google_firewall_external: ((google_firewall_external))
+        prefix:                   ((cpi_source_branch))
+        google_auto_network:      ((google_auto_network))
+        google_network:           ((google_network))
+
+  - name: version-semver
+    type: semver
+    source:
+      key:               current-version
+      bucket:            ((version_semver_bucket_name))
+      access_key_id:     ((version_semver_access_key))
+      secret_access_key: ((version_semver_secret_key))
+      region:            ((version_semver_region))
+      endpoint:          storage.googleapis.com
 
 resource_types:
 - name: gcs-resource

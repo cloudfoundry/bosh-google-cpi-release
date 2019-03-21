@@ -6,8 +6,8 @@ image_resource:
     repository: boshcpi/gce-cpi-release
 inputs:
   - name: bosh-cpi-src
-  - name: ci
   - name: bosh-cpi-release
+  - name: ci
   - name: release-version-semver
   - name: stemcell
 outputs:

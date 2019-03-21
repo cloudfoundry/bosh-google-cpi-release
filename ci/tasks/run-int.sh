@@ -3,7 +3,7 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.1.2.sh
+source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param google_json_key_data
 
@@ -47,12 +47,7 @@ gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
-# Setup Go and run tests
-export GOPATH=${PWD}/bosh-cpi-src
-export PATH=${GOPATH}/bin:$PATH
-
-check_go_version $GOPATH
+check_go_version ${PWD}/bosh-cpi-src
 
 cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
-env
 make testintci

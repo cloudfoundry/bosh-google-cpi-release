@@ -5,15 +5,16 @@ image_resource:
   source:
     repository: boshcpi/gce-cpi-release
 inputs:
+  - name: bats
   - name: bosh-cpi-src
   - name: ci
-  - name: stemcell
-  - name: bats
   - name: director-creds
   - name: infrastructure
+  - name: stemcell
 run:
   path: ci/ci/tasks/run-bats.sh
 params:
+  cpi_source_branch:                          replace-me
   google_json_key_data:                       replace-me
   google_subnetwork_range:                    replace-me
   base_os:                                    replace-me

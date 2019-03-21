@@ -9,12 +9,17 @@ export GOROOT=$(cd "${PACKAGES_DIR}/golang" && pwd -P)
 export PATH=${GOROOT}/bin:${PATH}
 
 # Build BOSH Google CPI package
-mkdir -p ${BOSH_COMPILE_TARGET}/go/src
-mv ${BOSH_COMPILE_TARGET}/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/
-cd ${BOSH_COMPILE_TARGET}/go/src/bosh-google-cpi
-export GOPATH=${BOSH_COMPILE_TARGET}/go
+# mkdir -p ${BOSH_COMPILE_TARGET}/go/src
+# mv ${BOSH_COMPILE_TARGET}/bosh-google-cpi ${BOSH_COMPILE_TARGET}/go/src/
+# cd ${BOSH_COMPILE_TARGET}/go/src/bosh-google-cpi
+
+# Since HOME is not set we must set GOPATH and GOCACHE
+mkdir -p /tmp/go/.cache
+export GOPATH=/tmp/go
+export GOCACHE=${GOPATH}/.cache
+cd ${BOSH_COMPILE_TARGET}/bosh-google-cpi
 make build
 
 # Copy BOSH Google CPI package
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/go/src/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/
+cp -a ${BOSH_COMPILE_TARGET}/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/
