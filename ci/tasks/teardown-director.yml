@@ -5,12 +5,12 @@ image_resource:
   source:
     repository: boshcpi/gce-cpi-release
 inputs:
-  - name: bosh-cpi-src
-  - name: ci
   - name: bosh-cli
+  - name: ci
   - name: deployment
-  - name: infrastructure
   - name: director-creds
+  - name: director-state
+  - name: infrastructure
 run:
   path: ci/ci/tasks/teardown-director.sh
 params:
@@ -18,3 +18,4 @@ params:
   google_json_key_data:           replace-me
   private_key_user:               replace-me
   private_key_data:               replace-me
+  cpi_source_branch:              replace-me

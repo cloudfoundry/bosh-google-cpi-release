@@ -9,15 +9,9 @@ This is the implementation of the CPI, and is part of the [BOSH Google CPI relea
 
 ### Installation
 
-The source for this CPI is not intended to be deployed except as a BOSH deployment and is not `go get`able. To build or install the CPI locally for development or test purposes, you can symlink the repository into your Go workspace.
+The source for this CPI is not intended to be deployed except as a BOSH deployment and is not `go get`able.
 
-From the root of the `bosh-google-cpi-boshrelease` repository:
-
-```
-ln -s $(pwd)/src/bosh-google-cpi $GOPATH/src/
-```
-
-You can now `go build` or `go install` the "main" package.
+For local development and testing, just run `make`. You can find the binary in `out`.
 
 ### Configuration
 

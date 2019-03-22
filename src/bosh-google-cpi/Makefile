@@ -2,29 +2,32 @@ default: test
 
 # Builds bosh-google-cpi for linux-amd64
 build:
-	go build -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" -o out/cpi bosh-google-cpi/main
+	go build -mod=vendor -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" -o out/cpi bosh-google-cpi/main
 
 # Build cross-platform binaries
 build-all:
-	gox -output="out/cpi_{{.OS}}_{{.Arch}}" -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" bosh-google-cpi/main
+	./.bin/gox -output="out/cpi_{{.OS}}_{{.Arch}}" -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" bosh-google-cpi/main
 
 # Prepration for tests
 get-deps:
+
+	test -d .bin || mkdir .bin
+
 	# Go lint tool
-	go install bosh-google-cpi/vendor/github.com/golang/lint/golint
+	GOBIN=$$PWD/.bin go install -mod=vendor github.com/golang/lint/golint
 
 	# Simplify cross-compiling
-	go install bosh-google-cpi/vendor/github.com/mitchellh/gox
+	GOBIN=$$PWD/.bin go install -mod=vendor github.com/mitchellh/gox
 
 	# Ginkgo test runner
-	go install bosh-google-cpi/vendor/github.com/onsi/ginkgo/ginkgo
+	GOBIN=$$PWD/.bin go install -mod=vendor github.com/onsi/ginkgo/ginkgo
 
 stemcell.tgz:
 	curl https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz -o stemcell.tgz
 
 # Cleans up directory and source code with gofmt
 clean:
-	go clean ./...
+	go clean -mod=vendor ./...
 
 # Run gofmt on all code
 fmt:
@@ -32,20 +35,19 @@ fmt:
 
 # Run linter with non-stric checking
 lint:
-	@echo ls -d */ | grep -v vendor | xargs -L 1 golint
-	ls -d */ | grep -v vendor | xargs -L 1 golint
+	ls -d */ | xargs -L 1 ./.bin/golint
 
 # Vet code
 vet:
-	go tool vet $$(ls -d */ | grep -v vendor)
+	go vet -mod=vendor ./...
 
 # Runs the unit tests with coverage
 test: get-deps clean fmt lint vet build
-	ginkgo -r -race -skipPackage=integration .
+	./.bin/ginkgo -r -race -skipPackage=integration -mod vendor .
 
 # Runs the integration tests from Concourse
 testintci: get-deps
-	ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
+	./.bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Runs the integration tests with coverage
 testint: check-proj get-deps clean fmt
@@ -66,7 +68,7 @@ testint: check-proj get-deps clean fmt
 	GOOGLE_PROJECT=$(shell cd ../../ci/test_infrastructure && terraform output google_project) \
 	SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
 	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
-    ginkgo integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
+    ./bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
 configint: stemcell.tgz check-proj

@@ -7,8 +7,8 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: ci
-  - name: stemcell
   - name: infrastructure
+  - name: stemcell
 run:
   path: ci/ci/tasks/run-int.sh
 params:

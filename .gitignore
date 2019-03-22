@@ -18,6 +18,7 @@ releases/**/*.tgz
 *#
 #*
 pkg/*
+.bin
 bin/*
 *.tfstate
 *.tfstate.backup
