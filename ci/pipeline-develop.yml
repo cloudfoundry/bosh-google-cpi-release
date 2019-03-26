@@ -68,11 +68,11 @@ jobs:
     plan:
       - aggregate:
         - {trigger: true,  passed: [run-bats, run-int],   get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true,  passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],            get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: false, passed: [run-bats],            get: director-creds, resource: director-creds}
         - {trigger: false, passed: [deploy-ubuntu],       get: director-state, resource: director-state}
         - {trigger: false, passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
-        - {trigger: false, passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                get: bosh-cli}
         - {trigger: false,                                get: bosh-deployment}
         - {get: ci}
