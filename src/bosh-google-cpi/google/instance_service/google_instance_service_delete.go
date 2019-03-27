@@ -20,6 +20,15 @@ func (i GoogleInstanceService) Delete(id string) error {
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Deleting Google Instance '%s'", id)
+
+	if err = i.removeFromTargetPool(instance.SelfLink); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Target Pool", id)
+	}
+
+	if err = i.removeFromBackendService(instance.SelfLink); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Backend Services", id)
+	}
+
 	operation, err := i.computeService.Instances.Delete(i.project, util.ResourceSplitter(instance.Zone), id).Do()
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Failed to delete Google Instance '%s'", id)
@@ -32,12 +41,5 @@ func (i GoogleInstanceService) Delete(id string) error {
 		}
 	}
 
-	if err = i.removeFromTargetPool(instance.SelfLink); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Target Pool", id)
-	}
-
-	if err = i.removeFromBackendService(instance.SelfLink); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Backend Services", id)
-	}
 	return nil
 }
