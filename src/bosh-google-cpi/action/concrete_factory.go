@@ -46,7 +46,7 @@ func NewConcreteFactory(
 		logger}
 }
 
-func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Action, error) {
+func (f ConcreteFactory) Create(method string, ctx map[string]interface{}, apiVersion int) (Action, error) {
 	ctxBytes, err := json.Marshal(ctx)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Remarshaling")
@@ -127,22 +127,12 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		f.logger,
 	)
 
-	// Choose the correct registry.Client based on the
-	// value of ClientOptions.UseGCEMetadata
-	var registryClient registry.Client
-	switch f.cfg.Cloud.Properties.Registry.UseGCEMetadata {
-	case true:
-		registryClient = registry.NewMetadataClient(
-			googleClient,
-			f.cfg.Cloud.Properties.Registry,
-			f.logger,
-		)
-	default:
-		registryClient = registry.NewHTTPClient(
-			f.cfg.Cloud.Properties.Registry,
-			f.logger,
-		)
-	}
+	registryClient := registry.NewMetadataClient(
+		googleClient,
+		f.cfg.Cloud.Properties.Registry,
+		f.logger,
+	)
+
 	snapshotService := snapshot.NewGoogleSnapshotService(
 		googleClient.Project(),
 		googleClient.ComputeService(),
@@ -186,7 +176,7 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 			vmService,
 		),
 		"delete_disk": NewDeleteDisk(diskService),
-		"attach_disk": NewAttachDisk(diskService, vmService, registryClient),
+		"attach_disk": f.selectAttachDisk(apiVersion, diskService, vmService, registryClient),
 		"detach_disk": NewDetachDisk(vmService, registryClient),
 		"has_disk":    NewHasDisk(diskService),
 
@@ -199,7 +189,8 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 		"delete_stemcell": NewDeleteStemcell(imageService),
 
 		// VM management
-		"create_vm": NewCreateVM(
+		"create_vm": f.selectCreateVM(
+			apiVersion,
 			vmService,
 			diskService,
 			diskTypeService,
@@ -234,4 +225,62 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}) (Acti
 	}
 
 	return action, nil
+}
+
+func (f ConcreteFactory) selectAttachDisk(
+	apiVersion int,
+	diskService disk.Service,
+	vmService instance.Service,
+	registryClient registry.Client,
+) interface{} {
+	if apiVersion == 2 {
+		return NewAttachDiskV2(diskService, vmService, registryClient)
+	} else {
+		return NewAttachDiskV1(diskService, vmService, registryClient)
+	}
+}
+
+func (f ConcreteFactory) selectCreateVM(
+	apiVersion int,
+	vmService instance.Service,
+	diskService disk.Service,
+	diskTypeService disktype.Service,
+	imageService image.Service,
+	machineTypeService machinetype.Service,
+	acceleratorTypeService acceleratortype.Service,
+	registryClient registry.Client,
+	registryOptions registry.ClientOptions,
+	agentOptions registry.AgentOptions,
+	defaultRootDiskSizeGb int,
+	defaultRootDiskType string,
+) interface{} {
+	if apiVersion == 2 {
+		return NewCreateVMV2(
+			vmService,
+			diskService,
+			diskTypeService,
+			imageService,
+			machineTypeService,
+			acceleratorTypeService,
+			registryClient,
+			registryOptions,
+			agentOptions,
+			defaultRootDiskSizeGb,
+			defaultRootDiskType,
+		)
+	} else {
+		return NewCreateVMV1(
+			vmService,
+			diskService,
+			diskTypeService,
+			imageService,
+			machineTypeService,
+			acceleratorTypeService,
+			registryClient,
+			registryOptions,
+			agentOptions,
+			defaultRootDiskSizeGb,
+			defaultRootDiskType,
+		)
+	}
 }

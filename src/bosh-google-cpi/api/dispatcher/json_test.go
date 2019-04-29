@@ -197,6 +197,37 @@ var _ = Describe("JSON", func() {
 			})
 		})
 
+		Context("when the api version is bigger than the max supported version", func() {
+			It("should return an error", func() {
+				response := dispatcher.Dispatch([]byte(`
+					{
+					  "method": "fake-action",
+					  "arguments": [
+					    123,
+					    "fake-arg",
+					    [
+					      123,
+					      "fake-arg"
+					    ],
+					    {
+					      "fake-arg2-key": "fake-arg2-value"
+					    }
+					  ],
+					  "api_version": 9000
+					}`))
+				Expect(response).To(MatchJSON(`
+					{
+						"result": null,
+							"error": {
+							"type": "Bosh::Clouds::CpiError",
+								"message": "API version 9000 not supported",
+								"ok_to_retry": false
+						},
+						"log": ""
+					}`))
+			})
+		})
+
 		Context("when method key is missing", func() {
 			It("responds with Bosh::Clouds::CpiError error", func() {
 				response := dispatcher.Dispatch([]byte(`{}`))
