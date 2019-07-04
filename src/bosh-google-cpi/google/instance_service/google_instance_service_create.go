@@ -173,15 +173,8 @@ func (i GoogleInstanceService) createMatadataParams(name string, regEndpoint str
 }
 
 func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, zone string) ([]*compute.NetworkInterface, error) {
-	network, found, err := i.networkService.Find(networks.NetworkProjectID(), networks.NetworkName())
-	if err != nil {
-		return nil, err
-	}
-	if !found {
-		return nil, bosherr.WrapErrorf(err, "Network '%s' does not exist in project '%s'", networks.NetworkName(), networks.NetworkProjectID())
-	}
-
 	subnetworkLink := ""
+	networkLink := ""
 	if networks.SubnetworkName() != "" {
 		subnetwork, err := i.subnetworkService.Find(networks.NetworkProjectID(), networks.SubnetworkName(), util.RegionFromZone(zone))
 		if err != nil {
@@ -191,6 +184,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, 
 			return nil, err
 		}
 		subnetworkLink = subnetwork.SelfLink
+		networkLink = subnetwork.Network
 	}
 
 	var networkInterfaces []*compute.NetworkInterface
@@ -209,7 +203,7 @@ func (i GoogleInstanceService) createNetworkInterfacesParams(networks Networks, 
 	}
 
 	networkInterface := &compute.NetworkInterface{
-		Network:       network.SelfLink,
+		Network:       networkLink,
 		Subnetwork:    subnetworkLink,
 		AccessConfigs: accessConfigs,
 		NetworkIP:     networks.StaticPrivateIP(),
