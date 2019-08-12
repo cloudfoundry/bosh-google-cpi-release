@@ -102,6 +102,9 @@ func (i GoogleImageService) create(name string, description string, sourceURL st
 		Name:        name,
 		Description: description,
 		RawDisk:     rawdisk,
+		GuestOsFeatures: []*compute.GuestOsFeature{
+			{ Type: "MULTI_IP_SUBNET" },
+		},
 	}
 
 	i.logger.Debug(googleImageServiceLogTag, "Creating Google Image with params: %#v", image)
