@@ -1,8 +1,8 @@
-golang/go1.9.1.darwin-amd64.tar.gz:
-  size: 102363520
-  object_id: d9c22ee8-01db-4bb1-4aee-42a1aa5da9ad
-  sha: f9922d9e1af7a9a768826efb85ca26ffb36277ae
-golang/go1.9.1.linux-amd64.tar.gz:
-  size: 104197862
-  object_id: d5a30ea9-e994-4b3e-77da-ba805c98bdca
-  sha: 8ab67607ac917684560e699b76b3121f5799e24e
+golang/go1.12.darwin-amd64.tar.gz:
+  size: 126903500
+  object_id: 55774b5b-ff39-4dde-4287-cf0662af1b2c
+  sha: 569bc0b8164cde6176b0340519b9c358db42f235
+golang/go1.12.linux-amd64.tar.gz:
+  size: 127228112
+  object_id: 8cdb6a20-1d35-4968-5b7b-61b202fba502
+  sha: 8715ddcd08e9d5ddf3e09c1af7c69bf4f23847ae

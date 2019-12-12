@@ -3,7 +3,7 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.1.2.sh
+source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param release_blobs_access_key
 check_param release_blobs_secret_key

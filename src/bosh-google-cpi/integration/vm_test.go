@@ -14,11 +14,72 @@ var _ = Describe("VM", func() {
 	It("creates a VM with an invalid configuration and receives an error message with logs", func() {
 		request := fmt.Sprintf(`{
 			  "method": "create_vm",
+			"arguments": [
+				"agent",
+				"%v",
+				{
+					"machine_type": "n1-standard-error"
+				},
+				{
+					"default": {
+						"type": "dynamic",
+						"cloud_properties": {
+							"tags": ["integration-delete"],
+							"network_name": "%v"
+						}
+					}
+				},
+				[],
+				{}
+			]
+			}`, existingStemcell, networkName)
+		resp, err := execCPI(request)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resp.Error.Message).ToNot(BeEmpty())
+		Expect(resp.Log).ToNot(BeEmpty())
+	})
+
+	It("creates a VM with an invalid configuration and receives an error message with logs while using api version 2", func() {
+		request := fmt.Sprintf(`{
+			"method": "create_vm",
+			"arguments": [
+				"agent",
+				"%v",
+				{
+					"machine_type": "n1-standard-error"
+				},
+				{
+					"default": {
+						"type": "dynamic",
+						"cloud_properties": {
+							"tags": ["integration-delete"],
+							"network_name": "%v"
+						}
+					}
+				},
+				[],
+				{}
+			],
+			"api_version": 2
+		}`, existingStemcell, networkName)
+		resp, err := execCPI(request)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resp.Error.Message).ToNot(BeEmpty())
+		Expect(resp.Log).ToNot(BeEmpty())
+	})
+
+	It("can create a VM and return the results in an array", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
 			  "arguments": [
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-error"
+				   "machine_type": "n1-standard-1",
+					"zone": "%v",
+				   "tags": ["tag1", "tag2"]
 				},
 				{
 				  "default": {
@@ -32,11 +93,12 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, networkName)
-		resp, err := execCPI(request)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(resp.Error.Message).ToNot(BeEmpty())
-		Expect(resp.Log).ToNot(BeEmpty())
+			}`, existingStemcell, zone, networkName)
+
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			Expect(instance.Tags.Items).To(ConsistOf("integration-delete", "tag1", "tag2"))
+		})
 	})
 
 	It("executes the VM lifecycle", func() {

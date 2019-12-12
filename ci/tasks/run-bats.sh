@@ -3,7 +3,7 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.1.2.sh
+source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param google_json_key_data
 check_param google_subnetwork_range
@@ -14,7 +14,7 @@ check_param private_key_data
 # Initialize deployment artifacts
 deployment_dir="${PWD}"
 creds_dir="${PWD}/director-creds"
-creds_file="${creds_dir}/creds.yml"
+creds_file="${creds_dir}/${cpi_source_branch}-creds.yml"
 cpi_release_name=bosh-google-cpi
 google_json_key=${deployment_dir}/google_key.json
 private_key=${deployment_dir}/private_key.pem

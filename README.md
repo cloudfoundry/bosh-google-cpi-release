@@ -22,13 +22,6 @@ After you have followed the instructions for deploying a BOSH director in [docs/
 
 ## Developing
 Contributions to the CPI are welcome. Unit and integration tests for any new features are encouraged.
-Developers may find it easier to set the GOPATH to the directory of the check-out repository:
-
-```
-cd bosh-google-cpi-release
-export GOPATH=$pwd
-PATH=$PATH:$GOPATH/bin
-```
 
 ### Running integration tests
 1. Set your project:

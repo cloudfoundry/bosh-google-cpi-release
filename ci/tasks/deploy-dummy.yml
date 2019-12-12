@@ -7,8 +7,8 @@ image_resource:
 inputs:
   - name: bosh-cpi-src
   - name: ci
-  - name: dummy-boshrelease
   - name: deployment
+  - name: dummy-boshrelease
 run:
   path: ci/ci/tasks/deploy-dummy.sh
 params:

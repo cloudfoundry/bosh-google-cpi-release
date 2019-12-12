@@ -2,6 +2,15 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [30.0.0] - 2019-01-04
+
+### Added
+- MULTI_IP_SUBNET support in GCE
+
+### Changed
+- Go 1.12
+- BOSH API v2
+
 ## [29.0.0] - 2019-01-04
 
 ### Fixed
@@ -203,6 +212,7 @@ CI:
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[30.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v29.0.1...v30.0.0
 [29.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.1...v29.0.0
 [28.0.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.0...v28.0.1
 [25.10.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v25.9.0...v25.10.0

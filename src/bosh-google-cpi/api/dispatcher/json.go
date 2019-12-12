@@ -3,9 +3,12 @@ package dispatcher
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"math"
 
 	bgcaction "bosh-google-cpi/action"
 	bgcapi "bosh-google-cpi/api"
+	"bosh-google-cpi/constant"
 )
 
 const (
@@ -20,7 +23,8 @@ type Request struct {
 	Method    string        `json:"method"`
 	Arguments []interface{} `json:"arguments"`
 
-	Context map[string]interface{} `json:"context"`
+	Context    map[string]interface{} `json:"context"`
+	ApiVersion int                    `json:"api_version,omitempty"`
 }
 
 type Response struct {
@@ -80,7 +84,13 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 		return c.buildCpiError("Must provide arguments key")
 	}
 
-	action, err := c.actionFactory.Create(req.Method, req.Context)
+	apiVersion := int(math.Max(1, float64(req.ApiVersion)))
+
+	if apiVersion > constant.MaxSupportedAPIVersion {
+		return c.buildCpiError(fmt.Sprintf("API version %d not supported", apiVersion))
+	}
+
+	action, err := c.actionFactory.Create(req.Method, req.Context, apiVersion)
 	if err != nil {
 		return c.buildNotImplementedError()
 	}

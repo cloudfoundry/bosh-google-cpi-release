@@ -1,7 +1,0 @@
-required = ["github.com/onsi/ginkgo/ginkgo", "github.com/golang/lint/golint", "github.com/mitchellh/gox"]
-
-[prune]
-  go-tests = true
-  non-go = true
-  unused-packages = true
-
