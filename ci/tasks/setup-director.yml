@@ -24,3 +24,4 @@ params:
   private_key_user:               replace-me
   private_key_data:               replace-me
   google_json_key_data:           replace-me
+  google_test_bucket_name:        replace-me
