@@ -1,6 +1,6 @@
 ---
 final_name: bosh-google-cpi
 blobstore:
-  provider: gcs
+  provider: s3
   options:
     bucket_name: bosh-cpi-artifacts
