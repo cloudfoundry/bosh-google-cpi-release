@@ -90,4 +90,6 @@ builds:
     version: 29.0.0
   68446695-7ed5-49b0-b79d-fb8d455888f3:
     version: 29.0.1
+  713a1bbe-650e-4a16-bbff-4e876a9bb526:
+    version: 30.0.0
 format-version: '2'
