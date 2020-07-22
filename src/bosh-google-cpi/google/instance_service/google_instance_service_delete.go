@@ -5,7 +5,6 @@ import (
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
-
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
@@ -18,14 +17,6 @@ func (i GoogleInstanceService) Delete(id string) error {
 	}
 	if !found {
 		return api.NewVMNotFoundError(id)
-	}
-
-	if err = i.removeFromTargetPool(instance.SelfLink); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Target Pool", id)
-	}
-
-	if err = i.removeFromBackendService(instance.SelfLink); err != nil {
-		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Backend Services", id)
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Deleting Google Instance '%s'", id)
@@ -41,5 +32,12 @@ func (i GoogleInstanceService) Delete(id string) error {
 		}
 	}
 
+	if err = i.removeFromTargetPool(instance.SelfLink); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Target Pool", id)
+	}
+
+	if err = i.removeFromBackendService(instance.SelfLink); err != nil {
+		return bosherr.WrapErrorf(err, "Failed to remove Google Instance %q from Backend Services", id)
+	}
 	return nil
 }
