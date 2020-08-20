@@ -1,5 +1,4 @@
 FROM ubuntu:16.04
-MAINTAINER Evan Brown <evanbrown@google.com>
 
 # Update base image
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install locales apt-utils
@@ -14,13 +13,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libpq-dev; apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
 
 # Install Golang
-ENV GOLANG_VERSION 1.12
+ENV GOLANG_VERSION 1.14
 RUN curl -sSL https://dl.google.com/go/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
 ENV GOROOT /usr/local/go
 ENV PATH $PATH:$GOROOT/bin
 
 # Install Google Cloud SDK
-ENV GCLOUD_SDK_VERSION 139.0.1
+ENV GCLOUD_SDK_VERSION 305.0.0
 RUN curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz | tar -v -C /usr/local -xz
 ENV PATH $PATH:/usr/local/google-cloud-sdk/bin
 
@@ -46,13 +45,13 @@ RUN ruby-install ruby 2.6.1 && \
     cp /etc/profile.d/chruby.sh /etc/profile.d/chruby-with-ruby-2.6.1.sh && \
     echo "chruby 2.6.1" >> /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
-# Install Bundler and BOSH CLI
-RUN /bin/bash -l -c "gem install bundler bosh_cli --no-document"
+# Install Bundler
+RUN /bin/bash -l -c "gem install bundler --no-document"
 
-# Install Bosh2
-RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-2.0.48-linux-amd64
+# Install Bosh cli
+RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-6.3.1-linux-amd64
 RUN chmod +x bosh-cli-*
-RUN mv bosh-cli-* /usr/bin/bosh2
+RUN mv bosh-cli-* /usr/bin/bosh
 
 # Install AWS CLI (used to upload stemcell)
 RUN pip install awscli
