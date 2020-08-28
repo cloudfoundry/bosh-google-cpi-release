@@ -5,8 +5,7 @@ set -e
 source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
-check_param release_blobs_access_key
-check_param release_blobs_secret_key
+check_param release_blobs_json_key
 
 # Version info
 semver_version=`cat release-version-semver/number`
@@ -38,9 +37,9 @@ pushd promoted/repo
   cat > config/private.yml << EOF
 ---
 blobstore:
-  s3:
-    access_key_id: ${release_blobs_access_key}
-    secret_access_key: ${release_blobs_secret_key}
+  options:
+    credentials_source: static
+    json_key: '${release_blobs_json_key}'
 EOF
 
   echo "Using BOSH CLI version..."
@@ -68,4 +67,3 @@ EOF
   mv releases/$cpi_release_name/$cpi_blob ../
   echo $cpi_sha > ../$cpi_blob.sha1
 popd
-

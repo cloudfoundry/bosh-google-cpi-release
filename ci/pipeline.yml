@@ -204,8 +204,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_access_key: ((release_blobs_access_key))
-          release_blobs_secret_key: ((release_blobs_secret_key))
+          release_blobs_json_key: ((google_json_key_data))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -235,8 +234,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_access_key: ((release_blobs_access_key))
-          release_blobs_secret_key: ((release_blobs_secret_key))
+          release_blobs_json_key: ((google_json_key_data))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -266,8 +264,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_access_key: ((release_blobs_access_key))
-          release_blobs_secret_key: ((release_blobs_secret_key))
+          release_blobs_json_key: ((google_json_key_data))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -384,13 +381,11 @@ resources:
   - name: infrastructure
     type: terraform
     source:
-      storage:
-        bucket:            ((google_state_bucket_name))
-        bucket_path:       terraform-((cpi_source_branch))
-        access_key_id:     ((google_state_access_key))
-        secret_access_key: ((google_state_secret_key))
-        region:            ((google_state_region))
-        endpoint:          storage.googleapis.com
+      backend_type: gcs
+      backend_config:
+        bucket: ((google_state_bucket_name))
+        prefix: terraform-((cpi_source_branch))
+        credentials: ((google_json_key_data))
       vars:
         google_project:           ((google_project))
         google_region:            ((google_region))
@@ -406,22 +401,18 @@ resources:
   - name: release-version-semver
     type: semver
     source:
+      driver: gcs
+      json_key:          ((google_json_key_data))
       key:               release-current-version
       bucket:            ((version_semver_bucket_name))
-      access_key_id:     ((version_semver_access_key))
-      secret_access_key: ((version_semver_secret_key))
-      region:            ((version_semver_region))
-      endpoint:          storage.googleapis.com
 
   - name: version-semver
     type: semver
     source:
+      driver: gcs
+      json_key:          ((google_json_key_data))
       key:               current-version
       bucket:            ((version_semver_bucket_name))
-      access_key_id:     ((version_semver_access_key))
-      secret_access_key: ((version_semver_secret_key))
-      region:            ((version_semver_region))
-      endpoint:          storage.googleapis.com
 
 resource_types:
 - name: gcs-resource
