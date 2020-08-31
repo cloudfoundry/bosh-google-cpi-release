@@ -1,5 +1,0 @@
----
-name: golang
-files:
-  - golang/go1.12.darwin-amd64.tar.gz
-  - golang/go1.12.linux-amd64.tar.gz

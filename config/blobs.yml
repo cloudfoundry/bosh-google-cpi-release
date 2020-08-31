@@ -1,8 +1,0 @@
-golang/go1.12.darwin-amd64.tar.gz:
-  size: 126903500
-  object_id: 55774b5b-ff39-4dde-4287-cf0662af1b2c
-  sha: 569bc0b8164cde6176b0340519b9c358db42f235
-golang/go1.12.linux-amd64.tar.gz:
-  size: 127228112
-  object_id: 8cdb6a20-1d35-4968-5b7b-61b202fba502
-  sha: 8715ddcd08e9d5ddf3e09c1af7c69bf4f23847ae
