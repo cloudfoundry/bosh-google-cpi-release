@@ -11,14 +11,14 @@ image_path=$PWD/bosh-cpi-src/${cpi_release_name}-${semver}.tgz
 
 pushd bosh-cpi-src
   echo "Using BOSH CLI version..."
-  bosh version
+  bosh --version
 
   echo "Exposing release semver to bosh-google-cpi"
   echo ${semver} > "src/bosh-google-cpi/release"
 
   # We have to use the --force flag because we just added the `src/bosh-google-cpi/release` file
   echo "Creating CPI BOSH Release..."
-  bosh2 create-release --name=${cpi_release_name} --version=${semver} --tarball=${image_path} --force
+  bosh create-release --name=${cpi_release_name} --version=${semver} --tarball=${image_path} --force
 popd
 
 echo -n $(sha1sum $image_path | awk '{print $1}') > $image_path.sha1
