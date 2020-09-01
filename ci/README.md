@@ -11,7 +11,7 @@ fly -t google login -c <YOUR CONCOURSE URL>
 * Update the [credentials-template.yml](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/ci/credentials-template.yml) file. Note that this configuration file requires a SSH private key for the `vcap` user. In order to generate this SSH key run:
 
  ```
- ssh-keygen -t rsa -f vcap_key -C "vcap@localhost"
+ ssh-keygen -t rsa -f vcap_key -C "vcap@localhost" -m PEM
  ```
 
  And then:
