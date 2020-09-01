@@ -23,7 +23,8 @@ export no_proxy="<%= no_proxy %>"
 <% end %>
 
 # Invoke CPI
-cmd="${PACKAGES_DIR}/bosh-google-cpi/bin/cpi -configFile=${JOBS_DIR}/google_cpi/config/cpi.json"
+platform=`uname | tr '[:upper:]' '[:lower:]'`
+cmd="${PACKAGES_DIR}/bosh-google-cpi/bin/cpi-${platform} -configFile=${JOBS_DIR}/google_cpi/config/cpi.json"
 
 if [ -d ${LOGS_DIR} ]; then
   exec $cmd 2>>${LOGS_DIR}/cpi.stderr.log <&0

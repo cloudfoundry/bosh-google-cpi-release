@@ -1,11 +1,22 @@
-set -e # exit immediately if a simple command exits with a non-zero status
-set -u # report the usage of uninitialized variables
+set -ex
 
-source /var/vcap/packages/golang-1.14-linux/bosh/compile.env
+if [ -z "$BOSH_PACKAGES_DIR" ]; then
+	pkg_dir=$(readlink -nf /var/vcap/packages/golang-1.14-linux)
+else
+	pkg_dir=$BOSH_PACKAGES_DIR/golang-1.14-linux
+fi
+
+source ${pkg_dir}/bosh/compile.env.generic
 
 cd ${BOSH_COMPILE_TARGET}/bosh-google-cpi
-make build
-
-# Copy BOSH Google CPI package
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
-cp -a ${BOSH_COMPILE_TARGET}/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/
+
+export GOARCH=amd64
+export GOOS=darwin
+make build
+cp -a ${BOSH_COMPILE_TARGET}/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/cpi-darwin
+
+export GOARCH=amd64
+export GOOS=linux
+make build
+cp -a ${BOSH_COMPILE_TARGET}/bosh-google-cpi/out/cpi ${BOSH_INSTALL_TARGET}/bin/cpi-linux
