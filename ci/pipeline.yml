@@ -16,7 +16,7 @@ groups:
 jobs:
   - name: test-unit
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {get: ci}
       - task: unit-tests
@@ -25,7 +25,7 @@ jobs:
   - name: build-candidate
     serial: true
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
         - {trigger: false,                     get: version-semver, params: {bump: patch}}
         - {get: ci}
@@ -44,11 +44,11 @@ jobs:
   - name: setup-infrastructure
     serial_groups: [run-bats, run-int]
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
         - {get: ci}
-      - aggregate: &teardown_step
+      - in_parallel: &teardown_step
         - task: teardown-infrastructure
           file: ci/ci/tasks/teardown-infrastructure.yml
           params:
@@ -64,12 +64,12 @@ jobs:
           terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
-      - aggregate: *teardown_step
+      - in_parallel: *teardown_step
 
   - name: teardown-infrastructure
     serial_groups: [run-bats, run-int]
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true,  passed: [run-bats, run-int],   get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-bats],            get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: false, passed: [run-bats],            get: director-creds, resource: director-creds}
@@ -79,7 +79,7 @@ jobs:
         - {trigger: false,                                get: bosh-cli}
         - {trigger: false,                                get: bosh-deployment}
         - {get: ci}
-      - aggregate: *teardown_step
+      - in_parallel: *teardown_step
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
       - task: teardown-director
@@ -108,7 +108,7 @@ jobs:
   - name: deploy-ubuntu
     serial_groups: [run-bats]
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
@@ -156,7 +156,7 @@ jobs:
     serial: true
     serial_groups: [run-bats]
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
@@ -181,7 +181,7 @@ jobs:
   - name: run-int
     serial_groups: [run-int]
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: true, passed: [build-candidate],                       get: bosh-cpi-src, resource: bosh-cpi-src-in}
         - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: true, passed: [setup-infrastructure],                  get: infrastructure, resource: infrastructure}
@@ -195,7 +195,7 @@ jobs:
   - name: promote-candidate-major
     serial: true
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
         - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
@@ -225,7 +225,7 @@ jobs:
   - name: promote-candidate-minor
     serial: true
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {get: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
@@ -255,7 +255,7 @@ jobs:
   - name: promote-candidate-patch
     serial: true
     plan:
-      - aggregate:
+      - in_parallel:
         - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
         - {get: ci}
         - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
