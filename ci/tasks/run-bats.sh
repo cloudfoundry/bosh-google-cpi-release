@@ -34,7 +34,7 @@ echo "${private_key_data}" > ${private_key}
 
 export BAT_STEMCELL="${deployment_dir}/stemcell.tgz"
 export BAT_DEPLOYMENT_SPEC="${bat_config_filename}"
-export BAT_BOSH_CLI=/usr/bin/bosh2
+export BAT_BOSH_CLI=/usr/bin/bosh
 export BAT_DNS_HOST=${google_address_director_ip}
 export BAT_INFRASTRUCTURE=google
 export BAT_NETWORKING=dynamic
