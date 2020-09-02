@@ -3,6 +3,8 @@ package action_test
 import (
 	"errors"
 
+	"encoding/json"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -99,6 +101,20 @@ var _ = Describe("SnapshotDisk", func() {
 			Expect(err.Error()).To(ContainSubstring("fake-snapshot-service-error"))
 			Expect(diskService.FindCalled).To(BeTrue())
 			Expect(snapshotService.CreateCalled).To(BeTrue())
+		})
+
+		It("can decode a string value into index metadata", func() {
+			data := []byte(`{"index":"job_index"}`)
+			var md SnapshotMetadata
+			err := json.Unmarshal(data, &md)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("can decode a int value into index metadata", func() {
+			data := []byte(`{"index":123}`)
+			var md SnapshotMetadata
+			err := json.Unmarshal(data, &md)
+			Expect(err).ToNot(HaveOccurred())
 		})
 	})
 })

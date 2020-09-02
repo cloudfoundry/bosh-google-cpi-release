@@ -2,7 +2,7 @@ package action
 
 import (
 	"encoding/json"
-
+        "fmt"
 	"bosh-google-cpi/google/instance_service"
 )
 
@@ -25,7 +25,7 @@ type NetworkCloudProperties struct {
 type SnapshotMetadata struct {
 	Deployment string      `json:"deployment,omitempty"`
 	Job        string      `json:"job,omitempty"`
-	Index      json.Number `json:"index,omitempty"`
+	Index      Number      `json:"index,omitempty"`
 }
 
 type StemcellCloudProperties struct {
@@ -79,4 +79,13 @@ type VMMetadata map[string]string
 type Accelerator struct {
 	AcceleratorType string `json:"type,omitempty"`
 	Count           int64  `json:"count,omitempty"`
+}
+
+type Number string
+
+func (n *Number) UnmarshalJSON(b []byte) error {
+     if b[0] != '"' {
+        b = []byte(fmt.Sprintf("\"%s\"", b))
+     }
+     return json.Unmarshal(b, (*string)(n))
 }
