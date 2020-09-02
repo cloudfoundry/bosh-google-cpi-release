@@ -106,7 +106,7 @@ jobs:
           action: destroy
 
   - name: deploy-ubuntu
-    serial_groups: [run-bats]
+    serial_groups: [run-bats, run-int]
     plan:
       - in_parallel:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
