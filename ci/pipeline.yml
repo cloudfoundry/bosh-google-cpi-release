@@ -60,7 +60,7 @@ jobs:
             google_zone: ((google_zone))
       - put: infrastructure
         params:
-          env_name: ((cpi_source_branch))
+          env_name: ((cpi_source_branch))-bosh-google-cpi
           terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
@@ -98,7 +98,7 @@ jobs:
           private_key_data:               ((private_key_data))
       - put: infrastructure
         params:
-          env_name: ((cpi_source_branch))
+          env_name: ((cpi_source_branch))-bosh-google-cpi
           terraform_source: ci/ci/test_infrastructure
           action: destroy
         get_params:
