@@ -57,6 +57,7 @@ type VMCloudProperties struct {
 	Tags                instance.Tags    `json:"tags,omitempty"`
 	Labels              instance.Labels  `json:"labels,omitempty"`
 	EphemeralExternalIP *bool            `json:"ephemeral_external_ip,omitempty"`
+	EphemeralDiskType   string           `json:"ephemeral_disk_type,omitempty"`
 	IPForwarding        *bool            `json:"ip_forwarding,omitempty"`
 	Accelerators        []Accelerator    `json:"accelerators,omitempty"`
 }

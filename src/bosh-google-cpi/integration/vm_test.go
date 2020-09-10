@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	computebeta "google.golang.org/api/compute/v0.beta"
-	compute "google.golang.org/api/compute/v1"
+	"google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("VM", func() {
@@ -802,6 +802,50 @@ var _ = Describe("VM", func() {
 			// Labels should be an exact match
 			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
 			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("executes the VM lifecycle with a local-ssd specified", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+                  "ephemeral_disk_type": "local-ssd",
+				  "service_account": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, serviceAccount, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+			Expect(instance.Disks[1].DeviceName).To(Equal("local-ssd-0"))
+			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
 		})
 
 		By("deleting the VM")
