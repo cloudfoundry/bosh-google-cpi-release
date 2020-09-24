@@ -699,7 +699,7 @@ var _ = Describe("VM", func() {
 				"agent",
 				"%v",
 				{
-				  "machine_type": "n1-standard-1",
+				  "machine_type": "n1-standard-2",
 				  "zone": "%v",
                                   "node_group": "%v"
 				},
