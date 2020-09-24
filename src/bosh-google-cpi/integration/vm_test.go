@@ -700,6 +700,7 @@ var _ = Describe("VM", func() {
 				"%v",
 				{
 				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
                                   "node_group": "%v"
 				},
 				{
@@ -713,7 +714,7 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, nodeGroup, networkName)
+			}`, existingStemcell, zone, nodeGroup, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 
 		By("deleting the VM")
