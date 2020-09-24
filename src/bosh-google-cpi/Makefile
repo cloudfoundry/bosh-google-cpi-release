@@ -68,6 +68,7 @@ testint: check-proj get-deps clean fmt
 	GOOGLE_PROJECT=$(shell cd ../../ci/test_infrastructure && terraform output google_project) \
 	SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
 	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
+	NODE_GROUP=$(shell cd ../../ci/test_infrastructure && terraform output google_node_group) \
     ./bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.

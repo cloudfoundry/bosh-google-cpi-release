@@ -44,6 +44,7 @@ var (
 	ilbInstanceGroup              = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
 	zone                          = envOrDefault("ZONE", "us-central1-a")
 	region                        = envOrDefault("REGION", "us-central1")
+	nodeGroup                     = envOrDefault("NODE_GROUP", "cfintegration-node-group")
 	imageURL                      = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
 
 	// Channel that will be used to retrieve IPs to use

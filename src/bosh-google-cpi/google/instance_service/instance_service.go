@@ -39,6 +39,7 @@ type Properties struct {
 	ServiceScopes     ServiceScopes
 	TargetPool        string
 	BackendService    BackendService
+	NodeGroup         string
 	Tags              Tags
 	Labels            Labels
 	Accelerators      []Accelerator
