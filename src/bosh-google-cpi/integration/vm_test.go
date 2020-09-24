@@ -706,7 +706,7 @@ var _ = Describe("VM", func() {
 				  "default": {
 					"type": "dynamic",
 					"cloud_properties": {
-					  "network_name": "%v",
+					  "network_name": "%v"
 					}
 				  }
 				},
