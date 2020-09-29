@@ -202,6 +202,7 @@ var _ = Describe("ConcreteFactory", func() {
 			operationService,
 			subnetworkService,
 			targetPoolService,
+			diskTypeService,
 			uuidGen,
 			logger,
 		)

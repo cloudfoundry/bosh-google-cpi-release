@@ -601,6 +601,33 @@ var _ = Describe("CreateVM", func() {
 			})
 		})
 
+		Context("when local-ssd has been set", func() {
+			BeforeEach(func() {
+				cloudProps.EphemeralDiskType = "local-ssd"
+
+				expectedVMProps.EphemeralDiskType = "local-ssd"
+				expectedAgentSettings.Disks.Ephemeral = "/dev/nvme0n1"
+			})
+
+			It("creates the vm with the right properties", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(diskService.FindCalled).To(BeFalse())
+				Expect(imageService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.FindCalled).To(BeTrue())
+				Expect(machineTypeService.CustomLinkCalled).To(BeFalse())
+				Expect(diskTypeService.FindCalled).To(BeFalse())
+				Expect(vmService.CreateCalled).To(BeTrue())
+				Expect(vmService.CleanUpCalled).To(BeFalse())
+				Expect(registryClient.UpdateCalled).To(BeTrue())
+				Expect(registryClient.UpdateSettings).To(Equal(expectedAgentSettings))
+				Expect(vmCID).To(Equal(VMCID("fake-vm-id")))
+				Expect(vmService.CreateVMProps).To(Equal(expectedVMProps))
+				Expect(vmService.CreateNetworks).To(Equal(expectedInstanceNetworks))
+				Expect(vmService.CreateRegistryEndpoint).To(Equal("http://fake-registry-username:fake-registry-password@fake-registry-host:25777"))
+			})
+		})
+
 		Context("when accelerator is set", func() {
 			BeforeEach(func() {
 				acceleratorTypeService.FindFound = true

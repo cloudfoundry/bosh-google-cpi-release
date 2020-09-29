@@ -43,6 +43,7 @@ type Properties struct {
 	Tags              Tags
 	Labels            Labels
 	Accelerators      []Accelerator
+	EphemeralDiskType string
 }
 
 type ServiceScopes []string

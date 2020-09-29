@@ -190,6 +190,8 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		return "", nil, bosherr.WrapErrorf(err, "Parsing BackendService %#v", cloudProps.BackendService)
 	}
 
+	ephemeral := cloudProps.EphemeralDiskType
+
 	// Parse VM properties
 	vmProps := &instance.Properties{
 		Zone:              zone,
@@ -209,6 +211,7 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		Labels:            cloudProps.Labels,
 		Accelerators:      acceleratorTypeLinks,
 		NodeGroup:         cloudProps.NodeGroup,
+		EphemeralDiskType: ephemeral,
 	}
 
 	// Create VM
@@ -230,6 +233,11 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 	// Create VM settings
 	agentNetworks := networks.AsRegistryNetworks()
 	agentSettings := registry.NewAgentSettings(agentID, vm, agentNetworks, registry.EnvSettings(env), cv.agentOptions)
+
+	if ephemeral == "local-ssd" {
+		agentSettings.Disks.Ephemeral = "/dev/nvme0n1"
+	}
+
 	if err = cv.registryClient.Update(vm, agentSettings); err != nil {
 		return "", nil, bosherr.WrapErrorf(err, "Creating VM")
 	}

@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"bosh-google-cpi/google/disk_type_service"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
 
@@ -26,6 +27,7 @@ type GoogleInstanceService struct {
 	backendServiceService backendservice.Service
 	networkService        network.Service
 	operationService      operation.Service
+	diskTypeService       disktype.Service
 	subnetworkService     subnetwork.Service
 	targetPoolService     targetpool.Service
 	uuidGen               boshuuid.Generator
@@ -42,6 +44,7 @@ func NewGoogleInstanceService(
 	operationService operation.Service,
 	subnetworkService subnetwork.Service,
 	targetPoolService targetpool.Service,
+	diskTypeService disktype.Service,
 	uuidGen boshuuid.Generator,
 	logger boshlog.Logger,
 ) GoogleInstanceService {
@@ -55,6 +58,7 @@ func NewGoogleInstanceService(
 		operationService:      operationService,
 		subnetworkService:     subnetworkService,
 		targetPoolService:     targetPoolService,
+		diskTypeService:       diskTypeService,
 		uuidGen:               uuidGen,
 		logger:                logger,
 	}

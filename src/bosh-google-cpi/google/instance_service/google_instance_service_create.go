@@ -2,6 +2,7 @@ package instance
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -57,6 +58,17 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	tags.Items = allTags.Unique()
 
 	acceleratorParams := i.createAcceleratorParams(vmProps.Accelerators)
+
+	var ssdDisk *compute.AttachedDisk
+
+	if vmProps.EphemeralDiskType == "local-ssd" {
+		ssdDisk, err = i.createLocalSSDParams(vmProps.Zone)
+		if err != nil {
+			return "", err
+		}
+
+		diskParams = append(diskParams, ssdDisk)
+	}
 
 	vm := &compute.Instance{
 		Name:              instanceName,
@@ -134,6 +146,29 @@ func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, d
 	disks = append(disks, disk)
 
 	return disks
+}
+
+func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.AttachedDisk, error) {
+	diskType, b, e := i.diskTypeService.Find("local-ssd", zone)
+	if e != nil {
+		return nil, e
+	}
+	if !b {
+		return nil, errors.New("disk not found")
+	}
+
+	disk := &compute.AttachedDisk{
+		AutoDelete: true,
+		Boot:       false,
+		InitializeParams: &compute.AttachedDiskInitializeParams{
+			DiskType: diskType.SelfLink,
+		},
+		Interface: "NVME",
+		Index:     1,
+		Type:      "SCRATCH",
+	}
+
+	return disk, nil
 }
 
 func (i GoogleInstanceService) createAcceleratorParams(accelerators []Accelerator) []*compute.AcceleratorConfig {
