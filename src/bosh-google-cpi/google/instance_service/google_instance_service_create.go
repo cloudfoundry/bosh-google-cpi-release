@@ -16,6 +16,7 @@ import (
 
 const defaultRootDiskSizeGb = 10
 const userDataKey = "user_data"
+const nodeGroupNodeAffinityKey = "compute.googleapis.com/node-group-name"
 
 // The zones in this map are known to default to Sandy Bridge CPUs, which do
 // not expose RDRAND required to seed sufficient entropy to avoid the bosh-agent
@@ -47,7 +48,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if err != nil {
 		return "", err
 	}
-	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible)
+	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible, vmProps.NodeGroup)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
 
 	// Handle tags
@@ -223,6 +224,7 @@ func (i GoogleInstanceService) createSchedulingParams(
 	automaticRestart bool,
 	onHostMaintenance string,
 	preemptible bool,
+	nodeGroup string,
 ) *compute.Scheduling {
 	if preemptible {
 		return &compute.Scheduling{Preemptible: preemptible}
@@ -232,6 +234,14 @@ func (i GoogleInstanceService) createSchedulingParams(
 		AutomaticRestart:  &automaticRestart,
 		OnHostMaintenance: onHostMaintenance,
 		Preemptible:       preemptible,
+	}
+
+	if nodeGroup != "" {
+		scheduling.NodeAffinities = []*compute.SchedulingNodeAffinity{{
+			Key:      nodeGroupNodeAffinityKey,
+			Operator: "IN",
+			Values:   []string{nodeGroup},
+		}}
 	}
 
 	if onHostMaintenance == "" {

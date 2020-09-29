@@ -1,9 +1,9 @@
 package action
 
 import (
+	instance "bosh-google-cpi/google/instance_service"
 	"encoding/json"
-        "fmt"
-	"bosh-google-cpi/google/instance_service"
+	"fmt"
 )
 
 type DiskCloudProperties struct {
@@ -23,9 +23,9 @@ type NetworkCloudProperties struct {
 }
 
 type SnapshotMetadata struct {
-	Deployment string      `json:"deployment,omitempty"`
-	Job        string      `json:"job,omitempty"`
-	Index      Number      `json:"index,omitempty"`
+	Deployment string `json:"deployment,omitempty"`
+	Job        string `json:"job,omitempty"`
+	Index      Number `json:"index,omitempty"`
 }
 
 type StemcellCloudProperties struct {
@@ -59,6 +59,7 @@ type VMCloudProperties struct {
 	EphemeralExternalIP *bool            `json:"ephemeral_external_ip,omitempty"`
 	IPForwarding        *bool            `json:"ip_forwarding,omitempty"`
 	Accelerators        []Accelerator    `json:"accelerators,omitempty"`
+	NodeGroup           string           `json:"node_group,omitempty"`
 }
 
 func (n VMCloudProperties) Validate() error {
@@ -84,8 +85,8 @@ type Accelerator struct {
 type Number string
 
 func (n *Number) UnmarshalJSON(b []byte) error {
-     if b[0] != '"' {
-        b = []byte(fmt.Sprintf("\"%s\"", b))
-     }
-     return json.Unmarshal(b, (*string)(n))
+	if b[0] != '"' {
+		b = []byte(fmt.Sprintf("\"%s\"", b))
+	}
+	return json.Unmarshal(b, (*string)(n))
 }

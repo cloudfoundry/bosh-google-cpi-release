@@ -689,6 +689,42 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
+	It("can execute the VM lifecycle on a specific node group", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "c2-standard-4",
+				  "zone": "%v",
+                                  "node_group": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, nodeGroup, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
 	var vmCID string
 	It("executes the VM lifecycle with default service scopes and no service account", func() {
 		By("creating a VM")

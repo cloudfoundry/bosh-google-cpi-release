@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"strings"
 
+	acceleratortype "bosh-google-cpi/google/accelerator_type_service"
+	disk "bosh-google-cpi/google/disk_service"
+	disktype "bosh-google-cpi/google/disk_type_service"
+	image "bosh-google-cpi/google/image_service"
+	instance "bosh-google-cpi/google/instance_service"
+	machinetype "bosh-google-cpi/google/machine_type_service"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
-	"bosh-google-cpi/google/disk_service"
-	"bosh-google-cpi/google/disk_type_service"
-	"bosh-google-cpi/google/image_service"
-	"bosh-google-cpi/google/instance_service"
-	"bosh-google-cpi/google/machine_type_service"
 	"bosh-google-cpi/util"
 
-	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
 
@@ -207,6 +208,7 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		Tags:              cloudProps.Tags,
 		Labels:            cloudProps.Labels,
 		Accelerators:      acceleratorTypeLinks,
+		NodeGroup:         cloudProps.NodeGroup,
 	}
 
 	// Create VM

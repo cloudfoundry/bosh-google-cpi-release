@@ -123,6 +123,7 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | `ip_forwarding`         | N        | Boolean                                  | `false`                                                                        | Overrides the equivalent option in the networks section
 | `tags`                  | N        | Array&lt;String&gt;                      | `["foo","bar"]`                                                                | Merged with tags from the networks section
 | `labels`                | N        | Map&lt;String,String&gt;                 | `{"foo":"bar"}`                                                                | A dictionary of (key,value) labels applied to the VM
+| `node_group`            | N        | String                                   | sole-tenant-node-group                                                         | Name of the [Sole Tenant Node Group](https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes). Ideally specified in the az cloud_properties |
 
 ### BOSH Persistent Disks options
 
