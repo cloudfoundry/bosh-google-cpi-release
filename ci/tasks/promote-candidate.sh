@@ -43,10 +43,10 @@ blobstore:
 EOF
 
   echo "Using BOSH CLI version..."
-  bosh version
+  bosh --version
 
   echo "Finalizing CPI BOSH Release..."
-  bosh finalize release ${dev_release} --version ${semver_version}
+  bosh finalize-release ${dev_release} --version ${semver_version}
 
   rm config/private.yml
 
