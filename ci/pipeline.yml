@@ -212,16 +212,6 @@ jobs:
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
-      - put: bosh-cpi-artifacts
-        params:
-          file: promoted/*.tgz
-          predefined_acl: "publicRead"
-
-      - put: bosh-cpi-artifacts-sha1
-        params:
-          file: promoted/*.tgz.sha1
-          predefined_acl: "publicRead"
-
   - name: promote-candidate-minor
     serial: true
     plan:
@@ -241,16 +231,6 @@ jobs:
 
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
-
-      - put: bosh-cpi-artifacts
-        params:
-          file: promoted/*.tgz
-          predefined_acl: "publicRead"
-
-      - put: bosh-cpi-artifacts-sha1
-        params:
-          file: promoted/*.tgz.sha1
-          predefined_acl: "publicRead"
 
   - name: promote-candidate-patch
     serial: true
@@ -272,17 +252,6 @@ jobs:
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
-      - put: bosh-cpi-artifacts
-        params:
-          file: promoted/*.tgz
-          predefined_acl: "publicRead"
-
-      - put: bosh-cpi-artifacts-sha1
-        params:
-          file: promoted/*.tgz.sha1
-          predefined_acl: "publicRead"
-
-
 
 resources:
   - name: bats
@@ -297,20 +266,6 @@ resources:
       regexp: bosh-cli-([0-9.]+)-linux-amd64
       bucket: bosh-cli-artifacts
       region_name: us-east-1
-
-  - name: bosh-cpi-artifacts
-    type: gcs-resource
-    source:
-      json_key: ((google_json_key_data))
-      bucket:   ((google_releases_bucket_name))
-      regexp:   bosh-google-cpi-([0-9]+)\.tgz
-
-  - name: bosh-cpi-artifacts-sha1
-    type: gcs-resource
-    source:
-      json_key: ((google_json_key_data))
-      bucket:   ((google_releases_bucket_name))
-      regexp:   bosh-google-cpi-([0-9]+)\.tgz\.sha1
 
   - name: bosh-cpi-dev-artifacts
     type: gcs-resource
