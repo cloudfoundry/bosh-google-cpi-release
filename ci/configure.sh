@@ -15,4 +15,5 @@ done
 fly -t cpi set-pipeline \
     -p bosh-google-cpi \
     -c pipeline.yml \
+    -v dockerhub_password=$(lpass show "Docker Hub" --password) \
     -l <(lpass show --notes "google-cpi concourse secrets")

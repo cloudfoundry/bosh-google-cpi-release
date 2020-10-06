@@ -252,6 +252,17 @@ jobs:
       - put: bosh-cpi-src-out
         params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
 
+  - name: build-dockerfile
+    public: true
+    serial: true
+    plan:
+      - get: bosh-cpi-src-dockerfiles
+        trigger: true
+      - put: google-cpi-image
+        params:
+          build: "bosh-cpi-src-dockerfiles/ci/docker/bosh-google-cpi-boshrelease"
+        get_params:
+          skip_download: true
 
 resources:
   - name: bats
@@ -290,6 +301,14 @@ resources:
         - releases/**/*.yml
         - ci/*
       uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+
+  - name: bosh-cpi-src-dockerfiles
+    type: git
+    source:
+      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+      branch: ((cpi_source_branch))
+      paths:
+      - "ci/docker"
 
   - name: bosh-cpi-src-out
     type: git
@@ -368,6 +387,14 @@ resources:
       json_key:          ((google_json_key_data))
       key:               current-version
       bucket:            ((version_semver_bucket_name))
+
+  - name: google-cpi-image
+    type: docker-image
+    source:
+      repository: boshcpi/gce-cpi-release
+      email: cf-bosh-eng@pivotal.io
+      username: bosh
+      password: ((dockerhub_password))
 
 resource_types:
 - name: gcs-resource
