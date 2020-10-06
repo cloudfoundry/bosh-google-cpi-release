@@ -62,4 +62,4 @@ RUN cd /tmp && \
     chmod +x certify-artifacts && \
     mv certify-artifacts /bin/certify-artifacts
 
-RUN useradd non-root-user --shell /bin/bash
+RUN useradd non-root-user --shell /bin/bash --create-home
