@@ -12,6 +12,9 @@ groups:
       - promote-candidate-major
       - promote-candidate-minor
       - promote-candidate-patch
+  - name: docker-ci-image
+    jobs:
+      - build-dockerfile
 
 jobs:
   - name: test-unit
