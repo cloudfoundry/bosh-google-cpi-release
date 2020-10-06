@@ -2,6 +2,9 @@
 
 set -e
 
+export HOME=/home/non-root-user
+sudo chown -R non-root-user $(pwd)
+
 source ci/ci/tasks/utils.sh
 source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
