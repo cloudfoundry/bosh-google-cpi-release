@@ -17,6 +17,7 @@ outputs:
   - name: director-state
 run:
   path: ci/ci/tasks/setup-director.sh
+  user: non-root-user
 params:
   BOSH_INIT_LOG_LEVEL:            warn
   cpi_source_branch:              replace-me

@@ -16,13 +16,12 @@ state_file="${PWD}/director-state/${cpi_source_branch}-manifest-state.json"
 cpi_release_name=bosh-google-cpi
 infrastructure_metadata="${PWD}/infrastructure/metadata"
 deployment_dir="${PWD}/deployment"
-google_json_key=${deployment_dir}/google_key.json
+google_json_key=$HOME/.config/gcloud/application_default_credentials.json
 private_key=${deployment_dir}/private_key.pem
 
 echo "Creating google json key..."
-echo "${google_json_key_data}" > ${google_json_key}
 mkdir -p $HOME/.config/gcloud/
-cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
+echo "${google_json_key_data}" > ${google_json_key}
 
 read_infrastructure
 
@@ -138,4 +137,3 @@ pushd ${deployment_dir}
   trap - ERR
   finish
 popd
-
