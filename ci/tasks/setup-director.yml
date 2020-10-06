@@ -19,6 +19,7 @@ run:
   path: ci/ci/tasks/setup-director.sh
   user: non-root-user
 params:
+  HOME: /home/non-root-user
   BOSH_INIT_LOG_LEVEL:            warn
   cpi_source_branch:              replace-me
   google_subnetwork_range:        replace-me
