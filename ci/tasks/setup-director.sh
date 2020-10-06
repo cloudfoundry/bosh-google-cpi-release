@@ -17,7 +17,7 @@ cpi_release_name=bosh-google-cpi
 infrastructure_metadata="${PWD}/infrastructure/metadata"
 deployment_dir="${PWD}/deployment"
 google_json_key=$HOME/.config/gcloud/application_default_credentials.json
-private_key=${deployment_dir}/private_key.pem
+private_key=${HOME}/private_key.pem
 
 echo "Creating google json key..."
 mkdir -p $HOME/.config/gcloud/
