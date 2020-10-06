@@ -63,3 +63,4 @@ RUN cd /tmp && \
     mv certify-artifacts /bin/certify-artifacts
 
 RUN useradd non-root-user --shell /bin/bash --create-home
+RUN echo "non-root-user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
