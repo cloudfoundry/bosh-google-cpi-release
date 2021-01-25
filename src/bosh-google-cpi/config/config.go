@@ -32,7 +32,7 @@ func NewConfigFromPath(configFile string, fs boshsys.FileSystem) (Config, error)
 		return config, bosherr.Errorf("Must provide a config file")
 	}
 
-	bytes, err := fs.ReadFile(configFile)
+	bytes, err := fs.ReadFileWithOpts(configFile, boshsys.ReadOpts{Quiet: true})
 	if err != nil {
 		return config, bosherr.WrapErrorf(err, "Reading config file '%s'", configFile)
 	}
