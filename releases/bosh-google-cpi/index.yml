@@ -85,6 +85,8 @@ builds:
     version: 24.2.0
   e28a991d-0a5d-458a-ae7a-247d9a33ed9a:
     version: "6"
+  ec2f36bc-d35d-45a1-7179-41c53b7add11:
+    version: 40.0.4
   ed02bd76-1428-4540-a543-1ee8a4218b6a:
     version: 25.1.0
   f2ee47ae-e9ed-43d1-aad3-80202b89a67b:
