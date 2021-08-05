@@ -396,8 +396,8 @@ resources:
     source:
       repository: boshcpi/gce-cpi-release
       email: cf-bosh-eng@pivotal.io
-      username: bosh
-      password: ((dockerhub_password))
+      username: ((docker.username))
+      password: ((docker.password))
 
 resource_types:
 - name: gcs-resource
