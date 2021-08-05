@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 
-set -e
+set -eu
+
+script_dir="$( cd "$( dirname "$0" )" && pwd )"
 
 until lpass status;do
     LPASS_DISABLE_PINENTRY=1 lpass ls a
     sleep 1
 done
 
-until fly -t cpi status;do
-    fly -t cpi login
-    sleep 1
-done
-
-fly -t cpi set-pipeline \
+fly -t bosh-ecosystem set-pipeline \
     -p bosh-google-cpi \
-    -c pipeline.yml \
+    -c ${script_dir}/pipeline.yml \
     -v dockerhub_password=$(lpass show "Docker Hub" --password) \
     -l <(lpass show --notes "google-cpi concourse secrets")
