@@ -185,9 +185,9 @@ jobs:
     serial_groups: [run-int]
     plan:
       - in_parallel:
-        - {trigger: true, passed: [build-candidate],                       get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [setup-infrastructure],                  get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: true, passed: [setup-infrastructure],                  get: infrastructure, resource: infrastructure}
+        - {trigger: true, passed: [build-candidate, deploy-ubuntu],        get: bosh-cpi-src, resource: bosh-cpi-src-in}
+        - {trigger: true, passed: [deploy-ubuntu],                         get: stemcell, resource: google-ubuntu-stemcell}
+        - {trigger: true, passed: [deploy-ubuntu],                         get: infrastructure, resource: infrastructure}
         - {get: ci}
       - task: run-int
         file: ci/ci/tasks/run-int.yml
