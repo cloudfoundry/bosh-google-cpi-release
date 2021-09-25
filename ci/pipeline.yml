@@ -45,7 +45,7 @@ jobs:
         params: {file: candidate/*.tgz.sha1}
 
   - name: setup-infrastructure
-    serial_groups: [run-bats, run-int]
+    serial_groups: [integration]
     plan:
       - in_parallel:
         - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -70,7 +70,7 @@ jobs:
       - in_parallel: *teardown_step
 
   - name: teardown-infrastructure
-    serial_groups: [run-bats, run-int]
+    serial_groups: [integration]
     plan:
       - in_parallel:
         - {trigger: true,  passed: [run-bats, run-int],   get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -109,7 +109,7 @@ jobs:
           action: destroy
 
   - name: deploy-ubuntu
-    serial_groups: [run-bats, run-int]
+    serial_groups: [integration]
     plan:
       - in_parallel:
         - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -157,7 +157,7 @@ jobs:
 
   - name: run-bats
     serial: true
-    serial_groups: [run-bats]
+    serial_groups: [integration]
     plan:
       - in_parallel:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
@@ -182,7 +182,7 @@ jobs:
           private_key_data:                           ((private_key_data))
 
   - name: run-int
-    serial_groups: [run-int]
+    serial_groups: [integration]
     plan:
       - in_parallel:
         - {trigger: true, passed: [build-candidate, deploy-ubuntu],        get: bosh-cpi-src, resource: bosh-cpi-src-in}
