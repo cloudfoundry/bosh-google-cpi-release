@@ -77,7 +77,7 @@ jobs:
         - {trigger: false, passed: [run-bats],            get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: false, passed: [run-bats],            get: director-creds, resource: director-creds}
         - {trigger: false, passed: [deploy-ubuntu],       get: director-state, resource: director-state}
-        - {trigger: false, passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
+        - {trigger: true , passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
         - {trigger: false, passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
         - {trigger: false,                                get: bosh-cli}
         - {trigger: false,                                get: bosh-deployment}
