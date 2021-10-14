@@ -177,6 +177,7 @@ func (f ConcreteFactory) Create(method string, ctx map[string]interface{}, apiVe
 			vmService,
 		),
 		"delete_disk": NewDeleteDisk(diskService),
+		"resize_disk": NewResizeDisk(diskService),
 		"attach_disk": f.selectAttachDisk(apiVersion, diskService, vmService, registryClient),
 		"detach_disk": NewDetachDisk(vmService, registryClient),
 		"has_disk":    NewHasDisk(diskService),

@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/disk_service"
+	disk "bosh-google-cpi/google/disk_service"
 )
 
 type FakeDiskService struct {
@@ -14,6 +14,9 @@ type FakeDiskService struct {
 
 	DeleteCalled bool
 	DeleteErr    error
+
+	ResizeCalled bool
+	ResizeErr    error
 
 	FindCalled bool
 	FindFound  bool
@@ -32,6 +35,11 @@ func (d *FakeDiskService) Create(size int, diskType string, zone string) (string
 func (d *FakeDiskService) Delete(id string) error {
 	d.DeleteCalled = true
 	return d.DeleteErr
+}
+
+func (d *FakeDiskService) Resize(id string, newSize int) error {
+	d.ResizeCalled = true
+	return d.ResizeErr
 }
 
 func (d *FakeDiskService) Find(id string, zone string) (disk.Disk, bool, error) {
