@@ -29,7 +29,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	request := fmt.Sprintf(`{
 			  "method": "create_stemcell",
 			  "arguments": ["%s", {
-				  "name": "bosh-google-kvm-ubuntu-trusty",
+				  "name": "bosh-google-kvm-ubuntu-bionic",
 				  "version": "%s",
 				  "infrastructure": "google"
 				}]
@@ -59,6 +59,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	client, err := google.DefaultClient(ctx, compute.ComputeScope)
 	Expect(err).To(BeNil())
 	computeService, err = compute.New(client)
+	Expect(err).To(BeNil())
 	computeServiceB, err = computebeta.New(client)
 	Expect(err).To(BeNil())
 })
