@@ -22,10 +22,6 @@ func (d GoogleDiskService) Resize(id string, newSize int) error {
 		return api.NewDiskNotFoundError(id, false)
 	}
 
-	if disk.Status != googleDiskReadyStatus && disk.Status != googleDiskFailedStatus {
-		return bosherr.WrapErrorf(err, "Cannot resize Google Disk '%s', status is '%s'", id, disk.Status)
-	}
-
 	if disk.SizeGb == newsizeGB.SizeGb {
 		d.logger.Debug(googleDiskServiceLogTag, "Skipping resize Google Disk '%s', becasue current value '%s'is equal to new value '%s'", id, disk.SizeGb, newsizeGB)
 	} else if disk.SizeGb > newsizeGB.SizeGb {
