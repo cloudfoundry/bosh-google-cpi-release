@@ -5,6 +5,7 @@ import (
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
+
 	"google.golang.org/api/compute/v1"
 )
 
@@ -25,6 +26,12 @@ func (d GoogleDiskService) Resize(id string, newSize int) error {
 		return bosherr.WrapErrorf(err, "Cannot resize Google Disk '%s', status is '%s'", id, disk.Status)
 	}
 
+	if disk.SizeGb == newsizeGB.SizeGb {
+		d.logger.Debug(googleDiskServiceLogTag, "Skipping resize Google Disk '%s', becasue current value '%s'is equal to new value '%s'", id, disk.SizeGb, newsizeGB)
+	} else if disk.SizeGb > newsizeGB.SizeGb {
+		return bosherr.WrapErrorf(err, "Skipping resize Google Disk '%s', cannot resize volume to a smaller size from '%s' to '%s'", id, disk.SizeGb, newsizeGB)
+	}
+
 	d.logger.Debug(googleDiskServiceLogTag, "Resizing Google Disk '%s'", id)
 	operation, err := d.computeService.Disks.Resize(d.project, util.ResourceSplitter(disk.Zone), id, newsizeGB).Do()
 	if err != nil {
@@ -37,8 +44,3 @@ func (d GoogleDiskService) Resize(id string, newSize int) error {
 
 	return nil
 }
-
-//TODO:
-// cannot resize to smaller disk (this should be handled already by the director call)
-// skip resize when values are the same
-// cannot resize as disk is still attached.

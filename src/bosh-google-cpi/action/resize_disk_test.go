@@ -24,10 +24,7 @@ var _ = Describe("ResizeDisk", func() {
 		diskService = &diskfakes.FakeDiskService{}
 		resizeDisk = NewResizeDisk(diskService)
 	})
-	//TODO: write tests for:
-	// cannot resize to smaller disk (this should be handled already by the director call)
-	// skip resize when values are the same
-	// cannot resize as disk is still attached.
+	
 	Describe("Run", func() {
 		It("resize the disk", func() {
 			_, err = resizeDisk.Run("fake-disk-id", 123)

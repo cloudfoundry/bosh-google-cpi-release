@@ -6,4 +6,5 @@ type Disk struct {
 	Status   string
 	Zone     string
 	Users    []string
+	SizeGb   int64
 }
