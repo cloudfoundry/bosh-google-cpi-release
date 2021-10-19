@@ -151,6 +151,15 @@ func (r *FakeCmdRunner) RunCommand(cmdName string, args ...string) (string, stri
 	return r.getOutputsForCmd(runCmd)
 }
 
+func (r *FakeCmdRunner) ClearCommandHistory() {
+	r.commandResultsLock.Lock()
+	defer r.commandResultsLock.Unlock()
+
+	r.RunCommands = [][]string{}
+	r.RunCommandsQuietly = [][]string{}
+	r.RunCommandsWithInput = [][]string{}
+}
+
 func (r *FakeCmdRunner) RunCommandQuietly(cmdName string, args ...string) (string, string, int, error) {
 	r.commandResultsLock.Lock()
 	defer r.commandResultsLock.Unlock()
@@ -210,7 +219,11 @@ func (r *FakeCmdRunner) getOutputsForCmd(runCmd []string) (string, string, int, 
 		}
 
 		if !result.Sticky {
-			r.commandResults[fullCmd] = newResults
+			if len(newResults) == 0 {
+				delete(r.commandResults, fullCmd)
+			} else {
+				r.commandResults[fullCmd] = newResults
+			}
 		}
 
 		return result.Stdout, result.Stderr, result.ExitStatus, result.Error
