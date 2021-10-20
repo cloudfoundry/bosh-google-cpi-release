@@ -23,9 +23,9 @@ func (d GoogleDiskService) Resize(id string, newSize int) error {
 	}
 
 	if disk.SizeGb == newsizeGB.SizeGb {
-		d.logger.Debug(googleDiskServiceLogTag, "Skipping resize Google Disk '%s', becasue current value '%s'is equal to new value '%s'", id, disk.SizeGb, newsizeGB)
+		d.logger.Debug(googleDiskServiceLogTag, "Skipping resize Google Disk '%s', becasue current value '%#v'is equal to new value '%#v'", id, disk.SizeGb, newsizeGB)
 	} else if disk.SizeGb > newsizeGB.SizeGb {
-		return bosherr.WrapErrorf(err, "Skipping resize Google Disk '%s', cannot resize volume to a smaller size from '%s' to '%s'", id, disk.SizeGb, newsizeGB)
+		return bosherr.WrapErrorf(err, "Skipping resize Google Disk '%s', cannot resize volume to a smaller size from '%#v' to '%#v'", id, disk.SizeGb, newsizeGB)
 	}
 
 	d.logger.Debug(googleDiskServiceLogTag, "Resizing Google Disk '%s'", id)
