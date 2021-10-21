@@ -149,4 +149,29 @@ var _ = Describe("Disk", func() {
 			}`, diskCID)
 		assertSucceeds(request)
 	})
+
+	It("can create and resize and delete a disk", func() {
+		By("creating a disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("resizing the disk")
+		request = fmt.Sprintf(`{
+			  "method": "resize_disk",
+			  "arguments": ["%v", 52768]
+			}`, diskCID)
+		assertSucceeds(request)
+
+		By("deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+	})
+
 })

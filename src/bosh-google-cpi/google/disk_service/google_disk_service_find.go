@@ -6,6 +6,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/util"
+
 	"google.golang.org/api/googleapi"
 )
 
@@ -27,6 +28,7 @@ func (d GoogleDiskService) Find(id string, zone string) (Disk, bool, error) {
 					Status:   diskItem.Status,
 					Zone:     diskItem.Zone,
 					Users:    diskItem.Users,
+					SizeGb:   diskItem.SizeGb,
 				}
 				return disk, true, nil
 			}
@@ -50,6 +52,7 @@ func (d GoogleDiskService) Find(id string, zone string) (Disk, bool, error) {
 		SelfLink: diskItem.SelfLink,
 		Status:   diskItem.Status,
 		Zone:     diskItem.Zone,
+		SizeGb:   diskItem.SizeGb,
 	}
 	return disk, true, nil
 }
