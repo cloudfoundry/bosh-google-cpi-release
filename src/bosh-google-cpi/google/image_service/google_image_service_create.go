@@ -103,7 +103,7 @@ func (i GoogleImageService) create(name string, description string, sourceURL st
 		Description: description,
 		RawDisk:     rawdisk,
 		GuestOsFeatures: []*compute.GuestOsFeature{
-			{ Type: "MULTI_IP_SUBNET" },
+			{Type: "MULTI_IP_SUBNET"},
 		},
 	}
 

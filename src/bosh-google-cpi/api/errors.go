@@ -41,8 +41,10 @@ func NewVMCreationFailedError(reason string, canRetry bool) VMCreationFailedErro
 	return VMCreationFailedError{reason: reason, canRetry: canRetry}
 }
 
-func (e VMCreationFailedError) Type() string   { return "Bosh::Clouds::VMCreationFailed" }
-func (e VMCreationFailedError) Error() string  { return fmt.Sprintf("VM failed to create: %v", e.reason) }
+func (e VMCreationFailedError) Type() string { return "Bosh::Clouds::VMCreationFailed" }
+func (e VMCreationFailedError) Error() string {
+	return fmt.Sprintf("VM failed to create: %v", e.reason)
+}
 func (e VMCreationFailedError) CanRetry() bool { return e.canRetry }
 
 type NoDiskSpaceError struct {
