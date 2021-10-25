@@ -82,10 +82,13 @@ if_p('blobstore') do
     }
   else
     blobstore["options"] = {
-      "endpoint" => "http://#{p(['agent.blobstore.address', 'blobstore.address'])}:#{p('blobstore.port')}",
-      "user" => p('blobstore.agent.user'),
-      "password" => p('blobstore.agent.password')
+      "endpoint" => "http://#{p(['agent.blobstore.address', 'blobstore.address'])}:#{p('blobstore.port')}"
     }
+
+    if_p('blobstore.agent.user') do
+      blobstore["options"]["user"] = p('blobstore.agent.user')
+      blobstore["options"]["password"] = p('blobstore.agent.password')
+    end
   end
 end
 

@@ -23,6 +23,16 @@ After you have followed the instructions for deploying a BOSH director in [docs/
 ## Developing
 Contributions to the CPI are welcome. Unit and integration tests for any new features are encouraged.
 
+### Running unit tests
+
+There is a Makefile target for running unit tests on the Golang code for the
+CPI.
+
+```
+cd src/bosh-google-cpi
+make test
+```
+
 ### Running integration tests
 1. Set your project:
 
@@ -30,13 +40,13 @@ Contributions to the CPI are welcome. Unit and integration tests for any new fea
   export GOOGLE_PROJECT=your-project-id
   ```
 
-1. Create the infrastructure required to run tests:
+2. Create the infrastructure required to run tests:
 
   ```
   make configint
   ```
 
-1. Run the integration tests:
+3. Run the integration tests:
 
   ```
   make testint
@@ -47,6 +57,17 @@ To destroy the infrastructure required to run the integration tests, execute:
   ```
   make cleanint
   ```
+
+### Running ERB job templates unit tests
+
+The ERB templates rendered by the jobs of this Bosh Release have unit tests
+using Ruby. The required Ruby version is specified in `.ruby-version` as per
+convention with `chruby` or similar tools. A script will help you to install
+the correct Ruby version if necessary and run the ERB unit tests:
+
+```
+./scripts/test-unit-erb
+```
 
 ## Contributing
 For detailes on how to contribute to this project - including filing bug reports and contributing code changes - pleasee see [CONTRIBUTING.md].
