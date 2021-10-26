@@ -13,10 +13,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libpq-dev; apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
 
 # Install Golang
-ENV GOLANG_VERSION 1.17
-RUN curl -sSL https://dl.google.com/go/go${GOLANG_VERSION}.linux-amd64.tar.gz | tar -v -C /usr/local -xz
-ENV GOROOT /usr/local/go
-ENV PATH $PATH:$GOROOT/bin
+COPY --from=golang:1 /usr/local/go /usr/local/go
+ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
 
 # Install Google Cloud SDK
 ENV GCLOUD_SDK_VERSION 305.0.0

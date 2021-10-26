@@ -261,6 +261,8 @@ jobs:
     plan:
       - get: bosh-cpi-src-dockerfiles
         trigger: true
+      - get: weekly
+        trigger: true
       - put: google-cpi-image
         params:
           build: "bosh-cpi-src-dockerfiles/ci/docker/bosh-google-cpi-boshrelease"
@@ -268,6 +270,13 @@ jobs:
           skip_download: true
 
 resources:
+  - name: weekly
+    type: time
+    source:
+      start: 3:00 -0700
+      stop: 4:30 -0700
+      days: [ Saturday ]
+
   - name: bats
     type: git
     source:
