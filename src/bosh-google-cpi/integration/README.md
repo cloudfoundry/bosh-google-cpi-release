@@ -25,4 +25,3 @@ Finally, you can pass arguments to Ginkgo. To run only the stemcell tests, set t
 ```
 $ GOOGLE_PROJECT=evandbrown17 GINKGO_ARGS=-ginkgo.focus=Stemcell make testint
 ```
-

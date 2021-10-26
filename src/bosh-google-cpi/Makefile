@@ -23,7 +23,10 @@ get-deps:
 	GOBIN=$$PWD/.bin go install -mod=vendor github.com/onsi/ginkgo/ginkgo
 
 stemcell.tgz:
-	curl https://storage.googleapis.com/bosh-cpi-artifacts/bosh-stemcell-3262.12-google-kvm-ubuntu-trusty-go_agent-raw.tar.gz -o stemcell.tgz
+	curl https://storage.googleapis.com/bosh-core-stemcells/1.34/bosh-stemcell-1.34-google-kvm-ubuntu-bionic-go_agent.tgz -o stemcell.tgz
+	tar -zxvf stemcell.tgz image
+	rm stemcell.tgz
+	mv image stemcell.tgz
 
 # Cleans up directory and source code with gofmt
 clean:
@@ -50,15 +53,16 @@ testintci: get-deps
 	./.bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Runs the integration tests with coverage
+# TODO: check why this only works if i copy my json key file to $HOME/.config/gcloud/application_default_credentials.json
 testint: check-proj get-deps clean fmt
 	CPI_ASYNC_DELETE=true \
 	STEMCELL_FILE=$(PWD)/stemcell.tgz \
-	STEMCELL_VERSION='3468.20' \
+	STEMCELL_VERSION='1.34' \
 	GOOGLE_PROJECT=$(GOOGLE_PROJECT) \
 	NETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_auto_network) \
 	CUSTOM_NETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_network) \
 	CUSTOM_SUBNETWORK_NAME=$(shell cd ../../ci/test_infrastructure && terraform output google_subnetwork) \
-	PRIVATE_IP=10.0.0.100,10.0.0.101,10.0.0.102 \
+	PRIVATE_IP=10.10.0.100,10.10.0.101,10.10.0.102 \
 	TARGET_POOL=$(shell cd ../../ci/test_infrastructure && terraform output google_target_pool) \
 	BACKEND_SERVICE=$(shell cd ../../ci/test_infrastructure && terraform output google_backend_service) \
 	REGION_BACKEND_SERVICE=$(shell cd ../../ci/test_infrastructure && terraform output google_region_backend_service) \
@@ -69,20 +73,18 @@ testint: check-proj get-deps clean fmt
 	SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
 	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
 	NODE_GROUP=$(shell cd ../../ci/test_infrastructure && terraform output google_node_group) \
-    ./bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
+    ./.bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.
 configint: stemcell.tgz check-proj
 	cd ../../ci/test_infrastructure; terraform init; terraform apply -auto-approve \
 	  -var 'google_project=$(GOOGLE_PROJECT)' \
 	  -var 'google_region=us-central1' \
-	  -var 'google_zone=us-central1-a' \
-	  -var 'google_subnetwork_range=10.0.0.0/24' \
+	  -var 'google_zone=us-central1-c' \
+	  -var 'google_subnetwork_range=10.10.0.0/24' \
 	  -var 'google_firewall_internal=cpi-integration-internal' \
 	  -var 'google_firewall_external=cpi-integration-external' \
-	  -var 'google_auto_network=cpi-auto' \
-	  -var 'google_network=cpi-manual' \
-	  -var 'google_json_key_data=""' \
+	  -var 'google_json_key_data=$(GOOGLE_JSON_KEY)' \
 	  -var 'prefix=cpi-integration'
 
 # Deletes the resources created by the configint target
@@ -92,15 +94,11 @@ cleanint: check-proj
 	cd ../../ci/test_infrastructure; terraform init; terraform destroy -force \
 	  -var 'google_project=$(GOOGLE_PROJECT)' \
 	  -var 'google_region=us-central1' \
-	  -var 'google_zone=us-central1-a' \
-	  -var 'google_subnetwork_range=10.0.0.0/24' \
+	  -var 'google_zone=us-central1-c' \
+	  -var 'google_subnetwork_range=10.10.0.0/24' \
 	  -var 'google_firewall_internal=cpi-integration-internal' \
 	  -var 'google_firewall_external=cpi-integration-external' \
-	  -var 'google_auto_network=cpi-auto' \
-	  -var 'google_manual_network=cpi-manual' \
-	  -var 'google_auto_network=cpi-auto' \
-	  -var 'google_network=cpi-manual' \
-	  -var 'google_json_key_data=""' \
+	  -var 'google_json_key_data=$(GOOGLE_JSON_KEY)' \
 	  -var 'prefix=cpi-integration'
 
 	@echo "All integration tests resources have been removed. You will need to run the configint target before doing integration tests again."
@@ -108,6 +106,11 @@ cleanint: check-proj
 check-proj:
 	@if test "$(GOOGLE_PROJECT)" = "" ; then \
 	  echo "GOOGLE_PROJECT must be set"; \
+	  exit 1; \
+	fi
+
+	@if test "$(GOOGLE_JSON_KEY)" = "" ; then \
+	  echo "GOOGLE_JSON_KEY must be set"; \
 	  exit 1; \
 	fi
 

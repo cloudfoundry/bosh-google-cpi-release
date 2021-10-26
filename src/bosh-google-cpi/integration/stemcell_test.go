@@ -15,8 +15,8 @@ var _ = Describe("Stemcell", func() {
 		request := fmt.Sprintf(`{
          "method": "create_stemcell",
          "arguments": ["", {
-           "name": "bosh-google-kvm-ubuntu-trusty",
-           "version": "3215",
+           "name": "bosh-google-kvm-ubuntu-bionic",
+           "version": "1.34",
            "infrastructure": "google",
            "image_url": "%s"
          }]

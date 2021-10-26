@@ -38,6 +38,8 @@ make test
 
   ```
   export GOOGLE_PROJECT=your-project-id
+  export GOOGLE_JSON_KEY=your-file-location-of-gcp-json-key
+  export GOOGLE_APPLICATION_CREDENTIALS=your-file-location-of-gcp-json-key
   ```
 
 2. Create the infrastructure required to run tests:
