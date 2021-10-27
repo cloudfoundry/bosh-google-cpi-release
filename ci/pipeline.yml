@@ -12,6 +12,7 @@ groups:
       - promote-candidate-major
       - promote-candidate-minor
       - promote-candidate-patch
+      - bump-golang-packages
   - name: docker-ci-image
     jobs:
       - build-dockerfile
@@ -269,6 +270,26 @@ jobs:
         get_params:
           skip_download: true
 
+  - name: bump-golang-packages
+    plan:
+    - in_parallel:
+      - get: bosh-cpi-src-in
+      - get: golang-release
+        trigger: true
+    - task: bump-golang-packages
+      file: golang-release/ci/tasks/shared/bump-golang-package.yml
+      input_mapping:
+        input_repo: bosh-cpi-src-in
+      output_mapping:
+        output_repo: bosh-cpi-src-out
+      params:
+        PACKAGES: [golang-1-linux, golang-1-darwin]
+        PRIVATE_YML: ((private-yml))
+    - put: bosh-cpi-src-out
+      params:
+        repository: bosh-cpi-src-out
+        rebase: true
+
 resources:
   - name: weekly
     type: time
@@ -328,6 +349,11 @@ resources:
       uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
       branch: ((cpi_source_branch))
       private_key: ((github_deployment_key_bosh_google_cpi_release))
+
+  - name: golang-release
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git
 
   - name: bosh-deployment
     type: git
