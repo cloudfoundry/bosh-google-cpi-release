@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: bosh/go-dep-bumper
+
+inputs:
+- name: bosh-cpi-src-in
+
+outputs:
+- name: bosh-cpi-src-out
+
+run:
+  path: bosh-cpi-src-in/ci/tasks/bump-deps.sh

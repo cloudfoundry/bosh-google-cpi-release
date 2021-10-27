@@ -1,0 +1,19 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: boshcpi/gce-cpi-release
+
+inputs:
+- name: bosh-cpi-src-in
+- name: golang-release
+
+outputs:
+- name: bosh-cpi-src-out
+
+run:
+  path: bosh-cpi-src-in/ci/tasks/bump-golang-package.sh
+
+params:
+  release_blobs_json_key: replace-me

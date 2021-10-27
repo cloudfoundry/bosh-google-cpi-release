@@ -1,7 +1,7 @@
 ---
 name: bosh-google-cpi
 dependencies:
-  - golang-1.17-linux
-  - golang-1.17-darwin
+  - golang-1-linux
+  - golang-1-darwin
 files:
   - bosh-google-cpi/**/*
