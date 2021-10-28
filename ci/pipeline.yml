@@ -13,6 +13,7 @@ groups:
       - promote-candidate-minor
       - promote-candidate-patch
       - bump-golang-packages
+      - bump-deps
   - name: docker-ci-image
     jobs:
       - build-dockerfile
@@ -269,6 +270,31 @@ jobs:
           build: "bosh-cpi-src-dockerfiles/ci/docker/bosh-google-cpi-boshrelease"
         get_params:
           skip_download: true
+
+  - name: bump-deps
+    plan:
+    - in_parallel:
+      - get: bosh-cpi-src-in
+      - get: golang-release
+      - get: ci
+      - get: weekly
+        trigger: true
+    - task: bump-deps
+      file: golang-release/ci/tasks/shared/bump-deps.yml
+      input_mapping:
+        input_repo: bosh-cpi-src-in
+      output_mapping:
+        output_repo: bosh-cpi-src-out
+      params:
+        SOURCE_PATH: src/bosh-google-cpi
+    - task: unit-tests
+      file: ci/ci/tasks/unit-tests.yml
+      input_mapping:
+        bosh-cpi-src: bosh-cpi-src-out
+    - put: bosh-cpi-src-out
+      params:
+        repository: bosh-cpi-src-out
+        rebase: true
 
   - name: bump-golang-packages
     plan:
