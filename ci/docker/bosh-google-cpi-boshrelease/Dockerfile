@@ -13,7 +13,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libpq-dev; apt-get clean
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
 
 # Install Golang
-COPY --from=golang:1 /usr/local/go /usr/local/go
+COPY --from=bosh/golang-release /var/vcap/packages/golang-1-linux /usr/local/go
 ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
 
 # Install Google Cloud SDK
