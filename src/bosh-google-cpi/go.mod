@@ -1,6 +1,6 @@
 module bosh-google-cpi
 
-go 1.17
+go 1.16
 
 require (
 	github.com/cloudfoundry/bosh-utils v0.0.286
