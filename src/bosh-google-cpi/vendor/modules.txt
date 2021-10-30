@@ -7,7 +7,7 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.2
 ## explicit; go 1.15
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-utils v0.0.286
+# github.com/cloudfoundry/bosh-utils v0.0.287
 ## explicit; go 1.17
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -127,7 +127,7 @@ go.opencensus.io/trace/tracestate
 # golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 ## explicit; go 1.11
 golang.org/x/lint
-# golang.org/x/net v0.0.0-20211020060615-d418f374d309
+# golang.org/x/net v0.0.0-20211029224645-99673261e6eb
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -149,7 +149,7 @@ golang.org/x/oauth2/google/internal/externalaccount
 golang.org/x/oauth2/internal
 golang.org/x/oauth2/jws
 golang.org/x/oauth2/jwt
-# golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359
+# golang.org/x/sys v0.0.0-20211029165221-6e7872819dc8
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
@@ -182,7 +182,7 @@ golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/internal/typeparams
-# google.golang.org/api v0.59.0
+# google.golang.org/api v0.60.0
 ## explicit; go 1.11
 google.golang.org/api/compute/v0.beta
 google.golang.org/api/compute/v1
@@ -211,7 +211,7 @@ google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20211028162531-8db9c33dc351
+# google.golang.org/genproto v0.0.0-20211029142109-e255c875f7c7
 ## explicit; go 1.11
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
