@@ -84,7 +84,8 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		Labels:            vmProps.Labels,
 		GuestAccelerators: acceleratorParams,
 		// Specify a non-Sandy Bridge CPU for known zones defined in the minCpuPlatform map
-		MinCpuPlatform: minCpuPlatform[vmProps.Zone],
+		// MinCpuPlatform: minCpuPlatform[vmProps.Zone],
+		MinCpuPlatform: "",
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
