@@ -19,16 +19,6 @@ const defaultRootDiskSizeGb = 10
 const userDataKey = "user_data"
 const nodeGroupNodeAffinityKey = "compute.googleapis.com/node-group-name"
 
-// The zones in this map are known to default to Sandy Bridge CPUs, which do
-// not expose RDRAND required to seed sufficient entropy to avoid the bosh-agent
-// blocking on boot. We can specify an Intel Broadwell platform to avoid Sandy
-// Bridge.
-// TODO(evanbrown): Allow MinCpuPlatform to be configured in cloud_properties.
-var minCpuPlatform = map[string]string{
-	"us-central1-a":  "Intel Broadwell",
-	"europe-west1-b": "Intel Broadwell",
-}
-
 func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, registryEndpoint string) (string, error) {
 	uuidStr, err := i.uuidGen.Generate()
 	if err != nil {
@@ -83,9 +73,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		Tags:              &tags,
 		Labels:            vmProps.Labels,
 		GuestAccelerators: acceleratorParams,
-		// Specify a non-Sandy Bridge CPU for known zones defined in the minCpuPlatform map
-		// MinCpuPlatform: minCpuPlatform[vmProps.Zone],
-		MinCpuPlatform: "",
+		MinCpuPlatform:    "",
 	}
 
 	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
