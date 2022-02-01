@@ -290,7 +290,7 @@ var _ = Describe("VM", func() {
 	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to 
 	// Broadwell), but we're keeping the tests to ensure the behaviour is what 
 	// we expect.
-	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU", func() {
+	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU when creating n1 VMs (Sandy Bridge is blocking bosh-agent on boot)", func() {
 		By("creating a VM")
 		var vmCID string
 		request := fmt.Sprintf(`{
@@ -329,7 +329,7 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	It("can create a VM in europe-west1-b and not get a Sandy Bridge CPU", func() {
+	It("can create a VM in europe-west1-b and not get a Sandy Bridge CPU when creating n1 VMs (Sandy Bridge is blocking bosh-agent on boot)", func() {
 		By("creating a VM")
 		var vmCID string
 		request := fmt.Sprintf(`{
