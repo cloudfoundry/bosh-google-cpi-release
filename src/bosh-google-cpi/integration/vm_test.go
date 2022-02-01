@@ -285,6 +285,11 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
+	// us-central1-a and europe-west1-b were known to default to Sandy Bridge CPUs, 
+	// which do not expose RDRAND required to seed sufficient entropy to avoid the 
+	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to 
+	// Broadwell), but we're keeping the tests to ensure the behaviour is what 
+	// we expect.
 	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU", func() {
 		By("creating a VM")
 		var vmCID string
