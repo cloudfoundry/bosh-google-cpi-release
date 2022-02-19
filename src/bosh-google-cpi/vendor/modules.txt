@@ -1,5 +1,5 @@
-# cloud.google.com/go/compute v1.2.0
-## explicit; go 1.11
+# cloud.google.com/go/compute v1.3.0
+## explicit; go 1.15
 cloud.google.com/go/compute/metadata
 # github.com/bmatcuk/doublestar v1.3.4
 ## explicit; go 1.12
@@ -7,7 +7,7 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.2
 ## explicit; go 1.15
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-utils v0.0.300
+# github.com/cloudfoundry/bosh-utils v0.0.301
 ## explicit; go 1.17
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -182,8 +182,8 @@ golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/internal/typeparams
-# google.golang.org/api v0.68.0
-## explicit; go 1.11
+# google.golang.org/api v0.69.0
+## explicit; go 1.15
 google.golang.org/api/compute/v0.beta
 google.golang.org/api/compute/v1
 google.golang.org/api/googleapi
@@ -211,7 +211,7 @@ google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20220211171837-173942840c17
+# google.golang.org/genproto v0.0.0-20220218161850-94dd64e39d7c
 ## explicit; go 1.15
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
