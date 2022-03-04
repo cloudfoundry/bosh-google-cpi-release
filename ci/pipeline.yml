@@ -58,7 +58,7 @@ jobs:
           file: ci/ci/tasks/teardown-infrastructure.yml
           params:
             google_auto_network: ((google_auto_network))
-            google_json_key_data: ((google_json_key_data))
+            google_json_key_data: ((gcp_credentials_json))
             google_network: ((google_network))
             google_project: ((google_project))
             google_region: ((google_region))
@@ -98,7 +98,7 @@ jobs:
           google_subnetwork_range:        ((google_subnetwork_range))
           google_subnetwork_gw:           ((google_subnetwork_gw))
           google_address_static_director: ((google_address_static_director))
-          google_json_key_data:           ((google_json_key_data))
+          google_json_key_data:           ((gcp_credentials_json))
           private_key_user:               ((private_key_user))
           private_key_data:               ((private_key_data))
       - put: infrastructure
@@ -134,7 +134,7 @@ jobs:
           google_subnetwork_range:        ((google_subnetwork_range))
           google_subnetwork_gw:           ((google_subnetwork_gw))
           google_address_static_director: ((google_address_static_director))
-          google_json_key_data:           ((google_json_key_data))
+          google_json_key_data:           ((gcp_credentials_json))
           private_key_user:               ((private_key_user))
           private_key_data:               ((private_key_data))
         on_failure:
@@ -149,7 +149,7 @@ jobs:
             google_subnetwork_range:        ((google_subnetwork_range))
             google_subnetwork_gw:           ((google_subnetwork_gw))
             google_address_static_director: ((google_address_static_director))
-            google_json_key_data:           ((google_json_key_data))
+            google_json_key_data:           ((gcp_credentials_json))
             private_key_user:               ((private_key_user))
             private_key_data:               ((private_key_data))
       - put: director-creds
@@ -178,7 +178,7 @@ jobs:
           google_address_static_available_range_bats: ((google_address_static_bats_available_range))
           google_address_static_bats:                 ((google_address_static_bats))
           google_address_static_pair_bats:            ((google_address_static_pair_bats))
-          google_json_key_data:                       ((google_json_key_data))
+          google_json_key_data:                       ((gcp_credentials_json))
           base_os:                                    Ubuntu
           stemcell_name:                              bosh-google-kvm-ubuntu-bionic-go_agent
           private_key_data:                           ((private_key_data))
@@ -194,7 +194,7 @@ jobs:
       - task: run-int
         file: ci/ci/tasks/run-int.yml
         params:
-          google_json_key_data:      ((google_json_key_data))
+          google_json_key_data:      ((gcp_credentials_json))
           google_address_static_int: ((google_address_static_int))
 
   - name: promote-candidate-major
@@ -209,7 +209,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_json_key: ((google_json_key_data))
+          release_blobs_json_key: ((gcp_credentials_json))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -229,7 +229,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_json_key: ((google_json_key_data))
+          release_blobs_json_key: ((gcp_credentials_json))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -249,7 +249,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_json_key: ((google_json_key_data))
+          release_blobs_json_key: ((gcp_credentials_json))
 
       - put: release-version-semver
         params: {file: release-version-semver/number}
@@ -310,7 +310,11 @@ jobs:
         output_repo: bosh-cpi-src-out
       params:
         PACKAGES: [golang-1-linux, golang-1-darwin]
-        PRIVATE_YML: ((private-yml))
+        PRIVATE_YML: |
+          blobstore:
+              options:
+                credentials_source: static
+                json_key: ((gcp_credentials_json))
     - put: bosh-cpi-src-out
       params:
         repository: bosh-cpi-src-out
@@ -340,14 +344,14 @@ resources:
   - name: bosh-cpi-dev-artifacts
     type: gcs-resource
     source:
-      json_key: ((google_json_key_data))
+      json_key: ((gcp_credentials_json))
       bucket:   ((google_releases_bucket_name))
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
 
   - name: bosh-cpi-dev-artifacts-sha1
     type: gcs-resource
     source:
-      json_key: ((google_json_key_data))
+      json_key: ((gcp_credentials_json))
       bucket:   ((google_releases_bucket_name))
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
 
@@ -398,14 +402,14 @@ resources:
   - name: director-creds
     type: gcs-resource
     source:
-      json_key:         ((google_json_key_data))
+      json_key:         ((gcp_credentials_json))
       bucket:           ((google_state_bucket_name))
       versioned_file:   ((cpi_source_branch))-creds.yml
 
   - name: director-state
     type: gcs-resource
     source:
-      json_key:         ((google_json_key_data))
+      json_key:         ((gcp_credentials_json))
       bucket:           ((google_state_bucket_name))
       versioned_file:   ((cpi_source_branch))-manifest-state.json
 
@@ -423,12 +427,12 @@ resources:
       backend_config:
         bucket: ((google_state_bucket_name))
         prefix: terraform-((cpi_source_branch))
-        credentials: ((google_json_key_data))
+        credentials: ((gcp_credentials_json))
       vars:
         google_project:           ((google_project))
         google_region:            ((google_region))
         google_zone:              ((google_zone))
-        google_json_key_data:     ((google_json_key_data))
+        google_json_key_data:     ((gcp_credentials_json))
         google_subnetwork_range:  ((google_subnetwork_range))
         google_firewall_internal: ((google_firewall_internal))
         google_firewall_external: ((google_firewall_external))
@@ -440,7 +444,7 @@ resources:
     type: semver
     source:
       driver: gcs
-      json_key:          ((google_json_key_data))
+      json_key:          ((gcp_credentials_json))
       key:               release-current-version
       bucket:            ((version_semver_bucket_name))
 
@@ -448,7 +452,7 @@ resources:
     type: semver
     source:
       driver: gcs
-      json_key:          ((google_json_key_data))
+      json_key:          ((gcp_credentials_json))
       key:               current-version
       bucket:            ((version_semver_bucket_name))
 
