@@ -314,7 +314,7 @@ jobs:
           blobstore:
               options:
                 credentials_source: static
-                json_key: ((gcp_credentials_json))
+                json_key: '((gcp_credentials_json))'
     - put: bosh-cpi-src-out
       params:
         repository: bosh-cpi-src-out
