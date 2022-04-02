@@ -127,7 +127,7 @@ go.opencensus.io/trace/tracestate
 # golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 ## explicit; go 1.11
 golang.org/x/lint
-# golang.org/x/net v0.0.0-20220325170049-de3da57026de
+# golang.org/x/net v0.0.0-20220401154927-543a649e0bdd
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
@@ -211,7 +211,7 @@ google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20220329172620-7be39ac1afc7
+# google.golang.org/genproto v0.0.0-20220401170504-314d38edb7de
 ## explicit; go 1.15
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails

@@ -8,7 +8,7 @@ require (
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.1
 	github.com/onsi/gomega v1.11.0
-	golang.org/x/net v0.0.0-20220325170049-de3da57026de
+	golang.org/x/net v0.0.0-20220401154927-543a649e0bdd
 	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
 	google.golang.org/api v0.74.0
 )
@@ -33,7 +33,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220329172620-7be39ac1afc7 // indirect
+	google.golang.org/genproto v0.0.0-20220401170504-314d38edb7de // indirect
 	google.golang.org/grpc v1.45.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
