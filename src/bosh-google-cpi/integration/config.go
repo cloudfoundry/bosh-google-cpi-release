@@ -49,9 +49,6 @@ var (
 	// Channel that will be used to retrieve IPs to use
 	ips chan string
 
-	// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
-	asyncDelete = envOrDefault("CPI_ASYNC_DELETE", "true")
-
 	cfgContent = fmt.Sprintf(`{
 	  "cloud": {
 		"plugin": "google",
@@ -73,6 +70,7 @@ var (
 	}`, googleProject)
 )
 
+// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
 func toggleAsyncDelete() {
 	key := "CPI_ASYNC_DELETE"
 	current := os.Getenv(key)
