@@ -35,7 +35,7 @@ var _ = Describe("Snapshot", func() {
 			  "method": "snapshot_disk",
 			  "arguments": ["%v", {"deployment": "deployment_name", "job": "job_name", "index": "job_index"}]
 			}`, diskCID)
-		snapshotCID = assertSucceedsWithResult(request).(string)
+		assertSucceedsWithResult(request)
 
 		By("creating a snapshot with metadata where index is an int")
 		request = fmt.Sprintf(`{
