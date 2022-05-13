@@ -331,31 +331,6 @@ func (i GoogleInstanceService) removeFromTargetPool(instanceSelfLink string) err
 	return nil
 }
 
-func (i GoogleInstanceService) updateTargetPool(instance *compute.Instance, targetPoolName string) error {
-	// Check if instance is associated to a target pool
-	currentTargetPool, _, err := i.targetPoolService.FindByInstance(instance.SelfLink, "")
-	if err != nil {
-		return err
-	}
-
-	// Check if target pool info has changed
-	if targetPoolName != currentTargetPool {
-		if currentTargetPool != "" {
-			if err := i.targetPoolService.RemoveInstance(currentTargetPool, instance.SelfLink); err != nil {
-				return err
-			}
-		}
-
-		if targetPoolName != "" {
-			if err := i.targetPoolService.AddInstance(targetPoolName, instance.SelfLink); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
-}
-
 func (i GoogleInstanceService) addToBackendService(instanceSelfLink string, backendService BackendService) error {
 	if err := i.backendServiceService.AddInstance(backendService.Name, instanceSelfLink); err != nil {
 		return err
