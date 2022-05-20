@@ -29,29 +29,25 @@ var (
 	serviceAccount   = envRequired("SERVICE_ACCOUNT")
 
 	// Configurable defaults
-	stemcellFile                  = envOrDefault("STEMCELL_FILE", "")
-	stemcellVersion               = envOrDefault("STEMCELL_VERSION", "")
-	networkName                   = envOrDefault("NETWORK_NAME", "cfintegration")
-	customNetworkName             = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
-	customSubnetworkName          = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
-	ipAddrs                       = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
-	targetPool                    = envOrDefault("TARGET_POOL", "cfintegration")
-	backendService                = envOrDefault("BACKEND_SERVICE", "cfintegration")
-	regionBackendService          = envOrDefault("REGION_BACKEND_SERVICE", "cfintegration-r")
-	collisionBackendService       = envOrDefault("COLLISION_BACKEND_SERVICE", "cfintegration-collision")
-	collisionRegionBackendService = envOrDefault("COLLISION_REGION_BACKEND_SERVICE", "cfintegration-collision")
-	instanceGroup                 = envOrDefault("BACKEND_SERVICE", "cfintegration")
-	ilbInstanceGroup              = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
-	zone                          = envOrDefault("ZONE", "us-central1-a")
-	region                        = envOrDefault("REGION", "us-central1")
-	nodeGroup                     = envOrDefault("NODE_GROUP", "cfintegration-node-group")
-	imageURL                      = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
+	stemcellFile            = envOrDefault("STEMCELL_FILE", "")
+	stemcellVersion         = envOrDefault("STEMCELL_VERSION", "")
+	networkName             = envOrDefault("NETWORK_NAME", "cfintegration")
+	customNetworkName       = envOrDefault("CUSTOM_NETWORK_NAME", "cfintegration-custom")
+	customSubnetworkName    = envOrDefault("CUSTOM_SUBNETWORK_NAME", "cfintegration-custom-us-central1")
+	ipAddrs                 = strings.Split(envOrDefault("PRIVATE_IP", "192.168.100.102,192.168.100.103,192.168.100.104"), ",")
+	targetPool              = envOrDefault("TARGET_POOL", "cfintegration")
+	backendService          = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	regionBackendService    = envOrDefault("REGION_BACKEND_SERVICE", "cfintegration-r")
+	collisionBackendService = envOrDefault("COLLISION_BACKEND_SERVICE", "cfintegration-collision")
+	instanceGroup           = envOrDefault("BACKEND_SERVICE", "cfintegration")
+	ilbInstanceGroup        = envOrDefault("ILB_INSTANCE_GROUP", "cfintegration-ilb")
+	zone                    = envOrDefault("ZONE", "us-central1-a")
+	region                  = envOrDefault("REGION", "us-central1")
+	nodeGroup               = envOrDefault("NODE_GROUP", "cfintegration-node-group")
+	imageURL                = envOrDefault("IMAGE_URL", "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20161213")
 
 	// Channel that will be used to retrieve IPs to use
 	ips chan string
-
-	// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
-	asyncDelete = envOrDefault("CPI_ASYNC_DELETE", "true")
 
 	cfgContent = fmt.Sprintf(`{
 	  "cloud": {
@@ -74,6 +70,7 @@ var (
 	}`, googleProject)
 )
 
+// If true, CPI will not wait for delete to complete. Speeds up tests significantly.
 func toggleAsyncDelete() {
 	key := "CPI_ASYNC_DELETE"
 	current := os.Getenv(key)

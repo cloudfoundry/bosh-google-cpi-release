@@ -2,11 +2,6 @@ package registry
 
 const defaultSystemDisk = "/dev/sda"
 
-type agentSettingsResponse struct {
-	Settings string `json:"settings"`
-	Status   string `json:"status"`
-}
-
 // AgentSettings are the Agent settings for a particular VM.
 type AgentSettings struct {
 	// Agent ID

@@ -21,8 +21,6 @@ const mainLogTag = "main"
 
 var (
 	configFileOpt = flag.String("configFile", "", "Path to configuration file")
-	input         io.Reader
-	output        io.Writer
 )
 
 func main() {
