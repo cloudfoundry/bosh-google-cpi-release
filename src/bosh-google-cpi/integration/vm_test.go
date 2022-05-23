@@ -582,7 +582,7 @@ var _ = Describe("VM", func() {
 			  "method": "delete_vm",
 			  "arguments": ["%v"]
 			}`, vmCID)
-		assertSucceedsWithResult(request)
+		assertSucceeds(request)
 	})
 
 	It("executes the VM lifecycle with automatic restart disabled", func() {
