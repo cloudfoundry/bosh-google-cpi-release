@@ -10,8 +10,9 @@ type FakeMachineTypeService struct {
 	FindMachineType machinetype.MachineType
 	FindErr         error
 
-	CustomLinkCalled bool
-	CustomLinkLink   string
+	CustomLinkCalled        bool
+	CustomLinkMachineSeries string
+	CustomLinkLink          string
 }
 
 func (d *FakeMachineTypeService) Find(id string, zone string) (machinetype.MachineType, bool, error) {
@@ -19,7 +20,8 @@ func (d *FakeMachineTypeService) Find(id string, zone string) (machinetype.Machi
 	return d.FindMachineType, d.FindFound, d.FindErr
 }
 
-func (d *FakeMachineTypeService) CustomLink(cpu int, ram int, zone string) string {
+func (d *FakeMachineTypeService) CustomLink(cpu int, ram int, zone string, machineSeries string) string {
 	d.CustomLinkCalled = true
+	d.CustomLinkMachineSeries = machineSeries
 	return d.CustomLinkLink
 }

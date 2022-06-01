@@ -350,7 +350,7 @@ func (cv createVMBase) findMachineTypeLink(cloudProps VMCloudProperties, zone st
 			return "", bosherr.Error("Creating vm: 'machine_type' or 'cpu' and 'ram' must be provided")
 		}
 
-		machineTypeLink = cv.machineTypeService.CustomLink(cloudProps.CPU, cloudProps.RAM, zone)
+		machineTypeLink = cv.machineTypeService.CustomLink(cloudProps.CPU, cloudProps.RAM, zone, cloudProps.MachineSeries)
 	}
 
 	return machineTypeLink, nil

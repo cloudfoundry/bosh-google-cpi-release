@@ -45,6 +45,7 @@ type VMCloudProperties struct {
 	MachineType         string           `json:"machine_type,omitempty"`
 	CPU                 int              `json:"cpu,omitempty"`
 	RAM                 int              `json:"ram,omitempty"`
+	MachineSeries       string           `json:"machine_series,omitempty"`
 	RootDiskSizeGb      int              `json:"root_disk_size_gb,omitempty"`
 	RootDiskType        string           `json:"root_disk_type,omitempty"`
 	AutomaticRestart    bool             `json:"automatic_restart,omitempty"`

@@ -363,6 +363,7 @@ var _ = Describe("CreateVM", func() {
 		Context("when custom machine type is set", func() {
 			BeforeEach(func() {
 				cloudProps.MachineType = ""
+				cloudProps.MachineSeries = "E2"
 				cloudProps.CPU = 2
 				cloudProps.RAM = 5120
 
@@ -377,6 +378,7 @@ var _ = Describe("CreateVM", func() {
 				Expect(imageService.FindCalled).To(BeTrue())
 				Expect(machineTypeService.FindCalled).To(BeFalse())
 				Expect(machineTypeService.CustomLinkCalled).To(BeTrue())
+				Expect(machineTypeService.CustomLinkMachineSeries).To(Equal("E2"))
 				Expect(diskTypeService.FindCalled).To(BeFalse())
 				Expect(vmService.CreateCalled).To(BeTrue())
 				Expect(vmService.CleanUpCalled).To(BeFalse())
