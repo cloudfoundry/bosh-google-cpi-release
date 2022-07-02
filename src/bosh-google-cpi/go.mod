@@ -3,14 +3,14 @@ module bosh-google-cpi
 go 1.18
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.319
+	github.com/cloudfoundry/bosh-utils v0.0.320
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.1
 	github.com/onsi/gomega v1.11.0
-	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
-	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2
-	google.golang.org/api v0.85.0
+	golang.org/x/net v0.0.0-20220630215102-69896b714898
+	golang.org/x/oauth2 v0.0.0-20220630143837-2104d58473e0
+	google.golang.org/api v0.86.0
 )
 
 require (
@@ -31,11 +31,11 @@ require (
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/sys v0.0.0-20220624220833-87e55d714810 // indirect
+	golang.org/x/sys v0.0.0-20220702020025-31831981b65f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.5 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220624142145-8cd45d7dbd1f // indirect
+	google.golang.org/genproto v0.0.0-20220630174209-ad1d48641aa7 // indirect
 	google.golang.org/grpc v1.47.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
