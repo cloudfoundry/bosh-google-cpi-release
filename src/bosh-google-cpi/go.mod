@@ -3,14 +3,14 @@ module bosh-google-cpi
 go 1.19
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.340
+	github.com/cloudfoundry/bosh-utils v0.0.341
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.2
 	golang.org/x/net v0.1.0
 	golang.org/x/oauth2 v0.1.0
-	google.golang.org/api v0.101.0
+	google.golang.org/api v0.102.0
 )
 
 require (
@@ -25,13 +25,13 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/iochan v1.0.0 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
-	go.opencensus.io v0.23.0 // indirect
+	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
