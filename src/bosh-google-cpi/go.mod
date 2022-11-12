@@ -8,9 +8,9 @@ require (
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.20.2
-	golang.org/x/net v0.1.0
-	golang.org/x/oauth2 v0.1.0
-	google.golang.org/api v0.102.0
+	golang.org/x/net v0.2.0
+	golang.org/x/oauth2 v0.2.0
+	google.golang.org/api v0.103.0
 )
 
 require (
@@ -33,11 +33,11 @@ require (
 	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c // indirect
+	google.golang.org/genproto v0.0.0-20221111202108-142d8a6fa32e // indirect
 	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
