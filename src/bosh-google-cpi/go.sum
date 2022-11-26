@@ -12,8 +12,8 @@ github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA
 github.com/charlievieth/fs v0.0.3 h1:3lZQXTj4PbE81CVPwALSn+JoyCNXkZgORHN6h2XHGlg=
 github.com/charlievieth/fs v0.0.3/go.mod h1:hD4sRzto1Hw8zCua76tNVKZxaeZZr1RiKftjAJQRLLo=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
-github.com/cloudfoundry/bosh-utils v0.0.342 h1:CgppE8JnY1kT1WSGqyIt6J7G0Ypyd4KAFnYTCn0yleM=
-github.com/cloudfoundry/bosh-utils v0.0.342/go.mod h1:FtoztxRfpySJrnLSjVFdcIXAN+Mb6U2XPBr8MF7Qf24=
+github.com/cloudfoundry/bosh-utils v0.0.343 h1:7mUOtNgSQONttnaKBXliJIASUhJ01VQo+Kg/opFFu10=
+github.com/cloudfoundry/bosh-utils v0.0.343/go.mod h1:hoGocXHw7P3Y71b1IX+KxbjVdJzrfqhHykziZwnij1k=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
