@@ -1,7 +1,7 @@
 # cloud.google.com/go/compute v1.14.0
 ## explicit; go 1.19
 cloud.google.com/go/compute/internal
-# cloud.google.com/go/compute/metadata v0.2.2
+# cloud.google.com/go/compute/metadata v0.2.3
 ## explicit; go 1.19
 cloud.google.com/go/compute/metadata
 # github.com/bmatcuk/doublestar v1.3.4
@@ -10,7 +10,7 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.3
 ## explicit; go 1.18
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-utils v0.0.344
+# github.com/cloudfoundry/bosh-utils v0.0.345
 ## explicit; go 1.19
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -191,16 +191,15 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.3.0
+# golang.org/x/tools v0.4.0
 ## explicit; go 1.18
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/inspector
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/internal/gcimporter
-golang.org/x/tools/internal/goroot
 golang.org/x/tools/internal/pkgbits
 golang.org/x/tools/internal/typeparams
-# google.golang.org/api v0.104.0
+# google.golang.org/api v0.105.0
 ## explicit; go 1.19
 google.golang.org/api/compute/v0.beta
 google.golang.org/api/compute/v1
