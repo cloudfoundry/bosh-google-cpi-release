@@ -42,65 +42,47 @@ func NewGoogleClient(
 	logger boshlog.Logger,
 ) (GoogleClient, error) {
 	var err error
-	var computeClient, storageClient *http.Client
+	var cloudClient *http.Client
 	userAgent := config.GetUserAgent()
 
 	if config.JSONKey != "" {
-		computeJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope)
+		jwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), computeScope, storageScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
 		}
-		computeClient = computeJwtConf.Client(oauth2.NoContext)
-
-		storageJwtConf, err := oauthgoogle.JWTConfigFromJSON([]byte(config.JSONKey), storageScope)
-		if err != nil {
-			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
-		}
-		storageClient = storageJwtConf.Client(oauth2.NoContext)
+		cloudClient = jwtConf.Client(oauth2.NoContext)
 	} else {
 		if v := os.Getenv("GCE_METADATA_HOST"); v == "" {
 			os.Setenv("GCE_METADATA_HOST", metadataHost)
 		}
-		computeClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope)
-		if err != nil {
-			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
-		}
-
-		storageClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, storageScope)
+		cloudClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope, storageScope)
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
 		}
 	}
 
 	// Custom RoundTripper for retries
-	computeRetrier := &RetryTransport{
-		Base:            computeClient.Transport,
+	retrier := &RetryTransport{
+		Base:            cloudClient.Transport,
 		MaxRetries:      retries,
 		FirstRetrySleep: firstRetrySleep,
 		logger:          logger,
 	}
-	computeClient.Transport = computeRetrier
-	computeService, err := compute.New(computeClient)
+	cloudClient.Transport = retrier
+
+	computeService, err := compute.New(cloudClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 	computeService.UserAgent = userAgent
 
-	computeServiceB, err := computebeta.New(computeClient)
+	computeServiceB, err := computebeta.New(cloudClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 	computeServiceB.UserAgent = userAgent
 
-	// Custom RoundTripper for retries
-	storageRetrier := &RetryTransport{
-		Base:            storageClient.Transport,
-		MaxRetries:      retries,
-		FirstRetrySleep: firstRetrySleep,
-		logger:          logger,
-	}
-	storageClient.Transport = storageRetrier
-	storageService, err := storage.New(storageClient)
+	storageService, err := storage.New(cloudClient)
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Storage Service client")
 	}
