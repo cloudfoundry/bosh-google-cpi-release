@@ -9,6 +9,10 @@ groups:
       - run-bats
       - run-int
       - teardown-infrastructure
+      - pre-release-fan-in
+      - automatically-release-new-patch
+      - promote-candidate
+      - clear-release-notes
       - promote-candidate-major
       - promote-candidate-minor
       - promote-candidate-patch
@@ -197,65 +201,143 @@ jobs:
           google_json_key_data:      ((gcp_credentials_json))
           google_address_static_int: ((google_address_static_int))
 
-  - name: promote-candidate-major
+  - name: pre-release-fan-in
+    plan:
+    - get: bosh-cpi-src-in
+      trigger: true
+      passed:
+      - run-int
+      - run-bats
+    - get: google-ubuntu-stemcell
+      passed:
+      - run-int
+      - run-bats
+    - get: bosh-cpi-dev-artifacts
+      passed:
+      - run-bats
+
+  - name: automatically-release-new-patch
     serial: true
     plan:
+    - in_parallel:
+      - get: bosh-cpi-src-in
+        trigger: true
+        passed:
+        - pre-release-fan-in
+      - get: golang-release
+      - get: release-version-semver
+    - try:
+        task: check-for-patched-cves
+        file: golang-release/ci/tasks/shared/check-for-patched-cves.yml
+        input_mapping:
+          input_repo: bosh-cpi-src-in
+          version: release-version-semver
+        params:
+          SEVERITY: CRITICAL,HIGH
+          SOURCE_PATH: src
+        on_success:
+          do:
+          - put: release-notes
+            params:
+              file: patched_cves/release-notes.md
+          - put: release-version-semver
+            params:
+              bump: patch
+    - task: ensure-cve-checker-succeeded
+      file: golang-release/ci/tasks/shared/ensure-cve-checker-succeeded.yml
+      params:
+        description: |
+          Since the previous step is wrapped in a "try", this task checks that the previous step fully executed.
+
+  - name: promote-candidate
+    plan:
       - in_parallel:
-        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                             get: release-version-semver, params: {bump: major}}
-        - {get: ci}
+        - get: ci
+        - get: bosh-cpi-src
+          resource: bosh-cpi-src-in
+          passed:
+          - pre-release-fan-in
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          passed:
+          - pre-release-fan-in
+        - get: bosh-cpi-release
+          resource: bosh-cpi-dev-artifacts
+          passed:
+          - pre-release-fan-in
+        - get: release-version-semver
+          trigger: true
+        - get: release-notes
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
           release_blobs_json_key: ((gcp_credentials_json))
-
-      - put: release-version-semver
-        params: {file: release-version-semver/number}
-
       - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
+        params:
+          repository: promoted/repo
+          rebase: true
+          tag_prefix: "v"
+          tag: promoted/semver_version
+      - put: github-release
+        params:
+          name: promoted/prefixed_semver_version
+          tag: promoted/prefixed_semver_version
+          body: release-notes/release-notes.md
+
+  - name: clear-release-notes
+    plan:
+    - get: release-version-semver
+      passed:
+      - promote-candidate
+      trigger: true
+    - get: golang-release
+    - task: clear-release-notes
+      file: golang-release/ci/tasks/shared/clear-release-notes.yml
+    - put: release-notes
+      params:
+        file: release-notes/release-notes.md
+
+  - name: promote-candidate-major
+    serial: true
+    plan:
+      - in_parallel:
+        - get: bosh-cpi-src-in
+          passed:
+          - pre-release-fan-in
+        - get: bosh-cpi-dev-artifacts
+          passed:
+          - pre-release-fan-in
+      - put: release-version-semver
+        params:
+          bump: major
 
   - name: promote-candidate-minor
     serial: true
     plan:
       - in_parallel:
-        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {get: ci}
-        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                             get: release-version-semver, params: {bump: minor}}
-      - task: promote
-        file: ci/ci/tasks/promote-candidate.yml
-        params:
-          release_blobs_json_key: ((gcp_credentials_json))
-
+        - get: bosh-cpi-src-in
+          passed:
+          - pre-release-fan-in
+        - get: bosh-cpi-dev-artifacts
+          passed:
+          - pre-release-fan-in
       - put: release-version-semver
-        params: {file: release-version-semver/number}
-
-      - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
+        params:
+          bump: minor
 
   - name: promote-candidate-patch
     serial: true
     plan:
       - in_parallel:
-        - {trigger: false, passed: [run-int,run-bats], get: bosh-cpi-src,           resource: bosh-cpi-src-in}
-        - {get: ci}
-        - {trigger: false, passed: [run-int,run-bats], get: stemcell,               resource: google-ubuntu-stemcell}
-        - {trigger: false, passed: [run-bats],         get: bosh-cpi-release,       resource: bosh-cpi-dev-artifacts}
-        - {trigger: false,                             get: release-version-semver, params: {bump: patch}}
-      - task: promote
-        file: ci/ci/tasks/promote-candidate.yml
-        params:
-          release_blobs_json_key: ((gcp_credentials_json))
-
+        - get: bosh-cpi-src-in
+          passed:
+          - pre-release-fan-in
+        - get: bosh-cpi-dev-artifacts
+          passed:
+          - pre-release-fan-in
       - put: release-version-semver
-        params: {file: release-version-semver/number}
-
-      - put: bosh-cpi-src-out
-        params: {repository: promoted/repo, rebase: true, tag_prefix: "v", tag: promoted/semver_version}
+        params:
+          bump: patch
 
   - name: build-dockerfile
     public: true
@@ -398,6 +480,21 @@ resources:
       paths:
         - ci/*
       uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+
+  - name: github-release
+    type: github-release
+    source:
+      owner: cloudfoundry
+      repository: bosh-google-cpi-release
+      access_token: ((github_public_repo_token))
+
+  - name: release-notes
+    type: gcs-resource
+    source:
+      bucket: bosh-ci-release-notes
+      json_key: ((gcp_credentials_json))
+      versioned_file: bosh-google-cpi-release/release-notes.md
+      initial_content_text: ""
 
   - name: director-creds
     type: gcs-resource

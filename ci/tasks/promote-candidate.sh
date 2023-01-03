@@ -8,8 +8,9 @@ source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 check_param release_blobs_json_key
 
 # Version info
-semver_version=`cat release-version-semver/number`
-echo $semver_version > promoted/semver_version
+semver_version="$(cat release-version-semver/number)"
+echo "$semver_version" > promoted/semver_version
+echo "v$semver_version" > promoted/prefixed_semver_version
 echo "BOSH Google CPI BOSH Release v${semver_version}" > promoted/annotation_message
 
 cp -r bosh-cpi-src promoted/repo
