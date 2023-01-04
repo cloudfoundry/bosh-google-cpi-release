@@ -494,6 +494,7 @@ resources:
       bucket: bosh-ci-release-notes
       json_key: ((gcp_credentials_json))
       versioned_file: bosh-google-cpi-release/release-notes.md
+      initial_version: "0"
       initial_content_text: ""
 
   - name: director-creds
