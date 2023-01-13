@@ -61,15 +61,15 @@ jobs:
         - task: teardown-infrastructure
           file: ci/ci/tasks/teardown-infrastructure.yml
           params:
-            google_auto_network: ((google_auto_network))
+            google_auto_network: google-cpi-ci-auto-network
             google_json_key_data: ((gcp_credentials_json))
-            google_network: ((google_network))
-            google_project: ((google_project))
-            google_region: ((google_region))
-            google_zone: ((google_zone))
+            google_network: google-cpi-ci-network
+            google_project: cf-bosh-core
+            google_region: us-east1
+            google_zone: us-east1-b
       - put: infrastructure
         params:
-          env_name: ((cpi_source_branch))-bosh-google-cpi
+          env_name: master-bosh-google-cpi
           terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
@@ -94,20 +94,20 @@ jobs:
       - task: teardown-director
         file: ci/ci/tasks/teardown-director.yml
         params:
-          google_project:                 ((google_project))
-          google_region:                  ((google_region))
-          google_zone:                    ((google_zone))
-          cpi_source_branch:              ((cpi_source_branch))
-          google_test_bucket_name:        ((google_test_bucket_name))
-          google_subnetwork_range:        ((google_subnetwork_range))
-          google_subnetwork_gw:           ((google_subnetwork_gw))
-          google_address_static_director: ((google_address_static_director))
+          google_project:                 cf-bosh-core
+          google_region:                  us-east1
+          google_zone:                    us-east1-b
+          cpi_source_branch:              master
+          google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+          google_subnetwork_range:        "10.0.0.0/24"
+          google_subnetwork_gw:           "10.0.0.1"
+          google_address_static_director: "10.0.0.6"
           google_json_key_data:           ((gcp_credentials_json))
-          private_key_user:               ((private_key_user))
-          private_key_data:               ((private_key_data))
+          private_key_user:               vcap
+          private_key_data:               ((director_ssh_keypair.private_key))
       - put: infrastructure
         params:
-          env_name: ((cpi_source_branch))-bosh-google-cpi
+          env_name: master-bosh-google-cpi
           terraform_source: ci/ci/test_infrastructure
           action: destroy
         get_params:
@@ -130,36 +130,36 @@ jobs:
       - task: setup-director
         file: ci/ci/tasks/setup-director.yml
         params:
-          cpi_source_branch:              ((cpi_source_branch))
-          google_project:                 ((google_project))
-          google_region:                  ((google_region))
-          google_zone:                    ((google_zone))
-          google_test_bucket_name:        ((google_test_bucket_name))
-          google_subnetwork_range:        ((google_subnetwork_range))
-          google_subnetwork_gw:           ((google_subnetwork_gw))
-          google_address_static_director: ((google_address_static_director))
+          cpi_source_branch:              master
+          google_project:                 cf-bosh-core
+          google_region:                  us-east1
+          google_zone:                    us-east1-b
+          google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+          google_subnetwork_range:        "10.0.0.0/24"
+          google_subnetwork_gw:           "10.0.0.1"
+          google_address_static_director: "10.0.0.6"
           google_json_key_data:           ((gcp_credentials_json))
-          private_key_user:               ((private_key_user))
-          private_key_data:               ((private_key_data))
+          private_key_user:               vcap
+          private_key_data:               ((director_ssh_keypair.private_key))
         on_failure:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
           params:
-            google_project:                 ((google_project))
-            google_region:                  ((google_region))
-            google_zone:                    ((google_zone))
-            cpi_source_branch:              ((cpi_source_branch))
-            google_test_bucket_name:        ((google_test_bucket_name))
-            google_subnetwork_range:        ((google_subnetwork_range))
-            google_subnetwork_gw:           ((google_subnetwork_gw))
-            google_address_static_director: ((google_address_static_director))
+            google_project:                 cf-bosh-core
+            google_region:                  us-east1
+            google_zone:                    us-east1-b
+            cpi_source_branch:              master
+            google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+            google_subnetwork_range:        "10.0.0.0/24"
+            google_subnetwork_gw:           "10.0.0.1"
+            google_address_static_director: "10.0.0.6"
             google_json_key_data:           ((gcp_credentials_json))
-            private_key_user:               ((private_key_user))
-            private_key_data:               ((private_key_data))
+            private_key_user:               vcap
+            private_key_data:               ((director_ssh_keypair.private_key))
       - put: director-creds
-        params: {file: director-creds/((cpi_source_branch))-creds.yml}
+        params: {file: director-creds/master-creds.yml}
       - put: director-state
-        params: {file: director-state/((cpi_source_branch))-manifest-state.json}
+        params: {file: director-state/master-manifest-state.json}
 
   - name: run-bats
     serial: true
@@ -176,16 +176,16 @@ jobs:
       - task: run-bats
         file: ci/ci/tasks/run-bats.yml
         params:
-          cpi_source_branch:                          ((cpi_source_branch))
-          google_subnetwork_range:                    ((google_subnetwork_range))
-          google_subnetwork_gw:                       ((google_subnetwork_gw))
-          google_address_static_available_range_bats: ((google_address_static_bats_available_range))
-          google_address_static_bats:                 ((google_address_static_bats))
-          google_address_static_pair_bats:            ((google_address_static_pair_bats))
+          cpi_source_branch:                          master
+          google_subnetwork_range:                    "10.0.0.0/24"
+          google_subnetwork_gw:                       "10.0.0.1"
+          google_address_static_available_range_bats: "10.0.0.20-10.0.0.30"
+          google_address_static_bats:                 "10.0.0.20"
+          google_address_static_pair_bats:            "10.0.0.20,10.0.0.21"
           google_json_key_data:                       ((gcp_credentials_json))
           base_os:                                    Ubuntu
           stemcell_name:                              bosh-google-kvm-ubuntu-jammy-go_agent
-          private_key_data:                           ((private_key_data))
+          private_key_data:                           ((director_ssh_keypair.private_key))
 
   - name: run-int
     serial_groups: [integration]
@@ -199,7 +199,7 @@ jobs:
         file: ci/ci/tasks/run-int.yml
         params:
           google_json_key_data:      ((gcp_credentials_json))
-          google_address_static_int: ((google_address_static_int))
+          google_address_static_int: "10.0.0.100,10.0.0.101,10.0.0.102"
 
   - name: pre-release-fan-in
     plan:
@@ -427,20 +427,19 @@ resources:
     type: gcs-resource
     source:
       json_key: ((gcp_credentials_json))
-      bucket:   ((google_releases_bucket_name))
+      bucket:   bosh-gcp-cpi-release
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
 
   - name: bosh-cpi-dev-artifacts-sha1
     type: gcs-resource
     source:
       json_key: ((gcp_credentials_json))
-      bucket:   ((google_releases_bucket_name))
+      bucket:   bosh-gcp-cpi-release
       regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
 
   - name: bosh-cpi-src-in
     type: git
     source:
-      branch: ((cpi_source_branch))
       ignore_paths:
         - .final_builds/**/*.yml
         - releases/**/*.yml
@@ -451,7 +450,6 @@ resources:
     type: git
     source:
       uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
-      branch: ((cpi_source_branch))
       paths:
       - "ci/docker"
 
@@ -459,8 +457,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
-      branch: ((cpi_source_branch))
-      private_key: ((github_deployment_key_bosh_google_cpi_release))
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
 
   - name: golang-release
     type: git
@@ -476,7 +473,6 @@ resources:
   - name: ci
     type: git
     source:
-      branch: ((cpi_source_branch))
       paths:
         - ci/*
       uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
@@ -501,15 +497,15 @@ resources:
     type: gcs-resource
     source:
       json_key:         ((gcp_credentials_json))
-      bucket:           ((google_state_bucket_name))
-      versioned_file:   ((cpi_source_branch))-creds.yml
+      bucket:           bosh-gcp-cpi-release-ci-state
+      versioned_file:   master-creds.yml
 
   - name: director-state
     type: gcs-resource
     source:
       json_key:         ((gcp_credentials_json))
-      bucket:           ((google_state_bucket_name))
-      versioned_file:   ((cpi_source_branch))-manifest-state.json
+      bucket:           bosh-gcp-cpi-release-ci-state
+      versioned_file:   master-manifest-state.json
 
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell
@@ -523,20 +519,20 @@ resources:
     source:
       backend_type: gcs
       backend_config:
-        bucket: ((google_state_bucket_name))
-        prefix: terraform-((cpi_source_branch))
+        bucket: bosh-gcp-cpi-release-ci-state
+        prefix: terraform-master
         credentials: ((gcp_credentials_json))
       vars:
-        google_project:           ((google_project))
-        google_region:            ((google_region))
-        google_zone:              ((google_zone))
+        google_project:           cf-bosh-core
+        google_region:            us-east1
+        google_zone:              us-east1-b
         google_json_key_data:     ((gcp_credentials_json))
-        google_subnetwork_range:  ((google_subnetwork_range))
-        google_firewall_internal: ((google_firewall_internal))
-        google_firewall_external: ((google_firewall_external))
-        prefix:                   ((cpi_source_branch))
-        google_auto_network:      ((google_auto_network))
-        google_network:           ((google_network))
+        google_subnetwork_range:  "10.0.0.0/24"
+        google_firewall_internal: google-cpi-ci-firewall-internal
+        google_firewall_external: google-cpi-ci-firewall-external
+        prefix:                   master
+        google_auto_network:      google-cpi-ci-auto-network
+        google_network:           google-cpi-ci-network
 
   - name: release-version-semver
     type: semver
@@ -544,7 +540,7 @@ resources:
       driver: gcs
       json_key:          ((gcp_credentials_json))
       key:               release-current-version
-      bucket:            ((version_semver_bucket_name))
+      bucket:            bosh-gcp-cpi-release-version-semver
 
   - name: version-semver
     type: semver
@@ -552,7 +548,7 @@ resources:
       driver: gcs
       json_key:          ((gcp_credentials_json))
       key:               current-version
-      bucket:            ((version_semver_bucket_name))
+      bucket:            bosh-gcp-cpi-release-version-semver
 
   - name: google-cpi-image
     type: docker-image
