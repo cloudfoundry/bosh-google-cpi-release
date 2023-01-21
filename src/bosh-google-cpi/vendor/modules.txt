@@ -199,7 +199,7 @@ golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/internal/gcimporter
 golang.org/x/tools/internal/pkgbits
 golang.org/x/tools/internal/typeparams
-# google.golang.org/api v0.107.0
+# google.golang.org/api v0.108.0
 ## explicit; go 1.19
 google.golang.org/api/compute/v0.beta
 google.golang.org/api/compute/v1
@@ -228,7 +228,7 @@ google.golang.org/appengine/internal/modules
 google.golang.org/appengine/internal/remote_api
 google.golang.org/appengine/internal/urlfetch
 google.golang.org/appengine/urlfetch
-# google.golang.org/genproto v0.0.0-20230117162540-28d6b9783ac4
+# google.golang.org/genproto v0.0.0-20230119192704-9d59e20e5cd1
 ## explicit; go 1.19
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
