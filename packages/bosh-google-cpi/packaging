@@ -6,7 +6,7 @@ else
 	pkg_dir=$BOSH_PACKAGES_DIR/golang-1-linux
 fi
 
-source ${pkg_dir}/bosh/compile.env.generic
+source ${pkg_dir}/bosh/compile.env
 
 # Since HOME is not set we must set GOPATH and GOCACHE
 mkdir -p /tmp/go/.cache
