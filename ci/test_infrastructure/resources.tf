@@ -3,7 +3,7 @@ resource "random_string" "account_suffix" {
   upper   = false
   special = false
   lower   = true
-  number  = true
+  numeric  = true
 }
 
 resource "google_service_account" "service_account" {
@@ -75,6 +75,7 @@ resource "google_compute_firewall" "external" {
   name        = "${var.prefix}-ext"
   description = "BOSH CI External Traffic"
   network     = google_compute_network.manual.self_link
+  source_tags = [var.google_firewall_external]
   target_tags = [var.google_firewall_external]
 
   allow {
