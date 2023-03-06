@@ -458,6 +458,7 @@ resources:
     source:
       uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
       private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
+      branch: master
 
   - name: golang-release
     type: git
