@@ -21,7 +21,6 @@ func (i *Labels) Validate() error {
 }
 
 var (
-	numFirstRe   = regexp.MustCompile("^[0-9]")
 	mustMatchReP = "^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$"
 	mustMatchRe  = regexp.MustCompile(mustMatchReP)
 )
@@ -43,11 +42,6 @@ func SafeLabel(s string) (string, error) {
 	// Ensure the string doesn't begin or end in -
 	s = strings.TrimSuffix(s, "-")
 	s = strings.TrimPrefix(s, "-")
-
-	// Ensure the string doesn't begin with a number
-	if numFirstRe.MatchString(s) {
-		s = "n" + s
-	}
 
 	// The sanitized value should pass the GCE regex
 	if mustMatchRe.MatchString(s) {
