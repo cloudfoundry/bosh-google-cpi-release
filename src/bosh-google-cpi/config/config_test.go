@@ -20,9 +20,6 @@ var validGoogleConfig = bgcconfig.Config{
 var validAgentOptions = registry.AgentOptions{
 	Mbus: "fake-mbus",
 	Ntp:  []string{},
-	Blobstore: registry.BlobstoreOptions{
-		Provider: "fake-blobstore-type",
-	},
 }
 
 var validRegistryOptions = registry.ClientOptions{

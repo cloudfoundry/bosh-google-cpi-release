@@ -57,10 +57,7 @@ var (
 			"project": "%v"
 		  },
 		  "agent": {
-			"mbus": "http://127.0.0.1",
-			"blobstore": {
-			  "provider": "local"
-			}
+				"mbus": "http://127.0.0.1"
 		  },
 		  "registry": {
 			"use_gce_metadata": true

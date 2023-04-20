@@ -7,9 +7,6 @@ type AgentSettings struct {
 	// Agent ID
 	AgentID string `json:"agent_id"`
 
-	// Blobstore settings
-	Blobstore BlobstoreSettings `json:"blobstore"`
-
 	// Disks settings
 	Disks DisksSettings `json:"disks"`
 
@@ -27,15 +24,6 @@ type AgentSettings struct {
 
 	// VM settings
 	VM VMSettings `json:"vm"`
-}
-
-// BlobstoreSettings are the Blobstore settings for a particular VM.
-type BlobstoreSettings struct {
-	// Blobstore provider
-	Provider string `json:"provider"`
-
-	// Blobstore options
-	Options map[string]interface{} `json:"options"`
 }
 
 // DisksSettings are the Disks settings for a particular VM.
@@ -111,10 +99,6 @@ func NewAgentSettings(agentID string, vmCID string, networksSettings NetworksSet
 		Disks: DisksSettings{
 			System:     defaultSystemDisk,
 			Persistent: map[string]PersistentSettings{},
-		},
-		Blobstore: BlobstoreSettings{
-			Provider: agentOptions.Blobstore.Provider,
-			Options:  agentOptions.Blobstore.Options,
 		},
 		Env:      EnvSettings(env),
 		Mbus:     agentOptions.Mbus,
