@@ -69,9 +69,6 @@ var _ = Describe("CreateVM", func() {
 		}
 		agentOptions = registry.AgentOptions{
 			Mbus: "http://fake-mbus",
-			Blobstore: registry.BlobstoreOptions{
-				Provider: "fake-blobstore-type",
-			},
 		}
 		defaultRootDiskSizeGb = 0
 		defaultRootDiskType = ""
@@ -151,9 +148,6 @@ var _ = Describe("CreateVM", func() {
 
 			expectedAgentSettings = registry.AgentSettings{
 				AgentID: "fake-agent-id",
-				Blobstore: registry.BlobstoreSettings{
-					Provider: "fake-blobstore-type",
-				},
 				Disks: registry.DisksSettings{
 					System:     "/dev/sda",
 					Persistent: map[string]registry.PersistentSettings{},
