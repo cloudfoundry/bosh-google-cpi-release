@@ -15,6 +15,7 @@ outputs:
   - name: bats-config
 
 params:
+  cpi_source_branch:
   google_subnetwork_range:
   stemcell_name:
   private_key_data:

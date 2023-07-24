@@ -177,9 +177,10 @@ jobs:
       - task: prepare-bats-config
         file: ci/ci/tasks/prepare-bats-config.yml
         params:
-          google_subnetwork_range:                    "10.0.0.0/24"
-          private_key_data:                           ((director_ssh_keypair.private_key))
-          stemcell_name:                              bosh-google-kvm-ubuntu-jammy-go_agent
+          cpi_source_branch:       master
+          google_subnetwork_range: "10.0.0.0/24"
+          private_key_data:        ((director_ssh_keypair.private_key))
+          stemcell_name:           bosh-google-kvm-ubuntu-jammy-go_agent
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
 
