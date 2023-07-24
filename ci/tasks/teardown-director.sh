@@ -3,7 +3,6 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 creds_file="${PWD}/director-creds/${cpi_source_branch}-creds.yml"
 state_file="${PWD}/director-state/${cpi_source_branch}-manifest-state.json"

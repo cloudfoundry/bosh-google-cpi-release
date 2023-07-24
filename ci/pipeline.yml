@@ -166,26 +166,22 @@ jobs:
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [build-candidate, deploy-ubuntu], get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
-        - {trigger: true, passed: [deploy-ubuntu],                  get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: true, passed: [deploy-ubuntu],                  get: director-creds, resource: director-creds}
-        - {trigger: true, passed: [deploy-ubuntu],                  get: infrastructure, resource: infrastructure}
-        - {trigger: false,                                          get: bats}
+        - {get: bosh-cpi-src,     resource: bosh-cpi-src-in,        trigger: true, passed: [build-candidate, deploy-ubuntu]}
+        - {get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts, trigger: true, passed: [build-candidate, deploy-ubuntu]}
+        - {get: stemcell,         resource: google-ubuntu-stemcell, trigger: true, passed: [deploy-ubuntu]}
+        - {get: director-creds,                                     trigger: true, passed: [deploy-ubuntu]}
+        - {get: infrastructure,                                     trigger: true, passed: [deploy-ubuntu]}
+        - {get: bats}
+        - {get: bosh-cli}
         - {get: ci}
-      - task: run-bats
-        file: ci/ci/tasks/run-bats.yml
+      - task: prepare-bats-config
+        file: ci/ci/tasks/prepare-bats-config.yml
         params:
-          cpi_source_branch:                          master
           google_subnetwork_range:                    "10.0.0.0/24"
-          google_subnetwork_gw:                       "10.0.0.1"
-          google_address_static_available_range_bats: "10.0.0.20-10.0.0.30"
-          google_address_static_bats:                 "10.0.0.20"
-          google_address_static_pair_bats:            "10.0.0.20,10.0.0.21"
-          google_json_key_data:                       ((gcp_credentials_json))
-          base_os:                                    Ubuntu
-          stemcell_name:                              bosh-google-kvm-ubuntu-jammy-go_agent
           private_key_data:                           ((director_ssh_keypair.private_key))
+          stemcell_name:                              bosh-google-kvm-ubuntu-jammy-go_agent
+      - task: run-bats
+        file: bats/ci/tasks/run-bats.yml
 
   - name: run-int
     serial_groups: [integration]

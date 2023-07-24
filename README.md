@@ -60,17 +60,6 @@ To destroy the infrastructure required to run the integration tests, execute:
   make cleanint
   ```
 
-### Running ERB job templates unit tests
-
-The ERB templates rendered by the jobs of this Bosh Release have unit tests
-using Ruby. The required Ruby version is specified in `.ruby-version` as per
-convention with `chruby` or similar tools. A script will help you to install
-the correct Ruby version if necessary and run the ERB unit tests:
-
-```
-./scripts/test-unit-erb
-```
-
 ## Contributing
 For detailes on how to contribute to this project - including filing bug reports and contributing code changes - pleasee see [CONTRIBUTING.md].
 

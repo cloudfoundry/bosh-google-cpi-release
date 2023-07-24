@@ -3,7 +3,6 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param release_blobs_json_key
 

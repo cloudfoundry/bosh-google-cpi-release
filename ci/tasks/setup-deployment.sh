@@ -3,7 +3,6 @@
 set -e
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 deployment_dir="${PWD}/deployment"
 cpi_release_name=bosh-google-cpi

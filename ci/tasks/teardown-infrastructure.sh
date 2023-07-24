@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 source ci/ci/tasks/utils.sh
-source /etc/profile.d/chruby-with-ruby-2.6.1.sh
 
 check_param google_json_key_data
 check_param google_project

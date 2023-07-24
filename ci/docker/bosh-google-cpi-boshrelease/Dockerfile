@@ -21,33 +21,8 @@ ENV GCLOUD_SDK_VERSION 305.0.0
 RUN curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz | tar -v -C /usr/local -xz
 ENV PATH $PATH:/usr/local/google-cloud-sdk/bin
 
-# Instal chruby
-RUN mkdir /tmp/chruby && \
-    cd /tmp && \
-    curl https://codeload.github.com/postmodern/chruby/tar.gz/v0.3.9 | tar -xz && \
-    cd /tmp/chruby-0.3.9 && \
-    sudo ./scripts/setup.sh && \
-    rm -rf /tmp/chruby
-
-# Install ruby-install
-RUN mkdir /tmp/ruby-install && \
-    cd /tmp && \
-    curl https://codeload.github.com/postmodern/ruby-install/tar.gz/v0.7.0 | tar -xz && \
-    cd /tmp/ruby-install-0.7.0 && \
-    sudo make install && \
-    rm -rf /tmp/ruby-install
-
-
-# Set default ruby
-RUN ruby-install ruby 2.6.1 && \
-    cp /etc/profile.d/chruby.sh /etc/profile.d/chruby-with-ruby-2.6.1.sh && \
-    echo "chruby 2.6.1" >> /etc/profile.d/chruby-with-ruby-2.6.1.sh
-
-# Install Bundler
-RUN /bin/bash -l -c "gem install bundler --no-document"
-
 # Install Bosh cli
-RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-6.3.1-linux-amd64
+RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.3.1-linux-amd64
 RUN chmod +x bosh-cli-*
 RUN mv bosh-cli-* /usr/bin/bosh
 
