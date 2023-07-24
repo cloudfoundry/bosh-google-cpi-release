@@ -1,25 +1,40 @@
 FROM ubuntu:jammy
 
 # Update base image
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install locales apt-utils
+RUN apt-get update && apt-get -y install locales apt-utils
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y upgrade; apt-get clean
 
-# Install dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential git-core curl wget jq sudo; apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 libsqlite3-dev; apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-client libmysqlclient-dev; apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libpq-dev; apt-get clean
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python python-pip libyaml-dev libpython-dev; apt-get clean
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        apt-transport-https \
+        ca-certificates \
+        gnupg \
+        git-core \
+        curl \
+        git \
+        wget \
+        jq \
+        sudo \
+        sqlite3 \
+        libsqlite3-dev \
+        mysql-client \
+        libmysqlclient-dev \
+        libpq-dev \
+        libyaml-dev
+
+RUN export GCLOUD_KEYFILE="/usr/share/keyrings/cloud.google.gpg" \
+    && echo "deb [signed-by=${GCLOUD_KEYFILE}] https://packages.cloud.google.com/apt cloud-sdk main" \
+    | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
+    && curl -fSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | apt-key --keyring "${GCLOUD_KEYFILE}" add - \
+    && apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+      google-cloud-cli
 
 # Install Golang
 COPY --from=bosh/golang-release /var/vcap/packages/golang-1-linux /usr/local/go
 ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
-
-# Install Google Cloud SDK
-ENV GCLOUD_SDK_VERSION 305.0.0
-RUN curl -sSL https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_SDK_VERSION}-linux-x86_64.tar.gz | tar -v -C /usr/local -xz
-ENV PATH $PATH:/usr/local/google-cloud-sdk/bin
 
 # Install Bosh cli
 RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.3.1-linux-amd64
