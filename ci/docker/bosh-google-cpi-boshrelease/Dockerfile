@@ -15,6 +15,7 @@ RUN apt-get update -y \
         git \
         wget \
         jq \
+        openssh-client \
         sudo \
         sqlite3 \
         libsqlite3-dev \
