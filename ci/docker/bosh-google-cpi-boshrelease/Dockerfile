@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:jammy
 
 # Update base image
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install locales apt-utils
@@ -50,9 +50,6 @@ RUN /bin/bash -l -c "gem install bundler --no-document"
 RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-6.3.1-linux-amd64
 RUN chmod +x bosh-cli-*
 RUN mv bosh-cli-* /usr/bin/bosh
-
-# Install AWS CLI (used to upload stemcell)
-RUN pip install awscli
 
 # receipt generator
 RUN cd /tmp && \
