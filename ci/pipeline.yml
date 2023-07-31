@@ -223,6 +223,26 @@ jobs:
         - pre-release-fan-in
       - get: golang-release
       - get: release-version-semver
+      - get: patched-version
+        resource: release-version-semver
+        params:
+          bump: patch
+    - try:
+        task: check-for-updated-golang-package
+        file: golang-release/ci/tasks/shared/check-for-updated-golang-package.yml
+        input_mapping:
+          input_repo: bosh-cpi-src-in
+          version: release-version-semver
+        params:
+          PACKAGES: [golang-1-linux, golang-1-darwin]
+        on_success:
+          do:
+            - put: release-notes
+              params:
+                file: release-notes/release-notes.md
+            - put: release-version-semver
+              params:
+                file: patched-version/version
     - try:
         task: check-for-patched-cves
         file: golang-release/ci/tasks/shared/check-for-patched-cves.yml
@@ -236,10 +256,10 @@ jobs:
           do:
           - put: release-notes
             params:
-              file: patched_cves/release-notes.md
+              file: release-notes/release-notes.md
           - put: release-version-semver
             params:
-              bump: patch
+              file: patched-version/version
     - task: ensure-cve-checker-succeeded
       file: golang-release/ci/tasks/shared/ensure-cve-checker-succeeded.yml
       params:
