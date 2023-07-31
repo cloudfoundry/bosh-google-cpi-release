@@ -12,7 +12,6 @@ groups:
       - pre-release-fan-in
       - automatically-release-new-patch
       - promote-candidate
-      - clear-release-notes
       - promote-candidate-major
       - promote-candidate-minor
       - promote-candidate-patch
@@ -300,19 +299,11 @@ jobs:
           name: promoted/prefixed_semver_version
           tag: promoted/prefixed_semver_version
           body: release-notes/release-notes.md
-
-  - name: clear-release-notes
-    plan:
-    - get: release-version-semver
-      passed:
-      - promote-candidate
-      trigger: true
-    - get: golang-release
-    - task: clear-release-notes
-      file: golang-release/ci/tasks/shared/clear-release-notes.yml
-    - put: release-notes
-      params:
-        file: release-notes/release-notes.md
+      - task: clear-release-notes
+        file: golang-release/ci/tasks/shared/clear-release-notes.yml
+      - put: release-notes
+        params:
+          file: release-notes/release-notes.md
 
   - name: promote-candidate-major
     serial: true
