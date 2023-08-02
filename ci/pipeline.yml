@@ -213,6 +213,7 @@ jobs:
       - run-bats
 
   - name: automatically-release-new-patch
+    serial_groups: [version]
     serial: true
     plan:
     - in_parallel:
@@ -267,6 +268,7 @@ jobs:
           Since the previous step is wrapped in a "try", this task checks that the previous step fully executed.
 
   - name: promote-candidate
+    serial_groups: [version]
     plan:
       - in_parallel:
         - get: ci
@@ -308,6 +310,7 @@ jobs:
           file: release-notes/release-notes.md
 
   - name: promote-candidate-major
+    serial_groups: [version]
     serial: true
     plan:
       - in_parallel:
@@ -322,6 +325,7 @@ jobs:
           bump: major
 
   - name: promote-candidate-minor
+    serial_groups: [version]
     serial: true
     plan:
       - in_parallel:
@@ -336,6 +340,7 @@ jobs:
           bump: minor
 
   - name: promote-candidate-patch
+    serial_groups: [version]
     serial: true
     plan:
       - in_parallel:
