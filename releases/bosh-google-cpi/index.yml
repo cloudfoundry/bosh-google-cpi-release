@@ -111,6 +111,8 @@ builds:
     version: "6"
   e883776c-11b2-441a-7f21-490696902987:
     version: 41.0.0
+  e8bcfea7-9845-489e-5c83-95ab35399ab9:
+    version: 49.0.2
   ec2f36bc-d35d-45a1-7179-41c53b7add11:
     version: 40.0.4
   ed02bd76-1428-4540-a543-1ee8a4218b6a:
