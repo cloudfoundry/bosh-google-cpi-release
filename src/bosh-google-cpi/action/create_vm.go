@@ -203,6 +203,7 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		AutomaticRestart:  cloudProps.AutomaticRestart,
 		OnHostMaintenance: cloudProps.OnHostMaintenance,
 		Preemptible:       cloudProps.Preemptible,
+		ProvisioningModel: cloudProps.ProvisioningModel,
 		ServiceAccount:    instance.ServiceAccount(cloudProps.ServiceAccount),
 		ServiceScopes:     instance.ServiceScopes(cloudProps.ServiceScopes),
 		TargetPool:        cloudProps.TargetPool,

@@ -51,6 +51,7 @@ type VMCloudProperties struct {
 	AutomaticRestart    bool             `json:"automatic_restart,omitempty"`
 	OnHostMaintenance   string           `json:"on_host_maintenance,omitempty"`
 	Preemptible         bool             `json:"preemptible,omitempty"`
+	ProvisioningModel   string           `json:"provisioning_model,omitempty"`
 	ServiceAccount      VMServiceAccount `json:"service_account,omitempty"`
 	ServiceScopes       VMServiceScopes  `json:"service_scopes,omitempty"`
 	TargetPool          string           `json:"target_pool,omitempty"`

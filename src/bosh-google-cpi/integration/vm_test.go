@@ -285,10 +285,10 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	// us-central1-a and europe-west1-b were known to default to Sandy Bridge CPUs, 
-	// which do not expose RDRAND required to seed sufficient entropy to avoid the 
-	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to 
-	// Broadwell), but we're keeping the tests to ensure the behaviour is what 
+	// us-central1-a and europe-west1-b were known to default to Sandy Bridge CPUs,
+	// which do not expose RDRAND required to seed sufficient entropy to avoid the
+	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to
+	// Broadwell), but we're keeping the tests to ensure the behaviour is what
 	// we expect.
 	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU when creating n1 VMs (Sandy Bridge is blocking bosh-agent on boot)", func() {
 		By("creating a VM")
@@ -671,6 +671,43 @@ var _ = Describe("VM", func() {
 				  "machine_type": "n1-standard-1",
 				  "zone": "%v",
 				  "preemtible": true
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can execute the VM lifecycle with a SPOT provisioning_model", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "provisioning_model": SPOT
 				},
 				{
 				  "default": {
