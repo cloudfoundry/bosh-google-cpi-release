@@ -3,14 +3,14 @@ module bosh-google-cpi
 go 1.21
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.394
+	github.com/cloudfoundry/bosh-utils v0.0.397
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.27.10
 	golang.org/x/net v0.15.0
 	golang.org/x/oauth2 v0.12.0
-	google.golang.org/api v0.141.0
+	google.golang.org/api v0.142.0
 )
 
 require (
@@ -25,7 +25,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/google/uuid v1.3.1 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.1 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/iochan v1.0.0 // indirect
@@ -39,8 +39,8 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
-	google.golang.org/grpc v1.58.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230920204549-e6e6cdab5c13 // indirect
+	google.golang.org/grpc v1.58.2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
