@@ -184,7 +184,8 @@ resource "google_compute_node_template" "soletenant-tmpl" {
 }
 
 resource "google_compute_node_group" "nodes" {
-  name      = "${var.prefix}-node-group"
-  zone      = var.google_zone
+  name          = "${var.prefix}-node-group"
+  zone          = var.google_zone
+  initial_size  = 1
   node_template = google_compute_node_template.soletenant-tmpl.id
 }
