@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/api/dispatcher"
 
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	boshfakelog "github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 
 	fakeaction "bosh-google-cpi/action/fakes"
 	bgcapi "bosh-google-cpi/api"
@@ -22,15 +22,17 @@ var _ = Describe("JSON", func() {
 	var (
 		actionFactory *fakeaction.FakeFactory
 		caller        *fakedisp.FakeCaller
-		logger        boshlog.Logger
+		logger        *boshfakelog.FakeLogger
 		dispatcher    JSON
+		logBuffer     *bytes.Buffer
 	)
 
 	BeforeEach(func() {
 		actionFactory = fakeaction.NewFakeFactory()
 		caller = &fakedisp.FakeCaller{}
-		logger = boshlog.NewLogger(boshlog.LevelNone)
-		dispatcher = NewJSON(actionFactory, caller, bgcapi.MultiLogger{Logger: logger, LogBuff: &bytes.Buffer{}})
+		logger = &boshfakelog.FakeLogger{}
+		logBuffer = &bytes.Buffer{}
+		dispatcher = NewJSON(actionFactory, caller, bgcapi.MultiLogger{Logger: logger, LogBuff: logBuffer})
 	})
 
 	Describe("Dispatch", func() {
@@ -80,6 +82,25 @@ var _ = Describe("JSON", func() {
 							"error": null,
 							"log": ""
 						}`))
+					})
+
+					It("redacts secrets from the request", func() {
+						logger.DebugWithDetailsStub = func(tag string, msg string, args ...interface{}) {
+							logBuffer.Write([]byte(fmt.Sprintf("%s", args...)))
+						}
+
+						dispatcher.Dispatch([]byte(`{"method":"fake-action","arguments":[{"Password": "secret_data", "private_key":"more\n_secret_data","public_key":"public_data","account_key":"secret_data","json_key":"secret_data","secret_access_key":"secret_data"}]}`))
+						_, msg, args := logger.DebugWithDetailsArgsForCall(0)
+						Expect(msg).To(Equal("Request bytes"))
+						Expect(args).To(HaveLen(1))
+						Expect(args[0]).To(ContainSubstring("public_data"))
+						Expect(args[0]).NotTo(ContainSubstring("secret_data"))
+
+						_, msg, args = logger.DebugWithDetailsArgsForCall(1)
+						Expect(msg).To(Equal("Response bytes"))
+						Expect(args).To(HaveLen(1))
+						Expect(args[0]).To(ContainSubstring("public_data"))
+						Expect(args[0]).NotTo(ContainSubstring("secret_data"))
 					})
 				})
 
