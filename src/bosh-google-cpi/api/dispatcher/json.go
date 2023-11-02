@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
 
 	bgcaction "bosh-google-cpi/action"
 	bgcapi "bosh-google-cpi/api"
@@ -66,15 +67,13 @@ func NewJSON(
 func (c JSON) Dispatch(reqBytes []byte) []byte {
 	var req Request
 
-	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", string(reqBytes))
+	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", redactSecrets(string(reqBytes)))
 
 	decoder := json.NewDecoder(bytes.NewReader(reqBytes))
 	decoder.UseNumber()
 	if err := decoder.Decode(&req); err != nil {
 		return c.buildCpiError("Must provide valid JSON payload")
 	}
-
-	c.logger.DebugWithDetails(jsonLogTag, "Deserialized request", req)
 
 	if req.Method == "" {
 		return c.buildCpiError("Must provide method key")
@@ -105,8 +104,6 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 		Log:    c.logger.LogBuff.String(),
 	}
 
-	c.logger.DebugWithDetails(jsonLogTag, "Deserialized response", resp)
-
 	respBytes, err := json.Marshal(resp)
 	if err != nil {
 		return c.buildCpiError("Failed to serialize result")
@@ -115,6 +112,11 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 	c.logger.DebugWithDetails(jsonLogTag, "Response bytes", string(respBytes))
 
 	return respBytes
+}
+
+func redactSecrets(sourceString string) string {
+	re := regexp.MustCompile(`(?si)("account_key"|"json_key"|"password"|"private_key"|"secret_access_key"): ?".*?"`)
+	return re.ReplaceAllString(sourceString, `$1:"REDACTED"`)
 }
 
 func (c JSON) buildCloudError(err error) []byte {
