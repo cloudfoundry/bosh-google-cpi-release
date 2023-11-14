@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -89,7 +90,21 @@ var _ = Describe("JSON", func() {
 							logBuffer.Write([]byte(fmt.Sprintf("%s", args...)))
 						}
 
-						dispatcher.Dispatch([]byte(`{"method":"fake-action","arguments":[{"Password": "secret_data", "private_key":"more\n_secret_data","public_key":"public_data","account_key":"secret_data","json_key":"secret_data","secret_access_key":"secret_data"}]}`))
+						respBytes := dispatcher.Dispatch([]byte(`{
+  "method": "fake-action",
+  "arguments": [
+    {
+      "Password": "secret_data",
+      "private_key": "more\n_secret_data",
+      "public_key": "public_data",
+      "account_key": "secret_data",
+      "json_key": "secret_data",
+      "secret_access_key": "secret_data"
+    }
+  ]
+}`))
+						Expect(respBytes).NotTo(ContainSubstring("Bosh::Clouds::CpiError"))
+
 						_, msg, args := logger.DebugWithDetailsArgsForCall(0)
 						Expect(msg).To(Equal("Request bytes"))
 						Expect(args).To(HaveLen(1))
