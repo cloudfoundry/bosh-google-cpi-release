@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"regexp"
 
 	bgcaction "bosh-google-cpi/action"
 	bgcapi "bosh-google-cpi/api"
 	"bosh-google-cpi/constant"
+	"bosh-google-cpi/redactor"
 )
 
 const (
@@ -67,7 +67,7 @@ func NewJSON(
 func (c JSON) Dispatch(reqBytes []byte) []byte {
 	var req Request
 
-	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", redactSecrets(string(reqBytes)))
+	c.logger.DebugWithDetails(jsonLogTag, "Request bytes", redactor.RedactSecrets(string(reqBytes)))
 
 	decoder := json.NewDecoder(bytes.NewReader(reqBytes))
 	decoder.UseNumber()
@@ -109,14 +109,9 @@ func (c JSON) Dispatch(reqBytes []byte) []byte {
 		return c.buildCpiError("Failed to serialize result")
 	}
 
-	c.logger.DebugWithDetails(jsonLogTag, "Response bytes", string(respBytes))
+	c.logger.DebugWithDetails(jsonLogTag, "Response bytes", redactor.RedactSecrets(string(respBytes)))
 
 	return respBytes
-}
-
-func redactSecrets(sourceString string) string {
-	re := regexp.MustCompile(`(?si)("account_key"|"json_key"|"password"|"private_key"|"secret_access_key"): ?".*?"`)
-	return re.ReplaceAllString(sourceString, `$1:"REDACTED"`)
 }
 
 func (c JSON) buildCloudError(err error) []byte {
@@ -144,7 +139,7 @@ func (c JSON) buildCloudError(err error) []byte {
 		panic(err)
 	}
 
-	c.logger.DebugWithDetails(jsonLogTag, "CloudError response bytes", string(respErrBytes))
+	c.logger.DebugWithDetails(jsonLogTag, "CloudError response bytes", redactor.RedactSecrets(string(respErrBytes)))
 
 	return respErrBytes
 }
@@ -163,7 +158,7 @@ func (c JSON) buildCpiError(message string) []byte {
 		panic(err)
 	}
 
-	c.logger.DebugWithDetails(jsonLogTag, "CpiError response bytes", string(respErrBytes))
+	c.logger.DebugWithDetails(jsonLogTag, "CpiError response bytes", redactor.RedactSecrets(string(respErrBytes)))
 
 	return respErrBytes
 }
@@ -182,7 +177,7 @@ func (c JSON) buildNotImplementedError() []byte {
 		panic(err)
 	}
 
-	c.logger.DebugWithDetails(jsonLogTag, "NotImplementedError response bytes", string(respErrBytes))
+	c.logger.DebugWithDetails(jsonLogTag, "NotImplementedError response bytes", redactor.RedactSecrets(string(respErrBytes)))
 
 	return respErrBytes
 }

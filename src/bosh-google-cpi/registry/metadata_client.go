@@ -6,11 +6,14 @@ import (
 	"math"
 	"time"
 
-	"bosh-google-cpi/google/client"
-	opsvc "bosh-google-cpi/google/operation_service"
-	"bosh-google-cpi/util"
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+
+	"bosh-google-cpi/google/client"
+	opsvc "bosh-google-cpi/google/operation_service"
+	"bosh-google-cpi/redactor"
+	"bosh-google-cpi/util"
+
 	"google.golang.org/api/compute/v1"
 )
 
@@ -45,6 +48,20 @@ type instanceMetadata struct {
 	items       map[string]string
 	fingerprint string
 	zone        string
+}
+
+func (i *instanceMetadata) withRedactedItems() *instanceMetadata {
+	redactedMetadata := &instanceMetadata{
+		fingerprint: i.fingerprint,
+		zone:        i.zone,
+	}
+
+	redactedMetadata.items = make(map[string]string)
+	for k, v := range i.items {
+		redactedMetadata.items[k] = redactor.RedactSecrets(v)
+	}
+
+	return redactedMetadata
 }
 
 func (i *instanceMetadata) computeMetadata() *compute.Metadata {
@@ -93,7 +110,7 @@ func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) e
 	if err != nil {
 		return bosherr.WrapErrorf(err, "Marshalling agent settings, contents: %#v", agentSettings)
 	}
-	c.logger.Debug(metadataClientLogTag, "Updating instance metadata for %q with agent settings %q", instanceID, settingsJSON)
+	c.logger.Debug(metadataClientLogTag, "Updating instance metadata for %q with agent settings %q", instanceID, redactor.RedactSecrets(string(settingsJSON)))
 
 	currentMetadata, err := c.metadata(instanceID)
 	if err != nil {
@@ -134,7 +151,7 @@ func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 			for _, item := range list.Instances[0].Metadata.Items {
 				metadata.items[item.Key] = *item.Value
 			}
-			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#v", instanceID, metadata))
+			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#v", instanceID, metadata.withRedactedItems()))
 			return metadata, nil
 		}
 	}
