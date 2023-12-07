@@ -179,6 +179,7 @@ jobs:
           cpi_source_branch:       master
           google_subnetwork_range: "10.0.0.0/24"
           private_key_data:        ((director_ssh_keypair.private_key))
+          public_key_data:         ((director_ssh_keypair.public_key))
           stemcell_name:           bosh-google-kvm-ubuntu-jammy-go_agent
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml

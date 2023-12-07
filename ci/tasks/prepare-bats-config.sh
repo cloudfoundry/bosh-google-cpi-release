@@ -6,6 +6,7 @@ source ci/ci/tasks/utils.sh
 
 check_param google_subnetwork_range
 check_param stemcell_name
+check_param public_key_data
 check_param private_key_data
 
 creds_dir="${PWD}/director-creds"
@@ -21,10 +22,7 @@ export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="$(bosh interpolate ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(bosh interpolate ${creds_file} --path /director_ssl/ca)"
 
-export BAT_DNS_HOST=${google_address_director_ip}
 export BAT_INFRASTRUCTURE=google
-export BAT_NETWORKING=dynamic
-export BAT_PRIVATE_KEY="${private_key_data}"
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration --tag ~dns"
 EOF
 
@@ -39,6 +37,9 @@ properties:
   instances: 1
   vip: ${google_address_bats_ip}
   zone: ${google_zone}
+  ssh_key_pair:
+    public_key: "${public_key_data}"
+    private_key: "${private_key_data}"
   static_ips: [${google_address_bats_internal_ip_pair}]
   networks:
     - name: default

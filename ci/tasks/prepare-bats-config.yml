@@ -19,6 +19,7 @@ params:
   google_subnetwork_range:
   stemcell_name:
   private_key_data:
+  public_key_data:
 
 run:
   path: ci/ci/tasks/prepare-bats-config.sh
