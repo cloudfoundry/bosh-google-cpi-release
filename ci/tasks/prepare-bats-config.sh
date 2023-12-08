@@ -39,7 +39,7 @@ properties:
   zone: ${google_zone}
   ssh_key_pair:
     public_key: "${public_key_data}"
-    private_key: "${private_key_data}"
+    private_key: "$(echo "${private_key_data}" | sed 's/$/\\n/' | tr -d '\n')"
   static_ips: [${google_address_bats_internal_ip_pair}]
   networks:
     - name: default
