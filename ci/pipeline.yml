@@ -102,8 +102,6 @@ jobs:
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
           google_json_key_data:           ((gcp_credentials_json))
-          private_key_user:               vcap
-          private_key_data:               ((director_ssh_keypair.private_key))
       - put: infrastructure
         params:
           env_name: master-bosh-google-cpi
@@ -138,8 +136,6 @@ jobs:
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
           google_json_key_data:           ((gcp_credentials_json))
-          private_key_user:               vcap
-          private_key_data:               ((director_ssh_keypair.private_key))
         on_failure:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
@@ -153,8 +149,6 @@ jobs:
             google_subnetwork_gw:           "10.0.0.1"
             google_address_static_director: "10.0.0.6"
             google_json_key_data:           ((gcp_credentials_json))
-            private_key_user:               vcap
-            private_key_data:               ((director_ssh_keypair.private_key))
       - put: director-creds
         params: {file: director-creds/master-creds.yml}
       - put: director-state
@@ -178,8 +172,6 @@ jobs:
         params:
           cpi_source_branch:       master
           google_subnetwork_range: "10.0.0.0/24"
-          private_key_data:        ((director_ssh_keypair.private_key))
-          public_key_data:         ((director_ssh_keypair.public_key))
           stemcell_name:           bosh-google-kvm-ubuntu-jammy-go_agent
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml

@@ -16,7 +16,6 @@ fly -t google login -c <YOUR CONCOURSE URL>
 
  And then:
  * Add the contents of the generated public SSH key-pair (`vcap_key.pub` file) as a Google Compute Engine [project-level key](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#project-wide).
- * Paste the contents of the generated private SSH key-pair (`vcap_key.pub`) into the `private_key_data` property at the `credentials.yml` file.
 
  Alternatively you may store some or all of these parameters in Credhub if your Concourse environment has it set up. Any parameter stored in Credhub should be removed from the credentials file before running the command below.
 

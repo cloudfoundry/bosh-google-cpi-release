@@ -6,8 +6,6 @@ source ci/ci/tasks/utils.sh
 
 check_param google_subnetwork_range
 check_param stemcell_name
-check_param public_key_data
-check_param private_key_data
 
 creds_dir="${PWD}/director-creds"
 creds_file="${creds_dir}/${cpi_source_branch}-creds.yml"
@@ -21,6 +19,8 @@ export BOSH_ENVIRONMENT="${google_address_director_ip}"
 export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="$(bosh interpolate ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(bosh interpolate ${creds_file} --path /director_ssl/ca)"
+export public_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/public_key)"
+export private_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/private_key)"
 
 export BAT_INFRASTRUCTURE=google
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration --tag ~dns"
@@ -38,8 +38,8 @@ properties:
   vip: ${google_address_bats_ip}
   zone: ${google_zone}
   ssh_key_pair:
-    public_key: "${public_key_data}"
-    private_key: "$(echo "${private_key_data}" | sed 's/$/\\n/' | tr -d '\n')"
+    public_key: "${public_key}"
+    private_key: "$(echo "${private_key}" | sed 's/$/\\n/' | tr -d '\n')"
   static_ips: [${google_address_bats_internal_ip_pair}]
   networks:
     - name: default

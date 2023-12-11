@@ -16,6 +16,4 @@ run:
 params:
   BOSH_INIT_LOG_LEVEL: warn
   google_json_key_data:           replace-me
-  private_key_user:               replace-me
-  private_key_data:               replace-me
   cpi_source_branch:              replace-me

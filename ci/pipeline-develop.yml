@@ -91,8 +91,6 @@ jobs:
           google_subnetwork_gw:           ((google_subnetwork_gw))
           google_address_static_director: ((google_address_static_director))
           google_json_key_data:           ((google_json_key_data))
-          private_key_user:               ((private_key_user))
-          private_key_data:               ((private_key_data))
       - put: infrastructure
         params:
           env_name: ((cpi_source_branch))
@@ -127,8 +125,6 @@ jobs:
           google_subnetwork_gw:           ((google_subnetwork_gw))
           google_address_static_director: ((google_address_static_director))
           google_json_key_data:           ((google_json_key_data))
-          private_key_user:               ((private_key_user))
-          private_key_data:               ((private_key_data))
         on_failure:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
@@ -142,8 +138,6 @@ jobs:
             google_subnetwork_gw:           ((google_subnetwork_gw))
             google_address_static_director: ((google_address_static_director))
             google_json_key_data:           ((google_json_key_data))
-            private_key_user:               ((private_key_user))
-            private_key_data:               ((private_key_data))
       - put: director-creds
         params: {file: director-creds/((cpi_source_branch))-creds.yml}
       - put: director-state
@@ -173,7 +167,6 @@ jobs:
           google_json_key_data:                       ((google_json_key_data))
           base_os:                                    Ubuntu
           stemcell_name:                              bosh-google-kvm-ubuntu-xenial-go_agent
-          private_key_data:                           ((private_key_data))
 
   - name: run-int
     serial_groups: [run-int]

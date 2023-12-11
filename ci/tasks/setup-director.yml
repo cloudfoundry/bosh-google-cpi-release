@@ -22,7 +22,5 @@ params:
   BOSH_INIT_LOG_LEVEL:            warn
   cpi_source_branch:              replace-me
   google_subnetwork_range:        replace-me
-  private_key_user:               replace-me
-  private_key_data:               replace-me
   google_json_key_data:           replace-me
   google_test_bucket_name:        replace-me
