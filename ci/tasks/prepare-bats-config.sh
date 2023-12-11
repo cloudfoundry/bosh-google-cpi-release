@@ -11,6 +11,9 @@ creds_dir="${PWD}/director-creds"
 creds_file="${creds_dir}/${cpi_source_branch}-creds.yml"
 infrastructure_metadata="${PWD}/infrastructure/metadata"
 
+public_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/public_key)"
+private_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/private_key)"
+
 read_infrastructure
 
 echo "Creating bats env config..."
@@ -19,8 +22,10 @@ export BOSH_ENVIRONMENT="${google_address_director_ip}"
 export BOSH_CLIENT="admin"
 export BOSH_CLIENT_SECRET="$(bosh interpolate ${creds_file} --path /admin_password)"
 export BOSH_CA_CERT="$(bosh interpolate ${creds_file} --path /director_ssl/ca)"
-export public_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/public_key)"
-export private_key="$(bosh interpolate ${creds_file} --path /jumpbox_ssh/private_key)"
+
+private_key_path=\$(mktemp)
+echo -e "${private_key}" > \${private_key_path}
+export BOSH_ALL_PROXY="ssh+socks5://jumpbox@${google_address_director_ip}:22?private-key=\${private_key_path}"
 
 export BAT_INFRASTRUCTURE=google
 export BAT_RSPEC_FLAGS="--tag ~multiple_manual_networks --tag ~raw_ephemeral_storage --tag ~changing_static_ip --tag ~network_reconfiguration --tag ~dns"
