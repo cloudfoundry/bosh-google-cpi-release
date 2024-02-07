@@ -139,6 +139,8 @@ builds:
     version: "2"
   f89c6e3f-5453-48cf-86aa-3d0bd8ce599b:
     version: 25.6.0
+  f9db8be7-cdae-46fc-6103-a65d82307205:
+    version: 49.0.12
   fd0c5072-cef0-4abb-7c09-c822ed13a63e:
     version: 49.0.9
   ffac76b9-6f99-4900-524b-f4602819d712:
