@@ -1,16 +1,16 @@
 module bosh-google-cpi
 
-go 1.22
+go 1.21
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.433
+	github.com/cloudfoundry/bosh-utils v0.0.438
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.30.0
 	golang.org/x/net v0.21.0
 	golang.org/x/oauth2 v0.17.0
-	google.golang.org/api v0.162.0
+	google.golang.org/api v0.163.0
 )
 
 require (
