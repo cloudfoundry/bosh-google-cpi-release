@@ -285,10 +285,10 @@ var _ = Describe("VM", func() {
 		assertSucceeds(request)
 	})
 
-	// us-central1-a and europe-west1-b were known to default to Sandy Bridge CPUs, 
-	// which do not expose RDRAND required to seed sufficient entropy to avoid the 
-	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to 
-	// Broadwell), but we're keeping the tests to ensure the behaviour is what 
+	// us-central1-a and europe-west1-b were known to default to Sandy Bridge CPUs,
+	// which do not expose RDRAND required to seed sufficient entropy to avoid the
+	// bosh-agent blocking on boot. This is not an issue anymore (n1 defaults to
+	// Broadwell), but we're keeping the tests to ensure the behaviour is what
 	// we expect.
 	It("can create a VM in us-central1-a and not get a Sandy Bridge CPU when creating n1 VMs (Sandy Bridge is blocking bosh-agent on boot)", func() {
 		By("creating a VM")
@@ -890,6 +890,111 @@ var _ = Describe("VM", func() {
 			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
 			Expect(instance.Disks[1].Type).To(Equal("SCRATCH"))
 		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("executes the VM lifecycle with a local-ssd specified and persistent disks", func() {
+
+		By("creating a disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("confirming a disk exists")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+
+		By("creating a VM")
+		var vmCID string
+		request = fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+                  "ephemeral_disk_type": "local-ssd",
+				  "service_account": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, serviceAccount, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+			Expect(instance.Disks[1].DeviceName).To(Equal("local-ssd-0"))
+			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
+			Expect(instance.Disks[1].Type).To(Equal("SCRATCH"))
+		})
+
+		By("attaching the disk")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		path := assertSucceedsWithResult(request).(string)
+		Expect(path).To(Equal("/dev/sdb"))
+
+		By("confirming the attachment of a disk")
+		request = fmt.Sprintf(`{
+			  "method": "get_disks",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		disks := toStringArray(assertSucceedsWithResult(request).([]interface{}))
+		Expect(disks).To(ContainElement(diskCID))
+
+		By("attaching the disk again without failing")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		By("detaching and deleting a disk")
+		request = fmt.Sprintf(`{
+			  "method": "detach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+
+		By("confirming a disk does not exist")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		found := assertSucceedsWithResult(request).(bool)
+		Expect(found).To(BeFalse())
 
 		By("deleting the VM")
 		request = fmt.Sprintf(`{

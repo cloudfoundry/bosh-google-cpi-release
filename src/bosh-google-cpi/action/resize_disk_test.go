@@ -24,7 +24,7 @@ var _ = Describe("ResizeDisk", func() {
 		diskService = &diskfakes.FakeDiskService{}
 		resizeDisk = NewResizeDisk(diskService)
 	})
-	
+
 	Describe("Run", func() {
 		It("resize the disk", func() {
 			_, err = resizeDisk.Run("fake-disk-id", 123)

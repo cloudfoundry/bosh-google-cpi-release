@@ -7,6 +7,7 @@ import (
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
+
 	"google.golang.org/api/compute/v1"
 )
 
@@ -57,10 +58,18 @@ func (i GoogleInstanceService) DiskDetail(vmID string, diskLink string) (*DiskAt
 		return nil, api.NewVMNotFoundError(vmID)
 	}
 
+	hasEmphermalSSD := false
 	// Derive the disk's attachment path based on its index
 	for _, attachedDisk := range instance.Disks {
+		// In case of local ssd the index is off by one - local ssd are always index one
+		if attachedDisk.Type == "SCRATCH" {
+			hasEmphermalSSD = true
+		}
 		if attachedDisk.Source == diskLink {
 			deviceIndex := int(attachedDisk.Index)
+			if hasEmphermalSSD {
+				deviceIndex -= 1
+			}
 			dev := &DiskAttachmentDetail{
 				Name: deviceName,
 				Path: fmt.Sprintf("%s%s", googleDiskPathPrefix, string(googleDiskPathSuffix[deviceIndex])),
