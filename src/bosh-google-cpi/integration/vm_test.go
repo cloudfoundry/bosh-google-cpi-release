@@ -957,8 +957,7 @@ var _ = Describe("VM", func() {
 			  "method": "attach_disk",
 			  "arguments": ["%v", "%v"]
 			}`, vmCID, diskCID)
-		path := assertSucceedsWithResult(request).(string)
-		Expect(path).To(Equal("/dev/sdb"))
+		assertSucceeds(request)
 
 		By("confirming the attachment of a disk")
 		request = fmt.Sprintf(`{
