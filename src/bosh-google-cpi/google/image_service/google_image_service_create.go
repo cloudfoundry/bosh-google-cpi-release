@@ -105,6 +105,7 @@ func (i GoogleImageService) create(name string, description string, sourceURL st
 		GuestOsFeatures: []*compute.GuestOsFeature{
 			{Type: "MULTI_IP_SUBNET"},
 			{Type: "UEFI_COMPATIBLE"},
+			{Type: "GVNIC"},
 		},
 	}
 
