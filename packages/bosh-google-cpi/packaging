@@ -1,9 +1,10 @@
 set -ex
 
+platform=`uname | tr '[:upper:]' '[:lower:]'`
 if [ -z "$BOSH_PACKAGES_DIR" ]; then
-	pkg_dir=$(readlink -nf /var/vcap/packages/golang-1-linux)
+	pkg_dir=$(readlink -nf /var/vcap/packages/golang-1-${platform})
 else
-	pkg_dir=$BOSH_PACKAGES_DIR/golang-1-linux
+	pkg_dir=$BOSH_PACKAGES_DIR/golang-1-${platform}
 fi
 
 source ${pkg_dir}/bosh/compile.env
