@@ -19,12 +19,11 @@ import (
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#maxpath
 //
-//   When using an API to create a directory, the specified path cannot be so
-//   long that you cannot append an 8.3 file name (that is, the directory name
-//   cannot exceed MAX_PATH minus 12).
+//	When using an API to create a directory, the specified path cannot be so
+//	long that you cannot append an 8.3 file name (that is, the directory name
+//	cannot exceed MAX_PATH minus 12).
 //
-//   MAX_PATH = 260
-//
+//	MAX_PATH = 260
 const MAX_PATH = 248 // 260 - 12
 
 func absPath(path string) (string, error) {

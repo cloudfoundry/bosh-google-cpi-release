@@ -1,6 +1,6 @@
 package gstruct
 
-//Options is the type for options passed to some matchers.
+// Options is the type for options passed to some matchers.
 type Options int
 
 const (
