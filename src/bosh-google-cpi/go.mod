@@ -11,6 +11,7 @@ require (
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.21.0
 	google.golang.org/api v0.184.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -52,5 +53,4 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
