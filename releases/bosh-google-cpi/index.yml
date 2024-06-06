@@ -115,6 +115,8 @@ builds:
     version: "20"
   abbf7c09-ea73-4464-4ade-51eddae58d67:
     version: 48.0.0
+  b41eac59-7895-4cac-5a1d-8f52dd94a13a:
+    version: 49.0.20
   b546c92b-fafe-4994-4d07-bde447a074c0:
     version: 49.0.0
   c33ed1df-d872-4aa4-710c-45644bc57102:
