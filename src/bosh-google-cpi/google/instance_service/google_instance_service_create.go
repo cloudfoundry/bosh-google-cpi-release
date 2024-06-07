@@ -59,8 +59,8 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		// Parse MachineType to figure out how many CPUs the instance has.
 		// Format: zones/zone/machineTypes/machine-type with machine-type being in the format
 		// of either n1-standard-1 or custom-4-5120
-		MachineTypeName := vmProps.MachineType[strings.LastIndex(vmProps.MachineType, "/")+1:]
-		machineTypeComponents := strings.Split(MachineTypeName, "-")
+		machineTypeName := vmProps.MachineType[strings.LastIndex(vmProps.MachineType, "/")+1:]
+		machineTypeComponents := strings.Split(machineTypeName, "-")
 		machineTypeSeries := machineTypeComponents[0]
 		machineTypeCpuComponent := machineTypeComponents[2]
 		if machineTypeSeries == "custom" {
