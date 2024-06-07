@@ -707,7 +707,7 @@ var _ = Describe("VM", func() {
 				{
 				  "machine_type": "c2-standard-4",
 				  "zone": "%v",
-                                  "node_group": "%v"
+				  "node_group": "%v"
 				},
 				{
 				  "default": {
@@ -889,6 +889,55 @@ var _ = Describe("VM", func() {
 			Expect(instance.Disks[1].DeviceName).To(Equal("local-ssd-0"))
 			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
 			Expect(instance.Disks[1].Type).To(Equal("SCRATCH"))
+		})
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("executes the VM lifecycle with a custom machine type and local-ssd specified", func() {
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n2-custom-12-6144",
+				  "zone": "%v",
+				  "ephemeral_disk_type": "local-ssd",
+				  "service_account": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, serviceAccount, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+		assertValidVM(vmCID, func(instance *compute.Instance) {
+			// Labels should be an exact match
+			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+			Expect(instance.Disks[1].DeviceName).To(Equal("local-ssd-0"))
+			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
+			Expect(instance.Disks[1].Type).To(Equal("SCRATCH"))
+			// We should have 2 local SSDs due to the number of vCPUs
+			Expect(instance.Disks[2].DeviceName).To(Equal("local-ssd-1"))
+			Expect(instance.Disks[2].Interface).To(Equal("NVME"))
+			Expect(instance.Disks[2].Type).To(Equal("SCRATCH"))
 		})
 
 		By("deleting the VM")
