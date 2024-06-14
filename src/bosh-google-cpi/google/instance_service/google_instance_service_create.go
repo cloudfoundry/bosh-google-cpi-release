@@ -39,7 +39,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if err != nil {
 		return "", err
 	}
-	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible, vmProps.NodeGroup)
+	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible, vmProps.ProvisioningModel, vmProps.NodeGroup)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
 
 	// Handle tags
@@ -248,10 +248,22 @@ func (i GoogleInstanceService) createSchedulingParams(
 	automaticRestart bool,
 	onHostMaintenance string,
 	preemptible bool,
+	provisioningModel string,
 	nodeGroup string,
 ) *compute.Scheduling {
 	if preemptible {
 		return &compute.Scheduling{Preemptible: preemptible}
+	}
+
+	// TODO: do we need to have an if statement for provisioningModel is not defined as STANDARD is default
+	if provisioningModel == "" {
+		return &compute.Scheduling{ProvisioningModel: provisioningModel}
+	}
+
+	// preemtible and provisioningModel are mutually exclusive
+	// TODO: prefere provisioningModel over preemptible or error out?
+	if preemptible && provisioningModel != "" {
+		return &compute.Scheduling{ProvisioningModel: provisioningModel}
 	}
 
 	scheduling := &compute.Scheduling{
