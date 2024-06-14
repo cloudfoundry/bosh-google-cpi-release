@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
@@ -52,12 +53,52 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	var ssdDisk *compute.AttachedDisk
 
 	if vmProps.EphemeralDiskType == "local-ssd" {
-		ssdDisk, err = i.createLocalSSDParams(vmProps.Zone)
+		// default is one local SSD
+		numberOfLocalSSDs := 1
+
+		// Parse MachineType to figure out how many CPUs the instance has.
+		// Format: zones/zone/machineTypes/machine-type with machine-type being in the format
+		// of either n1-standard-1 or custom-4-5120
+		machineTypeName := vmProps.MachineType[strings.LastIndex(vmProps.MachineType, "/")+1:]
+		machineTypeComponents := strings.Split(machineTypeName, "-")
+		machineTypeSeries := machineTypeComponents[0]
+		machineTypeCpuComponent := machineTypeComponents[2]
+		if machineTypeSeries == "custom" {
+			machineTypeCpuComponent = machineTypeComponents[1]
+		}
+		numberOfCPUs, err := strconv.Atoi(machineTypeCpuComponent)
 		if err != nil {
 			return "", err
 		}
+		// n2 and n2d series require a minimum number of SSDs depending on vCPUs
+		// https://cloud.google.com/compute/docs/disks/local-ssd#lssd_disk_options
+		if machineTypeSeries == "n2" {
+			if numberOfCPUs >= 82 {
+				numberOfLocalSSDs = 16
+			} else if numberOfCPUs >= 42 {
+				numberOfLocalSSDs = 8
+			} else if numberOfCPUs >= 22 {
+				numberOfLocalSSDs = 4
+			} else if numberOfCPUs >= 12 {
+				numberOfLocalSSDs = 2
+			}
+		} else if machineTypeSeries == "n2d" {
+			if numberOfCPUs >= 96 {
+				numberOfLocalSSDs = 8
+			} else if numberOfCPUs >= 64 {
+				numberOfLocalSSDs = 4
+			} else if numberOfCPUs >= 32 {
+				numberOfLocalSSDs = 2
+			}
+		}
+		for j := 0; j < numberOfLocalSSDs; j++ {
+			ssdDisk, err = i.createLocalSSDParams(vmProps.Zone, j+1)
+			if err != nil {
+				return "", err
+			}
 
-		diskParams = append(diskParams, ssdDisk)
+			diskParams = append(diskParams, ssdDisk)
+		}
 	}
 
 	vm := &compute.Instance{
@@ -137,7 +178,7 @@ func (i GoogleInstanceService) createDiskParams(stemcell string, diskSize int, d
 	return disks
 }
 
-func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.AttachedDisk, error) {
+func (i GoogleInstanceService) createLocalSSDParams(zone string, index int) (*compute.AttachedDisk, error) {
 	diskType, b, e := i.diskTypeService.Find("local-ssd", zone)
 	if e != nil {
 		return nil, e
@@ -153,7 +194,7 @@ func (i GoogleInstanceService) createLocalSSDParams(zone string) (*compute.Attac
 			DiskType: diskType.SelfLink,
 		},
 		Interface: "NVME",
-		Index:     1,
+		Index:     int64(index),
 		Type:      "SCRATCH",
 	}
 
