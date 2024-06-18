@@ -51,6 +51,9 @@ echo "Using bosh version..."
 ${BOSH_CLI} --version
 
 pushd ${deployment_dir}
+  echo "Cleaning up all unused resources..."
+  ${BOSH_CLI} clean-up -n --all
+
   echo "Destroying BOSH Director..."
   ${BOSH_CLI} delete-env bosh-deployment/bosh.yml \
       --state=${state_file} \
