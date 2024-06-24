@@ -2,14 +2,20 @@ package integration
 
 import (
 	"fmt"
+	"os"
+	"slices"
 
 	"bosh-google-cpi/util"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
+	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v1"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
+	iam "google.golang.org/api/iam/v1"
+	"gopkg.in/yaml.v3"
 
 	"testing"
 )
@@ -23,6 +29,9 @@ func TestIntegration(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
+	// Ensure tests are run using the documented minimum GCP permissions
+	validateMinimumPermissions()
+
 	// Clean any straggler VMs
 	cleanVMs()
 
@@ -52,7 +61,8 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	// Required env vars
 	Expect(googleProject).ToNot(Equal(""), "GOOGLE_PROJECT must be set")
 	Expect(externalStaticIP).ToNot(Equal(""), "EXTERNAL_STATIC_IP must be set")
-	Expect(serviceAccount).ToNot(Equal(""), "SERVICE_ACCOUNT must be set")
+	Expect(customServiceAccount).ToNot(Equal(""), "CUSTOM_SERVICE_ACCOUNT must be set")
+	Expect(jsonKeyServiceAccount).ToNot(Equal(""), "JSON_KEY_SERVICE_ACCOUNT must be set")
 
 	// Initialize a compute API client
 	ctx := context.Background()
@@ -76,6 +86,60 @@ var _ = SynchronizedAfterSuite(func() {}, func() {
 	Expect(response.Error).To(BeNil())
 	Expect(response.Result).To(BeNil())
 })
+
+type exampleRoleYaml struct {
+	IncludedPermissions []string `yaml:"included_permissions"`
+}
+
+func validateMinimumPermissions() {
+	ctx := context.Background()
+
+	// Get role names attached to current service account
+	resourceManager, err := cloudresourcemanager.NewService(ctx)
+	Expect(err).ToNot(HaveOccurred())
+
+	policy, err := resourceManager.Projects.GetIamPolicy(googleProject, &cloudresourcemanager.GetIamPolicyRequest{}).Do()
+	Expect(err).ToNot(HaveOccurred())
+
+	var roleNames []string
+	for _, binding := range policy.Bindings {
+		if slices.Contains(binding.Members, fmt.Sprintf("serviceAccount:%s", jsonKeyServiceAccount)) {
+			roleNames = append(roleNames, binding.Role)
+		}
+	}
+
+	// Get permissions for each role
+	iamService, err := iam.NewService(ctx)
+	Expect(err).ToNot(HaveOccurred())
+
+	var actualPermissions []string
+
+	for _, roleName := range roleNames {
+		role, err := iamService.Projects.Roles.Get(roleName).Do()
+		if err != nil {
+			role, err = iamService.Roles.Get(roleName).Do()
+		}
+		Expect(err).ToNot(HaveOccurred())
+
+		actualPermissions = append(actualPermissions, role.IncludedPermissions...)
+	}
+
+	//  Compare actual permissions against the permissions in the example role file
+	var expectedPermissions []string
+	var exampleRole *exampleRoleYaml
+
+	yamlContents, err := os.ReadFile("../../../docs/bosh-director-role.yml")
+	Expect(err).ToNot(HaveOccurred())
+	err = yaml.Unmarshal(yamlContents, &exampleRole)
+	Expect(err).ToNot(HaveOccurred())
+
+	// Permissions needed to introspect the roles for the project, and the permissions on each role
+	var expectedExtraPermissions = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get"}
+
+	expectedPermissions = append(exampleRole.IncludedPermissions, expectedExtraPermissions...)
+
+	Expect(actualPermissions).To(ConsistOf(expectedPermissions))
+}
 
 func cleanVMs() {
 	// Initialize a compute API client

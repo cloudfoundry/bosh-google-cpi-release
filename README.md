@@ -11,6 +11,15 @@ Stemcells are available on bosh.io: [http://bosh.io/stemcells/bosh-google-kvm-ub
 ## Usage
 If you are not familiar with [BOSH](http://bosh.io/) and its terminology please take a look at the [BOSH documentation](http://bosh.io/docs).
 
+## Permissions
+
+The Google Cloud permissions necessary for using the BOSH Google CPI are documented in [an example role file](docs/bosh-director-role.yml). This role can be created using the following `gcloud` command, then applied to the service account you use with the CPI:
+
+```
+gcloud iam roles --project <project-id> create bosh.director \
+  --file <( bosh int -v project_id=<project-id> bosh-director-role.yml )
+```
+
 ### Deploy a BOSH Director on Google Cloud Platform
 [BOSH Bootloader](https://github.com/cloudfoundry/bosh-bootloader) is the recommended way to deploy a BOSH director on GCP. Detailed instructions are available [here](https://github.com/cloudfoundry/bosh-bootloader/blob/master/docs/getting-started-gcp.md).
 
