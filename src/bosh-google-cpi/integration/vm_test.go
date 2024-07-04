@@ -925,12 +925,12 @@ var _ = Describe("VM", func() {
 				[],
 				{}
 			  ]
-			}`, existingStemcell, zone, serviceAccount, networkName)
+			}`, existingStemcell, zone, customServiceAccount, networkName)
 		vmCID = assertSucceedsWithResult(request).(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			// Labels should be an exact match
 			Expect(instance.ServiceAccounts[0].Scopes).To(Not(BeEmpty()))
-			Expect(instance.ServiceAccounts[0].Email).To(Equal(serviceAccount))
+			Expect(instance.ServiceAccounts[0].Email).To(Equal(customServiceAccount))
 			Expect(instance.Disks[1].DeviceName).To(Equal("local-ssd-0"))
 			Expect(instance.Disks[1].Interface).To(Equal("NVME"))
 			Expect(instance.Disks[1].Type).To(Equal("SCRATCH"))
