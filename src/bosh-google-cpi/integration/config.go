@@ -24,9 +24,10 @@ var (
 	existingStemcell string
 
 	// Provided by user
-	googleProject    = envRequired("GOOGLE_PROJECT")
-	externalStaticIP = envRequired("EXTERNAL_STATIC_IP")
-	serviceAccount   = envRequired("SERVICE_ACCOUNT")
+	googleProject         = envRequired("GOOGLE_PROJECT")
+	externalStaticIP      = envRequired("EXTERNAL_STATIC_IP")
+	customServiceAccount  = envRequired("CUSTOM_SERVICE_ACCOUNT")   // Separate, custom service account used to exercise the service_account CPI property
+	jsonKeyServiceAccount = envRequired("JSON_KEY_SERVICE_ACCOUNT") // Service account used to run the tests
 
 	// Configurable defaults
 	stemcellFile            = envOrDefault("STEMCELL_FILE", "")

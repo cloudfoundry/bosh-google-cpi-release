@@ -187,7 +187,7 @@ jobs:
       - task: run-int
         file: ci/ci/tasks/run-int.yml
         params:
-          google_json_key_data:      ((gcp_credentials_json))
+          google_json_key_data:      ((integration_gcp_credentials_json))
           google_address_static_int: "10.0.0.100,10.0.0.101,10.0.0.102"
 
   - name: pre-release-fan-in

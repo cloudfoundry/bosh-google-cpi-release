@@ -70,7 +70,8 @@ testint: check-proj get-deps clean fmt
 	ZONE=$(shell cd ../../ci/test_infrastructure && terraform output google_zone) \
 	REGION=$(shell cd ../../ci/test_infrastructure && terraform output google_region) \
 	GOOGLE_PROJECT=$(shell cd ../../ci/test_infrastructure && terraform output google_project) \
-	SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
+	CUSTOM_SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
+	JSON_KEY_SERVICE_ACCOUNT=$(shell jq -r .client_email $HOME/.config/gcloud/application_default_credentials.json) \
 	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
 	NODE_GROUP=$(shell cd ../../ci/test_infrastructure && terraform output google_node_group) \
     ./.bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
