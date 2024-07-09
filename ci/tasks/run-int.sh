@@ -6,10 +6,18 @@ source ci/ci/tasks/utils.sh
 
 check_param google_json_key_data
 
-# Initialize deployment artifacts
+# Reading custom permission roles for int tests
 google_json_key=google_key.json
-infrastructure_metadata="${PWD}/infrastructure/metadata"
 
+echo "Creating google json key..."
+echo "${google_json_key_data}" > ${google_json_key}
+mkdir -p $HOME/.config/gcloud/
+cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
+
+export JSON_KEY_SERVICE_ACCOUNT="$(jq -r .client_email "${google_json_key}")"
+
+# Initialize deployment artifacts
+infrastructure_metadata="${PWD}/infrastructure/metadata"
 read_infrastructure
 
 # Stemcell stuff
@@ -36,14 +44,8 @@ export EXTERNAL_STATIC_IP=${google_address_int_ip}
 export NODE_GROUP=${google_node_group}
 export CPI_ASYNC_DELETE=true
 
-echo "Creating google json key..."
-echo "${google_json_key_data}" > ${google_json_key}
-mkdir -p $HOME/.config/gcloud/
-cp ${google_json_key} $HOME/.config/gcloud/application_default_credentials.json
-
-export JSON_KEY_SERVICE_ACCOUNT="$(jq -r .client_email "${google_json_key}")"
-
 echo "Configuring google account..."
+gcloud config set disable_prompts true
 gcloud auth activate-service-account --key-file $HOME/.config/gcloud/application_default_credentials.json
 gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
