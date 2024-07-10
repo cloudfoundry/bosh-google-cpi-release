@@ -134,7 +134,7 @@ func validateMinimumPermissions() {
 	Expect(err).ToNot(HaveOccurred())
 
 	// Permissions needed to introspect the roles for the project, and the permissions on each role
-	var expectedExtraPermissions = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get"}
+	var expectedExtraPermissions = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get", "compute.disks.resize", "compute.addresses.useInternal", "compute.instances.setServiceAccount", "compute.acceleratorTypes.get"}
 
 	expectedPermissions = append(exampleRole.IncludedPermissions, expectedExtraPermissions...)
 
