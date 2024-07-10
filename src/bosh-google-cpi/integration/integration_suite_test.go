@@ -133,10 +133,11 @@ func validateMinimumPermissions() {
 	err = yaml.Unmarshal(yamlContents, &exampleRole)
 	Expect(err).ToNot(HaveOccurred())
 
-	// Permissions needed to introspect the roles for the project, and the permissions on each role
-	var expectedExtraPermissions = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get", "compute.disks.resize", "compute.addresses.useInternal", "compute.instances.setServiceAccount", "compute.acceleratorTypes.get"}
+	// permissions in addition to minimal set of permissions(docs/bosh-director-role.yml) required to run CPI
+	// these permissions are for testing specific use cases e.g. "create VM with an accelerator", "create a VM with a static private IP"
+	var additionalPermissionsForIntegrationTests = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get", "compute.disks.resize", "compute.addresses.useInternal", "compute.instances.setServiceAccount", "compute.acceleratorTypes.get"}
 
-	expectedPermissions = append(exampleRole.IncludedPermissions, expectedExtraPermissions...)
+	expectedPermissions = append(exampleRole.IncludedPermissions, additionalPermissionsForIntegrationTests...)
 
 	Expect(actualPermissions).To(ConsistOf(expectedPermissions))
 }
