@@ -135,7 +135,21 @@ func validateMinimumPermissions() {
 
 	// permissions in addition to minimal set of permissions(docs/bosh-director-role.yml) required to run CPI
 	// these permissions are for testing specific use cases e.g. "create VM with an accelerator", "create a VM with a static private IP"
-	var additionalPermissionsForIntegrationTests = []string{"resourcemanager.projects.getIamPolicy", "iam.roles.get", "compute.disks.resize", "compute.addresses.useInternal", "compute.instances.setServiceAccount", "compute.acceleratorTypes.get"}
+	additionalPermissionsForIntegrationTests := []string{
+		// Permissions needed to check permissions for this test
+		"resourcemanager.projects.getIamPolicy",
+		"iam.roles.get",
+		// Permission needed when using accelerators property
+		"compute.acceleratorTypes.get",
+		// Permission needed when using service_account or service_scopes properties
+		"compute.instances.setServiceAccount",
+		// Permissions associated with the role iam.serviceAccountUser, needed when using the service_account or service_scopes properties.
+		"iam.serviceAccounts.actAs",
+		"iam.serviceAccounts.get",
+		"iam.serviceAccounts.list",
+		"resourcemanager.projects.get",
+		"resourcemanager.projects.list",
+	}
 
 	expectedPermissions = append(exampleRole.IncludedPermissions, additionalPermissionsForIntegrationTests...)
 

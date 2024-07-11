@@ -19,6 +19,7 @@ included_permissions:
 - compute.disks.list
 - compute.disks.get
 - compute.disks.createSnapshot
+- compute.disks.resize
 - compute.snapshots.create
 - compute.disks.create
 - compute.images.useReadOnly
@@ -53,6 +54,7 @@ included_permissions:
 - compute.instances.deleteAccessConfig
 - compute.instances.addAccessConfig
 - compute.addresses.use
+- compute.addresses.useInternal
 
 # machine type
 - compute.machineTypes.get
