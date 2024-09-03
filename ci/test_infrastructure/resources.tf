@@ -147,6 +147,7 @@ resource "google_compute_region_backend_service" "region_backend_service" {
 
   backend {
     group = google_compute_instance_group.region_backend_service.self_link
+    balancing_mode  = "CONNECTION"
   }
 }
 
@@ -173,6 +174,7 @@ resource "google_compute_region_backend_service" "collision_region_backend_servi
 
   backend {
     group = google_compute_instance_group.region_backend_service.self_link
+    balancing_mode  = "CONNECTION"
   }
 }
 
