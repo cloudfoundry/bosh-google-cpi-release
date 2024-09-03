@@ -135,6 +135,8 @@ builds:
     version: 43.0.0
   db0c322d-808e-4772-88f6-2470eda32988:
     version: 27.0.1
+  de17b7df-7497-4979-719c-32d4db54ed31:
+    version: 50.0.3
   e0cf629a-9e69-4dec-4c68-e25d243c7d67:
     version: 49.0.14
   e0d42578-2f35-4b01-51df-14973605f806:
