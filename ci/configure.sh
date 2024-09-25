@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-
 set -eu
 
-script_dir="$( cd "$( dirname "$0" )" && pwd )"
+REPO_ROOT="$( cd "$( dirname "$0" )/.." && pwd )"
 
-fly -t bosh-ecosystem set-pipeline \
-    -p bosh-google-cpi \
-    -c ${script_dir}/pipeline.yml
+fly -t "${CONCOURSE_TARGET:-bosh}" \
+    set-pipeline -p bosh-google-cpi \
+    -c "${REPO_ROOT}/ci/pipeline.yml"
