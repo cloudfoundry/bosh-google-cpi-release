@@ -84,7 +84,10 @@ jobs:
         - {trigger: false, passed: [deploy-ubuntu],       get: director-state, resource: director-state}
         - {trigger: true , passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
         - {trigger: false, passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false,                                get: bosh-cli}
+        - get: bosh-cli
+          params:
+            globs:
+            - 'bosh-cli-*-linux-amd64'
         - {trigger: false,                                get: bosh-deployment}
         - {get: ci}
       - in_parallel: *teardown_step
@@ -119,7 +122,10 @@ jobs:
         - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
         - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
         - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: false,                                                  get: bosh-cli}
+        - get: bosh-cli
+          params:
+            globs:
+            - 'bosh-cli-*-linux-amd64'
         - {trigger: false,                                                  get: bosh-deployment}
         - {get: ci}
       - task: setup-deployment
@@ -165,7 +171,10 @@ jobs:
         - {get: director-creds,                                     trigger: true, passed: [deploy-ubuntu]}
         - {get: infrastructure,                                     trigger: true, passed: [deploy-ubuntu]}
         - {get: bats}
-        - {get: bosh-cli}
+        - get: bosh-cli
+          params:
+            globs:
+            - 'bosh-cli-*-linux-amd64'
         - {get: ci}
       - task: prepare-bats-config
         file: ci/ci/tasks/prepare-bats-config.yml
@@ -425,11 +434,11 @@ resources:
       branch: master
 
   - name: bosh-cli
-    type: s3
     source:
-      regexp: bosh-cli-([0-9.]+)-linux-amd64
-      bucket: bosh-cli-artifacts
-      region_name: us-east-1
+      access_token: ((github_public_repo_token))
+      owner: cloudfoundry
+      repository: bosh-cli
+    type: github-release
 
   - name: bosh-cpi-dev-artifacts
     type: gcs-resource
