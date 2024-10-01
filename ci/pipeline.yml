@@ -555,18 +555,20 @@ resources:
   - name: release-version-semver
     type: semver
     source:
-      driver: gcs
-      json_key:          ((gcp_credentials_json))
-      key:               release-current-version
-      bucket:            bosh-gcp-cpi-release-version-semver
+      driver: git
+      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
+      branch: semver
+      file: release-current-version
 
   - name: version-semver
     type: semver
     source:
-      driver: gcs
-      json_key:          ((gcp_credentials_json))
-      key:               current-version
-      bucket:            bosh-gcp-cpi-release-version-semver
+      driver: git
+      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
+      branch: semver
+      file: current-version
 
   - name: google-cpi-image
     type: docker-image
