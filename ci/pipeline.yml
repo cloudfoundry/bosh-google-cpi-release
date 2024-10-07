@@ -58,7 +58,7 @@ jobs:
           file: ci/ci/tasks/teardown-infrastructure.yml
           params:
             google_auto_network: google-cpi-ci-auto-network
-            google_json_key_data: ((gcp_credentials_json))
+            google_json_key_data: ((gcp_json_key))
             google_network: google-cpi-ci-network
             google_project: cf-bosh-core
             google_region: us-east1
@@ -101,7 +101,7 @@ jobs:
           google_subnetwork_range:        "10.0.0.0/24"
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
-          google_json_key_data:           ((gcp_credentials_json))
+          google_json_key_data:           ((gcp_json_key))
       - put: infrastructure
         params:
           env_name: master-bosh-google-cpi
@@ -138,7 +138,7 @@ jobs:
           google_subnetwork_range:        "10.0.0.0/24"
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
-          google_json_key_data:           ((gcp_credentials_json))
+          google_json_key_data:           ((gcp_json_key))
         on_failure:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
@@ -151,7 +151,7 @@ jobs:
             google_subnetwork_range:        "10.0.0.0/24"
             google_subnetwork_gw:           "10.0.0.1"
             google_address_static_director: "10.0.0.6"
-            google_json_key_data:           ((gcp_credentials_json))
+            google_json_key_data:           ((gcp_json_key))
       - put: director-creds
         params: {file: director-creds/master-creds.yml}
       - put: director-state
@@ -290,7 +290,7 @@ jobs:
       - task: promote
         file: ci/ci/tasks/promote-candidate.yml
         params:
-          release_blobs_json_key: ((gcp_credentials_json))
+          release_blobs_json_key: ((gcp_json_key))
       - put: bosh-cpi-src-out
         params:
           repository: promoted/repo
@@ -410,7 +410,7 @@ jobs:
           blobstore:
               options:
                 credentials_source: static
-                json_key: '((gcp_credentials_json))'
+                json_key: '((gcp_json_key))'
     - put: bosh-cpi-src-out
       params:
         repository: bosh-cpi-src-out
@@ -441,7 +441,7 @@ resources:
   - name: bosh-cpi-dev-artifacts
     type: gcs-resource
     source:
-      json_key: ((gcp_credentials_json))
+      json_key: ((gcp_json_key))
       bucket:   bosh-gcp-cpi-release-pipeline
       regexp:   dev-artifacts/bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
 
@@ -497,7 +497,7 @@ resources:
     type: gcs-resource
     source:
       bucket: bosh-gcp-cpi-release-pipeline
-      json_key: ((gcp_credentials_json))
+      json_key: ((gcp_json_key))
       versioned_file: release-notes/release-notes.md
       initial_version: "0"
       initial_content_text: ""
@@ -505,14 +505,14 @@ resources:
   - name: director-creds
     type: gcs-resource
     source:
-      json_key:         ((gcp_credentials_json))
+      json_key:         ((gcp_json_key))
       bucket:           bosh-gcp-cpi-release-pipeline
       versioned_file:   ci-state/master-creds.yml
 
   - name: director-state
     type: gcs-resource
     source:
-      json_key:         ((gcp_credentials_json))
+      json_key:         ((gcp_json_key))
       bucket:           bosh-gcp-cpi-release-pipeline
       versioned_file:   ci-state/master-manifest-state.json
 
@@ -530,12 +530,12 @@ resources:
       backend_config:
         bucket: bosh-gcp-cpi-release-pipeline
         prefix: ci-state/terraform-master
-        credentials: ((gcp_credentials_json))
+        credentials: ((gcp_json_key))
       vars:
         google_project:           cf-bosh-core
         google_region:            us-east1
         google_zone:              us-east1-b
-        google_json_key_data:     ((gcp_credentials_json))
+        google_json_key_data:     ((gcp_json_key))
         google_subnetwork_range:  "10.0.0.0/24"
         google_firewall_internal: google-cpi-ci-firewall-internal
         google_firewall_external: google-cpi-ci-firewall-external
