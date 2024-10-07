@@ -60,7 +60,7 @@ jobs:
             google_auto_network: google-cpi-ci-auto-network
             google_json_key_data: ((gcp_json_key))
             google_network: google-cpi-ci-network
-            google_project: cf-bosh-core
+            google_project: cloud-foundry-310819
             google_region: us-east1
             google_zone: us-east1-b
       - put: infrastructure
@@ -93,7 +93,7 @@ jobs:
       - task: teardown-director
         file: ci/ci/tasks/teardown-director.yml
         params:
-          google_project:                 cf-bosh-core
+          google_project:                 cloud-foundry-310819
           google_region:                  us-east1
           google_zone:                    us-east1-b
           cpi_source_branch:              master
@@ -131,7 +131,7 @@ jobs:
         file: ci/ci/tasks/setup-director.yml
         params:
           cpi_source_branch:              master
-          google_project:                 cf-bosh-core
+          google_project:                 cloud-foundry-310819
           google_region:                  us-east1
           google_zone:                    us-east1-b
           google_test_bucket_name:        bosh-gcp-cpi-release-pipeline-director-env
@@ -143,7 +143,7 @@ jobs:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
           params:
-            google_project:                 cf-bosh-core
+            google_project:                 cloud-foundry-310819
             google_region:                  us-east1
             google_zone:                    us-east1-b
             cpi_source_branch:              master
@@ -532,7 +532,7 @@ resources:
         prefix: ci-state/terraform-master
         credentials: ((gcp_json_key))
       vars:
-        google_project:           cf-bosh-core
+        google_project:           cloud-foundry-310819
         google_region:            us-east1
         google_zone:              us-east1-b
         google_json_key_data:     ((gcp_json_key))
