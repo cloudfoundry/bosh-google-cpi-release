@@ -46,9 +46,6 @@ jobs:
       - put: bosh-cpi-dev-artifacts
         params: {file: candidate/*.tgz}
 
-      - put: bosh-cpi-dev-artifacts-sha1
-        params: {file: candidate/*.tgz.sha1}
-
   - name: setup-infrastructure
     serial_groups: [integration]
     plan:
@@ -100,7 +97,7 @@ jobs:
           google_region:                  us-east1
           google_zone:                    us-east1-b
           cpi_source_branch:              master
-          google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+          google_test_bucket_name:        bosh-gcp-cpi-release-pipeline-director-env
           google_subnetwork_range:        "10.0.0.0/24"
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
@@ -137,7 +134,7 @@ jobs:
           google_project:                 cf-bosh-core
           google_region:                  us-east1
           google_zone:                    us-east1-b
-          google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+          google_test_bucket_name:        bosh-gcp-cpi-release-pipeline-director-env
           google_subnetwork_range:        "10.0.0.0/24"
           google_subnetwork_gw:           "10.0.0.1"
           google_address_static_director: "10.0.0.6"
@@ -150,7 +147,7 @@ jobs:
             google_region:                  us-east1
             google_zone:                    us-east1-b
             cpi_source_branch:              master
-            google_test_bucket_name:        bosh-gcp-cpi-release-ci-test
+            google_test_bucket_name:        bosh-gcp-cpi-release-pipeline-director-env
             google_subnetwork_range:        "10.0.0.0/24"
             google_subnetwork_gw:           "10.0.0.1"
             google_address_static_director: "10.0.0.6"
@@ -426,6 +423,7 @@ resources:
       start: 3:00 -0700
       stop: 4:30 -0700
       days: [ Saturday ]
+      initial_version: true
 
   - name: bats
     type: git
@@ -444,15 +442,8 @@ resources:
     type: gcs-resource
     source:
       json_key: ((gcp_credentials_json))
-      bucket:   bosh-gcp-cpi-release
-      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
-
-  - name: bosh-cpi-dev-artifacts-sha1
-    type: gcs-resource
-    source:
-      json_key: ((gcp_credentials_json))
-      bucket:   bosh-gcp-cpi-release
-      regexp:   bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz.sha1
+      bucket:   bosh-gcp-cpi-release-pipeline
+      regexp:   dev-artifacts/bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
 
   - name: bosh-cpi-src-in
     type: git
@@ -505,9 +496,9 @@ resources:
   - name: release-notes
     type: gcs-resource
     source:
-      bucket: bosh-ci-release-notes
+      bucket: bosh-gcp-cpi-release-pipeline
       json_key: ((gcp_credentials_json))
-      versioned_file: bosh-google-cpi-release/release-notes.md
+      versioned_file: release-notes/release-notes.md
       initial_version: "0"
       initial_content_text: ""
 
@@ -515,15 +506,15 @@ resources:
     type: gcs-resource
     source:
       json_key:         ((gcp_credentials_json))
-      bucket:           bosh-gcp-cpi-release-ci-state
-      versioned_file:   master-creds.yml
+      bucket:           bosh-gcp-cpi-release-pipeline
+      versioned_file:   ci-state/master-creds.yml
 
   - name: director-state
     type: gcs-resource
     source:
       json_key:         ((gcp_credentials_json))
-      bucket:           bosh-gcp-cpi-release-ci-state
-      versioned_file:   master-manifest-state.json
+      bucket:           bosh-gcp-cpi-release-pipeline
+      versioned_file:   ci-state/master-manifest-state.json
 
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell
@@ -537,8 +528,8 @@ resources:
     source:
       backend_type: gcs
       backend_config:
-        bucket: bosh-gcp-cpi-release-ci-state
-        prefix: terraform-master
+        bucket: bosh-gcp-cpi-release-pipeline
+        prefix: ci-state/terraform-master
         credentials: ((gcp_credentials_json))
       vars:
         google_project:           cf-bosh-core

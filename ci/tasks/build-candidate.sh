@@ -20,7 +20,4 @@ pushd bosh-cpi-src
   bosh create-release --name=${cpi_release_name} --version=${semver} --tarball=${image_path} --force
 popd
 
-echo -n $(sha1sum $image_path | awk '{print $1}') > $image_path.sha1
-
 mv ${image_path} candidate/
-mv ${image_path}.sha1 candidate/
