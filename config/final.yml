@@ -3,4 +3,4 @@ final_name: bosh-google-cpi
 blobstore:
   provider: gcs
   options:
-    bucket_name: bosh-gcp-cpi-release # google was not allowed in bucket names
+    bucket_name: bosh-gcp-cpi-release-blobs # google was not allowed in bucket names
