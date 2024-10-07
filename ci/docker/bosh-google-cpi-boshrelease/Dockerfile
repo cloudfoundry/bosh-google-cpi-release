@@ -39,7 +39,7 @@ COPY --from=bosh/golang-release /var/vcap/packages/golang-1-linux /usr/local/go
 ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
 
 # Install Bosh cli
-RUN wget https://s3.amazonaws.com/bosh-cli-artifacts/bosh-cli-7.3.1-linux-amd64
+RUN wget https://github.com/cloudfoundry/bosh-cli/releases/download/v7.8.0/bosh-cli-7.8.0-linux-amd64
 RUN chmod +x bosh-cli-*
 RUN mv bosh-cli-* /usr/bin/bosh
 
