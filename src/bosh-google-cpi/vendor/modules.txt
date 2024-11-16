@@ -1,4 +1,4 @@
-# cloud.google.com/go/auth v0.10.1
+# cloud.google.com/go/auth v0.10.2
 ## explicit; go 1.21
 cloud.google.com/go/auth
 cloud.google.com/go/auth/credentials
@@ -25,7 +25,7 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.3
 ## explicit; go 1.18
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-utils v0.0.500
+# github.com/cloudfoundry/bosh-utils v0.0.501
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -93,13 +93,15 @@ github.com/google/uuid
 ## explicit; go 1.19
 github.com/googleapis/enterprise-certificate-proxy/client
 github.com/googleapis/enterprise-certificate-proxy/client/util
-# github.com/googleapis/gax-go/v2 v2.13.0
-## explicit; go 1.20
+# github.com/googleapis/gax-go/v2 v2.14.0
+## explicit; go 1.21
 github.com/googleapis/gax-go/v2
 github.com/googleapis/gax-go/v2/apierror
 github.com/googleapis/gax-go/v2/apierror/internal/proto
 github.com/googleapis/gax-go/v2/callctx
 github.com/googleapis/gax-go/v2/internal
+github.com/googleapis/gax-go/v2/internallog
+github.com/googleapis/gax-go/v2/internallog/internal
 # github.com/kr/text v0.2.0
 ## explicit
 # github.com/mitchellh/gox v0.4.0
@@ -293,7 +295,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/api v0.205.0
+# google.golang.org/api v0.206.0
 ## explicit; go 1.21
 google.golang.org/api/cloudresourcemanager/v1
 google.golang.org/api/compute/v0.beta
@@ -311,7 +313,7 @@ google.golang.org/api/option/internaloption
 google.golang.org/api/storage/v1
 google.golang.org/api/transport/http
 google.golang.org/api/transport/http/internal/propagation
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f
 ## explicit; go 1.21
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
@@ -373,7 +375,7 @@ google.golang.org/grpc/serviceconfig
 google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
-# google.golang.org/protobuf v1.35.1
+# google.golang.org/protobuf v1.35.2
 ## explicit; go 1.21
 google.golang.org/protobuf/encoding/protojson
 google.golang.org/protobuf/encoding/prototext
