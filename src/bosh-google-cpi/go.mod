@@ -3,20 +3,20 @@ module bosh-google-cpi
 go 1.22.0
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.501
+	github.com/cloudfoundry/bosh-utils v0.0.503
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.34.1
+	github.com/onsi/gomega v1.34.2
 	golang.org/x/net v0.31.0
 	golang.org/x/oauth2 v0.24.0
-	google.golang.org/api v0.206.0
+	google.golang.org/api v0.209.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	cloud.google.com/go/auth v0.10.2 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
+	cloud.google.com/go/auth v0.11.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.6 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/charlievieth/fs v0.0.3 // indirect
@@ -42,12 +42,11 @@ require (
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	golang.org/x/crypto v0.29.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 	golang.org/x/text v0.20.0 // indirect
-	golang.org/x/tools v0.26.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f // indirect
+	golang.org/x/tools v0.27.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/grpc v1.68.0-dev // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

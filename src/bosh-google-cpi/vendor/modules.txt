@@ -1,4 +1,4 @@
-# cloud.google.com/go/auth v0.10.2
+# cloud.google.com/go/auth v0.11.0
 ## explicit; go 1.21
 cloud.google.com/go/auth
 cloud.google.com/go/auth/credentials
@@ -13,7 +13,7 @@ cloud.google.com/go/auth/internal/credsfile
 cloud.google.com/go/auth/internal/jwt
 cloud.google.com/go/auth/internal/transport
 cloud.google.com/go/auth/internal/transport/cert
-# cloud.google.com/go/auth/oauth2adapt v0.2.5
+# cloud.google.com/go/auth/oauth2adapt v0.2.6
 ## explicit; go 1.21
 cloud.google.com/go/auth/oauth2adapt
 # cloud.google.com/go/compute/metadata v0.5.2
@@ -25,7 +25,7 @@ github.com/bmatcuk/doublestar
 # github.com/charlievieth/fs v0.0.3
 ## explicit; go 1.18
 github.com/charlievieth/fs
-# github.com/cloudfoundry/bosh-utils v0.0.501
+# github.com/cloudfoundry/bosh-utils v0.0.503
 ## explicit; go 1.22.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -151,8 +151,8 @@ github.com/onsi/ginkgo/reporters/stenographer
 github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable
 github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty
 github.com/onsi/ginkgo/types
-# github.com/onsi/gomega v1.34.1
-## explicit; go 1.20
+# github.com/onsi/gomega v1.34.2
+## explicit; go 1.22
 github.com/onsi/gomega
 github.com/onsi/gomega/format
 github.com/onsi/gomega/gstruct
@@ -222,10 +222,6 @@ golang.org/x/crypto/cryptobyte/asn1
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
-# golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-## explicit; go 1.20
-golang.org/x/exp/constraints
-golang.org/x/exp/slices
 # golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 ## explicit; go 1.11
 golang.org/x/lint
@@ -281,7 +277,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.26.0
+# golang.org/x/tools v0.27.0
 ## explicit; go 1.22.0
 golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/inspector
@@ -295,7 +291,7 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/api v0.206.0
+# google.golang.org/api v0.209.0
 ## explicit; go 1.21
 google.golang.org/api/cloudresourcemanager/v1
 google.golang.org/api/compute/v0.beta
@@ -313,7 +309,7 @@ google.golang.org/api/option/internaloption
 google.golang.org/api/storage/v1
 google.golang.org/api/transport/http
 google.golang.org/api/transport/http/internal/propagation
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20241113202542-65e8d215514f
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697
 ## explicit; go 1.21
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
