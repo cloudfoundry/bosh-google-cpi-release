@@ -473,15 +473,18 @@ resources:
   - name: bosh-google-cpi-release
     type: git
     source:
-      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
+      branch: master
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
 
   - name: ci
     type: git
     source:
       paths:
         - ci/*
-      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
       branch: master
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
 
   - name: bosh-shared-ci
     type: git
