@@ -2,7 +2,7 @@
 
 set -e
 
-DOCKER_IMAGE=${DOCKER_IMAGE:-boshcpi/gce-cpi-release}
+DOCKER_IMAGE=${DOCKER_IMAGE:-foundationalinfrastructure/gce-cpi-release}
 DOCKER_IMAGE_VERSION=${DOCKER_IMAGE_VERSION:-v8}
 
 docker login

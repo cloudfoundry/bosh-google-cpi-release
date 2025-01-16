@@ -1,9 +1,9 @@
 ---
 platform: linux
 image_resource:
-  type: docker-image
+  type: registry-image
   source:
-    repository: boshcpi/gce-cpi-release
+    repository: foundationalinfrastructure/gce-cpi-release
 inputs:
   - name: bosh-cli
   - name: bosh-cpi-release

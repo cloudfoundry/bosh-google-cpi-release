@@ -27,8 +27,10 @@ jobs:
         - get: bosh-google-cpi-release
           trigger: true
         - get: ci
+        - get: google-cpi-registry-image
       - task: unit-tests
         file: ci/ci/tasks/unit-tests.yml
+        image: google-cpi-registry-image
 
   - name: setup-infrastructure
     serial_groups: [integration]
@@ -41,9 +43,11 @@ jobs:
           resource: google-ubuntu-stemcell
           trigger: true
         - get: ci
+        - get: google-cpi-registry-image
       - in_parallel: &teardown_step
         - task: teardown-infrastructure
           file: ci/ci/tasks/teardown-infrastructure.yml
+          image: google-cpi-registry-image
           params:
             google_auto_network: google-cpi-ci-auto-network
             google_json_key_data: ((gcp_json_key))
@@ -83,6 +87,7 @@ jobs:
         - get: bosh-deployment
         - get: ci
         - get: bosh-shared-ci
+        - get: google-cpi-registry-image
       - do: *teardown_step
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
@@ -92,8 +97,10 @@ jobs:
           release_tarball: bosh-cpi-release
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
+        image: google-cpi-registry-image
       - task: teardown-director
         file: ci/ci/tasks/teardown-director.yml
+        image: google-cpi-registry-image
         params:
           google_project:                 cloud-foundry-310819
           google_region:                  us-east1
@@ -135,6 +142,7 @@ jobs:
         - get: bosh-deployment
         - get: ci
         - get: bosh-shared-ci
+        - get: google-cpi-registry-image
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
         input_mapping:
@@ -143,8 +151,10 @@ jobs:
           release_tarball: bosh-cpi-release
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
+        image: google-cpi-registry-image
       - task: setup-director
         file: ci/ci/tasks/setup-director.yml
+        image: google-cpi-registry-image
         params:
           cpi_source_branch:              master
           google_project:                 cloud-foundry-310819
@@ -158,6 +168,7 @@ jobs:
         on_failure:
           task: teardown-director
           file: ci/ci/tasks/teardown-director.yml
+          image: google-cpi-registry-image
           params:
             google_project:                 cloud-foundry-310819
             google_region:                  us-east1
@@ -223,8 +234,10 @@ jobs:
           trigger: true
           passed: [deploy-ubuntu]
         - get: ci
+        - get: google-cpi-registry-image
       - task: run-int
         file: ci/ci/tasks/run-int.yml
+        image: google-cpi-registry-image
         params:
           google_json_key_data:      ((integration_gcp_credentials_json))
           google_address_static_int: "10.0.0.100,10.0.0.101,10.0.0.102"
@@ -392,6 +405,7 @@ jobs:
       - get: bosh-google-cpi-release
       - get: golang-release
       - get: ci
+      - get: google-cpi-registry-image
       - get: weekly
         trigger: true
     - task: bump-deps
@@ -404,6 +418,7 @@ jobs:
         SOURCE_PATH: src/bosh-google-cpi
     - task: unit-tests
       file: ci/ci/tasks/unit-tests.yml
+      image: google-cpi-registry-image
     - put: bosh-google-cpi-release
       params:
         repository: bosh-google-cpi-release
@@ -565,13 +580,19 @@ resources:
       username: ((dockerhub_username))
       password: ((dockerhub_password))
 
+  - name: google-cpi-registry-image
+    type: registry-image
+    source:
+      repository: foundationalinfrastructure/gce-cpi-release
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
+
   - name: google-cpi-image
     type: docker-image
     source:
-      repository: boshcpi/gce-cpi-release
-      email: cf-bosh-eng@pivotal.io
-      username: ((docker.username))
-      password: ((docker.password))
+      repository: foundationalinfrastructure/gce-cpi-release
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
 
 resource_types:
 - name: gcs-resource
