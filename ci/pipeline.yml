@@ -339,7 +339,7 @@ jobs:
         image: bosh-cli-registry-image
         file: bosh-shared-ci/tasks/release/create-final-release.yml
         input_mapping:
-          release_repo: backup-and-restore-sdk-release
+          release_repo: bosh-google-cpi-release
         params:
           GIT_USER_NAME: CI Bot
           GIT_USER_EMAIL: bots@cloudfoundry.org
