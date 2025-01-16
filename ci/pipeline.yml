@@ -80,6 +80,7 @@ jobs:
         - get: stemcell
           resource: google-ubuntu-stemcell
           passed: [run-bats, run-int]
+        - get: bosh-cli-registry-image
         - get: bosh-cli
           params:
             globs:
@@ -91,6 +92,7 @@ jobs:
       - do: *teardown_step
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
+        image: bosh-cli-registry-image
         input_mapping:
           release_repo: bosh-google-cpi-release
         output_mapping:
@@ -143,8 +145,10 @@ jobs:
         - get: ci
         - get: bosh-shared-ci
         - get: google-cpi-registry-image
+        - get: bosh-cli-registry-image
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
+        image: bosh-cli-registry-image
         input_mapping:
           release_repo: bosh-google-cpi-release
         output_mapping:
