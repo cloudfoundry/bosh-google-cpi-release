@@ -82,7 +82,14 @@ jobs:
             - 'bosh-cli-*-linux-amd64'
         - get: bosh-deployment
         - get: ci
-      - in_parallel: *teardown_step
+        - get: bosh-shared-ci
+      - do: *teardown_step
+      - task: build-release
+        file: bosh-shared-ci/tasks/release/create-dev-release.yml
+        input_mapping:
+          release_repo: bosh-google-cpi-release
+        output_mapping:
+          release_tarball: bosh-cpi-release
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
       - task: teardown-director
@@ -127,12 +134,13 @@ jobs:
             - 'bosh-cli-*-linux-amd64'
         - get: bosh-deployment
         - get: ci
+        - get: bosh-shared-ci
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
         input_mapping:
           release_repo: bosh-google-cpi-release
         output_mapping:
-          bosh-cpi-release: release_tarball
+          release_tarball: bosh-cpi-release
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
       - task: setup-director
