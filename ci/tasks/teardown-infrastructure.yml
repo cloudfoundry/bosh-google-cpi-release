@@ -5,7 +5,6 @@ image_resource:
   source:
     repository: boshcpi/gce-cpi-release
 inputs:
-  - name: bosh-cpi-src
   - name: ci
 run:
   path: ci/ci/tasks/teardown-infrastructure.sh

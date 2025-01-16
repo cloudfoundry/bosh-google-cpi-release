@@ -5,7 +5,7 @@ image_resource:
   source:
     repository: boshcpi/gce-cpi-release
 inputs:
-  - name: bosh-cpi-src
+  - name: bosh-google-cpi-release
   - name: ci
 run:
   path: ci/ci/tasks/unit-tests.sh

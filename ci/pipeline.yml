@@ -3,7 +3,6 @@ groups:
   - name: bosh-google-cpi-release
     jobs:
       - test-unit
-      - build-candidate
       - setup-infrastructure
       - deploy-ubuntu
       - run-bats
@@ -12,9 +11,9 @@ groups:
       - pre-release-fan-in
       - automatically-release-new-patch
       - promote-candidate
-      - promote-candidate-major
-      - promote-candidate-minor
-      - promote-candidate-patch
+      - release-new-major
+      - release-new-minor
+      - release-new-patch
       - bump-golang-packages
       - bump-deps
   - name: docker-ci-image
@@ -25,34 +24,23 @@ jobs:
   - name: test-unit
     plan:
       - in_parallel:
-        - {trigger: true, get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {get: ci}
+        - get: bosh-google-cpi-release
+          trigger: true
+        - get: ci
       - task: unit-tests
         file: ci/ci/tasks/unit-tests.yml
-
-  - name: build-candidate
-    serial: true
-    plan:
-      - in_parallel:
-        - {trigger: true, passed: [test-unit], get: bosh-cpi-src,   resource: bosh-cpi-src-in}
-        - {trigger: false,                     get: version-semver, params: {bump: patch}}
-        - {get: ci}
-      - put: version-semver
-        params: {file: version-semver/number}
-
-      - task: build-release
-        file: ci/ci/tasks/build-candidate.yml
-
-      - put: bosh-cpi-dev-artifacts
-        params: {file: candidate/*.tgz}
 
   - name: setup-infrastructure
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {trigger: true, passed: [build-candidate], get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true,                            get: stemcell, resource: google-ubuntu-stemcell}
-        - {get: ci}
+        - get: bosh-google-cpi-release
+          trigger: true
+          passed: [test-unit]
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          trigger: true
+        - get: ci
       - in_parallel: &teardown_step
         - task: teardown-infrastructure
           file: ci/ci/tasks/teardown-infrastructure.yml
@@ -75,18 +63,25 @@ jobs:
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {trigger: true,  passed: [run-bats, run-int],   get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: false, passed: [run-bats],            get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
-        - {trigger: false, passed: [run-bats],            get: director-creds, resource: director-creds}
-        - {trigger: false, passed: [deploy-ubuntu],       get: director-state, resource: director-state}
-        - {trigger: true , passed: [run-bats, run-int],   get: infrastructure, resource: infrastructure}
-        - {trigger: false, passed: [run-bats, run-int],   get: stemcell, resource: google-ubuntu-stemcell}
+        - get: bosh-google-cpi-release
+          trigger: true
+          passed: [run-bats, run-int]
+        - get: director-creds
+          passed: [run-bats]
+        - get: director-state
+          passed: [deploy-ubuntu]
+        - get: infrastructure
+          trigger: true
+          passed: [run-bats, run-int]
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          passed: [run-bats, run-int]
         - get: bosh-cli
           params:
             globs:
             - 'bosh-cli-*-linux-amd64'
-        - {trigger: false,                                get: bosh-deployment}
-        - {get: ci}
+        - get: bosh-deployment
+        - get: ci
       - in_parallel: *teardown_step
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
@@ -115,16 +110,29 @@ jobs:
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {trigger: true, passed: [build-candidate, setup-infrastructure],  get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [build-candidate],                        get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts}
-        - {trigger: true, passed: [setup-infrastructure],                   get: infrastructure, resource: infrastructure}
-        - {trigger: true, passed: [setup-infrastructure],                   get: stemcell, resource: google-ubuntu-stemcell}
+        - get: bosh-google-cpi-release
+          trigger: true
+          passed: [setup-infrastructure]
+        - get: infrastructure
+          resource: infrastructure
+          trigger: true
+          passed: [setup-infrastructure]
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          trigger: true
+          passed: [setup-infrastructure]
         - get: bosh-cli
           params:
             globs:
             - 'bosh-cli-*-linux-amd64'
-        - {trigger: false,                                                  get: bosh-deployment}
-        - {get: ci}
+        - get: bosh-deployment
+        - get: ci
+      - task: build-release
+        file: bosh-shared-ci/tasks/release/create-dev-release.yml
+        input_mapping:
+          release_repo: bosh-google-cpi-release
+        output_mapping:
+          bosh-cpi-release: release_tarball
       - task: setup-deployment
         file: ci/ci/tasks/setup-deployment.yml
       - task: setup-director
@@ -153,26 +161,36 @@ jobs:
             google_address_static_director: "10.0.0.6"
             google_json_key_data:           ((gcp_json_key))
       - put: director-creds
-        params: {file: director-creds/master-creds.yml}
+        params:
+          file: director-creds/master-creds.yml
       - put: director-state
-        params: {file: director-state/master-manifest-state.json}
+        params:
+          file: director-state/master-manifest-state.json
 
   - name: run-bats
     serial: true
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {get: bosh-cpi-src,     resource: bosh-cpi-src-in,        trigger: true, passed: [build-candidate, deploy-ubuntu]}
-        - {get: bosh-cpi-release, resource: bosh-cpi-dev-artifacts, trigger: true, passed: [build-candidate, deploy-ubuntu]}
-        - {get: stemcell,         resource: google-ubuntu-stemcell, trigger: true, passed: [deploy-ubuntu]}
-        - {get: director-creds,                                     trigger: true, passed: [deploy-ubuntu]}
-        - {get: infrastructure,                                     trigger: true, passed: [deploy-ubuntu]}
-        - {get: bats}
+        - get: bosh-google-cpi-release
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: director-creds
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: infrastructure
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: bats
         - get: bosh-cli
           params:
             globs:
             - 'bosh-cli-*-linux-amd64'
-        - {get: ci}
+        - get: ci
       - task: prepare-bats-config
         file: ci/ci/tasks/prepare-bats-config.yml
         params:
@@ -186,10 +204,17 @@ jobs:
     serial_groups: [integration]
     plan:
       - in_parallel:
-        - {trigger: true, passed: [build-candidate, deploy-ubuntu],        get: bosh-cpi-src, resource: bosh-cpi-src-in}
-        - {trigger: true, passed: [deploy-ubuntu],                         get: stemcell, resource: google-ubuntu-stemcell}
-        - {trigger: true, passed: [deploy-ubuntu],                         get: infrastructure, resource: infrastructure}
-        - {get: ci}
+        - get: bosh-google-cpi-release
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: stemcell
+          resource: google-ubuntu-stemcell
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: infrastructure
+          trigger: true
+          passed: [deploy-ubuntu]
+        - get: ci
       - task: run-int
         file: ci/ci/tasks/run-int.yml
         params:
@@ -198,7 +223,7 @@ jobs:
 
   - name: pre-release-fan-in
     plan:
-    - get: bosh-cpi-src-in
+    - get: bosh-google-cpi-release
       trigger: true
       passed:
       - run-int
@@ -207,16 +232,12 @@ jobs:
       passed:
       - run-int
       - run-bats
-    - get: bosh-cpi-dev-artifacts
-      passed:
-      - run-bats
 
   - name: automatically-release-new-patch
     serial_groups: [version]
-    serial: true
     plan:
     - in_parallel:
-      - get: bosh-cpi-src-in
+      - get: bosh-google-cpi-release
         trigger: true
         passed:
         - pre-release-fan-in
@@ -227,11 +248,36 @@ jobs:
         resource: release-version-semver
         params:
           bump: patch
+      - get: bosh-shared-ci
+      - get: bosh-security-scanner-registry-image
     - try:
-        task: check-for-updated-golang-package
-        file: golang-release/ci/tasks/shared/check-for-updated-golang-package.yml
+        task: check-for-patched-cves
+        file: bosh-shared-ci/tasks/release/check-for-patched-cves.yml
+        image: bosh-security-scanner-registry-image
         input_mapping:
-          input_repo: bosh-cpi-src-in
+          input_repo: bosh-google-cpi-release
+          version: current-version
+        params:
+          SEVERITY: CRITICAL,HIGH
+        on_success:
+          do:
+            - put: release-notes
+              params:
+                file: release-notes/release-notes.md
+            - put: release-version-semver
+              params:
+                file: patched-version/version
+    - task: ensure-cve-checker-succeeded
+      file: bosh-shared-ci/tasks/release/ensure-task-succeeded.yml
+      image: bosh-security-scanner-registry-image
+      input_mapping:
+        task-output-folder: patched_cves
+    - try:
+        task: check-for-updated-vendored-packages
+        file: bosh-shared-ci/tasks/release/check-for-updated-vendored-packages.yml
+        image: bosh-security-scanner-registry-image
+        input_mapping:
+          input_repo: bosh-google-cpi-release
           version: current-version
         params:
           PACKAGES: [golang-1-linux, golang-1-darwin]
@@ -243,112 +289,78 @@ jobs:
             - put: release-version-semver
               params:
                 file: patched-version/version
-    - try:
-        task: check-for-patched-cves
-        file: golang-release/ci/tasks/shared/check-for-patched-cves.yml
-        input_mapping:
-          input_repo: bosh-cpi-src-in
-          version: current-version
-        params:
-          SEVERITY: CRITICAL,HIGH
-          SOURCE_PATH: src
-        on_success:
-          do:
-          - put: release-notes
-            params:
-              file: release-notes/release-notes.md
-          - put: release-version-semver
-            params:
-              file: patched-version/version
-    - task: ensure-cve-checker-succeeded
-      file: golang-release/ci/tasks/shared/ensure-cve-checker-succeeded.yml
-      params:
-        description: |
-          Since the previous step is wrapped in a "try", this task checks that the previous step fully executed.
+    - task: ensure-update-package-check-succeeded
+      file: bosh-shared-ci/tasks/release/ensure-task-succeeded.yml
+      image: bosh-security-scanner-registry-image
+      input_mapping:
+        task-output-folder: package-updates
 
   - name: promote-candidate
+    disable_manual_trigger: true
     serial_groups: [version]
     plan:
       - in_parallel:
         - get: ci
-        - get: bosh-cpi-src
-          resource: bosh-cpi-src-in
+        - get: bosh-google-cpi-release
           passed:
           - pre-release-fan-in
         - get: stemcell
           resource: google-ubuntu-stemcell
           passed:
           - pre-release-fan-in
-        - get: bosh-cpi-release
-          resource: bosh-cpi-dev-artifacts
-          passed:
-          - pre-release-fan-in
-        - get: release-version-semver
+        - get: version
+          resource: release-version-semver
           trigger: true
         - get: release-notes
-        - get: golang-release
-      - task: promote
-        file: ci/ci/tasks/promote-candidate.yml
+        - get: bosh-shared-ci
+        - get: bosh-cli-registry-image
+      - task: create-final-release
+        image: bosh-cli-registry-image
+        file: bosh-shared-ci/tasks/release/create-final-release.yml
+        input_mapping:
+          release_repo: backup-and-restore-sdk-release
         params:
-          release_blobs_json_key: ((gcp_json_key))
-      - put: bosh-cpi-src-out
+          GIT_USER_NAME: CI Bot
+          GIT_USER_EMAIL: bots@cloudfoundry.org
+          PRIVATE_YML: |
+            ---
+            blobstore:
+              options:
+                credentials_source: static
+                json_key: '((gcp_json_key))'
+      - put: bosh-google-cpi-release
         params:
-          repository: promoted/repo
+          repository: release_repo
           rebase: true
-          tag_prefix: "v"
-          tag: promoted/semver_version
+          tag: release_metadata/tag-name
       - put: github-release
         params:
-          name: promoted/prefixed_semver_version
-          tag: promoted/prefixed_semver_version
+          name: release_metadata/version
+          tag: release_metadata/version
           body: release-notes/release-notes.md
-      - task: clear-release-notes
-        file: golang-release/ci/tasks/shared/clear-release-notes.yml
+          commitish: bosh-google-cpi-release/.git/ref
+          generate_release_notes: true
       - put: release-notes
         params:
-          file: release-notes/release-notes.md
+          file: release_metadata/empty-file
 
-  - name: promote-candidate-major
+  - name: release-new-major
     serial_groups: [version]
-    serial: true
     plan:
-      - in_parallel:
-        - get: bosh-cpi-src-in
-          passed:
-          - pre-release-fan-in
-        - get: bosh-cpi-dev-artifacts
-          passed:
-          - pre-release-fan-in
       - put: release-version-semver
         params:
           bump: major
 
-  - name: promote-candidate-minor
+  - name: release-new-minor
     serial_groups: [version]
-    serial: true
     plan:
-      - in_parallel:
-        - get: bosh-cpi-src-in
-          passed:
-          - pre-release-fan-in
-        - get: bosh-cpi-dev-artifacts
-          passed:
-          - pre-release-fan-in
       - put: release-version-semver
         params:
           bump: minor
 
-  - name: promote-candidate-patch
+  - name: release-new-patch
     serial_groups: [version]
-    serial: true
     plan:
-      - in_parallel:
-        - get: bosh-cpi-src-in
-          passed:
-          - pre-release-fan-in
-        - get: bosh-cpi-dev-artifacts
-          passed:
-          - pre-release-fan-in
       - put: release-version-semver
         params:
           bump: patch
@@ -357,20 +369,19 @@ jobs:
     public: true
     serial: true
     plan:
-      - get: bosh-cpi-src-dockerfiles
-        trigger: true
+      - get: bosh-google-cpi-release
       - get: weekly
         trigger: true
       - put: google-cpi-image
         params:
-          build: "bosh-cpi-src-dockerfiles/ci/docker/bosh-google-cpi-boshrelease"
+          build: "bosh-google-cpi-release/ci/docker/bosh-google-cpi-boshrelease"
         get_params:
           skip_download: true
 
   - name: bump-deps
     plan:
     - in_parallel:
-      - get: bosh-cpi-src-in
+      - get: bosh-google-cpi-release
       - get: golang-release
       - get: ci
       - get: weekly
@@ -378,32 +389,30 @@ jobs:
     - task: bump-deps
       file: golang-release/ci/tasks/shared/bump-deps.yml
       input_mapping:
-        input_repo: bosh-cpi-src-in
+        input_repo: bosh-google-cpi-release
       output_mapping:
-        output_repo: bosh-cpi-src-out
+        output_repo: bosh-google-cpi-release
       params:
         SOURCE_PATH: src/bosh-google-cpi
     - task: unit-tests
       file: ci/ci/tasks/unit-tests.yml
-      input_mapping:
-        bosh-cpi-src: bosh-cpi-src-out
-    - put: bosh-cpi-src-out
+    - put: bosh-google-cpi-release
       params:
-        repository: bosh-cpi-src-out
+        repository: bosh-google-cpi-release
         rebase: true
 
   - name: bump-golang-packages
     plan:
     - in_parallel:
-      - get: bosh-cpi-src-in
+      - get: bosh-google-cpi-release
       - get: golang-release
         trigger: true
     - task: bump-golang-packages
       file: golang-release/ci/tasks/shared/bump-golang-package.yml
       input_mapping:
-        input_repo: bosh-cpi-src-in
+        input_repo: bosh-google-cpi-release
       output_mapping:
-        output_repo: bosh-cpi-src-out
+        output_repo: bosh-google-cpi-release
       params:
         PACKAGES: [golang-1-linux, golang-1-darwin]
         PRIVATE_YML: |
@@ -411,9 +420,9 @@ jobs:
               options:
                 credentials_source: static
                 json_key: '((gcp_json_key))'
-    - put: bosh-cpi-src-out
+    - put: bosh-google-cpi-release
       params:
-        repository: bosh-cpi-src-out
+        repository: bosh-google-cpi-release
         rebase: true
 
 resources:
@@ -438,35 +447,24 @@ resources:
       repository: bosh-cli
     type: github-release
 
-  - name: bosh-cpi-dev-artifacts
-    type: gcs-resource
-    source:
-      json_key: ((gcp_json_key))
-      bucket:   bosh-gcp-cpi-release-pipeline
-      regexp:   dev-artifacts/bosh-google-cpi-([0-9]+\.[0-9]+\.[0-9]+)\.tgz
-
-  - name: bosh-cpi-src-in
+  - name: bosh-google-cpi-release
     type: git
     source:
-      ignore_paths:
-        - .final_builds/**/*.yml
-        - releases/**/*.yml
+      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
+
+  - name: ci
+    type: git
+    source:
+      paths:
         - ci/*
       uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
-
-  - name: bosh-cpi-src-dockerfiles
-    type: git
-    source:
-      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
-      paths:
-      - "ci/docker"
-
-  - name: bosh-cpi-src-out
-    type: git
-    source:
-      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
-      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
       branch: master
+
+  - name: bosh-shared-ci
+    type: git
+    source:
+      uri: git@github.com:cloudfoundry/bosh-shared-ci.git
+      private_key: ((github_deploy_key_bosh-shared-ci.private_key))
 
   - name: golang-release
     type: git
@@ -478,13 +476,6 @@ resources:
     source:
       uri: https://github.com/cloudfoundry/bosh-deployment.git
       branch: master
-
-  - name: ci
-    type: git
-    source:
-      paths:
-        - ci/*
-      uri: https://github.com/cloudfoundry/bosh-google-cpi-release.git
 
   - name: github-release
     type: github-release
@@ -552,14 +543,19 @@ resources:
       branch: semver
       file: release-current-version
 
-  - name: version-semver
-    type: semver
+  - name: bosh-cli-registry-image
+    type: registry-image
     source:
-      driver: git
-      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
-      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
-      branch: semver
-      file: current-version
+      repository: bosh/cli
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
+
+  - name: bosh-security-scanner-registry-image
+    type: registry-image
+    source:
+      repository: bosh/security-scanner
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
 
   - name: google-cpi-image
     type: docker-image

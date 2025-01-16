@@ -4,7 +4,7 @@ set -e
 
 source ci/ci/tasks/utils.sh
 
-check_go_version ${PWD}/bosh-cpi-src
+check_go_version ${PWD}/bosh-google-cpi-release
 
-cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
+cd ${PWD}/bosh-google-cpi-release/src/bosh-google-cpi
 make test

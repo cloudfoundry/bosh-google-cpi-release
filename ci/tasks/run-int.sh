@@ -51,7 +51,7 @@ gcloud config set project ${google_project}
 gcloud config set compute/region ${google_region}
 gcloud config set compute/zone ${google_zone}
 
-check_go_version ${PWD}/bosh-cpi-src
+check_go_version ${PWD}/bosh-google-cpi-release
 
-cd ${PWD}/bosh-cpi-src/src/bosh-google-cpi
+cd ${PWD}/bosh-google-cpi-release/src/bosh-google-cpi
 make testintci
