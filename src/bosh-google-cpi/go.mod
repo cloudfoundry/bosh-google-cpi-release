@@ -3,14 +3,14 @@ module bosh-google-cpi
 go 1.22.0
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.523
+	github.com/cloudfoundry/bosh-utils v0.0.524
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.36.2
 	golang.org/x/net v0.34.0
 	golang.org/x/oauth2 v0.25.0
-	google.golang.org/api v0.218.0
+	google.golang.org/api v0.219.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -44,7 +44,7 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250102185135-69823020774d // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250124145028-65684f501c47 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250127172529-29210b9bc287 // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.4 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
