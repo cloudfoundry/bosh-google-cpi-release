@@ -5,6 +5,8 @@ builds:
     version: "11"
   079e9103-2268-46f4-5b5f-b99291dd590d:
     version: 49.0.1
+  0a3fa8d3-741b-41c1-4ed1-4d2cf31bc868:
+    version: 50.0.11
   0c1fca0d-065f-4887-6ec5-009e356e58c6:
     version: 49.0.4
   0f46926c-5770-4b1c-8609-89a9128216b6:
