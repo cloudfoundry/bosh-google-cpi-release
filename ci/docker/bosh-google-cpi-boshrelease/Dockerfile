@@ -43,11 +43,5 @@ RUN wget https://github.com/cloudfoundry/bosh-cli/releases/download/v7.8.0/bosh-
 RUN chmod +x bosh-cli-*
 RUN mv bosh-cli-* /usr/bin/bosh
 
-# receipt generator
-RUN cd /tmp && \
-    curl -o certify-artifacts -L https://s3.amazonaws.com/bosh-certification-generator-releases/certify-artifacts-linux-amd64 && \
-    chmod +x certify-artifacts && \
-    mv certify-artifacts /bin/certify-artifacts
-
 RUN useradd non-root-user --shell /bin/bash --create-home
 RUN echo "non-root-user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
