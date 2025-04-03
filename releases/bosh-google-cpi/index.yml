@@ -17,6 +17,8 @@ builds:
     version: "23"
   15fd5592-95d0-416f-7eb9-a2809f828ed6:
     version: 40.0.2
+  17b22ad2-d42d-43c8-50f6-d16575ceec41:
+    version: 50.0.13
   1a7babe9-bad9-4015-bdbb-e4f5f8530ab6:
     version: 25.8.0
   1abcdc0b-609f-45e3-4f58-0d7e534acdd4:
