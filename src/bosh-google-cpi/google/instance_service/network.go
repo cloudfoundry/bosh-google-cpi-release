@@ -1,8 +1,9 @@
 package instance
 
 import (
-	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	"regexp"
+
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 )
 
 const maxTagLength = 63
@@ -26,7 +27,7 @@ type Tags []string
 
 func (t Tags) Validate() error {
 	if len(t) > 0 {
-		pattern, _ := regexp.Compile("^[A-Za-z]+[A-Za-z0-9-]*[A-Za-z0-9]+$")
+		pattern := regexp.MustCompile("^[A-Za-z]+[A-Za-z0-9-]*[A-Za-z0-9]+$")
 		for _, tag := range t {
 			if len(tag) > maxTagLength || !pattern.MatchString(tag) {
 				return bosherr.Errorf("Invalid tag '%s': does not comply with RFC1035", tag)
@@ -44,7 +45,7 @@ func (t Tags) Unique() []string {
 	}
 
 	tagItems := make([]string, 0)
-	for tag, _ := range tagDict {
+	for tag := range tagDict {
 		tagItems = append(tagItems, tag)
 	}
 	return tagItems

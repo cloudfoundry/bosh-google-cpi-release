@@ -5,10 +5,10 @@ import (
 	"time"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-
-	"bosh-google-cpi/util"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
+
+	"bosh-google-cpi/util"
 )
 
 func (o GoogleOperationService) Waiter(operation *compute.Operation, zone string, region string) (*compute.Operation, error) {

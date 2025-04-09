@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
 	diskfakes "bosh-google-cpi/google/disk_service/fakes"
 )
 

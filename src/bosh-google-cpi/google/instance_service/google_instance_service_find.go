@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-
-	"bosh-google-cpi/util"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
+
+	"bosh-google-cpi/util"
 )
 
 func (i GoogleInstanceService) Find(id string, zone string) (*compute.Instance, bool, error) {

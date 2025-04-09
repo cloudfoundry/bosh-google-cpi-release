@@ -1,18 +1,18 @@
 package instance
 
 import (
-	"bosh-google-cpi/google/disk_type_service"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
-
-	"bosh-google-cpi/google/address_service"
-	"bosh-google-cpi/google/backendservice_service"
-	"bosh-google-cpi/google/network_service"
-	"bosh-google-cpi/google/operation_service"
-	"bosh-google-cpi/google/subnetwork_service"
-	"bosh-google-cpi/google/target_pool_service"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
+
+	address "bosh-google-cpi/google/address_service"
+	backendservice "bosh-google-cpi/google/backendservice_service"
+	disktype "bosh-google-cpi/google/disk_type_service"
+	network "bosh-google-cpi/google/network_service"
+	operation "bosh-google-cpi/google/operation_service"
+	subnetwork "bosh-google-cpi/google/subnetwork_service"
+	targetpool "bosh-google-cpi/google/target_pool_service"
 )
 
 const googleInstanceServiceLogTag = "GoogleInstanceService"

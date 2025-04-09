@@ -171,7 +171,7 @@ var _ = Describe("VM", func() {
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}
-		mj, _ := json.Marshal(m)
+		mj, _ := json.Marshal(m) //nolint:errcheck
 		request = fmt.Sprintf(`{
 			  "method": "set_vm_metadata",
 			  "arguments": [
@@ -1287,6 +1287,6 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, zone, collisionBackendService, networkName)
-		assertFails(request)
+		assertFails(request) //nolint:errcheck
 	})
 })

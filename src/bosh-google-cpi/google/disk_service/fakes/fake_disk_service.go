@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	disk "bosh-google-cpi/google/disk_service"
+	"bosh-google-cpi/google/disk_service"
 )
 
 type FakeDiskService struct {

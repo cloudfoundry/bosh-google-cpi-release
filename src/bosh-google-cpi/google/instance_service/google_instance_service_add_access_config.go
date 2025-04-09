@@ -2,9 +2,9 @@ package instance
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/compute/v1"
 )
 
 func (i GoogleInstanceService) AddAccessConfig(id string, zone string, networkInterface string, accessConfig *compute.AccessConfig) error {

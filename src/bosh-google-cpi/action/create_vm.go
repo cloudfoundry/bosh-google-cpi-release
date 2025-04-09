@@ -4,19 +4,17 @@ import (
 	"fmt"
 	"strings"
 
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+
+	"bosh-google-cpi/api"
 	acceleratortype "bosh-google-cpi/google/accelerator_type_service"
 	disk "bosh-google-cpi/google/disk_service"
 	disktype "bosh-google-cpi/google/disk_type_service"
 	image "bosh-google-cpi/google/image_service"
 	instance "bosh-google-cpi/google/instance_service"
 	machinetype "bosh-google-cpi/google/machine_type_service"
-
-	bosherr "github.com/cloudfoundry/bosh-utils/errors"
-
-	"bosh-google-cpi/api"
-	"bosh-google-cpi/util"
-
 	"bosh-google-cpi/registry"
+	"bosh-google-cpi/util"
 )
 
 type createVMBase struct {
@@ -174,7 +172,7 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		if boshgroups, ok := boshenv.(map[string]interface{})["groups"]; ok {
 			for _, tag := range boshgroups.([]interface{}) {
 				// Ignore error as labels will be validated later
-				safeTag, _ := instance.SafeLabel(tag.(string))
+				safeTag, _ := instance.SafeLabel(tag.(string)) //nolint:errcheck
 				cloudProps.Tags = append(cloudProps.Tags, safeTag)
 			}
 		}
@@ -308,7 +306,7 @@ func (cv createVMBase) findZone(zoneName string, disks []DiskCID) (string, error
 		return zone, nil
 	}
 
-	return "", fmt.Errorf("Could not find zone %q", zoneName)
+	return "", fmt.Errorf("Could not find zone %q", zoneName) //nolint:staticcheck
 }
 
 func isGcpImageURL(s string) bool {

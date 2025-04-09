@@ -47,7 +47,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	if _, err = i.storageService.Buckets.Insert(i.project, bucket).Do(); err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Storage Bucket")
 	}
-	defer i.deleteBucket(imageName)
+	defer i.deleteBucket(imageName) //nolint:errcheck
 
 	// Upload the image file to the previously created bucket
 	objectName := fmt.Sprintf("%s.tar.gz", imageName)
@@ -70,14 +70,14 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Reading stemcell image file")
 	}
-	defer imageFile.Close()
+	defer imageFile.Close() //nolint:errcheck
 
 	i.logger.Debug(googleImageServiceLogTag, "Creating Google Storage Object with params: %#v", object)
 	imageObject, err := i.storageService.Objects.Insert(imageName, object).Media(imageFile).Do()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Storage Object")
 	}
-	defer i.deleteObject(imageName, objectName)
+	defer i.deleteObject(imageName, objectName) //nolint:errcheck
 
 	// Create the image
 	image, err := i.create(imageName, description, imageObject.MediaLink, "")

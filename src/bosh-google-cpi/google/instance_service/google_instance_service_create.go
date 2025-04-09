@@ -72,7 +72,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		}
 		// n2 and n2d series require a minimum number of SSDs depending on vCPUs
 		// https://cloud.google.com/compute/docs/disks/local-ssd#lssd_disk_options
-		if machineTypeSeries == "n2" {
+		if machineTypeSeries == "n2" { //nolint:staticcheck
 			if numberOfCPUs >= 82 {
 				numberOfLocalSSDs = 16
 			} else if numberOfCPUs >= 42 {
@@ -138,7 +138,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		}
 	}
 
-	if &vmProps.BackendService != nil && vmProps.BackendService.Name != "" {
+	if &vmProps.BackendService != nil && vmProps.BackendService.Name != "" { //nolint:staticcheck
 		if err := i.addToBackendService(operation.TargetLink, vmProps.BackendService); err != nil {
 			i.logger.Debug(googleInstanceServiceLogTag, "Failed to add created Google Instance to Backend Service: %v", err)
 			i.CleanUp(vm.Name)

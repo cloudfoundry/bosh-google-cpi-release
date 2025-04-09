@@ -151,7 +151,7 @@ var _ = Describe("JSONCaller", func() {
 		It("handles optional arguments when not passed in", func() {
 			action := &actionWithOptionalRunArgument{}
 
-			caller.Call(action, []interface{}{"setup"})
+			caller.Call(action, []interface{}{"setup"}) //nolint:errcheck
 
 			Expect(action.SubAction).To(Equal("setup"))
 			Expect(action.OptionalArgs).To(Equal([]argsType{}))

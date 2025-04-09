@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/network_service"
+	network "bosh-google-cpi/google/network_service"
 )
 
 type FakeNetworkService struct {

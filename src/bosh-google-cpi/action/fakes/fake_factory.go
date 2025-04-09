@@ -26,7 +26,7 @@ func (f *FakeFactory) Create(method string, ctx map[string]interface{}, apiVersi
 	if action := f.registeredActions[method]; action != nil {
 		return action, nil
 	}
-	return nil, errors.New("Action not found")
+	return nil, errors.New("Action not found") //nolint:staticcheck
 }
 
 func (f *FakeFactory) RegisterAction(method string, action *FakeAction) {

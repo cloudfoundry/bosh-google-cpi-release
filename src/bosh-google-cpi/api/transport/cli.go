@@ -2,7 +2,6 @@ package transport
 
 import (
 	"io"
-	"io/ioutil"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
@@ -34,7 +33,7 @@ func NewCLI(
 }
 
 func (t CLI) ServeOnce() error {
-	reqBytes, err := ioutil.ReadAll(t.in)
+	reqBytes, err := io.ReadAll(t.in)
 	if err != nil {
 		t.logger.Error(cliLogTag, "Failed reading from IN: %s", err)
 		return bosherr.WrapError(err, "Reading from IN")

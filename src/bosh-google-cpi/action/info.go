@@ -1,6 +1,8 @@
 package action
 
-import "bosh-google-cpi/constant"
+import (
+	"bosh-google-cpi/constant"
+)
 
 type InfoResult struct {
 	StemcellFormats []string `json:"stemcell_formats"`

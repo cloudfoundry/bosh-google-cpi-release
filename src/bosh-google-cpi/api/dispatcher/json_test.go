@@ -6,15 +6,13 @@ import (
 	"errors"
 	"fmt"
 
+	boshfakelog "github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "bosh-google-cpi/api/dispatcher"
-
-	boshfakelog "github.com/cloudfoundry/bosh-utils/logger/loggerfakes"
-
 	fakeaction "bosh-google-cpi/action/fakes"
 	bgcapi "bosh-google-cpi/api"
+	. "bosh-google-cpi/api/dispatcher"
 	fakedisp "bosh-google-cpi/api/dispatcher/fakes"
 	fakeapi "bosh-google-cpi/api/fakes"
 )
@@ -87,7 +85,7 @@ var _ = Describe("JSON", func() {
 
 					It("redacts secrets from the request", func() {
 						logger.DebugWithDetailsStub = func(tag string, msg string, args ...interface{}) {
-							logBuffer.Write([]byte(fmt.Sprintf("%s", args...)))
+							logBuffer.Write([]byte(fmt.Sprintf("%s", args...))) //nolint:staticcheck
 						}
 
 						respBytes := dispatcher.Dispatch([]byte(`{

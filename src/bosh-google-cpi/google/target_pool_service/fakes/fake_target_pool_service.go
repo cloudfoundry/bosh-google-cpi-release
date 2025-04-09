@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/target_pool_service"
+	targetpool "bosh-google-cpi/google/target_pool_service"
 )
 
 type FakeTargetPoolService struct {

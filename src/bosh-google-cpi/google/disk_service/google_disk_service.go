@@ -3,9 +3,9 @@ package disk
 import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	boshuuid "github.com/cloudfoundry/bosh-utils/uuid"
-
-	"bosh-google-cpi/google/operation_service"
 	"google.golang.org/api/compute/v1"
+
+	operation "bosh-google-cpi/google/operation_service"
 )
 
 const googleDiskServiceLogTag = "GoogleDiskService"

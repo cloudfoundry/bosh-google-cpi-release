@@ -4,20 +4,19 @@ import (
 	"fmt"
 	"os"
 	"slices"
-
-	"bosh-google-cpi/util"
+	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
-	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v1"
+	"google.golang.org/api/cloudresourcemanager/v1"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
-	iam "google.golang.org/api/iam/v1"
+	"google.golang.org/api/iam/v1"
 	"gopkg.in/yaml.v3"
 
-	"testing"
+	"bosh-google-cpi/util"
 )
 
 var computeService *compute.Service
@@ -68,9 +67,9 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 	ctx := context.Background()
 	client, err := google.DefaultClient(ctx, compute.ComputeScope)
 	Expect(err).To(BeNil())
-	computeService, err = compute.New(client)
+	computeService, err = compute.New(client) //nolint:staticcheck
 	Expect(err).To(BeNil())
-	computeServiceB, err = computebeta.New(client)
+	computeServiceB, err = computebeta.New(client) //nolint:staticcheck
 	Expect(err).To(BeNil())
 })
 
@@ -161,13 +160,13 @@ func cleanVMs() {
 	ctx := context.Background()
 	client, err := google.DefaultClient(ctx, compute.ComputeScope)
 	Expect(err).To(BeNil())
-	computeService, err := compute.New(client)
+	computeService, err := compute.New(client) //nolint:staticcheck
 	Expect(err).To(BeNil())
 
 	// Clean up any VMs left behind from failed tests. Instances with the 'integration-delete' tag will be deleted.
 	var pageToken string
 	toDelete := make([]*compute.Instance, 0)
-	GinkgoWriter.Write([]byte("Looking for VMs with 'integration-delete' tag. Matches will be deleted\n"))
+	GinkgoWriter.Write([]byte("Looking for VMs with 'integration-delete' tag. Matches will be deleted\n")) //nolint:errcheck
 	for {
 		// Clean up VMs with 'integration-delete' tag
 		listCall := computeService.Instances.AggregatedList(googleProject)
@@ -190,7 +189,7 @@ func cleanVMs() {
 	}
 
 	for _, vm := range toDelete {
-		GinkgoWriter.Write([]byte(fmt.Sprintf("Deleting VM %v\n", vm.Name)))
+		GinkgoWriter.Write([]byte(fmt.Sprintf("Deleting VM %v\n", vm.Name))) //nolint:errcheck,staticcheck
 		_, err := computeService.Instances.Delete(googleProject, util.ResourceSplitter(vm.Zone), vm.Name).Do()
 		Expect(err).ToNot(HaveOccurred())
 	}

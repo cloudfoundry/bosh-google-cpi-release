@@ -2,11 +2,10 @@ package disk
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/util"
-
-	"google.golang.org/api/compute/v1"
 )
 
 func (d GoogleDiskService) Resize(id string, newSize int) error {
