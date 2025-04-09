@@ -2,7 +2,7 @@ package action
 
 import (
 	"bosh-google-cpi/api"
-	instance "bosh-google-cpi/google/instance_service"
+	"bosh-google-cpi/google/instance"
 	"bosh-google-cpi/registry"
 )
 

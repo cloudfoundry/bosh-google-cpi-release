@@ -3,7 +3,7 @@ package action
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
-	"bosh-google-cpi/google/snapshot_service"
+	"bosh-google-cpi/google/snapshot"
 )
 
 type DeleteSnapshot struct {

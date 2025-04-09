@@ -5,7 +5,7 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
-	"bosh-google-cpi/google/image_service"
+	"bosh-google-cpi/google/image"
 )
 
 const googleInfrastructure = "google"

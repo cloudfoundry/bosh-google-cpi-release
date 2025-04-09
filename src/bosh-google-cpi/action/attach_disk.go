@@ -6,8 +6,8 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
-	disk "bosh-google-cpi/google/disk_service"
-	instance "bosh-google-cpi/google/instance_service"
+	"bosh-google-cpi/google/disk"
+	"bosh-google-cpi/google/instance"
 	"bosh-google-cpi/registry"
 )
 

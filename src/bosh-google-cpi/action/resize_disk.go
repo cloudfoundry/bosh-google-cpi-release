@@ -4,7 +4,7 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
-	disk "bosh-google-cpi/google/disk_service"
+	"bosh-google-cpi/google/disk"
 	"bosh-google-cpi/util"
 )
 

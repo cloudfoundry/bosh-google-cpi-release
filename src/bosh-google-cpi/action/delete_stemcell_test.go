@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-	imagefakes "bosh-google-cpi/google/image_service/fakes"
+	imagefakes "bosh-google-cpi/google/image/fakes"
 )
 
 var _ = Describe("DeleteStemcell", func() {
