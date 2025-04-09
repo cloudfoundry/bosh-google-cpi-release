@@ -16,7 +16,7 @@ func assertSucceeds(request string) {
 }
 
 func assertFails(request string) error {
-	response, _ := execCPI(request)
+	response, _ := execCPI(request) //nolint:errcheck
 	Expect(response.Error).ToNot(BeNil())
 	return response.Error
 }
@@ -30,7 +30,7 @@ func assertSucceedsWithResult(request string) interface{} {
 }
 
 func toStringArray(raw []interface{}) []string {
-	strings := make([]string, len(raw), len(raw))
+	strings := make([]string, len(raw), len(raw)) //nolint:staticcheck
 	for i := range raw {
 		strings[i] = raw[i].(string)
 	}

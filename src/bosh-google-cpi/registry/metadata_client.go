@@ -8,13 +8,12 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/google/client"
 	opsvc "bosh-google-cpi/google/operation_service"
 	"bosh-google-cpi/redactor"
 	"bosh-google-cpi/util"
-
-	"google.golang.org/api/compute/v1"
 )
 
 const (

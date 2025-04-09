@@ -1,20 +1,17 @@
 package action_test
 
 import (
-	"errors"
-
 	"encoding/json"
+	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	snapshotfakes "bosh-google-cpi/google/snapshot_service/fakes"
-
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/google/disk_service"
+	diskfakes "bosh-google-cpi/google/disk_service/fakes"
+	snapshotfakes "bosh-google-cpi/google/snapshot_service/fakes"
 )
 
 var _ = Describe("SnapshotDisk", func() {

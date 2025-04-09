@@ -9,7 +9,6 @@ import (
 	fakesys "github.com/cloudfoundry/bosh-utils/system/fakes"
 
 	bgcconfig "bosh-google-cpi/google/config"
-
 	"bosh-google-cpi/registry"
 )
 

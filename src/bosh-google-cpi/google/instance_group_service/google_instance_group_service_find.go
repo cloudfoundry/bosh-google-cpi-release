@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/googleapi"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/googleapi"
 )
 
 func (i GoogleInstanceGroupService) Find(id string, zone string) (InstanceGroup, bool, error) {
@@ -33,7 +33,7 @@ func (i GoogleInstanceGroupService) Find(id string, zone string) (InstanceGroup,
 					Zone:       instanceGroupItem.Zone,
 					Subnetwork: instanceGroupItem.Subnetwork,
 				}
-				return instanceGroup, true, nil
+				return instanceGroup, true, nil //nolint:staticcheck
 			}
 		}
 

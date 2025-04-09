@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/googleapi"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/googleapi"
 )
 
 func (t GoogleTargetPoolService) Find(id string, region string) (TargetPool, bool, error) {

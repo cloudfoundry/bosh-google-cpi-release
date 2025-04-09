@@ -5,17 +5,14 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"google.golang.org/api/compute/v1"
 
 	. "bosh-google-cpi/action"
-
+	"bosh-google-cpi/api"
 	diskfakes "bosh-google-cpi/google/disk_service/fakes"
+	"bosh-google-cpi/google/disk_type_service"
 	disktypefakes "bosh-google-cpi/google/disk_type_service/fakes"
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
-
-	"bosh-google-cpi/api"
-	"bosh-google-cpi/google/disk_type_service"
-
-	"google.golang.org/api/compute/v1"
 )
 
 var _ = Describe("CreateDisk", func() {

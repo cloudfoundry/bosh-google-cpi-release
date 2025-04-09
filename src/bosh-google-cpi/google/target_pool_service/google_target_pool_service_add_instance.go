@@ -2,9 +2,9 @@ package targetpool
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/compute/v1"
 )
 
 func (t GoogleTargetPoolService) AddInstance(id string, vmLink string) error {

@@ -1,15 +1,14 @@
 package client
 
 import (
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"time"
 
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 type errorTransport struct {

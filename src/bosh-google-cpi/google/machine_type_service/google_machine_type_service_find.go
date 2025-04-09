@@ -2,9 +2,9 @@ package machinetype
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/googleapi"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/googleapi"
 )
 
 func (m GoogleMachineTypeService) Find(id string, zone string) (MachineType, bool, error) {

@@ -4,10 +4,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 
 	. "bosh-google-cpi/action"
-
-	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("CalculateVMCloudProperties", func() {

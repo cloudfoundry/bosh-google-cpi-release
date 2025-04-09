@@ -7,11 +7,9 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
 	instancefakes "bosh-google-cpi/google/instance_service/fakes"
-	registryfakes "bosh-google-cpi/registry/fakes"
-
 	"bosh-google-cpi/registry"
+	registryfakes "bosh-google-cpi/registry/fakes"
 )
 
 var _ = Describe("DetachDisk", func() {

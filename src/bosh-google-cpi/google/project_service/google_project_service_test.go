@@ -1,7 +1,7 @@
 package project_test
 
 import (
-	"bosh-google-cpi/google/project_service"
+	project "bosh-google-cpi/google/project_service"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

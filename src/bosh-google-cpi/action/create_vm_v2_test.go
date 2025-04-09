@@ -1,8 +1,14 @@
 package action_test
 
 import (
+	"errors"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+
 	. "bosh-google-cpi/action"
 	"bosh-google-cpi/api"
+	"bosh-google-cpi/google/accelerator_type_service"
 	acceleratortypefakes "bosh-google-cpi/google/accelerator_type_service/fakes"
 	"bosh-google-cpi/google/disk_service"
 	diskfakes "bosh-google-cpi/google/disk_service/fakes"
@@ -15,14 +21,7 @@ import (
 	"bosh-google-cpi/google/machine_type_service"
 	machinetypefakes "bosh-google-cpi/google/machine_type_service/fakes"
 	"bosh-google-cpi/registry"
-	"errors"
-
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	registryfakes "bosh-google-cpi/registry/fakes"
-
-	"bosh-google-cpi/google/accelerator_type_service"
 )
 
 var _ = Describe("CreateVM", func() {
@@ -321,7 +320,7 @@ var _ = Describe("CreateVM", func() {
 
 		Context("when VM props override network props", func() {
 			BeforeEach(func() {
-				var t bool = true
+				var t = true
 				cloudProps.EphemeralExternalIP = &t
 				cloudProps.IPForwarding = &t
 

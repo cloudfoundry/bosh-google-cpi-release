@@ -7,16 +7,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	instancefakes "bosh-google-cpi/google/instance_service/fakes"
-
-	registryfakes "bosh-google-cpi/registry/fakes"
-
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/google/disk_service"
-
+	diskfakes "bosh-google-cpi/google/disk_service/fakes"
+	instancefakes "bosh-google-cpi/google/instance_service/fakes"
 	"bosh-google-cpi/registry"
+	registryfakes "bosh-google-cpi/registry/fakes"
 )
 
 var _ = Describe("AttachDisk", func() {

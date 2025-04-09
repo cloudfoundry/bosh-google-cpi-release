@@ -4,14 +4,12 @@ import (
 	"errors"
 	"io"
 
+	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "bosh-google-cpi/api/transport"
-
-	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-
 	fakedisp "bosh-google-cpi/api/dispatcher/fakes"
+	. "bosh-google-cpi/api/transport"
 )
 
 type FakeReader struct {

@@ -19,7 +19,7 @@ func (i GoogleInstanceService) AttachedDisks(id string) (AttachedDisks, error) {
 	}
 
 	for _, disk := range instance.Disks {
-		if disk.Boot != true {
+		if disk.Boot != true { //nolint:staticcheck
 			disks = append(disks, util.ResourceSplitter(disk.Source))
 		}
 	}

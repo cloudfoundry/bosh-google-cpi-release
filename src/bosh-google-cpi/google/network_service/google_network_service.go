@@ -2,10 +2,9 @@ package network
 
 import (
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-
-	"bosh-google-cpi/google/project_service"
-
 	"google.golang.org/api/compute/v1"
+
+	project "bosh-google-cpi/google/project_service"
 )
 
 const googleNetworkServiceLogTag = "GoogleNetworkService"

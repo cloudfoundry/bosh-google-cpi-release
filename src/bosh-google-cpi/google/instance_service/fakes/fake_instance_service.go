@@ -1,8 +1,9 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/instance_service"
 	"google.golang.org/api/compute/v1"
+
+	"bosh-google-cpi/google/instance_service"
 )
 
 type FakeInstanceService struct {
@@ -82,7 +83,6 @@ func (i *FakeInstanceService) AttachedDisks(id string) (instance.AttachedDisks, 
 
 func (i *FakeInstanceService) CleanUp(id string) {
 	i.CleanUpCalled = true
-	return
 }
 
 func (i *FakeInstanceService) Create(vmProps *instance.Properties, networks instance.Networks, registryEndpoint string) (string, error) {

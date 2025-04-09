@@ -6,8 +6,8 @@ import (
 	"bosh-google-cpi/util"
 )
 
-var ErrRegionRequired error = errors.New("A region is required to find a subnet")
-var ErrSubnetNotFound error = errors.New("Subnet could not be found")
+var ErrRegionRequired error = errors.New("A region is required to find a subnet") //nolint:staticcheck
+var ErrSubnetNotFound error = errors.New("Subnet could not be found")             //nolint:staticcheck
 
 func (s GoogleSubnetworkService) Find(projectId, id, region string) (Subnetwork, error) {
 	if region == "" {

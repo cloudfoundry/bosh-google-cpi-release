@@ -1,8 +1,9 @@
 package backendservice
 
 import (
-	"bosh-google-cpi/util"
 	"google.golang.org/api/compute/v1"
+
+	"bosh-google-cpi/util"
 )
 
 type BackendService struct {

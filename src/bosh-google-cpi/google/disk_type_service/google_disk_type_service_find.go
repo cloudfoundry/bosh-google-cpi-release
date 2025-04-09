@@ -2,9 +2,9 @@ package disktype
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/googleapi"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/googleapi"
 )
 
 func (d GoogleDiskTypeService) Find(id string, zone string) (DiskType, bool, error) {

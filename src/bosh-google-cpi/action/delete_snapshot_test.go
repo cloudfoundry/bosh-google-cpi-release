@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
 	snapshotfakes "bosh-google-cpi/google/snapshot_service/fakes"
 )
 

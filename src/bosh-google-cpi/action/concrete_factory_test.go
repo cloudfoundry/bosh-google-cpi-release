@@ -3,6 +3,7 @@ package action_test
 import (
 	"encoding/json"
 	"fmt"
+
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	fakeuuid "github.com/cloudfoundry/bosh-utils/uuid/fakes"
 	. "github.com/onsi/ginkgo"
@@ -10,13 +11,12 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
-	clientfakes "bosh-google-cpi/google/client/fakes"
-
 	"bosh-google-cpi/config"
+	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/google/address_service"
 	"bosh-google-cpi/google/backendservice_service"
 	"bosh-google-cpi/google/client"
+	clientfakes "bosh-google-cpi/google/client/fakes"
 	"bosh-google-cpi/google/disk_service"
 	"bosh-google-cpi/google/disk_type_service"
 	"bosh-google-cpi/google/image_service"
@@ -28,8 +28,6 @@ import (
 	"bosh-google-cpi/google/snapshot_service"
 	"bosh-google-cpi/google/subnetwork_service"
 	"bosh-google-cpi/google/target_pool_service"
-
-	"bosh-google-cpi/google/accelerator_type_service"
 	"bosh-google-cpi/registry"
 )
 
@@ -92,7 +90,7 @@ var _ = Describe("ConcreteFactory", func() {
 		err = json.Unmarshal(ctxBytes, &cfg.Cloud.Properties.Google)
 		Expect(err).ToNot(HaveOccurred())
 
-		googleClient, _ = GoogleClientFunc(cfg.Cloud.Properties.Google, logger)
+		googleClient, _ = GoogleClientFunc(cfg.Cloud.Properties.Google, logger) //nolint:errcheck
 
 		factory = NewConcreteFactory(
 			uuidGen,

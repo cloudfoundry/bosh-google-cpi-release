@@ -5,7 +5,6 @@ import (
 
 	"bosh-google-cpi/api"
 	"bosh-google-cpi/google/instance_service"
-
 	"bosh-google-cpi/registry"
 )
 

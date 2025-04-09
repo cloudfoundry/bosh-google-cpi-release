@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-
 	imagefakes "bosh-google-cpi/google/image_service/fakes"
 )
 

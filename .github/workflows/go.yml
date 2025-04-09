@@ -1,0 +1,29 @@
+name: go
+on:
+  push:
+    paths:
+    - 'src/bosh-google-cpi/**'
+  pull_request:
+    paths:
+    - 'src/bosh-google-cpi/**'
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: src/bosh-google-cpi/go.mod
+    - uses: golangci/golangci-lint-action@v7
+      with:
+        working-directory: src/bosh-google-cpi/
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: src/bosh-google-cpi/go.mod
+    - run:  go run github.com/onsi/ginkgo/ginkgo -r -race -skipPackage=integration ./...
+      working-directory: src/bosh-google-cpi/
+

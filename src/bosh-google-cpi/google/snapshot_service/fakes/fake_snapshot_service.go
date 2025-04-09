@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"bosh-google-cpi/google/snapshot_service"
+	snapshot "bosh-google-cpi/google/snapshot_service"
 )
 
 type FakeSnapshotService struct {

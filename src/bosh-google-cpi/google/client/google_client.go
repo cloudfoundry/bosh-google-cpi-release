@@ -7,14 +7,13 @@ import (
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
-
-	"bosh-google-cpi/google/config"
-
 	"golang.org/x/oauth2"
 	oauthgoogle "golang.org/x/oauth2/google"
 	computebeta "google.golang.org/api/compute/v0.beta"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/storage/v1"
+
+	"bosh-google-cpi/google/config"
 )
 
 const (
@@ -50,12 +49,12 @@ func NewGoogleClient(
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Reading Google JSON Key")
 		}
-		cloudClient = jwtConf.Client(oauth2.NoContext)
+		cloudClient = jwtConf.Client(oauth2.NoContext) //nolint:staticcheck
 	} else {
 		if v := os.Getenv("GCE_METADATA_HOST"); v == "" {
-			os.Setenv("GCE_METADATA_HOST", metadataHost)
+			os.Setenv("GCE_METADATA_HOST", metadataHost) //nolint:errcheck
 		}
-		cloudClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope, storageScope)
+		cloudClient, err = oauthgoogle.DefaultClient(oauth2.NoContext, computeScope, storageScope) //nolint:staticcheck
 		if err != nil {
 			return GoogleClient{}, bosherr.WrapError(err, "Creating a Google default client")
 		}
@@ -70,19 +69,19 @@ func NewGoogleClient(
 	}
 	cloudClient.Transport = retrier
 
-	computeService, err := compute.New(cloudClient)
+	computeService, err := compute.New(cloudClient) //nolint:staticcheck
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 	computeService.UserAgent = userAgent
 
-	computeServiceB, err := computebeta.New(cloudClient)
+	computeServiceB, err := computebeta.New(cloudClient) //nolint:staticcheck
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Compute Service client")
 	}
 	computeServiceB.UserAgent = userAgent
 
-	storageService, err := storage.New(cloudClient)
+	storageService, err := storage.New(cloudClient) //nolint:staticcheck
 	if err != nil {
 		return GoogleClient{}, bosherr.WrapError(err, "Creating a Google Storage Service client")
 	}

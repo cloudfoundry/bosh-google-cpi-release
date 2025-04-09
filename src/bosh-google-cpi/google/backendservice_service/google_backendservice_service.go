@@ -3,15 +3,14 @@ package backendservice
 import (
 	"strings"
 
-	"bosh-google-cpi/google/instance_group_service"
-	"bosh-google-cpi/google/operation_service"
-
-	"bosh-google-cpi/util"
-
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 	boshlog "github.com/cloudfoundry/bosh-utils/logger"
 	"google.golang.org/api/compute/v1"
 	"google.golang.org/api/googleapi"
+
+	"bosh-google-cpi/google/instance_group_service"
+	"bosh-google-cpi/google/operation_service"
+	"bosh-google-cpi/util"
 )
 
 const googleBackendServiceServiceLogTag = "GoogleBackendServiceService"
@@ -72,7 +71,7 @@ func (i GoogleBackendServiceService) AddInstance(id, vmLink string) error {
 		if b.InstanceGroupZone == zone {
 			// TODO(evanbrown): Handle multiple network interfaces
 			// Confirm that instance group is in same subnetwork as instance
-			if ig, found, _ := i.instanceGroupsService.Find(b.InstanceGroupID, b.InstanceGroupZone); found && (ig.Subnetwork == "" || ig.Subnetwork == instance.NetworkInterfaces[0].Subnetwork) {
+			if ig, found, _ := i.instanceGroupsService.Find(b.InstanceGroupID, b.InstanceGroupZone); found && (ig.Subnetwork == "" || ig.Subnetwork == instance.NetworkInterfaces[0].Subnetwork) { //nolint:errcheck
 				if err = i.instanceGroupsService.AddInstance(b.InstanceGroupID, vmLink); err != nil {
 					return bosherr.WrapErrorf(err, "Failed to add instance %q to Backend Service %q's instance group named %q", vmLink, id, b.InstanceGroupID)
 				}
@@ -187,7 +186,7 @@ func (i GoogleBackendServiceService) findByInstance(vmLink string) ([]BackendSer
 	for _, bs := range allBackendServices {
 		for _, b := range bs.Backends {
 			if b.InstanceGroupZone == zone {
-				if igs, found, _ := i.instanceGroupsService.Find(b.InstanceGroupLink, b.InstanceGroupZone); found {
+				if igs, found, _ := i.instanceGroupsService.Find(b.InstanceGroupLink, b.InstanceGroupZone); found { //nolint:errcheck
 					for _, instance := range igs.Instances {
 						if instance == vmLink {
 							i.logger.Debug(googleBackendServiceServiceLogTag, "Found instance %q in Instance Group %q", vmLink, igs.Name)

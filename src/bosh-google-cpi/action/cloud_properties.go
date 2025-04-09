@@ -1,9 +1,10 @@
 package action
 
 import (
-	instance "bosh-google-cpi/google/instance_service"
 	"encoding/json"
 	"fmt"
+
+	instance "bosh-google-cpi/google/instance_service"
 )
 
 type DiskCloudProperties struct {

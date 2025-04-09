@@ -5,18 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
+
+	boshlogger "github.com/cloudfoundry/bosh-utils/logger"
+	"github.com/cloudfoundry/bosh-utils/uuid"
 
 	"bosh-google-cpi/action"
 	boshapi "bosh-google-cpi/api"
 	boshdisp "bosh-google-cpi/api/dispatcher"
 	"bosh-google-cpi/api/transport"
 	boshcfg "bosh-google-cpi/config"
-
-	boshlogger "github.com/cloudfoundry/bosh-utils/logger"
-	"github.com/cloudfoundry/bosh-utils/uuid"
 )
 
 var (
@@ -73,9 +72,9 @@ func toggleAsyncDelete() {
 	key := "CPI_ASYNC_DELETE"
 	current := os.Getenv(key)
 	if current == "" {
-		os.Setenv(key, "true")
+		os.Setenv(key, "true") //nolint:errcheck
 	} else {
-		os.Setenv(key, "")
+		os.Setenv(key, "") //nolint:errcheck
 	}
 }
 
@@ -136,7 +135,7 @@ func execCPI(request string) (boshdisp.Response, error) {
 		return boshResponse, err
 	}
 
-	if response, err = ioutil.ReadAll(&out); err != nil {
+	if response, err = io.ReadAll(&out); err != nil {
 		return boshResponse, err
 	}
 

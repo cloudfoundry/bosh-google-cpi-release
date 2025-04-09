@@ -2,9 +2,9 @@ package acceleratortype
 
 import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/googleapi"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/googleapi"
 )
 
 func (m GoogleAcceleratorTypeService) Find(id string, zone string) (AcceleratorType, bool, error) {

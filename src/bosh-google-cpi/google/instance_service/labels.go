@@ -11,10 +11,10 @@ type Labels map[string]string
 func (i *Labels) Validate() error {
 	for k, v := range *i {
 		if !mustMatchRe.MatchString(k) {
-			return fmt.Errorf("Label key %q is invalid. Must batch regular expression %q", k, mustMatchReP)
+			return fmt.Errorf("Label key %q is invalid. Must batch regular expression %q", k, mustMatchReP) //nolint:staticcheck
 		}
 		if !mustMatchRe.MatchString(v) {
-			return fmt.Errorf("Label value %q is invalid. Must batch regular expression %q", v, mustMatchReP)
+			return fmt.Errorf("Label value %q is invalid. Must batch regular expression %q", v, mustMatchReP) //nolint:staticcheck
 		}
 	}
 	return nil
@@ -28,12 +28,13 @@ var (
 
 // This function sanitizes an string, ensuring it is a valid label.
 // It is used to clean up labels provided via BOSH metadata.
+
 func SafeLabel(s string) (string, error) {
 	maxlen := 61
 	// Replace common invalid chars
-	s = strings.Replace(s, "/", "-", -1)
-	s = strings.Replace(s, "_", "-", -1)
-	s = strings.Replace(s, ":", "-", -1)
+	s = strings.Replace(s, "/", "-", -1) //nolint:staticcheck
+	s = strings.Replace(s, "_", "-", -1) //nolint:staticcheck
+	s = strings.Replace(s, ":", "-", -1) //nolint:staticcheck
 
 	// Trim to max length
 	if len(s) > maxlen {
@@ -54,5 +55,5 @@ func SafeLabel(s string) (string, error) {
 		return s, nil
 	}
 
-	return "", fmt.Errorf("Label value %q did not satisfy the GCE label regexp", s)
+	return "", fmt.Errorf("Label value %q did not satisfy the GCE label regexp", s) //nolint:staticcheck
 }

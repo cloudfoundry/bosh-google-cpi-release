@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/util"
-	"google.golang.org/api/compute/v1"
 )
 
 func (d GoogleDiskService) Create(size int, diskType string, zone string) (string, error) {
