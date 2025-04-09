@@ -5,8 +5,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-	instance "bosh-google-cpi/google/instance_service"
-	instancefakes "bosh-google-cpi/google/instance_service/fakes"
+	"bosh-google-cpi/google/instance"
+	instancefakes "bosh-google-cpi/google/instance/fakes"
 	registryfakes "bosh-google-cpi/registry/fakes"
 )
 

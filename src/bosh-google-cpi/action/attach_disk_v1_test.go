@@ -8,9 +8,9 @@ import (
 
 	. "bosh-google-cpi/action"
 	"bosh-google-cpi/api"
-	"bosh-google-cpi/google/disk_service"
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	instancefakes "bosh-google-cpi/google/instance_service/fakes"
+	"bosh-google-cpi/google/disk"
+	diskfakes "bosh-google-cpi/google/disk/fakes"
+	instancefakes "bosh-google-cpi/google/instance/fakes"
 	"bosh-google-cpi/registry"
 	registryfakes "bosh-google-cpi/registry/fakes"
 )

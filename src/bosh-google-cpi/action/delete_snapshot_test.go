@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-	snapshotfakes "bosh-google-cpi/google/snapshot_service/fakes"
+	snapshotfakes "bosh-google-cpi/google/snapshot/fakes"
 )
 
 var _ = Describe("DeleteSnapshot", func() {

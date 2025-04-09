@@ -9,9 +9,9 @@ import (
 
 	. "bosh-google-cpi/action"
 	"bosh-google-cpi/api"
-	"bosh-google-cpi/google/disk_service"
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	snapshotfakes "bosh-google-cpi/google/snapshot_service/fakes"
+	"bosh-google-cpi/google/disk"
+	diskfakes "bosh-google-cpi/google/disk/fakes"
+	snapshotfakes "bosh-google-cpi/google/snapshot/fakes"
 )
 
 var _ = Describe("SnapshotDisk", func() {

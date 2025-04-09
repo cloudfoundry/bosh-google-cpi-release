@@ -11,7 +11,7 @@ import (
 	"google.golang.org/api/compute/v1"
 
 	"bosh-google-cpi/google/client"
-	opsvc "bosh-google-cpi/google/operation_service"
+	opsvc "bosh-google-cpi/google/operation"
 	"bosh-google-cpi/redactor"
 	"bosh-google-cpi/util"
 )

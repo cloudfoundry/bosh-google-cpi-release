@@ -9,10 +9,10 @@ import (
 
 	. "bosh-google-cpi/action"
 	"bosh-google-cpi/api"
-	diskfakes "bosh-google-cpi/google/disk_service/fakes"
-	"bosh-google-cpi/google/disk_type_service"
-	disktypefakes "bosh-google-cpi/google/disk_type_service/fakes"
-	instancefakes "bosh-google-cpi/google/instance_service/fakes"
+	diskfakes "bosh-google-cpi/google/disk/fakes"
+	"bosh-google-cpi/google/disktype"
+	disktypefakes "bosh-google-cpi/google/disktype/fakes"
+	instancefakes "bosh-google-cpi/google/instance/fakes"
 )
 
 var _ = Describe("CreateDisk", func() {

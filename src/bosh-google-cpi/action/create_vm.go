@@ -7,12 +7,12 @@ import (
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
-	acceleratortype "bosh-google-cpi/google/accelerator_type_service"
-	disk "bosh-google-cpi/google/disk_service"
-	disktype "bosh-google-cpi/google/disk_type_service"
-	image "bosh-google-cpi/google/image_service"
-	instance "bosh-google-cpi/google/instance_service"
-	machinetype "bosh-google-cpi/google/machine_type_service"
+	"bosh-google-cpi/google/acceleratortype"
+	"bosh-google-cpi/google/disk"
+	"bosh-google-cpi/google/disktype"
+	"bosh-google-cpi/google/image"
+	"bosh-google-cpi/google/instance"
+	"bosh-google-cpi/google/machinetype"
 	"bosh-google-cpi/registry"
 	"bosh-google-cpi/util"
 )

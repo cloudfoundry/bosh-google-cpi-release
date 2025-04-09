@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "bosh-google-cpi/action"
-	"bosh-google-cpi/google/instance_service"
+	"bosh-google-cpi/google/instance"
 	"bosh-google-cpi/registry"
 )
 

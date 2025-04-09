@@ -3,7 +3,7 @@ package action
 import (
 	"bosh-google-cpi/registry"
 
-	"bosh-google-cpi/google/instance_service"
+	"bosh-google-cpi/google/instance"
 )
 
 type Networks map[string]*Network
