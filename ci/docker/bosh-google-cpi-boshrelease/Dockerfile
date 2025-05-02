@@ -35,7 +35,7 @@ RUN export GCLOUD_KEYFILE="/usr/share/keyrings/cloud.google.gpg" \
       google-cloud-cli
 
 # Install Golang
-COPY --from=bosh/golang-release /var/vcap/packages/golang-1-linux /usr/local/go
+COPY --from=ghcr.io/cloudfoundry/golang-release /var/vcap/packages/golang-1-linux /usr/local/go
 ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
 
 # Install Bosh cli
