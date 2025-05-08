@@ -3,9 +3,11 @@ on:
   push:
     paths:
     - 'src/bosh-google-cpi/**'
+    - '.github/**'
   pull_request:
     paths:
     - 'src/bosh-google-cpi/**'
+    - '.github/**'
 jobs:
   lint:
     runs-on: ubuntu-latest
