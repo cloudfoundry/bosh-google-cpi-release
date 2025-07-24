@@ -394,9 +394,11 @@ jobs:
     public: true
     serial: true
     plan:
-      - get: bosh-google-cpi-release
-      - get: weekly
-        trigger: true
+      - in_parallel:
+        - get: bosh-google-cpi-release
+        - get: bosh-golang-release-image
+        - get: weekly
+          trigger: true
       - put: google-cpi-image
         params:
           build: "bosh-google-cpi-release/ci/docker/bosh-google-cpi-boshrelease"
@@ -586,6 +588,13 @@ resources:
       repository: bosh/security-scanner
       username: ((dockerhub_username))
       password: ((dockerhub_password))
+
+  - name: bosh-golang-release-image
+    type: registry-image
+    source:
+      repository: ghcr.io/cloudfoundry/bosh/golang-release
+      username: ((github_read_write_packages.username))
+      password: ((github_read_write_packages.password))
 
   - name: google-cpi-registry-image
     type: registry-image
