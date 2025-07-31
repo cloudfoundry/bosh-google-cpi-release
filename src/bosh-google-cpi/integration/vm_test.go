@@ -712,6 +712,7 @@ var _ = Describe("VM", func() {
 				{
 				  "default": {
 					"type": "dynamic",
+					"tags": ["integration-delete"]
 					"cloud_properties": {
 					  "network_name": "%v"
 					}
