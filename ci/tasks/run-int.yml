@@ -9,6 +9,7 @@ inputs:
   - name: ci
   - name: infrastructure
   - name: stemcell
+  - name: sole-tenancy-infrastructure
 run:
   path: ci/ci/tasks/run-int.sh
 params:

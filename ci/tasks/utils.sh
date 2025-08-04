@@ -79,6 +79,5 @@ function read_infrastructure {
 
   export google_address_int_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_int_ip)
   export google_address_int_internal_ip=$(cat ${infrastructure_metadata} | jq -r .google_address_int_internal_ip)
-  export google_node_group=$(cat  ${infrastructure_metadata} | jq -r .google_node_group)
   export google_service_account=$(cat ${infrastructure_metadata} | jq -r .google_service_account)
 }

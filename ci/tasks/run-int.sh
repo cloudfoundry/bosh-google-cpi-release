@@ -41,7 +41,7 @@ export REGION=${google_region}
 export GOOGLE_PROJECT=${google_project}
 export CUSTOM_SERVICE_ACCOUNT=${google_service_account}
 export EXTERNAL_STATIC_IP=${google_address_int_ip}
-export NODE_GROUP=${google_node_group}
+export NODE_GROUP=$(cat "${PWD}/sole-tenancy-infrastructure/metadata" | jq -r .google_node_group)
 export CPI_ASYNC_DELETE=true
 
 echo "Configuring google account..."
