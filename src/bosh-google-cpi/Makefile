@@ -73,7 +73,7 @@ testint: check-proj get-deps clean fmt
 	CUSTOM_SERVICE_ACCOUNT=$(shell cd ../../ci/test_infrastructure && terraform output google_service_account) \
 	JSON_KEY_SERVICE_ACCOUNT=$(shell jq -r .client_email $HOME/.config/gcloud/application_default_credentials.json) \
 	EXTERNAL_STATIC_IP=$(shell cd ../../ci/test_infrastructure && terraform output google_address_int_ip) \
-	NODE_GROUP=$(shell cd ../../ci/test_infrastructure && terraform output google_node_group) \
+	NODE_GROUP=$(shell cd ../../ci/sole_tenancy_infrastructure && terraform output google_node_group) \
     ./.bin/ginkgo -mod vendor integration -slowSpecThreshold=500 -progress -nodes=3 -randomizeAllSpecs -randomizeSuites $(GINKGO_ARGS) -v
 
 # Checks and creates, if necessary, resources in a project required to run integration tests.

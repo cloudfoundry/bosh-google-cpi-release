@@ -85,7 +85,3 @@ output "google_address_int_internal_ip" {
 output "google_service_account" {
   value = google_service_account.service_account.email
 }
-
-output "google_node_group" {
-  value = google_compute_node_group.nodes.name
-}
