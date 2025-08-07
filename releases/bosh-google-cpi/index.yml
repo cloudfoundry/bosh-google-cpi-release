@@ -25,6 +25,8 @@ builds:
     version: 50.0.4
   20bc1b91-2960-42a9-af0b-0a046284c350:
     version: 25.7.0
+  283b51dc-fb4e-4dea-73cd-44a9f1742b60:
+    version: 50.0.17
   2e8d95a0-275b-49fb-7eb5-6dafbf183efe:
     version: 49.0.11
   30d41eb3-3df5-422b-abea-5a16d23a6bf6:
