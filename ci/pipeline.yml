@@ -241,7 +241,8 @@ jobs:
         - get: google-cpi-registry-image
       - put: sole-tenancy-infrastructure
         params:
-          terraform_source: ci/sole_tenancy_infrastructure
+          env_name: master-bosh-google-cpi-sole-tenancy
+          terraform_source: ci/ci/sole_tenancy_infrastructure
       - task: run-int
         file: ci/ci/tasks/run-int.yml
         image: google-cpi-registry-image
@@ -252,7 +253,8 @@ jobs:
           put: sole-tenancy-infrastructure
           params:
             action: destroy
-            terraform_source: ci/sole_tenancy_infrastructure
+            env_name: master-bosh-google-cpi-sole-tenancy
+            terraform_source: ci/ci/sole_tenancy_infrastructure
 
   - name: pre-release-fan-in
     plan:
@@ -577,7 +579,7 @@ resources:
   - name: sole-tenancy-infrastructure
     type: terraform
     source:
-      terraform_source: ci/sole_tenancy_infrastructure
+      terraform_source: ci/ci/sole_tenancy_infrastructure
       backend_type: gcs
       backend_config:
         bucket: bosh-gcp-cpi-release-pipeline
