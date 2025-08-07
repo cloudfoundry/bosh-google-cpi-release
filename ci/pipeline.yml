@@ -255,6 +255,9 @@ jobs:
             action: destroy
             env_name: master-bosh-google-cpi-sole-tenancy
             terraform_source: ci/ci/sole_tenancy_infrastructure
+          get_params:
+            action: destroy
+            terraform_source: ci/ci/sole_tenancy_infrastructure
 
   - name: pre-release-fan-in
     plan:
