@@ -3,7 +3,7 @@ module bosh-google-cpi
 go 1.23.0
 
 require (
-	github.com/cloudfoundry/bosh-utils v0.0.554
+	github.com/cloudfoundry/bosh-utils v0.0.555
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/mitchellh/gox v0.4.0
 	github.com/onsi/ginkgo v1.16.5
