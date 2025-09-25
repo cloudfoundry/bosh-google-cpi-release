@@ -10,26 +10,35 @@ type Labels map[string]string
 
 func (i *Labels) Validate() error {
 	for k, v := range *i {
-		if !mustMatchRe.MatchString(k) {
-			return fmt.Errorf("Label key %q is invalid. Must batch regular expression %q", k, mustMatchReP) //nolint:staticcheck
+		if !mustMatchReKey.MatchString(k) {
+			return fmt.Errorf("label key %q is invalid. Must batch regular expression %q", k, mustMatchReKeyP) //nolint:staticcheck
 		}
-		if !mustMatchRe.MatchString(v) {
-			return fmt.Errorf("Label value %q is invalid. Must batch regular expression %q", v, mustMatchReP) //nolint:staticcheck
+		if !mustMatchReValue.MatchString(v) {
+			return fmt.Errorf("label value %q is invalid. Must batch regular expression %q", v, mustMatchReValueP) //nolint:staticcheck
 		}
 	}
 	return nil
 }
 
 var (
-	numFirstRe   = regexp.MustCompile("^[0-9]")
-	mustMatchReP = "^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$"
-	mustMatchRe  = regexp.MustCompile(mustMatchReP)
+	numFirstRe        = regexp.MustCompile("^[0-9]")
+	mustMatchReKeyP   = "^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$"
+	mustMatchReValueP = "^(?:[a-z0-9](?:[-_a-z0-9]{0,61}[a-z0-9])?)$"
+	mustMatchReKey    = regexp.MustCompile(mustMatchReKeyP)
+	mustMatchReValue  = regexp.MustCompile(mustMatchReValueP)
 )
 
-// This function sanitizes an string, ensuring it is a valid label.
+// This function sanitizes a string, ensuring it is a valid label.
 // It is used to clean up labels provided via BOSH metadata.
 
-func SafeLabel(s string) (string, error) {
+type LabelType int
+
+const (
+	LabelKey LabelType = iota
+	LabelValue
+)
+
+func SafeLabel(s string, labelType LabelType) (string, error) {
 	maxlen := 61
 	// Replace common invalid chars
 	s = strings.Replace(s, "/", "-", -1) //nolint:staticcheck
@@ -46,14 +55,19 @@ func SafeLabel(s string) (string, error) {
 	s = strings.TrimPrefix(s, "-")
 
 	// Ensure the string doesn't begin with a number
-	if numFirstRe.MatchString(s) {
+	if labelType == LabelKey && numFirstRe.MatchString(s) {
 		s = "n" + s
 	}
 
 	// The sanitized value should pass the GCE regex
-	if mustMatchRe.MatchString(s) {
+	if labelType == LabelKey {
+		if mustMatchReKey.MatchString(s) {
+			return s, nil
+		}
+		return "", fmt.Errorf("label key %q did not satisfy the GCE label regexp", s) //nolint:staticcheck
+	} else if mustMatchReValue.MatchString(s) {
 		return s, nil
 	}
 
-	return "", fmt.Errorf("Label value %q did not satisfy the GCE label regexp", s) //nolint:staticcheck
+	return "", fmt.Errorf("label value %q did not satisfy the GCE label regexp", s) //nolint:staticcheck
 }

@@ -63,10 +63,13 @@ func (i GoogleInstanceService) SetMetadata(id string, vmMetadata Metadata) error
 	}
 
 	for k, v := range vmMetadata {
-		if l, err := SafeLabel(v); err == nil {
-			labelsMap[k] = l
+		safeKey, keyErr := SafeLabel(k, LabelKey)
+		safeValue, valueErr := SafeLabel(v, LabelValue)
+
+		if keyErr == nil && valueErr == nil {
+			labelsMap[safeKey] = safeValue
 		} else {
-			i.logger.Debug(googleInstanceServiceLogTag, fmt.Sprintf("Skipped label for %q: %v", k, err))
+			i.logger.Debug(googleInstanceServiceLogTag, fmt.Sprintf("Skipped label %q:%q: key error: %v, value error: %v", k, v, keyErr, valueErr))
 		}
 	}
 

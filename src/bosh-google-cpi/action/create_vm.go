@@ -172,7 +172,7 @@ func (cv createVMBase) Run(agentID string, stemcellCID StemcellCID, cloudProps V
 		if boshgroups, ok := boshenv.(map[string]interface{})["groups"]; ok {
 			for _, tag := range boshgroups.([]interface{}) {
 				// Ignore error as labels will be validated later
-				safeTag, _ := instance.SafeLabel(tag.(string)) //nolint:errcheck
+				safeTag, _ := instance.SafeLabel(tag.(string), instance.LabelKey) //nolint:errcheck
 				cloudProps.Tags = append(cloudProps.Tags, safeTag)
 			}
 		}
