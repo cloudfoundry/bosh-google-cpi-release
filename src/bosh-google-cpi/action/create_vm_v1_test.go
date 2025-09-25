@@ -168,6 +168,71 @@ var _ = Describe("CreateVM", func() {
 				},
 			}
 		})
+		Context("when env.bosh.groups contains tags that need sanitization", func() {
+			BeforeEach(func() {
+				env = Environment{
+					"bosh": map[string]interface{}{
+						"groups": []interface{}{
+							"123numeric-tag",
+							"test/slash/tag",
+							"test_underscore",
+							"test:colon:tag",
+							"-hyphen-test-",
+							"valid-tag",
+						},
+					},
+				}
+				expectedVMProps.Tags = instance.Tags([]string{
+					"n123numeric-tag", // prefixed now
+					"test-slash-tag",
+					"test-underscore",
+					"test-colon-tag",
+					"hyphen-test",
+					"valid-tag",
+				})
+			})
+
+			It("sanitizes the tags correctly", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(vmService.CreateVMProps.Tags).To(Equal(expectedVMProps.Tags))
+			})
+			AfterEach(func() {
+				// Prevent env leaking into later specs
+				env = nil
+
+				// Reset any mutated inputs/expectations that may persist
+				cloudProps.Tags = nil
+				expectedVMProps.Tags = nil
+			})
+		})
+		Context("when env.bosh.groups contains tags that are invalid", func() {
+			BeforeEach(func() {
+				env = Environment{
+					"bosh": map[string]interface{}{
+						"groups": []interface{}{
+							"valid-tag",
+							"----",
+						},
+					},
+				}
+			})
+
+			It("raises invalid tag error", func() {
+				vmCID, err = createVM.Run("fake-agent-id", "fake-stemcell-id", cloudProps, networks, disks, env)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("Invalid tag"))
+			})
+			AfterEach(func() {
+				// Prevent env leaking into later specs
+				env = nil
+
+				// Reset any mutated inputs/expectations that may persist
+				cloudProps.Tags = nil
+				expectedVMProps.Tags = nil
+			})
+		})
+
 		Context("when BackendService is set as a hash", func() {
 			var backendService map[string]string
 			BeforeEach(func() {
