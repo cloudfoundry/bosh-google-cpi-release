@@ -167,7 +167,7 @@ var _ = Describe("VM", func() {
 			"name":        "val-with-underscores-ending-in-dash",
 			"deployment":  "deployment-name",
 			"job":         "job-name",
-			"index":       "n0",
+			"index":       "0",
 			"label-1-key": "label-1-value",
 			"label-2-key": "label-2-value",
 		}
