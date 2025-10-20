@@ -44,24 +44,24 @@ jobs:
           trigger: true
         - get: ci
         - get: google-cpi-registry-image
-      - in_parallel: &teardown_step
-        - task: teardown-infrastructure
-          file: ci/ci/tasks/teardown-infrastructure.yml
+      - in_parallel: &delete_orphaned_vms_step
+        - task: delete-orphaned-vms
+          file: ci/ci/tasks/delete-orphaned-vms.yml
           image: google-cpi-registry-image
           params:
-            google_auto_network: google-cpi-ci-auto-network
-            google_json_key_data: ((gcp_json_key))
-            google_network: google-cpi-ci-network
             google_project: cloud-foundry-310819
             google_region: us-east1
             google_zone: us-east1-b
+            google_json_key_data: ((gcp_json_key))
+            google_auto_network: master-auto
+            google_manual_network: master-manual
       - put: infrastructure
         params:
           env_name: master-bosh-google-cpi
           terraform_source: ci/ci/test_infrastructure
           delete_on_failure: true
       # delete VM created for regional backend service hack
-      - in_parallel: *teardown_step
+      - in_parallel: *delete_orphaned_vms_step
 
   - name: teardown-infrastructure
     serial_groups: [integration]
@@ -89,7 +89,7 @@ jobs:
         - get: ci
         - get: bosh-shared-ci
         - get: google-cpi-registry-image
-      - do: *teardown_step
+      - do: *delete_orphaned_vms_step
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
         image: bosh-cli-registry-image
@@ -576,8 +576,6 @@ resources:
         google_firewall_internal: google-cpi-ci-firewall-internal
         google_firewall_external: google-cpi-ci-firewall-external
         prefix:                   master
-        google_auto_network:      google-cpi-ci-auto-network
-        google_network:           google-cpi-ci-network
 
   - name: sole-tenancy-infrastructure
     type: terraform

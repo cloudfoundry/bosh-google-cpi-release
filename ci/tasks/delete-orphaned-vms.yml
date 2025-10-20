@@ -1,0 +1,17 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: foundationalinfrastructure/gce-cpi-release
+inputs:
+  - name: ci
+run:
+  path: ci/ci/tasks/delete-orphaned-vms.sh
+params:
+  google_project:        replace-me
+  google_region:         replace-me
+  google_zone:           replace-me
+  google_json_key_data:  replace-me
+  google_auto_network:   replace-me
+  google_manual_network: replace-me
