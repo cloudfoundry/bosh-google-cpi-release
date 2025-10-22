@@ -35,6 +35,7 @@ type Properties struct {
 	AutomaticRestart  bool
 	OnHostMaintenance string
 	Preemptible       bool
+	ProvisioningModel string
 	ServiceAccount    ServiceAccount
 	ServiceScopes     ServiceScopes
 	TargetPool        string

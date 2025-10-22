@@ -32,9 +32,9 @@ stemcell.tgz:
 clean:
 	go clean -mod=vendor ./...
 
-# Run gofmt on all code
+# Run gofmt on all code (excluding vendor directory)
 fmt:
-	gofmt -l -w .
+	find . -name '*.go' -not -path './vendor/*' -not -path './.bin/*' -exec gofmt -l -w {} \;
 
 # Run linter with non-stric checking
 lint:

@@ -40,7 +40,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 	if err != nil {
 		return "", err
 	}
-	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible, vmProps.NodeGroup)
+	schedulingParams := i.createSchedulingParams(vmProps.AutomaticRestart, vmProps.OnHostMaintenance, vmProps.Preemptible, vmProps.ProvisioningModel, vmProps.NodeGroup)
 	serviceAccountsParams := i.createServiceAccountsParams(vmProps)
 
 	// Handle tags
@@ -289,17 +289,24 @@ func (i GoogleInstanceService) createSchedulingParams(
 	automaticRestart bool,
 	onHostMaintenance string,
 	preemptible bool,
+	provisioningModel string,
 	nodeGroup string,
 ) *compute.Scheduling {
-	if preemptible {
-		return &compute.Scheduling{Preemptible: preemptible}
+	scheduling := &compute.Scheduling{}
+
+	if provisioningModel != "" {
+		scheduling.ProvisioningModel = provisioningModel
+		if provisioningModel == "SPOT" {
+			return scheduling
+		}
+	} else if preemptible {
+		scheduling.Preemptible = true
+		return scheduling
 	}
 
-	scheduling := &compute.Scheduling{
-		AutomaticRestart:  &automaticRestart,
-		OnHostMaintenance: onHostMaintenance,
-		Preemptible:       preemptible,
-	}
+	scheduling.AutomaticRestart = &automaticRestart
+	scheduling.OnHostMaintenance = onHostMaintenance
+	scheduling.Preemptible = false
 
 	if nodeGroup != "" {
 		scheduling.NodeAffinities = []*compute.SchedulingNodeAffinity{{
