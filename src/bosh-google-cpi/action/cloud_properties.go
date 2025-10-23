@@ -52,6 +52,7 @@ type VMCloudProperties struct {
 	AutomaticRestart    bool             `json:"automatic_restart,omitempty"`
 	OnHostMaintenance   string           `json:"on_host_maintenance,omitempty"`
 	Preemptible         bool             `json:"preemptible,omitempty"`
+	ProvisioningModel   string           `json:"provisioning_model,omitempty"`
 	ServiceAccount      VMServiceAccount `json:"service_account,omitempty"`
 	ServiceScopes       VMServiceScopes  `json:"service_scopes,omitempty"`
 	TargetPool          string           `json:"target_pool,omitempty"`
@@ -72,6 +73,16 @@ func (n VMCloudProperties) Validate() error {
 
 	if err := n.Labels.Validate(); err != nil {
 		return err
+	}
+
+	if n.ProvisioningModel != "" {
+		validModels := map[string]bool{
+			"SPOT":     true,
+			"STANDARD": true,
+		}
+		if !validModels[n.ProvisioningModel] {
+			return fmt.Errorf("invalid provisioning_model '%s': must be 'SPOT' or 'STANDARD'", n.ProvisioningModel)
+		}
 	}
 
 	return nil

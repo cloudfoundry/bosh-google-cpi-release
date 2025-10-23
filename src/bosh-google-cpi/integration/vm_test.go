@@ -670,7 +670,119 @@ var _ = Describe("VM", func() {
 				{
 				  "machine_type": "n1-standard-1",
 				  "zone": "%v",
-				  "preemtible": true
+				  "preemptible": true
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can execute the VM lifecycle with a SPOT provisioning_model", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "provisioning_model": "SPOT"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("can execute the VM lifecycle with a STANDARD provisioning_model", func() {
+		By("creating a VM")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "provisioning_model": "STANDARD"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		assertSucceeds(request)
+	})
+
+	It("provisioning_model takes precedence over preemptible", func() {
+		By("creating a VM with both provisioning_model and preemptible")
+		var vmCID string
+
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v",
+				  "preemptible": true,
+				  "provisioning_model": "STANDARD"
 				},
 				{
 				  "default": {

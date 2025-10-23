@@ -107,7 +107,8 @@ These options are specified under `cloud_properties` at the [resource_pools](htt
 | `root_disk_type`        | N        | String                                   | `pd-standard`                                                                  | The name of the [Google Compute Engine Disk Type](https://cloud.google.com/compute/docs/disks/#overview) the CPI will use when creating the instance root disk
 | `automatic_restart`     | N        | Boolean                                  | `false`                                                                        | If the instances should be [restarted automatically](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#autorestart) if they are terminated for non-user-initiated reasons (`false` by default)
 | `on_host_maintenance`   | N        | String                                   | `MIGRATE`                                                                      | [Instance behavior](https://cloud.google.com/compute/docs/instances/setting-instance-scheduling-options#onhostmaintenance) on infrastructure maintenance that may temporarily impact instance performance (supported values are `MIGRATE` (default) or `TERMINATE`)
-| `preemptible`           | N        | Boolean                                  | `false`                                                                        | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default)
+| `preemptible`           | N        | Boolean                                  | `false`                                                                        | If the instances should be [preemptible](https://cloud.google.com/preemptible-vms/) (`false` by default). **Deprecated:** Use `provisioning_model: SPOT` instead.
+| `provisioning_model`    | N        | String                                   | `SPOT`                                                                     | The [provisioning model](https://cloud.google.com/compute/docs/instances/provisioning-models) for the instance. Valid values: `SPOT`, `STANDARD`. When both `provisioning_model` and `preemptible` are specified, `provisioning_model` takes precedence.
 | `service_account`       | N        | String                                   | `service-account-name@project-name.iam.gserviceaccount.com`                    | The full service account address of the service account to launch the VM with. If a value is provided, `service_scopes` will default to `https://www.googleapis.com/auth/cloud-platform` unless it is explicitly set. See [service account permissions](https://cloud.google.com/compute/docs/access/service-accounts#service_account_permissions) for more details. To use the default service account, leave this field empty and specify `service_scopes`.
 | `service_scopes`        | N        | Array&lt;String&gt;                      | `cloud-platform`                                                               | If this value is specified and `service_account` is empty, `default` will be used for `service_account`. This value supports both short (e.g., `cloud-platform`) and fully-qualified (e.g., `https://www.googleapis.com/auth/cloud-platform` formats. See [Authorization scope names](https://cloud.google.com/docs/authentication#oauth_scopes) for more details.
 | `target_pool`           | N        | String                                   | `cf-router`                                                                    | The name of the [Google Compute Engine Target Pool](https://cloud.google.com/compute/docs/load-balancing/network/target-pools) the instances should be added to
@@ -129,7 +130,7 @@ These options are specified under `cloud_properties` at the [disk_pools](http://
 
 ## Deployment Manifest Example - Dynamic Networking
 
-This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with dynamic networking:
+This is an example of how Google Compute Engine CPI specific properties are used in a BOSH deployment manifest with dynamic networking and SPOT vm:
 
 ```yaml
 ---
@@ -170,6 +171,7 @@ resource_pools:
       root_disk_type: pd-ssd
       automatic_restart: false
       on_host_maintenance: MIGRATE
+      provisioning_model: SPOT
       service_scopes:
         - compute.readonly
         - devstorage.read_write
