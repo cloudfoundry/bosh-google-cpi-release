@@ -36,7 +36,7 @@ clean:
 fmt:
 	find . -name '*.go' -not -path './vendor/*' -not -path './.bin/*' -exec gofmt -l -w {} \;
 
-# Run linter with non-stric checking
+# Run linter with non-strict checking
 lint:
 	ls -d */ | xargs -L 1 ./.bin/golint
 
