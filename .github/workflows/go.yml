@@ -16,7 +16,7 @@ jobs:
     - uses: actions/setup-go@v6
       with:
         go-version-file: src/bosh-google-cpi/go.mod
-    - uses: golangci/golangci-lint-action@v8
+    - uses: golangci/golangci-lint-action@v9
       with:
         working-directory: src/bosh-google-cpi/
   test-unit:
