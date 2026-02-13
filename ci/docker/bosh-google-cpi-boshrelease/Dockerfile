@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
