@@ -219,7 +219,7 @@ jobs:
         params:
           cpi_source_branch:       master
           google_subnetwork_range: "10.0.0.0/24"
-          stemcell_name:           bosh-google-kvm-ubuntu-jammy-go_agent
+          stemcell_name:           bosh-google-kvm-ubuntu-noble
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
 
@@ -555,7 +555,7 @@ resources:
   - name: google-ubuntu-stemcell
     type: bosh-io-stemcell
     source:
-      name: bosh-google-kvm-ubuntu-jammy-go_agent
+      name: bosh-google-kvm-ubuntu-noble
       force_regular: true
       tarball: true
 
