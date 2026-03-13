@@ -58,8 +58,13 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 		diskTypeSelfLink = dt.SelfLink
 	}
 
-	// If the disk already has the target type and meets the size requirement, skip.
-	if existingDisk.Type == diskTypeSelfLink && sizeGib <= int(existingDisk.SizeGb) {
+	if existingDisk.Type == diskTypeSelfLink {
+		if sizeGib <= int(existingDisk.SizeGb) {
+			return string(diskCID), nil // already at target size and type
+		}
+		if err := ud.diskService.Resize(string(diskCID), sizeGib); err != nil {
+			return nil, bosherr.WrapErrorf(err, "Updating disk '%s': resizing", diskCID)
+		}
 		return string(diskCID), nil
 	}
 
@@ -72,18 +77,18 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 	// Find the snapshot to get its SelfLink
 	snap, found, err := ud.snapshotService.Find(snapshotID)
 	if err != nil {
-		_ = ud.snapshotService.Delete(snapshotID)
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': finding snapshot '%s'", diskCID, snapshotID)
 	}
 	if !found {
-		_ = ud.snapshotService.Delete(snapshotID)
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' not found after creation", diskCID, snapshotID)
 	}
 
 	// Delete the old disk
 	if err := ud.diskService.Delete(string(diskCID)); err != nil {
 		// Snapshot exists, but we failed to delete the old disk. Clean up snapshot.
-		_ = ud.snapshotService.Delete(snapshotID)
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': deleting old disk", diskCID)
 	}
 
@@ -93,8 +98,7 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': recreating from snapshot '%s'", diskCID, snapshotID)
 	}
 
-	// Non-fatal: disk was recreated successfully, snapshot is just orphaned.
-	_ = ud.snapshotService.Delete(snapshotID)
+	_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 
 	return newDiskID, nil
 }
