@@ -85,17 +85,18 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 		return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' not found after creation", diskCID, snapshotID)
 	}
 
-	// Delete the old disk
-	if err := ud.diskService.Delete(string(diskCID)); err != nil {
-		// Snapshot exists, but we failed to delete the old disk. Clean up snapshot.
-		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
-		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': deleting old disk", diskCID)
-	}
-
+	// Create the new disk from snapshot BEFORE deleting the old one.
+	// This ensures data is never lost: if creation fails, the old disk
+	// is still intact and the caller can retry or fall back.
 	newDiskID, err := ud.diskService.CreateFromSnapshot(snap.SelfLink, sizeGib, diskTypeSelfLink, zone)
 	if err != nil {
-		// Old disk is gone; snapshot remains for manual recovery.
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': recreating from snapshot '%s'", diskCID, snapshotID)
+	}
+
+	if err := ud.diskService.Delete(string(diskCID)); err != nil {
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
+		return newDiskID, nil
 	}
 
 	_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
