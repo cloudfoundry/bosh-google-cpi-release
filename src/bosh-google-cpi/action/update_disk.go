@@ -1,6 +1,8 @@
 package action
 
 import (
+	"fmt"
+
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
 	"bosh-google-cpi/api"
@@ -41,7 +43,7 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 	zone := existingDisk.Zone
 	sizeGib := util.ConvertMib2Gib(newSize)
 	if sizeGib < int(existingDisk.SizeGb) {
-		sizeGib = int(existingDisk.SizeGb)
+		return nil, bosherr.Errorf("Updating disk '%s': requested size %d GiB is smaller than current size %d GiB", diskCID, sizeGib, existingDisk.SizeGb)
 	}
 
 	// Resolve the target disk type; default to the existing type so we never
@@ -58,7 +60,7 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 		diskTypeSelfLink = dt.SelfLink
 	}
 
-	if existingDisk.Type == diskTypeSelfLink {
+	if util.ResourceSplitter(existingDisk.Type) == util.ResourceSplitter(diskTypeSelfLink) {
 		if sizeGib <= int(existingDisk.SizeGb) {
 			return string(diskCID), nil // already at target size and type
 		}
@@ -69,7 +71,7 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 	}
 
 	// Snapshot the existing disk
-	snapshotID, err := ud.snapshotService.Create(string(diskCID), "update-disk snapshot", zone)
+	snapshotID, err := ud.snapshotService.Create(string(diskCID), fmt.Sprintf("update-disk snapshot for %s", diskCID), zone)
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': creating snapshot", diskCID)
 	}
@@ -96,7 +98,7 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 
 	if err := ud.diskService.Delete(string(diskCID)); err != nil {
 		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
-		return newDiskID, nil
+		return newDiskID, bosherr.WrapErrorf(err, "Updating disk '%s': new disk '%s' created but old disk could not be deleted", diskCID, newDiskID)
 	}
 
 	_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
