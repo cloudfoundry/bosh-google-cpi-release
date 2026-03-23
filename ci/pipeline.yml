@@ -639,11 +639,11 @@ resources:
 
 resource_types:
 - name: gcs-resource
-  type: docker-image
+  type: registry-image
   source:
     repository: frodenas/gcs-resource
 - name: terraform
-  type: docker-image
+  type: registry-image
   source:
     repository: ljfranklin/terraform-resource
     tag: 1.3.9
