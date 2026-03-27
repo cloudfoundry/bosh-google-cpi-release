@@ -2,6 +2,7 @@ package action
 
 import (
 	"fmt"
+	"time"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
 
@@ -75,16 +76,32 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 	if err != nil {
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': creating snapshot", diskCID)
 	}
+	defer func() {
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
+	}()
 
-	// Find the snapshot to get its SelfLink
-	snap, found, err := ud.snapshotService.Find(snapshotID)
-	if err != nil {
-		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
-		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': finding snapshot '%s'", diskCID, snapshotID)
-	}
-	if !found {
-		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
-		return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' not found after creation", diskCID, snapshotID)
+	// Wait for the snapshot to reach READY status before creating the replacement disk.
+	// snapshotService.Create already waits for the GCP operation to complete, but on
+	// larger disks the snapshot may not be immediately queryable or ready.
+	var snap snapshot.Snapshot
+	for attempts := 0; ; attempts++ {
+		snap, found, err = ud.snapshotService.Find(snapshotID)
+		if err != nil {
+			return nil, bosherr.WrapErrorf(err, "Updating disk '%s': finding snapshot '%s'", diskCID, snapshotID)
+		}
+		if !found {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' not found after creation", diskCID, snapshotID)
+		}
+		if snap.Status == "READY" {
+			break
+		}
+		if snap.Status == "FAILED" {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' entered FAILED state", diskCID, snapshotID)
+		}
+		if attempts >= 60 {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' did not reach READY status (current: %s)", diskCID, snapshotID, snap.Status)
+		}
+		time.Sleep(5 * time.Second)
 	}
 
 	// Create the new disk from snapshot BEFORE deleting the old one.
@@ -92,16 +109,12 @@ func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudPrope
 	// is still intact and the caller can retry or fall back.
 	newDiskID, err := ud.diskService.CreateFromSnapshot(snap.SelfLink, sizeGib, diskTypeSelfLink, zone)
 	if err != nil {
-		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': recreating from snapshot '%s'", diskCID, snapshotID)
 	}
 
 	if err := ud.diskService.Delete(string(diskCID)); err != nil {
-		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 		return newDiskID, bosherr.WrapErrorf(err, "Updating disk '%s': new disk '%s' created but old disk could not be deleted", diskCID, newDiskID)
 	}
-
-	_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
 
 	return newDiskID, nil
 }

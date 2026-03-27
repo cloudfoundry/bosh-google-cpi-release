@@ -152,6 +152,7 @@ var _ = Describe("UpdateDisk", func() {
 				snapshotService.FindFound = true
 				snapshotService.FindSnapshot = snapshot.Snapshot{
 					SelfLink: "https://googleapis.com/snapshots/fake-snapshot-id",
+					Status:   "READY",
 				}
 
 				diskService.CreateFromSnapshotID = "new-disk-id"
@@ -209,6 +210,18 @@ var _ = Describe("UpdateDisk", func() {
 				_, err = updateDisk.Run("fake-disk-id", 10240, DiskCloudProperties{DiskType: "hyperdisk-balanced"})
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("not found after creation"))
+				Expect(snapshotService.DeleteCalled).To(BeTrue())
+			})
+
+			It("returns an error and cleans up snapshot if snapshot enters FAILED state", func() {
+				snapshotService.FindSnapshot = snapshot.Snapshot{
+					SelfLink: "https://googleapis.com/snapshots/fake-snapshot-id",
+					Status:   "FAILED",
+				}
+
+				_, err = updateDisk.Run("fake-disk-id", 10240, DiskCloudProperties{DiskType: "hyperdisk-balanced"})
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("FAILED state"))
 				Expect(snapshotService.DeleteCalled).To(BeTrue())
 			})
 
