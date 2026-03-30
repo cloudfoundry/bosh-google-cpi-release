@@ -12,6 +12,14 @@ type FakeDiskService struct {
 	CreateDiskType string
 	CreateZone     string
 
+	CreateFromSnapshotCalled           bool
+	CreateFromSnapshotErr              error
+	CreateFromSnapshotID               string
+	CreateFromSnapshotSnapshotSelfLink string
+	CreateFromSnapshotSize             int
+	CreateFromSnapshotDiskType         string
+	CreateFromSnapshotZone             string
+
 	DeleteCalled bool
 	DeleteErr    error
 
@@ -30,6 +38,15 @@ func (d *FakeDiskService) Create(size int, diskType string, zone string) (string
 	d.CreateDiskType = diskType
 	d.CreateZone = zone
 	return d.CreateID, d.CreateErr
+}
+
+func (d *FakeDiskService) CreateFromSnapshot(snapshotSelfLink string, size int, diskType string, zone string) (string, error) {
+	d.CreateFromSnapshotCalled = true
+	d.CreateFromSnapshotSnapshotSelfLink = snapshotSelfLink
+	d.CreateFromSnapshotSize = size
+	d.CreateFromSnapshotDiskType = diskType
+	d.CreateFromSnapshotZone = zone
+	return d.CreateFromSnapshotID, d.CreateFromSnapshotErr
 }
 
 func (d *FakeDiskService) Delete(id string) error {

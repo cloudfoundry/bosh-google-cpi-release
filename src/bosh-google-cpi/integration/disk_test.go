@@ -174,4 +174,120 @@ var _ = Describe("Disk", func() {
 		assertSucceeds(request)
 	})
 
+	It("can update a disk with the same type and size (no-op)", func() {
+		By("creating a pd-ssd disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("updating with the same type and size")
+		request = fmt.Sprintf(`{
+			  "method": "update_disk",
+			  "arguments": ["%v", 32768, {"type": "pd-ssd"}]
+			}`, diskCID)
+		result := assertSucceedsWithResult(request).(string)
+		Expect(result).To(Equal(diskCID))
+
+		By("deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+	})
+
+	It("can update a disk by resizing in-place when only size changes", func() {
+		By("creating a pd-ssd disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("updating with same type but larger size")
+		request = fmt.Sprintf(`{
+			  "method": "update_disk",
+			  "arguments": ["%v", 52768, {"type": "pd-ssd"}]
+			}`, diskCID)
+		result := assertSucceedsWithResult(request).(string)
+		Expect(result).To(Equal(diskCID))
+
+		By("deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+	})
+
+	It("fails to update a disk to a smaller size", func() {
+		By("creating a disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("attempting to shrink the disk")
+		request = fmt.Sprintf(`{
+			  "method": "update_disk",
+			  "arguments": ["%v", 10240, {"type": "pd-ssd"}]
+			}`, diskCID)
+		err := assertFails(request)
+		Expect(err.Error()).To(ContainSubstring("smaller than current size"))
+
+		By("deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		assertSucceeds(request)
+	})
+
+	It("can update a disk by changing its type via snapshot", func() {
+		By("creating a pd-ssd disk")
+		var diskCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_disk",
+			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
+			}`, zone)
+		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("updating to hyperdisk-balanced type")
+		request = fmt.Sprintf(`{
+			  "method": "update_disk",
+			  "arguments": ["%v", 32768, {"type": "hyperdisk-balanced"}]
+			}`, diskCID)
+		newDiskCID := assertSucceedsWithResult(request).(string)
+		Expect(newDiskCID).ToNot(Equal(diskCID))
+
+		By("confirming the new disk exists")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, newDiskCID)
+		found := assertSucceedsWithResult(request).(bool)
+		Expect(found).To(BeTrue())
+
+		By("confirming the old disk was deleted")
+		request = fmt.Sprintf(`{
+			  "method": "has_disk",
+			  "arguments": ["%v"]
+			}`, diskCID)
+		found = assertSucceedsWithResult(request).(bool)
+		Expect(found).To(BeFalse())
+
+		By("deleting the new disk")
+		request = fmt.Sprintf(`{
+			  "method": "delete_disk",
+			  "arguments": ["%v"]
+			}`, newDiskCID)
+		assertSucceeds(request)
+	})
+
 })

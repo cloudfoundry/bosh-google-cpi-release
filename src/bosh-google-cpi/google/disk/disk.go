@@ -7,4 +7,5 @@ type Disk struct {
 	Zone     string
 	Users    []string
 	SizeGb   int64
+	Type     string
 }

@@ -28,6 +28,7 @@ func (d GoogleDiskService) Find(id string, zone string) (Disk, bool, error) {
 					Zone:     diskItem.Zone,
 					Users:    diskItem.Users,
 					SizeGb:   diskItem.SizeGb,
+					Type:     diskItem.Type,
 				}
 				return disk, true, nil
 			}
@@ -52,6 +53,7 @@ func (d GoogleDiskService) Find(id string, zone string) (Disk, bool, error) {
 		Status:   diskItem.Status,
 		Zone:     diskItem.Zone,
 		SizeGb:   diskItem.SizeGb,
+		Type:     diskItem.Type,
 	}
 	return disk, true, nil
 }

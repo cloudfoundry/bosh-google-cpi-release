@@ -1,0 +1,120 @@
+package action
+
+import (
+	"fmt"
+	"time"
+
+	bosherr "github.com/cloudfoundry/bosh-utils/errors"
+
+	"bosh-google-cpi/api"
+	"bosh-google-cpi/google/disk"
+	"bosh-google-cpi/google/disktype"
+	"bosh-google-cpi/google/snapshot"
+	"bosh-google-cpi/util"
+)
+
+type UpdateDisk struct {
+	diskService     disk.Service
+	diskTypeService disktype.Service
+	snapshotService snapshot.Service
+}
+
+func NewUpdateDisk(
+	diskService disk.Service,
+	diskTypeService disktype.Service,
+	snapshotService snapshot.Service,
+) UpdateDisk {
+	return UpdateDisk{
+		diskService:     diskService,
+		diskTypeService: diskTypeService,
+		snapshotService: snapshotService,
+	}
+}
+
+func (ud UpdateDisk) Run(diskCID DiskCID, newSize int, cloudProps DiskCloudProperties) (interface{}, error) {
+	// Find the existing disk
+	existingDisk, found, err := ud.diskService.Find(string(diskCID), "")
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Updating disk '%s'", diskCID)
+	}
+	if !found {
+		return nil, api.NewDiskNotFoundError(string(diskCID), false)
+	}
+
+	zone := existingDisk.Zone
+	sizeGib := util.ConvertMib2Gib(newSize)
+	if sizeGib < int(existingDisk.SizeGb) {
+		return nil, bosherr.Errorf("Updating disk '%s': requested size %d GiB is smaller than current size %d GiB", diskCID, sizeGib, existingDisk.SizeGb)
+	}
+
+	// Resolve the target disk type; default to the existing type so we never
+	// silently change it when no type is specified in cloud_properties.
+	diskTypeSelfLink := existingDisk.Type
+	if cloudProps.DiskType != "" {
+		dt, found, err := ud.diskTypeService.Find(cloudProps.DiskType, zone)
+		if err != nil {
+			return nil, bosherr.WrapErrorf(err, "Updating disk '%s': finding disk type '%s'", diskCID, cloudProps.DiskType)
+		}
+		if !found {
+			return nil, bosherr.Errorf("Updating disk '%s': disk type '%s' not found", diskCID, cloudProps.DiskType)
+		}
+		diskTypeSelfLink = dt.SelfLink
+	}
+
+	if util.ResourceSplitter(existingDisk.Type) == util.ResourceSplitter(diskTypeSelfLink) {
+		if sizeGib <= int(existingDisk.SizeGb) {
+			return string(diskCID), nil // already at target size and type
+		}
+		if err := ud.diskService.Resize(string(diskCID), sizeGib); err != nil {
+			return nil, bosherr.WrapErrorf(err, "Updating disk '%s': resizing", diskCID)
+		}
+		return string(diskCID), nil
+	}
+
+	// Snapshot the existing disk
+	snapshotID, err := ud.snapshotService.Create(string(diskCID), fmt.Sprintf("update-disk snapshot for %s", diskCID), zone)
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': creating snapshot", diskCID)
+	}
+	defer func() {
+		_ = ud.snapshotService.Delete(snapshotID) //nolint:errcheck
+	}()
+
+	// Wait for the snapshot to reach READY status before creating the replacement disk.
+	// snapshotService.Create already waits for the GCP operation to complete, but on
+	// larger disks the snapshot may not be immediately queryable or ready.
+	var snap snapshot.Snapshot
+	for attempts := 0; ; attempts++ {
+		snap, found, err = ud.snapshotService.Find(snapshotID)
+		if err != nil {
+			return nil, bosherr.WrapErrorf(err, "Updating disk '%s': finding snapshot '%s'", diskCID, snapshotID)
+		}
+		if !found {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' not found after creation", diskCID, snapshotID)
+		}
+		if snap.Status == "READY" {
+			break
+		}
+		if snap.Status == "FAILED" {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' entered FAILED state", diskCID, snapshotID)
+		}
+		if attempts >= 60 {
+			return nil, bosherr.Errorf("Updating disk '%s': snapshot '%s' did not reach READY status (current: %s)", diskCID, snapshotID, snap.Status)
+		}
+		time.Sleep(5 * time.Second)
+	}
+
+	// Create the new disk from snapshot BEFORE deleting the old one.
+	// This ensures data is never lost: if creation fails, the old disk
+	// is still intact and the caller can retry or fall back.
+	newDiskID, err := ud.diskService.CreateFromSnapshot(snap.SelfLink, sizeGib, diskTypeSelfLink, zone)
+	if err != nil {
+		return nil, bosherr.WrapErrorf(err, "Updating disk '%s': recreating from snapshot '%s'", diskCID, snapshotID)
+	}
+
+	if err := ud.diskService.Delete(string(diskCID)); err != nil {
+		return newDiskID, bosherr.WrapErrorf(err, "Updating disk '%s': new disk '%s' created but old disk could not be deleted", diskCID, newDiskID)
+	}
+
+	return newDiskID, nil
+}
