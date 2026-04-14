@@ -74,6 +74,7 @@ included_permissions:
 # snapshots
 - compute.snapshots.delete
 - compute.snapshots.get
+- compute.snapshots.useReadOnly
 
 # target pool
 - compute.targetPools.list
