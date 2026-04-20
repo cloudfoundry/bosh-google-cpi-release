@@ -21,6 +21,17 @@ type NotSupportedError struct{}
 func (e NotSupportedError) Type() string  { return "Bosh::Clouds::NotSupported" }
 func (e NotSupportedError) Error() string { return "Not supported" }
 
+type InsufficientPermissionsError struct {
+	message string
+}
+
+func NewInsufficientPermissionsError(message string) InsufficientPermissionsError {
+	return InsufficientPermissionsError{message: message}
+}
+
+func (e InsufficientPermissionsError) Type() string  { return "Bosh::Clouds::InsufficientPermissions" }
+func (e InsufficientPermissionsError) Error() string { return e.message }
+
 type VMNotFoundError struct {
 	vmID string
 }
