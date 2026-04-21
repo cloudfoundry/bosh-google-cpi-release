@@ -234,6 +234,17 @@ var _ = Describe("UpdateDisk", func() {
 				Expect(snapshotService.DeleteCalled).To(BeTrue())
 			})
 
+			It("returns InsufficientPermissionsError and cleans up snapshot when CreateFromSnapshot is denied due to missing permission", func() {
+				diskService.CreateFromSnapshotErr = disk.ErrSnapshotPermissionDenied
+
+				_, err = updateDisk.Run("fake-disk-id", 10240, DiskCloudProperties{DiskType: "hyperdisk-balanced"})
+				Expect(err).To(HaveOccurred())
+				Expect(err).To(BeAssignableToTypeOf(api.InsufficientPermissionsError{}))
+				Expect(err.Error()).To(ContainSubstring("compute.snapshots.useReadOnly"))
+				Expect(snapshotService.DeleteCalled).To(BeTrue())
+				Expect(diskService.DeleteCalled).To(BeFalse())
+			})
+
 			It("returns new disk CID with error if old disk deletion fails", func() {
 				diskService.DeleteErr = errors.New("fake-delete-error")
 
