@@ -1,9 +1,6 @@
 ---
 platform: linux
-image_resource:
-  type: registry-image
-  source:
-    repository: foundationalinfrastructure/gce-cpi-release
+
 inputs:
   - name: bosh-cli
   - name: bosh-cpi-release
@@ -12,12 +9,15 @@ inputs:
   - name: deployment
   - name: infrastructure
   - name: stemcell
+
 outputs:
   - name: director-creds
   - name: director-state
+
 run:
   path: ci/ci/tasks/setup-director.sh
   user: non-root-user
+
 params:
   BOSH_INIT_LOG_LEVEL:            warn
   cpi_source_branch:              replace-me

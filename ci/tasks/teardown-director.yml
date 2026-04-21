@@ -1,9 +1,6 @@
 ---
 platform: linux
-image_resource:
-  type: registry-image
-  source:
-    repository: foundationalinfrastructure/gce-cpi-release
+
 inputs:
   - name: bosh-cli
   - name: ci
@@ -11,8 +8,10 @@ inputs:
   - name: director-creds
   - name: director-state
   - name: infrastructure
+
 run:
   path: ci/ci/tasks/teardown-director.sh
+
 params:
   BOSH_INIT_LOG_LEVEL: warn
   google_json_key_data:           replace-me
