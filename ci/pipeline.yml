@@ -195,6 +195,7 @@ jobs:
     serial_groups: [integration]
     plan:
       - in_parallel:
+        - get: bosh-integration-image
         - get: bosh-google-cpi-release
           trigger: true
           passed: [deploy-ubuntu]
@@ -216,6 +217,7 @@ jobs:
         - get: ci
       - task: prepare-bats-config
         file: ci/ci/tasks/prepare-bats-config.yml
+        image: bosh-integration-image
         params:
           cpi_source_branch:       master
           google_subnetwork_range: "10.0.0.0/24"
@@ -620,6 +622,14 @@ resources:
     type: registry-image
     source:
       repository: ghcr.io/cloudfoundry/bosh/golang-release
+      username: ((github_read_write_packages.username))
+      password: ((github_read_write_packages.password))
+
+  - name: bosh-integration-image
+    type: registry-image
+    source:
+      repository: ghcr.io/cloudfoundry/bosh/integration
+      tag: main
       username: ((github_read_write_packages.username))
       password: ((github_read_write_packages.password))
 
