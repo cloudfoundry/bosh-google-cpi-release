@@ -200,13 +200,56 @@ var _ = Describe("Disk", func() {
 	})
 
 	It("can update a disk by resizing in-place when only size changes", func() {
+		// This test simulates the director flow when enable_cpi_update_disk is true
+		// and only size changes (same type): detach → update_disk → reattach same CID
+
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
 		By("creating a pd-ssd disk")
 		var diskCID string
-		request := fmt.Sprintf(`{
+		request = fmt.Sprintf(`{
 			  "method": "create_disk",
 			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
 			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
+
+		By("attaching the disk to the VM")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		By("detaching the disk (as director does before update_disk)")
+		request = fmt.Sprintf(`{
+			  "method": "detach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
 
 		By("updating with same type but larger size")
 		request = fmt.Sprintf(`{
@@ -216,11 +259,39 @@ var _ = Describe("Disk", func() {
 		result := assertSucceedsWithResult(request).(string)
 		Expect(result).To(Equal(diskCID))
 
-		By("deleting the disk")
+		By("reattaching the same disk after in-place resize")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		By("confirming the disk is attached")
+		request = fmt.Sprintf(`{
+			  "method": "get_disks",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		disks := toStringArray(assertSucceedsWithResult(request).([]interface{}))
+		Expect(disks).To(ContainElement(diskCID))
+
+		By("detaching and deleting the disk")
+		request = fmt.Sprintf(`{
+			  "method": "detach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
 		request = fmt.Sprintf(`{
 			  "method": "delete_disk",
 			  "arguments": ["%v"]
 			}`, diskCID)
+		assertSucceeds(request)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
 		assertSucceeds(request)
 	})
 
@@ -250,15 +321,66 @@ var _ = Describe("Disk", func() {
 	})
 
 	It("can update a disk by changing its type via snapshot", func() {
+		// This test simulates the director flow when enable_cpi_update_disk is true:
+		// create disk → attach to VM → detach → update_disk (type change) → attach new disk → verify
+
+		By("creating a VM")
+		var vmCID string
+		request := fmt.Sprintf(`{
+			  "method": "create_vm",
+			  "arguments": [
+				"agent",
+				"%v",
+				{
+				  "machine_type": "n1-standard-1",
+				  "zone": "%v"
+				},
+				{
+				  "default": {
+					"type": "dynamic",
+					"cloud_properties": {
+					  "tags": ["integration-delete"],
+					  "network_name": "%v"
+					}
+				  }
+				},
+				[],
+				{}
+			  ]
+			}`, existingStemcell, zone, networkName)
+		vmCID = assertSucceedsWithResult(request).(string)
+
 		By("creating a pd-ssd disk")
 		var diskCID string
-		request := fmt.Sprintf(`{
+		request = fmt.Sprintf(`{
 			  "method": "create_disk",
 			  "arguments": [32768, {"type": "pd-ssd", "zone": "%v"}, ""]
 			}`, zone)
 		diskCID = assertSucceedsWithResult(request).(string)
 
-		By("updating to hyperdisk-balanced type")
+		By("attaching the disk to the VM")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		By("confirming the disk is attached")
+		request = fmt.Sprintf(`{
+			  "method": "get_disks",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		disks := toStringArray(assertSucceedsWithResult(request).([]interface{}))
+		Expect(disks).To(ContainElement(diskCID))
+
+		By("detaching the disk (as director does before update_disk when enable_cpi_update_disk is true)")
+		request = fmt.Sprintf(`{
+			  "method": "detach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, diskCID)
+		assertSucceeds(request)
+
+		By("updating to hyperdisk-balanced type (simulates director calling CPI update_disk)")
 		request = fmt.Sprintf(`{
 			  "method": "update_disk",
 			  "arguments": ["%v", 32768, {"type": "hyperdisk-balanced"}]
@@ -282,11 +404,40 @@ var _ = Describe("Disk", func() {
 		found = assertSucceedsWithResult(request).(bool)
 		Expect(found).To(BeFalse())
 
-		By("deleting the new disk")
+		By("attaching the new disk to the VM (as director does after update_disk returns new CID)")
+		request = fmt.Sprintf(`{
+			  "method": "attach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, newDiskCID)
+		assertSucceeds(request)
+
+		By("confirming the new disk is attached")
+		request = fmt.Sprintf(`{
+			  "method": "get_disks",
+			  "arguments": ["%v"]
+			}`, vmCID)
+		disks = toStringArray(assertSucceedsWithResult(request).([]interface{}))
+		Expect(disks).To(ContainElement(newDiskCID))
+		Expect(disks).ToNot(ContainElement(diskCID))
+
+		By("detaching and deleting the new disk")
+		request = fmt.Sprintf(`{
+			  "method": "detach_disk",
+			  "arguments": ["%v", "%v"]
+			}`, vmCID, newDiskCID)
+		assertSucceeds(request)
+
 		request = fmt.Sprintf(`{
 			  "method": "delete_disk",
 			  "arguments": ["%v"]
 			}`, newDiskCID)
+		assertSucceeds(request)
+
+		By("deleting the VM")
+		request = fmt.Sprintf(`{
+			  "method": "delete_vm",
+			  "arguments": ["%v"]
+			}`, vmCID)
 		assertSucceeds(request)
 	})
 
