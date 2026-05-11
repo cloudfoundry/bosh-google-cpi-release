@@ -1,0 +1,33 @@
+name: bosh-google-cpi
+version: 50.1.3
+commit_hash: 8f27da7f
+uncommitted_changes: false
+jobs:
+- name: google_cpi
+  version: 2c62632a7fcaf2609292a4de3555205709a7e076a79975da5312e85e5df8b1d9
+  fingerprint: 2c62632a7fcaf2609292a4de3555205709a7e076a79975da5312e85e5df8b1d9
+  sha1: sha256:a57fc9ab10d7785b8cb8df5d2458d5f28977f6cb162e3cef362349662beb0689
+  packages:
+  - bosh-google-cpi
+packages:
+- name: bosh-google-cpi
+  version: 4cc70a6f433196e23bbfb2a6bb0a73185f6d94e6a49e98e88ae5beca2ce471e6
+  fingerprint: 4cc70a6f433196e23bbfb2a6bb0a73185f6d94e6a49e98e88ae5beca2ce471e6
+  sha1: sha256:a8c6560dd53b4e631339c05acbac15324cbf7347ebfb3702333d3b3fcb41d2a6
+  dependencies:
+  - golang-1-linux
+  - golang-1-darwin
+- name: golang-1-darwin
+  version: 4b02bd1c105f020386fd1579e30fde52cda48e83670c348e8b89efab218f51af
+  fingerprint: 4b02bd1c105f020386fd1579e30fde52cda48e83670c348e8b89efab218f51af
+  sha1: sha256:d10aa1c600c396ff3cc646e539b9a67a117c5dc414aa604e8cae67e95f631904
+  dependencies: []
+- name: golang-1-linux
+  version: 13cae133eddfb84c2b42976ae01abbac89ab1f092697457046e596037adc6ff5
+  fingerprint: 13cae133eddfb84c2b42976ae01abbac89ab1f092697457046e596037adc6ff5
+  sha1: sha256:e0e73720d1d0e027ceed131efc15c43622291a684913d64cbd9f114e4836706d
+  dependencies: []
+license:
+  version: 341c961e5e930facdf95269bfaf14dfd465417bfd912a669c8c1d3e17b6c931c
+  fingerprint: 341c961e5e930facdf95269bfaf14dfd465417bfd912a669c8c1d3e17b6c931c
+  sha1: sha256:65b45344e017a29b060899cebce66db142ab16f721ec446d6b134658eaf6a0d7
