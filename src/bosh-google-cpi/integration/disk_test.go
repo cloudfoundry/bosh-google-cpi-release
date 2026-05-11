@@ -380,10 +380,10 @@ var _ = Describe("Disk", func() {
 			}`, vmCID, diskCID)
 		assertSucceeds(request)
 
-		By("updating to hyperdisk-balanced type (simulates director calling CPI update_disk)")
+		By("updating to pd-balanced type (simulates director calling CPI update_disk)")
 		request = fmt.Sprintf(`{
 			  "method": "update_disk",
-			  "arguments": ["%v", 32768, {"type": "hyperdisk-balanced"}]
+			  "arguments": ["%v", 32768, {"type": "pd-balanced"}]
 			}`, diskCID)
 		newDiskCID := assertSucceedsWithResult(request).(string)
 		Expect(newDiskCID).ToNot(Equal(diskCID))
