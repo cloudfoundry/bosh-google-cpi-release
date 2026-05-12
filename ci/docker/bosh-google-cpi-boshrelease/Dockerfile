@@ -3,7 +3,7 @@ FROM ubuntu
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-ENV BOSH_CLI_VERSION=7.8.0
+ENV BOSH_CLI_VERSION=7.10.5
 
 # Update base image
 RUN apt-get update -y \
