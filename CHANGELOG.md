@@ -223,6 +223,7 @@ CI:
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[50.1.3]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v50.1.2...v50.1.3
 [30.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v29.0.1...v30.0.0
 [29.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.1...v29.0.0
 [28.0.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.0...v28.0.1
