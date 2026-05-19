@@ -3,7 +3,7 @@ FROM ubuntu
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-ENV BOSH_CLI_VERSION=7.8.0
+ENV BOSH_CLI_VERSION=7.10.5
 
 # Update base image
 RUN apt-get update -y \
@@ -15,10 +15,10 @@ RUN apt-get update -y \
       locales \
     && localedef -i en_US -f UTF-8 en_US.UTF-8 \
     && export GCLOUD_KEYFILE="/usr/share/keyrings/cloud.google.gpg" \
-    && echo "deb [signed-by=${GCLOUD_KEYFILE}] https://packages.cloud.google.com/apt cloud-sdk main" \
-     | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-     | apt-key --keyring "${GCLOUD_KEYFILE}" add - \
+      | gpg --dearmor -o "${GCLOUD_KEYFILE}" \
+    && echo "deb [signed-by=${GCLOUD_KEYFILE}] https://packages.cloud.google.com/apt cloud-sdk main" \
+      | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
         build-essential \
