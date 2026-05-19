@@ -2,6 +2,17 @@
 All releases of the BOSH CPI for Google Cloud Platform will be documented in
 this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [50.1.3] - 2026-05-11
+
+### Added
+- Native disk update via `update_disk` action: supports in-place resize and disk type migration via snapshot (e.g., `pd-ssd` → `hyperdisk-balanced`). Requires Director `enable_cpi_update_disk: true` and `compute.snapshots.useReadOnly` permission on the service account (see `docs/bosh-director-role.yml`).
+
+### Fixed
+- CVE-2026-33186: gRPC authorization bypass due to improper HTTP/2 path validation
+
+### Changed
+- Go 1.26.3
+
 ## [30.0.0] - 2019-01-04
 
 ### Added
@@ -212,6 +223,7 @@ CI:
 ### Fixed
 - Integration tests will use the CI pipeline stemcell rather than requiring an existing stemcell in a project
 
+[50.1.3]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v50.1.2...v50.1.3
 [30.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v29.0.1...v30.0.0
 [29.0.0]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.1...v29.0.0
 [28.0.1]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/compare/v28.0.0...v28.0.1
