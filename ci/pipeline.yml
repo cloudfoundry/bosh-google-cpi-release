@@ -331,9 +331,26 @@ jobs:
         - get: bosh-golang-release-image
         - get: weekly
           trigger: true
-      - put: google-cpi-image
+      - task: build-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+          inputs:
+            - name: bosh-google-cpi-release
+          outputs:
+            - name: image
+          params:
+            CONTEXT: bosh-google-cpi-release/ci/docker/bosh-google-cpi-boshrelease
+            DOCKERFILE: bosh-google-cpi-release/ci/docker/bosh-google-cpi-boshrelease/Dockerfile
+          run:
+            path: build
+      - put: google-cpi-registry-image
         params:
-          build: "bosh-google-cpi-release/ci/docker/bosh-google-cpi-boshrelease"
+          image: image/image.tar
         get_params:
           skip_download: true
 
@@ -554,13 +571,7 @@ resources:
     type: registry-image
     source:
       repository: foundationalinfrastructure/gce-cpi-release
-      username: ((dockerhub_username))
-      password: ((dockerhub_password))
-
-  - name: google-cpi-image
-    type: docker-image
-    source:
-      repository: foundationalinfrastructure/gce-cpi-release
+      tag: latest
       username: ((dockerhub_username))
       password: ((dockerhub_password))
 
