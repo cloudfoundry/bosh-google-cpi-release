@@ -25,6 +25,11 @@ echo "DIAG: ls -la \$HOME"; ls -la "$HOME" 2>&1 || true
 echo "DIAG: stat \$HOME"; stat "$HOME" 2>&1 || true
 echo "DIAG: writable check: $([ -w "$HOME" ] && echo yes || echo no)"
 echo "DIAG: mountinfo home/non-root:"; grep -E "home|non-root" /proc/self/mountinfo 2>&1 || echo "(none)"
+echo "DIAG: passwd entry: $(getent passwd non-root-user 2>&1)"
+echo "DIAG: passwd ubuntu (should be missing): $(getent passwd ubuntu 2>&1 || echo MISSING)"
+echo "DIAG: files owned by uid 1000:"; find / -maxdepth 3 -uid 1000 2>/dev/null | head -5 || true
+echo "DIAG: files owned by uid 1001:"; find / -maxdepth 3 -uid 1001 2>/dev/null | head -5 || true
+echo "DIAG: files owned by uid 1002:"; find / -maxdepth 3 -uid 1002 2>/dev/null | head -5 || true
 mkdir -p $HOME/.config/gcloud/
 echo "${google_json_key_data}" > ${google_json_key}
 
