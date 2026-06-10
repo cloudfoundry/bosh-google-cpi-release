@@ -19,6 +19,12 @@ deployment_dir="${PWD}/deployment"
 google_json_key=$HOME/.config/gcloud/application_default_credentials.json
 
 echo "Creating google json key..."
+echo "DIAG: whoami=$(whoami) id=$(id) HOME=$HOME pwd=$(pwd)"
+echo "DIAG: ls -la /home/"; ls -la /home/ 2>&1 || true
+echo "DIAG: ls -la \$HOME"; ls -la "$HOME" 2>&1 || true
+echo "DIAG: stat \$HOME"; stat "$HOME" 2>&1 || true
+echo "DIAG: writable check: $([ -w "$HOME" ] && echo yes || echo no)"
+echo "DIAG: mountinfo home/non-root:"; grep -E "home|non-root" /proc/self/mountinfo 2>&1 || echo "(none)"
 mkdir -p $HOME/.config/gcloud/
 echo "${google_json_key_data}" > ${google_json_key}
 
