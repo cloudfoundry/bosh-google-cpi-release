@@ -124,6 +124,7 @@ jobs:
           stemcell_name:           bosh-google-kvm-ubuntu-noble
       - task: run-bats
         file: bats/ci/tasks/run-bats.yml
+        image: bosh-integration-image
       - put: sole-tenancy-infrastructure
         params:
           env_name: master-bosh-google-cpi-sole-tenancy
