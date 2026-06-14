@@ -48,6 +48,8 @@ RUN bosh_bin_path="/usr/bin/bosh" \
       > "${bosh_bin_path}" \
     && chmod +x "${bosh_bin_path}"
 
-RUN useradd non-root-user --shell /bin/bash --create-home \
+RUN usermod -l non-root-user -d /home/non-root-user -m ubuntu \
+    && groupmod -n non-root-user ubuntu \
+    && chsh -s /bin/bash non-root-user \
     && echo "non-root-user ALL=(ALL) NOPASSWD: ALL" \
       >> /etc/sudoers
