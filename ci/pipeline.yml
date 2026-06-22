@@ -63,6 +63,7 @@ jobs:
   - name: deploy-ubuntu-and-run-tests
     serial_groups: [integration]
     plan:
+      - get: google-cpi-registry-image
       - in_parallel:
         - get: bosh-google-cpi-release
           trigger: true
@@ -82,7 +83,6 @@ jobs:
         - get: bosh-deployment
         - get: ci
         - get: bosh-shared-ci
-        - get: google-cpi-registry-image
         - get: bosh-cli-registry-image
         - get: bosh-integration-image
         - get: bats
