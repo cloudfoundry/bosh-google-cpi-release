@@ -125,6 +125,8 @@ builds:
     version: 46.0.2
   86efc082-c773-4c1a-a718-489e5bf12bab:
     version: 25.3.0
+  88b6ea3a-87fb-4aa9-5b11-ea413fc7df91:
+    version: 50.1.5
   8cb52764-1f14-4b91-abcc-83aa44b94dd5:
     version: 25.9.0
   8f15d444-410e-4d38-973f-60bdba28faff:
