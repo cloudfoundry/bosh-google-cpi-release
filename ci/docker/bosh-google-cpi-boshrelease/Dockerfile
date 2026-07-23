@@ -48,6 +48,6 @@ RUN bosh_bin_path="/usr/bin/bosh" \
       > "${bosh_bin_path}" \
     && chmod +x "${bosh_bin_path}"
 
-RUN useradd non-root-user --shell /bin/bash --create-home \
+RUN useradd non-root-user --uid 2000 --shell /bin/bash --create-home \
     && echo "non-root-user ALL=(ALL) NOPASSWD: ALL" \
       >> /etc/sudoers
