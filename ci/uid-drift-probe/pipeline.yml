@@ -1,0 +1,104 @@
+---
+# uid-drift bisection pipeline.
+#
+# Goal: find WHERE uid 1001 (non-root-user home) drifts, by contrasting the two
+# ways Concourse feeds an image to a task, and by re-running to watch it compound.
+#
+#   build-probe     oci-build-task builds the probe image, pushes to registry
+#   stat-inline     runs probe.sh via image_resource: (inline fetch)   <- #404 control (expected CLEAN)
+#   stat-via-get    runs probe.sh via image: <get resource> (volume)   <- suspected drift path
+#   stat-via-get-x3 same as above but pins nothing; re-trigger repeatedly to watch drift climb
+#
+# Fill in ((probe_image_repository)) etc. via a vars file or `fly set-pipeline -v`.
+
+groups:
+  - name: uid-drift
+    jobs:
+      - build-probe
+      - stat-inline
+      - stat-via-get
+
+resources:
+  - name: probe-src
+    type: git
+    source:
+      uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
+      branch: ((probe_branch))
+      private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
+      paths:
+        - ci/uid-drift-probe/*
+
+  - name: probe-image
+    type: registry-image
+    source:
+      repository: ((probe_image_repository))
+      tag: uid-drift-probe
+      username: ((dockerhub_username))
+      password: ((dockerhub_password))
+
+jobs:
+  - name: build-probe
+    serial: true
+    plan:
+      - get: probe-src
+        trigger: true
+      - task: build-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+          inputs:
+            - name: probe-src
+          outputs:
+            - name: image
+          params:
+            CONTEXT: probe-src/ci/uid-drift-probe
+            DOCKERFILE: probe-src/ci/uid-drift-probe/Dockerfile
+          run:
+            path: build
+      - put: probe-image
+        params:
+          image: image/image.tar
+        get_params:
+          skip_download: true
+
+  # CONTROL: inline image fetch. Per #404 this path does NOT drift.
+  - name: stat-inline
+    serial: true
+    plan:
+      - get: probe-src
+      - get: probe-image
+        trigger: true
+        passed: [build-probe]
+        params:
+          skip_download: true   # force inline fetch below, not the volume
+      - task: probe
+        image_resource:
+          type: registry-image
+          source:
+            repository: ((probe_image_repository))
+            tag: uid-drift-probe
+            username: ((dockerhub_username))
+            password: ((dockerhub_password))
+        config:
+          platform: linux
+          run:
+            path: /probe.sh
+
+  # SUSPECT: volume-mounted image from a get step (image: <resource>).
+  # Re-trigger this job repeatedly and watch DRIFT: delta climb 0 -> 1 -> 2 ...
+  - name: stat-via-get
+    serial: true
+    plan:
+      - get: probe-image
+        trigger: true
+        passed: [build-probe]
+      - task: probe
+        image: probe-image
+        config:
+          platform: linux
+          run:
+            path: /probe.sh
