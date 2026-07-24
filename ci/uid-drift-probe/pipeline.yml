@@ -76,15 +76,15 @@ jobs:
         params:
           skip_download: true   # force inline fetch below, not the volume
       - task: probe
-        image_resource:
-          type: registry-image
-          source:
-            repository: ((probe_image_repository))
-            tag: uid-drift-probe
-            username: ((dockerhub_username))
-            password: ((dockerhub_password))
         config:
           platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: ((probe_image_repository))
+              tag: uid-drift-probe
+              username: ((dockerhub_username))
+              password: ((dockerhub_password))
           run:
             path: /probe.sh
 
