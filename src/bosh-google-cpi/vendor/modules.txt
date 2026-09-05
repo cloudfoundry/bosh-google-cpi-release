@@ -28,7 +28,7 @@ github.com/bmatcuk/doublestar
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cloudfoundry/bosh-utils v0.0.645
+# github.com/cloudfoundry/bosh-utils v0.0.647
 ## explicit; go 1.25.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -93,7 +93,7 @@ github.com/google/uuid
 ## explicit; go 1.25.0
 github.com/googleapis/enterprise-certificate-proxy/client
 github.com/googleapis/enterprise-certificate-proxy/client/util
-# github.com/googleapis/gax-go/v2 v2.24.0
+# github.com/googleapis/gax-go/v2 v2.24.1
 ## explicit; go 1.25.0
 github.com/googleapis/gax-go/v2
 github.com/googleapis/gax-go/v2/apierror
@@ -283,7 +283,7 @@ golang.org/x/tools/internal/pkgbits
 golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/api v0.295.0
+# google.golang.org/api v0.296.0
 ## explicit; go 1.25.0
 google.golang.org/api/cloudresourcemanager/v1
 google.golang.org/api/compute/v0.beta
@@ -301,7 +301,7 @@ google.golang.org/api/option
 google.golang.org/api/option/internaloption
 google.golang.org/api/storage/v1
 google.golang.org/api/transport/http
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20260825221802-da73d73af1c5
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20260904194346-d0f1323225a4
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
