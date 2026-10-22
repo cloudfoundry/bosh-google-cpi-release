@@ -6,7 +6,7 @@ build:
 
 # Build cross-platform binaries (linux and darwin, matching the BOSH packaging script)
 build-all:
-	for os in linux darwin; do \
+	set -e; for os in linux darwin; do \
 	  GOOS=$$os GOARCH=amd64 go build -mod=vendor \
 	    -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" \
 	    -o out/cpi_$${os}_amd64 bosh-google-cpi/main; \
