@@ -53,9 +53,6 @@ github.com/go-logr/stdr
 # github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572
 ## explicit; go 1.13
 github.com/go-task/slim-sprig
-# github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
-## explicit
-github.com/golang/lint/golint
 # github.com/google/go-cmp v0.7.0
 ## explicit; go 1.21
 github.com/google/go-cmp/cmp
@@ -104,12 +101,6 @@ github.com/googleapis/gax-go/v2/internallog
 github.com/googleapis/gax-go/v2/internallog/internal
 # github.com/kr/text v0.2.0
 ## explicit
-# github.com/mitchellh/gox v0.4.0
-## explicit
-github.com/mitchellh/gox
-# github.com/mitchellh/iochan v1.0.0
-## explicit
-github.com/mitchellh/iochan
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
@@ -219,9 +210,6 @@ golang.org/x/crypto/cryptobyte/asn1
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
-# golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
-## explicit; go 1.11
-golang.org/x/lint
 # golang.org/x/net v0.61.0
 ## explicit; go 1.26.0
 golang.org/x/net/html
@@ -277,13 +265,8 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/tools v0.51.0
 ## explicit; go 1.26.0
-golang.org/x/tools/go/ast/astutil
 golang.org/x/tools/go/ast/edge
 golang.org/x/tools/go/ast/inspector
-golang.org/x/tools/go/gcexportdata
-golang.org/x/tools/go/types/objectpath
-golang.org/x/tools/internal/gcimporter
-golang.org/x/tools/internal/pkgbits
 # google.golang.org/api v0.304.0
 ## explicit; go 1.26.0
 google.golang.org/api/cloudresourcemanager/v1

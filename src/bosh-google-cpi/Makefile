@@ -4,20 +4,18 @@ default: test
 build:
 	go build -mod=vendor -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" -o out/cpi bosh-google-cpi/main
 
-# Build cross-platform binaries
+# Build cross-platform binaries (linux and darwin, matching the BOSH packaging script)
 build-all:
-	./.bin/gox -output="out/cpi_{{.OS}}_{{.Arch}}" -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" bosh-google-cpi/main
+	for os in linux darwin; do \
+	  GOOS=$$os GOARCH=amd64 go build -mod=vendor \
+	    -ldflags="-X bosh-google-cpi/google/config.cpiRelease=`cat release 2>/dev/null`" \
+	    -o out/cpi_$${os}_amd64 bosh-google-cpi/main; \
+	done
 
 # Prepration for tests
 get-deps:
 
 	test -d .bin || mkdir .bin
-
-	# Go lint tool
-	GOBIN=$$PWD/.bin go install -mod=vendor github.com/golang/lint/golint
-
-	# Simplify cross-compiling
-	GOBIN=$$PWD/.bin go install -mod=vendor github.com/mitchellh/gox
 
 	# Ginkgo test runner
 	GOBIN=$$PWD/.bin go install -mod=vendor github.com/onsi/ginkgo/ginkgo
@@ -36,9 +34,9 @@ clean:
 fmt:
 	find . -name '*.go' -not -path './vendor/*' -not -path './.bin/*' -exec gofmt -l -w {} \;
 
-# Run linter with non-strict checking
+# Run linter
 lint:
-	ls -d */ | xargs -L 1 ./.bin/golint
+	go vet -mod=vendor ./...
 
 # Vet code
 vet:
