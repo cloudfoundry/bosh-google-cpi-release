@@ -117,7 +117,7 @@ func (i GoogleInstanceService) Create(vmProps *Properties, networks Networks, re
 		MinCpuPlatform:    "",
 	}
 
-	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance with params: %v", vm)
+	i.logger.Debug(googleInstanceServiceLogTag, "Creating Google Instance %q in zone %q", vm.Name, vmProps.Zone)
 	operation, err := i.computeService.Instances.Insert(i.project, util.ResourceSplitter(vmProps.Zone), vm).Do()
 	if err != nil {
 		i.logger.Debug(googleInstanceServiceLogTag, "Failed to create Google Instance: %v", err)

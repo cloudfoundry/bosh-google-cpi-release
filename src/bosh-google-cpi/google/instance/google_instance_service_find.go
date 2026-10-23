@@ -1,6 +1,7 @@
 package instance
 
 import (
+	"context"
 	"fmt"
 
 	bosherr "github.com/cloudfoundry/bosh-utils/errors"
@@ -14,19 +15,28 @@ import (
 func (i GoogleInstanceService) Find(id string, zone string) (*compute.Instance, bool, error) {
 	if zone == "" {
 		i.logger.Debug(googleInstanceServiceLogTag, "Finding Google Instance '%s'", id)
-		filter := fmt.Sprintf("name eq .*%s", id)
-		instances, err := i.computeService.Instances.AggregatedList(i.project).Filter(filter).Do()
+		filter := fmt.Sprintf("name = %q", id)
+		var found *compute.Instance
+		err := i.computeService.Instances.AggregatedList(i.project).Filter(filter).Pages(context.Background(), func(page *compute.InstanceAggregatedList) error {
+			for _, items := range page.Items {
+				for _, instance := range items.Instances {
+					if instance.Name != id {
+						continue
+					}
+					if found != nil {
+						return fmt.Errorf("instance %q is ambiguous across zones", id)
+					}
+					found = instance
+				}
+			}
+			return nil
+		})
 		if err != nil {
 			return &compute.Instance{}, false, bosherr.WrapErrorf(err, "Failed to find Google Instance '%s'", id)
 		}
-
-		for _, instanceItems := range instances.Items {
-			for _, instance := range instanceItems.Instances {
-				// Return the first instance (it can only be 1 instance with the same name across all zones)
-				return instance, true, nil
-			}
+		if found != nil {
+			return found, true, nil
 		}
-
 		return &compute.Instance{}, false, nil
 	}
 
@@ -46,19 +56,28 @@ func (i GoogleInstanceService) Find(id string, zone string) (*compute.Instance, 
 func (i GoogleInstanceService) FindBeta(id string, zone string) (*computebeta.Instance, bool, error) {
 	if zone == "" {
 		i.logger.Debug(googleInstanceServiceLogTag, "Finding Google Instance '%s'", id)
-		filter := fmt.Sprintf("name eq .*%s", id)
-		instances, err := i.computeServiceB.Instances.AggregatedList(i.project).Filter(filter).Do()
+		filter := fmt.Sprintf("name = %q", id)
+		var found *computebeta.Instance
+		err := i.computeServiceB.Instances.AggregatedList(i.project).Filter(filter).Pages(context.Background(), func(page *computebeta.InstanceAggregatedList) error {
+			for _, items := range page.Items {
+				for _, instance := range items.Instances {
+					if instance.Name != id {
+						continue
+					}
+					if found != nil {
+						return fmt.Errorf("instance %q is ambiguous across zones", id)
+					}
+					found = instance
+				}
+			}
+			return nil
+		})
 		if err != nil {
 			return &computebeta.Instance{}, false, bosherr.WrapErrorf(err, "Failed to find Google Instance '%s'", id)
 		}
-
-		for _, instanceItems := range instances.Items {
-			for _, instance := range instanceItems.Instances {
-				// Return the first instance (it can only be 1 instance with the same name across all zones)
-				return instance, true, nil
-			}
+		if found != nil {
+			return found, true, nil
 		}
-
 		return &computebeta.Instance{}, false, nil
 	}
 

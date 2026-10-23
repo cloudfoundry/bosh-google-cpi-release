@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -12,7 +13,6 @@ import (
 
 	"bosh-google-cpi/google/client"
 	opsvc "bosh-google-cpi/google/operation"
-	"bosh-google-cpi/redactor"
 	"bosh-google-cpi/util"
 )
 
@@ -24,11 +24,16 @@ const (
 	opReadyStatus        = "DONE"
 )
 
+type metadataGoogleClient interface {
+	ComputeService() *compute.Service
+	Project() string
+}
+
 // MetadataClient represents a GCE metadata client.
 type MetadataClient struct {
 	options      ClientOptions
 	logger       boshlog.Logger
-	googleClient client.GoogleClient
+	googleClient metadataGoogleClient
 }
 
 // NewMetadataClient creates a new GCE metadata client.
@@ -49,26 +54,12 @@ type instanceMetadata struct {
 	zone        string
 }
 
-func (i *instanceMetadata) withRedactedItems() *instanceMetadata {
-	redactedMetadata := &instanceMetadata{
-		fingerprint: i.fingerprint,
-		zone:        i.zone,
-	}
-
-	redactedMetadata.items = make(map[string]string)
-	for k, v := range i.items {
-		redactedMetadata.items[k] = redactor.RedactSecrets(v)
-	}
-
-	return redactedMetadata
-}
-
 func (i *instanceMetadata) computeMetadata() *compute.Metadata {
 	metadata := &compute.Metadata{
 		Fingerprint: i.fingerprint,
 	}
 
-	metadata.Items = make([]*compute.MetadataItems, len(i.items))
+	metadata.Items = make([]*compute.MetadataItems, 0, len(i.items))
 	for k := range i.items {
 		v := i.items[k]
 		metadata.Items = append(metadata.Items, &compute.MetadataItems{Key: k, Value: &v})
@@ -93,11 +84,11 @@ func (c MetadataClient) Fetch(instanceID string) (AgentSettings, error) {
 	var settings string
 	var ok bool
 	if settings, ok = metadata.items[c.options.GCEMetadataKey]; !ok {
-		return AgentSettings{}, bosherr.WrapError(err, fmt.Sprintf("Retrieving settings from instance metadata for instance %q, key: %q, metadata: %#v", instanceID, c.options.GCEMetadataKey, metadata.items))
+		return AgentSettings{}, bosherr.Errorf("Retrieving settings from instance metadata for instance %q: missing key %q", instanceID, c.options.GCEMetadataKey)
 	}
 	var agentSettings AgentSettings
 	if err = json.Unmarshal([]byte(settings), &agentSettings); err != nil {
-		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from instance metadata key %q, contents: %v", c.options.GCEMetadataKey, settings)
+		return AgentSettings{}, bosherr.WrapErrorf(err, "Unmarshalling agent settings response from instance metadata key %q", c.options.GCEMetadataKey)
 	}
 	return agentSettings, nil
 
@@ -107,9 +98,9 @@ func (c MetadataClient) Fetch(instanceID string) (AgentSettings, error) {
 func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) error {
 	settingsJSON, err := json.Marshal(agentSettings)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Marshalling agent settings, contents: %#v", agentSettings)
+		return bosherr.WrapErrorf(err, "Marshalling agent settings")
 	}
-	c.logger.Debug(metadataClientLogTag, "Updating instance metadata for %q with agent settings %q", instanceID, redactor.RedactSecrets(string(settingsJSON)))
+	c.logger.Debug(metadataClientLogTag, "Updating instance metadata for %q", instanceID)
 
 	currentMetadata, err := c.metadata(instanceID)
 	if err != nil {
@@ -117,44 +108,52 @@ func (c MetadataClient) Update(instanceID string, agentSettings AgentSettings) e
 	}
 	currentMetadata.items[c.options.GCEMetadataKey] = string(settingsJSON)
 
-	c.logger.Debug(metadataClientLogTag, "Updating instance metadata to: %#v", currentMetadata.computeMetadata())
 	op, err := c.googleClient.ComputeService().Instances.SetMetadata(c.googleClient.Project(), currentMetadata.zone, instanceID, currentMetadata.computeMetadata()).Do()
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
+		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call")
 	}
 	_, err = c.wait(op)
 	if err != nil {
-		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call: %v, metadata value: %#v", err, currentMetadata.computeMetadata())
+		return bosherr.WrapErrorf(err, "Updating instance metadata with SetMetadata call")
 	}
 	return nil
 }
 
 func (c MetadataClient) metadata(instanceID string) (instanceMetadata, error) {
 	svc := c.googleClient.ComputeService().Instances
-	listCall := svc.AggregatedList(c.googleClient.Project())
-	listCall.Filter(fmt.Sprintf("name eq %v", instanceID))
-	aggregatedList, err := listCall.Do()
-	c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Searching for instance %q", instanceID))
+	listCall := svc.AggregatedList(c.googleClient.Project()).Filter(fmt.Sprintf("name = %q", instanceID))
+	var found *compute.Instance
+	err := listCall.Pages(context.Background(), func(page *compute.InstanceAggregatedList) error {
+		for _, list := range page.Items {
+			for _, instance := range list.Instances {
+				if instance.Name != instanceID {
+					continue
+				}
+				if found != nil {
+					return fmt.Errorf("instance %q is ambiguous across zones", instanceID)
+				}
+				found = instance
+			}
+		}
+		return nil
+	})
 	if err != nil {
-		return instanceMetadata{}, bosherr.WrapError(err, fmt.Sprintf("Listing instances to find instance %q", instanceID))
+		return instanceMetadata{}, bosherr.WrapErrorf(err, "Listing instances to find instance %q", instanceID)
 	}
-
-	// Find single instance in list
-	for _, list := range aggregatedList.Items {
-		if len(list.Instances) == 1 {
-			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Found instance %q in zone %q", instanceID, list.Instances[0].Zone))
-			var metadata instanceMetadata
-			metadata.fingerprint = list.Instances[0].Metadata.Fingerprint
-			metadata.zone = util.ResourceSplitter(list.Instances[0].Zone)
-			metadata.items = make(map[string]string)
-			for _, item := range list.Instances[0].Metadata.Items {
+	if found == nil {
+		return instanceMetadata{}, bosherr.Errorf("Could not find instance %q", instanceID)
+	}
+	metadata := instanceMetadata{zone: util.ResourceSplitter(found.Zone), items: make(map[string]string)}
+	if found.Metadata != nil {
+		metadata.fingerprint = found.Metadata.Fingerprint
+		for _, item := range found.Metadata.Items {
+			if item != nil && item.Value != nil {
 				metadata.items[item.Key] = *item.Value
 			}
-			c.logger.Debug(metadataClientLogTag, fmt.Sprintf("Got metadata for instance %q: %#v", instanceID, metadata.withRedactedItems()))
-			return metadata, nil
 		}
 	}
-	return instanceMetadata{}, bosherr.WrapError(err, fmt.Sprintf("Could not find find instance %q", instanceID))
+	c.logger.Debug(metadataClientLogTag, "Got metadata for instance %q in zone %q", instanceID, metadata.zone)
+	return metadata, nil
 }
 
 func (c MetadataClient) wait(operation *compute.Operation) (*compute.Operation, error) {
