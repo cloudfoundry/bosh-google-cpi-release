@@ -8,6 +8,9 @@ on:
     paths:
     - 'src/bosh-google-cpi/**'
     - '.github/**'
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
     - uses: actions/setup-go@v7
       with:
         go-version-file: src/bosh-google-cpi/go.mod
-    - uses: golangci/golangci-lint-action@v9
+    - uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9
       with:
         working-directory: src/bosh-google-cpi/
   test-unit:
