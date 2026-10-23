@@ -40,7 +40,8 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	// Create a temporary bucket
 	imageName := fmt.Sprintf("%s-%s", googleImageNamePrefix, uuidStr)
 	bucket := &storage.Bucket{
-		Name: imageName,
+		Name:             imageName,
+		IamConfiguration: &storage.BucketIamConfiguration{PublicAccessPrevention: "enforced"},
 	}
 
 	i.logger.Debug(googleImageServiceLogTag, "Creating Google Storage Bucket with params: %#v", bucket)
@@ -52,19 +53,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	// Upload the image file to the previously created bucket
 	objectName := fmt.Sprintf("%s.tar.gz", imageName)
 
-	var objectAccessControl []*storage.ObjectAccessControl
-	objectAcl := &storage.ObjectAccessControl{
-		Bucket: imageName,
-		Entity: "allUsers",
-		Object: objectName,
-		Role:   "READER",
-	}
-	objectAccessControl = append(objectAccessControl, objectAcl)
-
-	object := &storage.Object{
-		Name: objectName,
-		Acl:  objectAccessControl,
-	}
+	object := &storage.Object{Name: objectName}
 
 	imageFile, err := os.Open(imagePath)
 	if err != nil {
@@ -73,7 +62,7 @@ func (i GoogleImageService) CreateFromTarball(imagePath string, description stri
 	defer imageFile.Close() //nolint:errcheck
 
 	i.logger.Debug(googleImageServiceLogTag, "Creating Google Storage Object with params: %#v", object)
-	imageObject, err := i.storageService.Objects.Insert(imageName, object).Media(imageFile).Do()
+	imageObject, err := i.storageService.Objects.Insert(imageName, object).PredefinedAcl("private").Media(imageFile).Do()
 	if err != nil {
 		return "", bosherr.WrapErrorf(err, "Creating Google Storage Object")
 	}
