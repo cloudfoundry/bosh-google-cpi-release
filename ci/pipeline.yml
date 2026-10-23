@@ -512,6 +512,7 @@ resources:
         google_subnetwork_range:  "10.0.0.0/24"
         google_firewall_internal: google-cpi-ci-firewall-internal
         google_firewall_external: google-cpi-ci-firewall-external
+        google_external_access_cidrs: ((google_ci_worker_egress_cidrs))
         prefix:                   master
 
   - name: sole-tenancy-infrastructure

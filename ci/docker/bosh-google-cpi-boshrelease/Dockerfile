@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
 ENV BOSH_CLI_VERSION=7.10.5
+ENV BOSH_CLI_SHA256=e9847375ba5397589e7b070305defc70321ad0e62d18b67a70a330efcab6e526
 
 # Update base image
 RUN apt-get update -y \
@@ -46,6 +47,7 @@ ENV GOROOT=/usr/local/go PATH=/usr/local/go/bin:$PATH
 RUN bosh_bin_path="/usr/bin/bosh" \
     && curl -fsSL https://github.com/cloudfoundry/bosh-cli/releases/download/v${BOSH_CLI_VERSION}/bosh-cli-${BOSH_CLI_VERSION}-linux-amd64 \
       > "${bosh_bin_path}" \
+    && printf '%s  %s\n' "${BOSH_CLI_SHA256}" "${bosh_bin_path}" | sha256sum -c - \
     && chmod +x "${bosh_bin_path}"
 
 RUN useradd non-root-user --shell /bin/bash --create-home \

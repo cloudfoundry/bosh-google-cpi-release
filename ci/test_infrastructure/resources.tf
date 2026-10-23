@@ -75,7 +75,7 @@ resource "google_compute_firewall" "external" {
   name        = "${var.prefix}-ext"
   description = "BOSH CI External Traffic"
   network     = google_compute_network.manual.self_link
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = var.google_external_access_cidrs
   target_tags = [var.google_firewall_external]
 
   allow {
