@@ -28,7 +28,7 @@ github.com/bmatcuk/doublestar
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cloudfoundry/bosh-utils v0.0.666
+# github.com/cloudfoundry/bosh-utils v0.0.667
 ## explicit; go 1.26.0
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
