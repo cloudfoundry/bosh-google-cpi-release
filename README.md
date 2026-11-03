@@ -26,8 +26,8 @@ gcloud iam roles --project <project-id> create bosh.director \
 ### Deploy other software
 After you have followed the instructions for deploying a BOSH director in [docs/bosh/README.md](docs/bosh/README.md), you may deploy releases like Cloud Foundry or Concourse by following the links below:
 
-* [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/cloudfoundry)
-* [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/master/docs/concourse)
+* [Deploying Cloud Foundry on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/main/docs/cloudfoundry)
+* [Deploying Concourse on Google Compute Engine](https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/blob/main/docs/concourse)
 
 ## Developing
 Contributions to the CPI are welcome. Unit and integration tests for any new features are encouraged.

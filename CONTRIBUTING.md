@@ -20,7 +20,7 @@ You can add a feature or bug-fix via pull request.
 
 1. Implement your feature or bug fix
 1. Commit and push your changes
-1. Submit a pull request to the `develop` branch of the [bosh-google-cpi-release] repository. PRs to the master branch are not accepted.
+1. Submit a pull request to the `develop` branch of the [bosh-google-cpi-release] repository. PRs to the main branch are not accepted.
 1. Unit tests and a BOSH release are created for each PR. You should see the status of your PR change to "pending" within a few minutes of submitting it, and then to "passed" or "failed" within 10 minutes.
 
 [bosh-google-cpi-release]: https://github.com/cloudfoundry-incubator/bosh-google-cpi-release/

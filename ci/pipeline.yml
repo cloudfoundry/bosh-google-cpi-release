@@ -429,7 +429,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
-      branch: master
+      branch: main
       private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
 
   - name: ci
@@ -438,7 +438,7 @@ resources:
       paths:
         - ci/*
       uri: git@github.com:cloudfoundry/bosh-google-cpi-release.git
-      branch: master
+      branch: main
       private_key: ((github_deploy_key_bosh-google-cpi-release.private_key))
 
   - name: bosh-shared-ci
