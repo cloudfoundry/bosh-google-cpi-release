@@ -18,6 +18,7 @@ resource "google_compute_address" "director_internal" {
   name         = "${var.prefix}-dir-internal"
   address_type = "INTERNAL"
   subnetwork   = google_compute_subnetwork.subnetwork.self_link
+  address      = cidrhost(var.google_subnetwork_range, 6)
 }
 
 resource "google_compute_address" "bats" {
@@ -33,6 +34,7 @@ resource "google_compute_address" "int_internal" {
   name         = "${var.prefix}-int-internal-${count.index}"
   address_type = "INTERNAL"
   subnetwork   = google_compute_subnetwork.subnetwork.self_link
+  address      = cidrhost(var.google_subnetwork_range, 7 + count.index)
 }
 
 resource "google_compute_network" "auto" {
