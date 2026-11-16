@@ -3,6 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -271,7 +272,13 @@ var _ = Describe("VM", func() {
 				{}
 			  ]
 			}`, existingStemcell, zone, networkName)
-		vmCID = assertSucceedsWithResult(request).(string)
+		response, err := execCPI(request)
+		Expect(err).ToNot(HaveOccurred())
+		if response.Error != nil && response.Error.CanRetry && strings.Contains(response.Error.Message, "STOCKOUT") {
+			Skip("skipping accelerator test: GCP zone has no available GPU resources (STOCKOUT)")
+		}
+		Expect(response.Error).To(BeNil())
+		vmCID = response.Result.(string)
 		assertValidVM(vmCID, func(instance *compute.Instance) {
 			expectedAcceleratorTypeLink := fmt.Sprintf("https://www.googleapis.com/compute/v1/projects/%v/zones/%v/acceleratorTypes/nvidia-tesla-t4", googleProject, zone)
 			Expect(instance.GuestAccelerators[0].AcceleratorType).To(Equal(expectedAcceleratorTypeLink))
