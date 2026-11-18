@@ -3,7 +3,6 @@ groups:
   - name: bosh-google-cpi-release
     jobs:
       - test-unit
-      - setup-infrastructure
       - deploy-ubuntu-and-run-tests
       - pre-release-fan-in
       - automatically-release-new-patch
@@ -29,7 +28,7 @@ jobs:
         file: ci/ci/tasks/unit-tests.yml
         image: google-cpi-registry-image
 
-  - name: setup-infrastructure
+  - name: deploy-ubuntu-and-run-tests
     serial_groups: [integration]
     plan:
       - in_parallel:
@@ -39,8 +38,17 @@ jobs:
         - get: stemcell
           resource: google-ubuntu-stemcell
           trigger: true
+        - get: bosh-cli
+          params:
+            globs:
+            - 'bosh-cli-*-linux-amd64'
+        - get: bosh-deployment
         - get: ci
+        - get: bosh-shared-ci
         - get: google-cpi-registry-image
+        - get: bosh-cli-registry-image
+        - get: bosh-integration-image
+        - get: bats
       - in_parallel: &delete_orphaned_vms_step
         - task: delete-orphaned-vms
           file: ci/ci/tasks/delete-orphaned-vms.yml
@@ -59,33 +67,6 @@ jobs:
           delete_on_failure: true
       # delete VM created for regional backend service hack
       - in_parallel: *delete_orphaned_vms_step
-
-  - name: deploy-ubuntu-and-run-tests
-    serial_groups: [integration]
-    plan:
-      - in_parallel:
-        - get: bosh-google-cpi-release
-          trigger: true
-          passed: [setup-infrastructure]
-        - get: infrastructure
-          resource: infrastructure
-          trigger: true
-          passed: [setup-infrastructure]
-        - get: stemcell
-          resource: google-ubuntu-stemcell
-          trigger: true
-          passed: [setup-infrastructure]
-        - get: bosh-cli
-          params:
-            globs:
-            - 'bosh-cli-*-linux-amd64'
-        - get: bosh-deployment
-        - get: ci
-        - get: bosh-shared-ci
-        - get: google-cpi-registry-image
-        - get: bosh-cli-registry-image
-        - get: bosh-integration-image
-        - get: bats
       - task: build-release
         file: bosh-shared-ci/tasks/release/create-dev-release.yml
         image: bosh-cli-registry-image
