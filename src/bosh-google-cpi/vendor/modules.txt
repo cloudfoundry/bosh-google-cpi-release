@@ -28,7 +28,7 @@ github.com/bmatcuk/doublestar
 # github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cloudfoundry/bosh-utils v0.0.675
+# github.com/cloudfoundry/bosh-utils v0.0.676
 ## explicit; go 1.26.11
 github.com/cloudfoundry/bosh-utils/errors
 github.com/cloudfoundry/bosh-utils/logger
@@ -61,6 +61,8 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
+# github.com/google/pprof v0.0.0-20261118010117-084b33a85f63
+## explicit; go 1.26.0
 # github.com/google/s2a-go v0.1.11
 ## explicit; go 1.20
 github.com/google/s2a-go
@@ -100,8 +102,8 @@ github.com/googleapis/gax-go/v2/callctx
 github.com/googleapis/gax-go/v2/internal
 github.com/googleapis/gax-go/v2/internallog
 github.com/googleapis/gax-go/v2/internallog/internal
-# github.com/kr/text v0.2.0
-## explicit
+# github.com/kr/pretty v0.3.1
+## explicit; go 1.12
 # github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 ## explicit
 github.com/nu7hatch/gouuid
@@ -160,8 +162,8 @@ github.com/onsi/gomega/matchers/support/goraph/util
 github.com/onsi/gomega/types
 # github.com/rogpeppe/go-internal v1.16.0
 ## explicit; go 1.25
-# go.opentelemetry.io/auto/sdk v1.2.1
-## explicit; go 1.24.0
+# go.opentelemetry.io/auto/sdk v1.2.2
+## explicit; go 1.25.0
 go.opentelemetry.io/auto/sdk
 go.opentelemetry.io/auto/sdk/internal/telemetry
 # go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0
@@ -213,7 +215,7 @@ golang.org/x/crypto/cryptobyte/asn1
 golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
-# golang.org/x/net v0.62.0
+# golang.org/x/net v0.63.0
 ## explicit; go 1.26.0
 golang.org/x/net/html
 golang.org/x/net/html/atom
@@ -266,11 +268,11 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/tools v0.52.0
+# golang.org/x/tools v0.53.0
 ## explicit; go 1.26.0
 golang.org/x/tools/go/ast/edge
 golang.org/x/tools/go/ast/inspector
-# google.golang.org/api v0.315.0
+# google.golang.org/api v0.316.0
 ## explicit; go 1.26.0
 google.golang.org/api/cloudresourcemanager/v1
 google.golang.org/api/compute/v0.beta
@@ -288,11 +290,11 @@ google.golang.org/api/option
 google.golang.org/api/option/internaloption
 google.golang.org/api/storage/v1
 google.golang.org/api/transport/http
-# google.golang.org/genproto v0.0.0-20261110000943-09e21b237f2c
+# google.golang.org/genproto v0.0.0-20261118221215-c8830f628b3f
 ## explicit; go 1.26.0
-# google.golang.org/genproto/googleapis/api v0.0.0-20261110000943-09e21b237f2c
+# google.golang.org/genproto/googleapis/api v0.0.0-20261118221215-c8830f628b3f
 ## explicit; go 1.26.0
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20261110000943-09e21b237f2c
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20261118221215-c8830f628b3f
 ## explicit; go 1.26.0
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
